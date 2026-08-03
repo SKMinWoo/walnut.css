@@ -1,0 +1,170 @@
+/* ═══════════════════════════════════════════════════
+   01 — TOKENS
+   Type-safe design tokens via @property.
+   Entire palette generated from oklch().
+   Default theme: Café (warm walnut darks, bone lights).
+═══════════════════════════════════════════════════ */
+
+/* ─── Animatable custom properties ─── */
+@property --wal-hue {
+  syntax: "<number>";
+  inherits: true;
+  initial-value: 55;
+}
+@property --wal-chroma {
+  syntax: "<number>";
+  inherits: true;
+  initial-value: 0.04;
+}
+@property --wal-accent-hue {
+  syntax: "<number>";
+  inherits: true;
+  initial-value: 25;
+}
+@property --wal-gold-hue {
+  syntax: "<number>";
+  inherits: true;
+  initial-value: 85;
+}
+@property --wal-olive-hue {
+  syntax: "<number>";
+  inherits: true;
+  initial-value: 130;
+}
+@property --wal-radius {
+  syntax: "<length>";
+  inherits: true;
+  initial-value: 12px;
+}
+
+/* ─── CAFÉ PALETTE (dark default) ─── */
+:root {
+  /* Core surface scale — derived from hue + chroma */
+  --wal-bg:           oklch(16% var(--wal-chroma) var(--wal-hue));
+  --wal-bg-subtle:    oklch(19% var(--wal-chroma) var(--wal-hue));
+  --wal-surface:      oklch(22% calc(var(--wal-chroma) + 0.005) var(--wal-hue));
+  --wal-surface-2:    oklch(26% calc(var(--wal-chroma) + 0.008) var(--wal-hue));
+  --wal-line:         oklch(32% 0.025 var(--wal-hue));
+  --wal-line-soft:    oklch(28% 0.02 var(--wal-hue));
+
+  /* Text scale */
+  --wal-text:         oklch(92% 0.015 var(--wal-hue));
+  --wal-text-soft:    oklch(68% 0.03 var(--wal-hue));
+  --wal-text-muted:   oklch(52% 0.025 var(--wal-hue));
+
+  /* Accent: terracotta */
+  --wal-accent:       oklch(62% 0.17 var(--wal-accent-hue));
+  --wal-accent-hover: oklch(68% 0.19 var(--wal-accent-hue));
+  --wal-accent-soft:  oklch(62% 0.17 var(--wal-accent-hue) / 0.12);
+  --wal-accent-fg:    oklch(96% 0.01 var(--wal-accent-hue));
+
+  /* Secondary: goldenrod */
+  --wal-gold:         oklch(75% 0.15 var(--wal-gold-hue));
+  --wal-gold-soft:    oklch(75% 0.15 var(--wal-gold-hue) / 0.15);
+
+  /* Tertiary: olive / botanical green */
+  --wal-olive:        oklch(55% 0.10 var(--wal-olive-hue));
+  --wal-olive-soft:   oklch(55% 0.10 var(--wal-olive-hue) / 0.12);
+
+  /* Functional */
+  --wal-success:      oklch(65% 0.16 145);
+  --wal-warning:      oklch(75% 0.15 85);
+  --wal-danger:       oklch(62% 0.20 25);
+
+  /* Shadows */
+  --wal-shadow:       0 20px 44px -18px oklch(10% 0.02 var(--wal-hue) / 0.45);
+  --wal-shadow-sm:    0 4px 12px -4px oklch(10% 0.02 var(--wal-hue) / 0.3);
+  --wal-shadow-lg:    0 32px 64px -24px oklch(8% 0.02 var(--wal-hue) / 0.55);
+
+  /* Radius */
+  --wal-radius:       12px;
+  --wal-radius-sm:    6px;
+  --wal-radius-lg:    18px;
+  --wal-radius-full:  999px;
+
+  /* Spacing scale */
+  --wal-space-xs:     0.25rem;
+  --wal-space-sm:     0.5rem;
+  --wal-space-md:     1rem;
+  --wal-space-lg:     1.5rem;
+  --wal-space-xl:     2.5rem;
+  --wal-space-2xl:    4rem;
+  --wal-space-3xl:    6rem;
+
+  /* Transition presets */
+  --wal-ease:         cubic-bezier(0.16, 1, 0.3, 1);
+  --wal-duration:     0.2s;
+  --wal-duration-slow: 0.4s;
+
+  /* Navbar */
+  --wal-nav-h:        64px;
+}
+
+/* ─── CAFÉ LIGHT MODE ─── */
+:root[data-theme="light"],
+.wal-light {
+  --wal-bg:           oklch(93% 0.025 var(--wal-hue));
+  --wal-bg-subtle:    oklch(90% 0.03 var(--wal-hue));
+  --wal-surface:      oklch(97% 0.015 var(--wal-hue));
+  --wal-surface-2:    oklch(91% 0.025 var(--wal-hue));
+  --wal-line:         oklch(84% 0.03 var(--wal-hue));
+  --wal-line-soft:    oklch(88% 0.02 var(--wal-hue));
+
+  --wal-text:         oklch(20% 0.03 var(--wal-hue));
+  --wal-text-soft:    oklch(42% 0.04 var(--wal-hue));
+  --wal-text-muted:   oklch(58% 0.03 var(--wal-hue));
+
+  --wal-accent:       oklch(52% 0.18 var(--wal-accent-hue));
+  --wal-accent-hover: oklch(46% 0.20 var(--wal-accent-hue));
+  --wal-accent-fg:    oklch(97% 0.01 var(--wal-accent-hue));
+
+  --wal-shadow:       0 20px 44px -18px oklch(50% 0.03 var(--wal-hue) / 0.18);
+  --wal-shadow-sm:    0 4px 12px -4px oklch(50% 0.03 var(--wal-hue) / 0.12);
+  --wal-shadow-lg:    0 32px 64px -24px oklch(50% 0.03 var(--wal-hue) / 0.22);
+}
+
+/* Auto light mode from system preference */
+@media (prefers-color-scheme: light) {
+  :root:not([data-theme="dark"]):not(.wal-dark) {
+    --wal-bg:           oklch(93% 0.025 var(--wal-hue));
+    --wal-bg-subtle:    oklch(90% 0.03 var(--wal-hue));
+    --wal-surface:      oklch(97% 0.015 var(--wal-hue));
+    --wal-surface-2:    oklch(91% 0.025 var(--wal-hue));
+    --wal-line:         oklch(84% 0.03 var(--wal-hue));
+    --wal-line-soft:    oklch(88% 0.02 var(--wal-hue));
+
+    --wal-text:         oklch(20% 0.03 var(--wal-hue));
+    --wal-text-soft:    oklch(42% 0.04 var(--wal-hue));
+    --wal-text-muted:   oklch(58% 0.03 var(--wal-hue));
+
+    --wal-accent:       oklch(52% 0.18 var(--wal-accent-hue));
+    --wal-accent-hover: oklch(46% 0.20 var(--wal-accent-hue));
+    --wal-accent-fg:    oklch(97% 0.01 var(--wal-accent-hue));
+
+    --wal-shadow:       0 20px 44px -18px oklch(50% 0.03 var(--wal-hue) / 0.18);
+    --wal-shadow-sm:    0 4px 12px -4px oklch(50% 0.03 var(--wal-hue) / 0.12);
+    --wal-shadow-lg:    0 32px 64px -24px oklch(50% 0.03 var(--wal-hue) / 0.22);
+  }
+}
+
+
+/* ─── TYPOGRAPHY ─── */
+:root {
+  /* Font stacks — users override these vars */
+  --wal-font-display: "Jost", Futura, system-ui, sans-serif;
+  --wal-font-body:    "Inter", system-ui, sans-serif;
+  --wal-font-mono:    "DM Mono", ui-monospace, "Cascadia Code", monospace;
+  --wal-font-serif:   "Courier Prime", Courier, monospace;
+
+  /* Type scale — minor third (1.2) */
+  --wal-text-xs:   0.694rem;   /* ~11.1px */
+  --wal-text-sm:   0.833rem;   /* ~13.3px */
+  --wal-text-base: 1rem;       /* 16px */
+  --wal-text-md:   1.2rem;     /* ~19.2px */
+  --wal-text-lg:   1.44rem;    /* ~23px */
+  --wal-text-xl:   1.728rem;   /* ~27.6px */
+  --wal-text-2xl:  2.074rem;   /* ~33.2px */
+  --wal-text-3xl:  2.488rem;   /* ~39.8px */
+  --wal-text-4xl:  2.986rem;   /* ~47.8px */
+  --wal-text-5xl:  3.583rem;   /* ~57.3px */
+}

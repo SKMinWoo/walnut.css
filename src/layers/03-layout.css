@@ -1,0 +1,271 @@
+/* ═══════════════════════════════════════════════════
+   03 — LAYOUT
+   Composable layout primitives driven by container
+   queries. Every component that needs responsive
+   awareness becomes its own inline-size container.
+   No media queries for component sizing — only
+   @container.  Pure CSS, zero JavaScript.
+═══════════════════════════════════════════════════ */
+
+
+/* ─── .wal-wrap ─────────────────────────────────
+   Max-width content container, horizontally centered.
+   Acts as a container query context so children can
+   respond to the wrapper width, not the viewport.
+   ────────────────────────────────────────────── */
+.wal-wrap {
+  width: 100%;
+  max-width: 1140px;
+  margin-inline: auto;
+
+  /* Responsive padding: 1rem at narrow → 3rem at wide */
+  padding-inline: clamp(var(--wal-space-md), 5cqi, var(--wal-space-3xl));
+
+  /* Establish container context */
+  container-type: inline-size;
+  container-name: wrap;
+}
+
+
+/* ─── .wal-grid ─────────────────────────────────
+   Intrinsic CSS Grid with auto-fill columns by
+   default.  Explicit column variants collapse via
+   container queries for true component-level
+   responsiveness.
+   ────────────────────────────────────────────── */
+.wal-grid {
+  display: grid;
+  gap: var(--wal-space-lg);
+
+  /* Auto-fill: columns never narrower than 280px */
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 280px), 1fr));
+
+  /* Container context for column variants */
+  container-type: inline-size;
+  container-name: grid;
+
+
+  /* ── Gap modifiers ── */
+
+  &.wal-gap-sm { gap: var(--wal-space-sm); }
+  &.wal-gap-md { gap: var(--wal-space-md); }
+  &.wal-gap-lg { gap: var(--wal-space-xl); }
+
+
+  /* ── Explicit column variants ──
+     Each switches to single-column below its own
+     container-query breakpoint, chosen to prevent
+     columns from becoming uncomfortably narrow.  */
+
+  &.wal-cols-2 {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  &.wal-cols-3 {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  &.wal-cols-4 {
+    grid-template-columns: repeat(4, 1fr);
+  }
+
+  &.wal-cols-5 {
+    grid-template-columns: repeat(5, 1fr);
+  }
+}
+
+/* ── Container-query collapse rules ──
+   The grid responds to its own width, not the viewport.
+   Breakpoints are tuned so columns stay ≥ ~240px.  */
+
+/* 2-column → 1 when grid < 480px */
+@container grid (max-width: 480px) {
+  .wal-grid.wal-cols-2 {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* 3-column → 1 when grid < 520px */
+@container grid (max-width: 520px) {
+  .wal-grid.wal-cols-3 {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* 3-column → 2 when grid is mid-range (520–780px) */
+@container grid (min-width: 521px) and (max-width: 780px) {
+  .wal-grid.wal-cols-3 {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* 4-column → 1 when grid < 480px */
+@container grid (max-width: 480px) {
+  .wal-grid.wal-cols-4 {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* 4-column → 2 when grid is mid-range (480–860px) */
+@container grid (min-width: 481px) and (max-width: 860px) {
+  .wal-grid.wal-cols-4 {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* 5-column → 1 when grid < 480px */
+@container grid (max-width: 480px) {
+  .wal-grid.wal-cols-5 {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* 5-column → 2 when grid 480–720px */
+@container grid (min-width: 481px) and (max-width: 720px) {
+  .wal-grid.wal-cols-5 {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* 5-column → 3 when grid 721–1000px */
+@container grid (min-width: 721px) and (max-width: 1000px) {
+  .wal-grid.wal-cols-5 {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+
+/* ─── .wal-flex ──────────────────────────────────
+   Flexbox row with gap. Composable modifiers for
+   direction, wrapping, and alignment.
+   ────────────────────────────────────────────── */
+.wal-flex {
+  display: flex;
+  gap: var(--wal-space-md);
+
+  /* Direction */
+  &.wal-flex-col  { flex-direction: column; }
+
+  /* Wrapping */
+  &.wal-flex-wrap { flex-wrap: wrap; }
+
+  /* Alignment presets */
+  &.wal-flex-center {
+    align-items: center;
+    justify-content: center;
+  }
+
+  &.wal-flex-between {
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  &.wal-flex-end {
+    justify-content: flex-end;
+    align-items: center;
+  }
+
+  /* Gap modifiers (re-use the same class names as grid) */
+  &.wal-gap-sm { gap: var(--wal-space-sm); }
+  &.wal-gap-md { gap: var(--wal-space-md); }
+  &.wal-gap-lg { gap: var(--wal-space-xl); }
+}
+
+
+/* ─── .wal-stack ─────────────────────────────────
+   Vertical rhythm primitive.  Every direct child
+   is separated by a consistent gap — the
+   "lobotomized owl" approach, modernized with gap.
+   ────────────────────────────────────────────── */
+.wal-stack {
+  display: flex;
+  flex-direction: column;
+  gap: var(--wal-space-lg);
+
+  /* Size variants */
+  &.wal-gap-sm { gap: var(--wal-space-sm); }
+  &.wal-gap-md { gap: var(--wal-space-md); }
+  &.wal-gap-lg { gap: var(--wal-space-xl); }
+}
+
+
+/* ─── .wal-cluster ───────────────────────────────
+   Horizontal cluster that wraps naturally.
+   Perfect for tag lists, pill groups, and inline
+   action bars.
+   ────────────────────────────────────────────── */
+.wal-cluster {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--wal-space-sm);
+  align-items: center;
+
+  /* Size variants */
+  &.wal-gap-sm { gap: var(--wal-space-xs); }
+  &.wal-gap-md { gap: var(--wal-space-md); }
+  &.wal-gap-lg { gap: var(--wal-space-lg); }
+}
+
+
+/* ─── .wal-sidebar ───────────────────────────────
+   Two-panel layout: one fixed-width sidebar, one
+   fluid content area.  Wraps to stacked column at
+   narrow container widths via container query.
+   Uses the "flexbox holy grail" trick with
+   flex-basis + flex-grow for the fluid side.
+   ────────────────────────────────────────────── */
+.wal-sidebar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--wal-space-xl);
+
+  container-type: inline-size;
+  container-name: sidebar;
+
+  /* Sidebar panel (first child by convention) */
+  & > :first-child {
+    flex-basis: 260px;
+    flex-grow: 0;
+    flex-shrink: 0;
+  }
+
+  /* Content panel fills remaining space */
+  & > :last-child {
+    flex-basis: 0;
+    flex-grow: 999;
+    min-width: 55%;
+  }
+}
+
+/* Collapse to single-column when container < 540px */
+@container sidebar (max-width: 540px) {
+  .wal-sidebar {
+    flex-direction: column;
+
+    & > :first-child {
+      flex-basis: auto;
+    }
+
+    & > :last-child {
+      min-width: 0;
+    }
+  }
+}
+
+
+/* ─── .wal-section ───────────────────────────────
+   Top-level page section with generous vertical
+   rhythm and a subtle top border.  Mirrors the
+   cinematic specimen style: quiet separation
+   between scenes.
+   ────────────────────────────────────────────── */
+.wal-section {
+  padding-block: var(--wal-space-3xl);
+  border-top: 1px solid var(--wal-line);
+
+  /* First section on the page needs no border */
+  &:first-child,
+  &:first-of-type {
+    border-top: none;
+  }
+}

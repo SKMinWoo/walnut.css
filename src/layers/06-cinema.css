@@ -1,0 +1,202 @@
+/* ═══════════════════════════════════════════════════════════════════════
+   06-cinema.css
+   Scroll-driven animations and cinematic motion effects.
+   ═══════════════════════════════════════════════════════════════════════ */
+
+@media (prefers-reduced-motion: no-preference) {
+  
+  /* ── Scroll-driven Reveals ─────────────────────────────────────────── */
+  
+  /* Shared keyframes for reveals */
+  @keyframes wal-reveal-fade-up {
+    from {
+      opacity: 0;
+      transform: translateY(30px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes wal-reveal-slide-left {
+    from {
+      opacity: 0;
+      transform: translateX(-50px);
+    }
+    to {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
+
+  @keyframes wal-reveal-slide-right {
+    from {
+      opacity: 0;
+      transform: translateX(50px);
+    }
+    to {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
+
+  @keyframes wal-reveal-scale-up {
+    from {
+      opacity: 0;
+      transform: scale(0.9);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+
+  .wal-reveal,
+  .wal-reveal-left,
+  .wal-reveal-right,
+  .wal-reveal-scale {
+    animation-timing-function: var(--wal-ease, cubic-bezier(0.2, 0.8, 0.2, 1));
+    animation-fill-mode: both;
+    /* Use view timeline for scroll-driven animations */
+    animation-timeline: view();
+    /* Natural entrance feel */
+    animation-range: entry 10% cover 35%;
+  }
+
+  .wal-reveal {
+    animation-name: wal-reveal-fade-up;
+  }
+
+  .wal-reveal-left {
+    animation-name: wal-reveal-slide-left;
+  }
+
+  .wal-reveal-right {
+    animation-name: wal-reveal-slide-right;
+  }
+
+  .wal-reveal-scale {
+    animation-name: wal-reveal-scale-up;
+  }
+
+  /* ── Scroll Progress ───────────────────────────────────────────────── */
+  
+  @keyframes wal-progress-grow {
+    from { transform: scaleX(0); }
+    to { transform: scaleX(1); }
+  }
+
+  .wal-progress-bar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 3px;
+    background: var(--wal-accent);
+    transform-origin: 0 50%;
+    animation: wal-progress-grow linear;
+    animation-timeline: scroll();
+    z-index: 1000;
+  }
+
+  /* ── Parallax ──────────────────────────────────────────────────────── */
+
+  @keyframes wal-parallax-move {
+    from { transform: translateY(-10%); }
+    to { transform: translateY(10%); }
+  }
+
+  .wal-parallax {
+    animation: wal-parallax-move linear;
+    animation-timeline: scroll();
+  }
+
+  /* ── View Transitions ──────────────────────────────────────────────── */
+
+  /* View transition name helpers */
+  .wal-transition-name-hero { view-transition-name: wal-hero; }
+  .wal-transition-name-header { view-transition-name: wal-header; }
+  .wal-transition-name-image { view-transition-name: wal-image; }
+  .wal-transition-name-title { view-transition-name: wal-title; }
+
+  /* Cinematic cross-fade for old/new view transitions */
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    animation-duration: var(--wal-duration-slow, 0.8s);
+    animation-timing-function: var(--wal-ease, cubic-bezier(0.4, 0, 0.2, 1));
+  }
+
+  ::view-transition-old(*) {
+    animation-name: wal-breathe-out;
+  }
+  
+  ::view-transition-new(*) {
+    animation-name: wal-breathe-in;
+  }
+
+  @keyframes wal-breathe-out {
+    to { opacity: 0; transform: scale(0.98); }
+  }
+
+  @keyframes wal-breathe-in {
+    from { opacity: 0; transform: scale(1.02); }
+  }
+
+  /* ── Cinematic Keyframes ───────────────────────────────────────────── */
+
+  @keyframes wal-drift {
+    0% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
+    100% { transform: translateY(0); }
+  }
+
+  @keyframes wal-pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.03); }
+    100% { transform: scale(1); }
+  }
+
+  @keyframes wal-shimmer {
+    0% { background-position: -200% center; }
+    100% { background-position: 200% center; }
+  }
+
+  @keyframes wal-breathe {
+    0% { opacity: 1; }
+    50% { opacity: 0.7; }
+    100% { opacity: 1; }
+  }
+
+  @keyframes wal-letterbox-open {
+    0% { transform: scaleY(1); }
+    100% { transform: scaleY(0); }
+  }
+
+  /* ── Utility Animation Classes ─────────────────────────────────────── */
+
+  .wal-animate-drift {
+    animation: wal-drift 4s var(--wal-ease, ease-in-out) infinite;
+  }
+
+  .wal-animate-pulse {
+    animation: wal-pulse 3s var(--wal-ease, ease-in-out) infinite;
+  }
+
+  .wal-animate-breathe {
+    animation: wal-breathe 5s var(--wal-ease, ease-in-out) infinite;
+  }
+
+  /* Animation delays */
+  .wal-delay-100 { animation-delay: 100ms; }
+  .wal-delay-200 { animation-delay: 200ms; }
+  .wal-delay-300 { animation-delay: 300ms; }
+  .wal-delay-400 { animation-delay: 400ms; }
+  .wal-delay-500 { animation-delay: 500ms; }
+  .wal-delay-600 { animation-delay: 600ms; }
+  .wal-delay-700 { animation-delay: 700ms; }
+  .wal-delay-800 { animation-delay: 800ms; }
+  .wal-delay-900 { animation-delay: 900ms; }
+  .wal-delay-1000 { animation-delay: 1000ms; }
+
+}

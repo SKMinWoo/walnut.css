@@ -1,0 +1,34 @@
+{
+  "name": "walnut.css",
+  "version": "0.1.0",
+  "description": "A cinematic, nature-inspired CSS framework built on modern platform APIs. Café warmth, botanical texture, zero JavaScript.",
+  "keywords": [
+    "css",
+    "css-framework",
+    "oklch",
+    "container-queries",
+    "scroll-animations",
+    "design-system",
+    "dark-mode",
+    "cinematic",
+    "modern-css"
+  ],
+  "author": "Alex Kim",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/SKMinWoo/walnut.css"
+  },
+  "homepage": "https://github.com/SKMinWoo/walnut.css",
+  "main": "dist/walnut.css",
+  "style": "dist/walnut.css",
+  "files": [
+    "dist/",
+    "src/"
+  ],
+  "scripts": {
+    "build": "node build.js",
+    "dev": "npx serve docs"
+  },
+  "devDependencies": {}
+}

@@ -1,0 +1,249 @@
+/* ═══════════════════════════════════════════════════════════════════════
+   05-utilities.css
+   Minimal utility classes for layout, typography, color, and more.
+   ═══════════════════════════════════════════════════════════════════════ */
+
+/* ── Spacing Utilities ───────────────────────────────────────────────── */
+/* Margins */
+.wal-m-xs { margin: var(--wal-space-xs); }
+.wal-m-sm { margin: var(--wal-space-sm); }
+.wal-m-md { margin: var(--wal-space-md); }
+.wal-m-lg { margin: var(--wal-space-lg); }
+.wal-m-xl { margin: var(--wal-space-xl); }
+.wal-m-2xl { margin: var(--wal-space-2xl); }
+.wal-m-3xl { margin: var(--wal-space-3xl); }
+.wal-m-0 { margin: 0; }
+
+.wal-mt-xs { margin-top: var(--wal-space-xs); }
+.wal-mt-sm { margin-top: var(--wal-space-sm); }
+.wal-mt-md { margin-top: var(--wal-space-md); }
+.wal-mt-lg { margin-top: var(--wal-space-lg); }
+.wal-mt-xl { margin-top: var(--wal-space-xl); }
+.wal-mt-2xl { margin-top: var(--wal-space-2xl); }
+.wal-mt-3xl { margin-top: var(--wal-space-3xl); }
+.wal-mt-0 { margin-top: 0; }
+
+.wal-mb-xs { margin-bottom: var(--wal-space-xs); }
+.wal-mb-sm { margin-bottom: var(--wal-space-sm); }
+.wal-mb-md { margin-bottom: var(--wal-space-md); }
+.wal-mb-lg { margin-bottom: var(--wal-space-lg); }
+.wal-mb-xl { margin-bottom: var(--wal-space-xl); }
+.wal-mb-2xl { margin-bottom: var(--wal-space-2xl); }
+.wal-mb-3xl { margin-bottom: var(--wal-space-3xl); }
+.wal-mb-0 { margin-bottom: 0; }
+
+.wal-ml-xs { margin-left: var(--wal-space-xs); }
+.wal-ml-sm { margin-left: var(--wal-space-sm); }
+.wal-ml-md { margin-left: var(--wal-space-md); }
+.wal-ml-lg { margin-left: var(--wal-space-lg); }
+.wal-ml-xl { margin-left: var(--wal-space-xl); }
+.wal-ml-2xl { margin-left: var(--wal-space-2xl); }
+.wal-ml-3xl { margin-left: var(--wal-space-3xl); }
+.wal-ml-0 { margin-left: 0; }
+
+.wal-mr-xs { margin-right: var(--wal-space-xs); }
+.wal-mr-sm { margin-right: var(--wal-space-sm); }
+.wal-mr-md { margin-right: var(--wal-space-md); }
+.wal-mr-lg { margin-right: var(--wal-space-lg); }
+.wal-mr-xl { margin-right: var(--wal-space-xl); }
+.wal-mr-2xl { margin-right: var(--wal-space-2xl); }
+.wal-mr-3xl { margin-right: var(--wal-space-3xl); }
+.wal-mr-0 { margin-right: 0; }
+
+.wal-mx-xs { margin-inline: var(--wal-space-xs); }
+.wal-mx-sm { margin-inline: var(--wal-space-sm); }
+.wal-mx-md { margin-inline: var(--wal-space-md); }
+.wal-mx-lg { margin-inline: var(--wal-space-lg); }
+.wal-mx-xl { margin-inline: var(--wal-space-xl); }
+.wal-mx-2xl { margin-inline: var(--wal-space-2xl); }
+.wal-mx-3xl { margin-inline: var(--wal-space-3xl); }
+.wal-mx-0 { margin-inline: 0; }
+
+.wal-my-xs { margin-block: var(--wal-space-xs); }
+.wal-my-sm { margin-block: var(--wal-space-sm); }
+.wal-my-md { margin-block: var(--wal-space-md); }
+.wal-my-lg { margin-block: var(--wal-space-lg); }
+.wal-my-xl { margin-block: var(--wal-space-xl); }
+.wal-my-2xl { margin-block: var(--wal-space-2xl); }
+.wal-my-3xl { margin-block: var(--wal-space-3xl); }
+.wal-my-0 { margin-block: 0; }
+
+/* Padding */
+.wal-p-xs { padding: var(--wal-space-xs); }
+.wal-p-sm { padding: var(--wal-space-sm); }
+.wal-p-md { padding: var(--wal-space-md); }
+.wal-p-lg { padding: var(--wal-space-lg); }
+.wal-p-xl { padding: var(--wal-space-xl); }
+.wal-p-2xl { padding: var(--wal-space-2xl); }
+.wal-p-3xl { padding: var(--wal-space-3xl); }
+.wal-p-0 { padding: 0; }
+
+.wal-pt-xs { padding-top: var(--wal-space-xs); }
+.wal-pt-sm { padding-top: var(--wal-space-sm); }
+.wal-pt-md { padding-top: var(--wal-space-md); }
+.wal-pt-lg { padding-top: var(--wal-space-lg); }
+.wal-pt-xl { padding-top: var(--wal-space-xl); }
+.wal-pt-2xl { padding-top: var(--wal-space-2xl); }
+.wal-pt-3xl { padding-top: var(--wal-space-3xl); }
+.wal-pt-0 { padding-top: 0; }
+
+.wal-pb-xs { padding-bottom: var(--wal-space-xs); }
+.wal-pb-sm { padding-bottom: var(--wal-space-sm); }
+.wal-pb-md { padding-bottom: var(--wal-space-md); }
+.wal-pb-lg { padding-bottom: var(--wal-space-lg); }
+.wal-pb-xl { padding-bottom: var(--wal-space-xl); }
+.wal-pb-2xl { padding-bottom: var(--wal-space-2xl); }
+.wal-pb-3xl { padding-bottom: var(--wal-space-3xl); }
+.wal-pb-0 { padding-bottom: 0; }
+
+.wal-pl-xs { padding-left: var(--wal-space-xs); }
+.wal-pl-sm { padding-left: var(--wal-space-sm); }
+.wal-pl-md { padding-left: var(--wal-space-md); }
+.wal-pl-lg { padding-left: var(--wal-space-lg); }
+.wal-pl-xl { padding-left: var(--wal-space-xl); }
+.wal-pl-2xl { padding-left: var(--wal-space-2xl); }
+.wal-pl-3xl { padding-left: var(--wal-space-3xl); }
+.wal-pl-0 { padding-left: 0; }
+
+.wal-pr-xs { padding-right: var(--wal-space-xs); }
+.wal-pr-sm { padding-right: var(--wal-space-sm); }
+.wal-pr-md { padding-right: var(--wal-space-md); }
+.wal-pr-lg { padding-right: var(--wal-space-lg); }
+.wal-pr-xl { padding-right: var(--wal-space-xl); }
+.wal-pr-2xl { padding-right: var(--wal-space-2xl); }
+.wal-pr-3xl { padding-right: var(--wal-space-3xl); }
+.wal-pr-0 { padding-right: 0; }
+
+.wal-px-xs { padding-inline: var(--wal-space-xs); }
+.wal-px-sm { padding-inline: var(--wal-space-sm); }
+.wal-px-md { padding-inline: var(--wal-space-md); }
+.wal-px-lg { padding-inline: var(--wal-space-lg); }
+.wal-px-xl { padding-inline: var(--wal-space-xl); }
+.wal-px-2xl { padding-inline: var(--wal-space-2xl); }
+.wal-px-3xl { padding-inline: var(--wal-space-3xl); }
+.wal-px-0 { padding-inline: 0; }
+
+.wal-py-xs { padding-block: var(--wal-space-xs); }
+.wal-py-sm { padding-block: var(--wal-space-sm); }
+.wal-py-md { padding-block: var(--wal-space-md); }
+.wal-py-lg { padding-block: var(--wal-space-lg); }
+.wal-py-xl { padding-block: var(--wal-space-xl); }
+.wal-py-2xl { padding-block: var(--wal-space-2xl); }
+.wal-py-3xl { padding-block: var(--wal-space-3xl); }
+.wal-py-0 { padding-block: 0; }
+
+/* Gap */
+.wal-gap-xs { gap: var(--wal-space-xs); }
+.wal-gap-sm { gap: var(--wal-space-sm); }
+.wal-gap-md { gap: var(--wal-space-md); }
+.wal-gap-lg { gap: var(--wal-space-lg); }
+.wal-gap-xl { gap: var(--wal-space-xl); }
+.wal-gap-2xl { gap: var(--wal-space-2xl); }
+.wal-gap-3xl { gap: var(--wal-space-3xl); }
+.wal-gap-0 { gap: 0; }
+
+/* ── Typography Utilities ────────────────────────────────────────────── */
+/* Font Families */
+.wal-font-display { font-family: var(--wal-font-display); }
+.wal-font-body { font-family: var(--wal-font-body); }
+.wal-font-mono { font-family: var(--wal-font-mono); }
+.wal-font-serif { font-family: var(--wal-font-serif); }
+
+/* Sizes */
+.wal-text-xs { font-size: var(--wal-text-xs); }
+.wal-text-sm { font-size: var(--wal-text-sm); }
+.wal-text-base { font-size: var(--wal-text-base); }
+.wal-text-lg { font-size: var(--wal-text-lg); }
+.wal-text-xl { font-size: var(--wal-text-xl); }
+.wal-text-2xl { font-size: var(--wal-text-2xl); }
+.wal-text-3xl { font-size: var(--wal-text-3xl); }
+.wal-text-4xl { font-size: var(--wal-text-4xl); }
+.wal-text-5xl { font-size: var(--wal-text-5xl); }
+
+/* Weights */
+.wal-weight-300 { font-weight: 300; }
+.wal-weight-400 { font-weight: 400; }
+.wal-weight-500 { font-weight: 500; }
+.wal-weight-600 { font-weight: 600; }
+.wal-weight-700 { font-weight: 700; }
+.wal-weight-800 { font-weight: 800; }
+
+/* Alignment */
+.wal-text-center { text-align: center; }
+.wal-text-left { text-align: left; }
+.wal-text-right { text-align: right; }
+
+/* Transform */
+.wal-uppercase { text-transform: uppercase; }
+.wal-lowercase { text-transform: lowercase; }
+.wal-capitalize { text-transform: capitalize; }
+
+/* Tracking */
+.wal-tracking-tight { letter-spacing: -0.025em; }
+.wal-tracking-normal { letter-spacing: 0; }
+.wal-tracking-wide { letter-spacing: 0.05em; }
+
+/* ── Color Utilities ─────────────────────────────────────────────────── */
+/* Text Colors */
+.wal-color-accent { color: var(--wal-accent); }
+.wal-color-gold { color: var(--wal-gold); }
+.wal-color-olive { color: var(--wal-olive); }
+.wal-color-soft { color: var(--wal-text-soft); }
+.wal-color-muted { color: var(--wal-text-muted); }
+
+/* Backgrounds */
+.wal-bg-surface { background-color: var(--wal-surface); }
+.wal-bg-surface-2 { background-color: var(--wal-surface-2); }
+.wal-bg-accent-soft { background-color: var(--wal-accent-soft); }
+.wal-bg-gold-soft { background-color: var(--wal-gold-soft); }
+.wal-bg-olive-soft { background-color: var(--wal-olive-soft); }
+
+/* ── Display & Visibility ────────────────────────────────────────────── */
+.wal-hidden { display: none; }
+.wal-block { display: block; }
+.wal-inline { display: inline; }
+.wal-inline-block { display: inline-block; }
+.wal-flex { display: flex; }
+.wal-grid { display: grid; }
+
+.wal-sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+/* ── Border & Radius ─────────────────────────────────────────────────── */
+.wal-border { border: 1px solid var(--wal-line); }
+.wal-border-top { border-top: 1px solid var(--wal-line); }
+.wal-border-bottom { border-bottom: 1px solid var(--wal-line); }
+
+.wal-rounded { border-radius: var(--wal-radius); }
+.wal-rounded-sm { border-radius: var(--wal-radius-sm); }
+.wal-rounded-lg { border-radius: var(--wal-radius-lg); }
+.wal-rounded-full { border-radius: var(--wal-radius-full); }
+.wal-rounded-none { border-radius: 0; }
+
+/* ── Misc ────────────────────────────────────────────────────────────── */
+.wal-shadow { box-shadow: var(--wal-shadow); }
+.wal-shadow-sm { box-shadow: var(--wal-shadow-sm); }
+.wal-shadow-lg { box-shadow: var(--wal-shadow-lg); }
+.wal-shadow-none { box-shadow: none; }
+
+.wal-glass {
+  background-color: color-mix(in oklch, var(--wal-surface) 70%, transparent);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+.wal-gradient-text {
+  background: linear-gradient(135deg, var(--wal-accent), var(--wal-gold));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
