@@ -1055,7 +1055,9 @@ mark {
     font-family: var(--wal-font-mono);
     font-size: var(--wal-text-xs);
     padding: 0.2rem 0.6rem;
-    border-radius: var(--wal-radius-full);
+    /* Own token so a consumer with square geometry can flatten chips
+       independently of buttons and badges. */
+    border-radius: var(--wal-chip-radius, var(--wal-radius-full));
     border: 1px solid var(--wal-line);
     background: var(--wal-chip-bg, var(--wal-surface));
     color: var(--wal-chip-color, var(--wal-text-soft));
