@@ -173,19 +173,31 @@ table {
   --wal-card-ink-soft:  oklch(68% 0.03 var(--wal-hue));
   --wal-card-ink-muted: oklch(52% 0.025 var(--wal-hue));
 
+  /* Chroma is a token, not a literal, because the sRGB gamut is not the same
+     width at every hue. The defaults below are tuned for the shipped hues; at
+     62% lightness, for example, c=0.17 is in gamut around terracotta but clips
+     across much of the green–blue arc, where the browser silently flattens it
+     and the rendered colour stops matching the requested hue.
+     Rotating --wal-*-hue far from a shipped theme should therefore come with a
+     lowered chroma. CSS cannot compute the gamut boundary, so a consumer doing
+     dynamic theming needs to set these itself. */
+  --wal-accent-chroma: 0.17;
+  --wal-gold-chroma:   0.15;
+  --wal-olive-chroma:  0.10;
+
   /* Accent: terracotta */
-  --wal-accent:       oklch(62% 0.17 var(--wal-accent-hue));
-  --wal-accent-hover: oklch(68% 0.19 var(--wal-accent-hue));
-  --wal-accent-soft:  oklch(62% 0.17 var(--wal-accent-hue) / 0.12);
+  --wal-accent:       oklch(62% var(--wal-accent-chroma) var(--wal-accent-hue));
+  --wal-accent-hover: oklch(68% calc(var(--wal-accent-chroma) + 0.02) var(--wal-accent-hue));
+  --wal-accent-soft:  oklch(62% var(--wal-accent-chroma) var(--wal-accent-hue) / 0.12);
   --wal-accent-fg:    oklch(96% 0.01 var(--wal-accent-hue));
 
   /* Secondary: goldenrod */
-  --wal-gold:         oklch(75% 0.15 var(--wal-gold-hue));
-  --wal-gold-soft:    oklch(75% 0.15 var(--wal-gold-hue) / 0.15);
+  --wal-gold:         oklch(75% var(--wal-gold-chroma) var(--wal-gold-hue));
+  --wal-gold-soft:    oklch(75% var(--wal-gold-chroma) var(--wal-gold-hue) / 0.15);
 
   /* Tertiary: olive / botanical green */
-  --wal-olive:        oklch(55% 0.10 var(--wal-olive-hue));
-  --wal-olive-soft:   oklch(55% 0.10 var(--wal-olive-hue) / 0.12);
+  --wal-olive:        oklch(55% var(--wal-olive-chroma) var(--wal-olive-hue));
+  --wal-olive-soft:   oklch(55% var(--wal-olive-chroma) var(--wal-olive-hue) / 0.12);
 
   /* Functional */
   --wal-success:      oklch(65% 0.16 145);
@@ -235,8 +247,8 @@ table {
   --wal-text-soft:    oklch(42% 0.04 var(--wal-hue));
   --wal-text-muted:   oklch(58% 0.03 var(--wal-hue));
 
-  --wal-accent:       oklch(52% 0.18 var(--wal-accent-hue));
-  --wal-accent-hover: oklch(46% 0.20 var(--wal-accent-hue));
+  --wal-accent:       oklch(52% var(--wal-accent-chroma) var(--wal-accent-hue));
+  --wal-accent-hover: oklch(46% calc(var(--wal-accent-chroma) + 0.02) var(--wal-accent-hue));
   --wal-accent-fg:    oklch(97% 0.01 var(--wal-accent-hue));
 
   --wal-shadow:       0 20px 44px -18px oklch(50% 0.03 var(--wal-hue) / 0.18);
@@ -258,8 +270,8 @@ table {
     --wal-text-soft:    oklch(42% 0.04 var(--wal-hue));
     --wal-text-muted:   oklch(58% 0.03 var(--wal-hue));
 
-    --wal-accent:       oklch(52% 0.18 var(--wal-accent-hue));
-    --wal-accent-hover: oklch(46% 0.20 var(--wal-accent-hue));
+    --wal-accent:       oklch(52% var(--wal-accent-chroma) var(--wal-accent-hue));
+    --wal-accent-hover: oklch(46% calc(var(--wal-accent-chroma) + 0.02) var(--wal-accent-hue));
     --wal-accent-fg:    oklch(97% 0.01 var(--wal-accent-hue));
 
     --wal-shadow:       0 20px 44px -18px oklch(50% 0.03 var(--wal-hue) / 0.18);
