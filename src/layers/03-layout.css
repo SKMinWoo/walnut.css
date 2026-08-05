@@ -29,9 +29,9 @@
 
 /* ─── .wal-grid ─────────────────────────────────
    Intrinsic CSS Grid with auto-fill columns by
-   default.  Explicit column variants collapse via
-   container queries for true component-level
-   responsiveness.
+   default.  Explicit column variants shed columns
+   intrinsically (auto-fit + minmax), so they respond
+   to their parent's width at any nesting depth.
    ────────────────────────────────────────────── */
 .wal-grid {
   display: grid;
@@ -40,9 +40,15 @@
   /* Auto-fill: columns never narrower than 280px */
   grid-template-columns: repeat(auto-fill, minmax(min(100%, 280px), 1fr));
 
-  /* Container context for column variants */
-  container-type: inline-size;
-  container-name: grid;
+  /* NOTE: deliberately NOT a query container.
+     `@container` resolves against the nearest *ancestor* container — an element
+     can never query itself. The previous `container-type: inline-size` here plus
+     `@container grid { .wal-grid.wal-cols-N { ... } }` below therefore never
+     matched, and the column variants never collapsed at any width. The variants
+     now collapse intrinsically via auto-fit + minmax, which needs no container
+     at all and works at any nesting depth.
+     Removing container-type also drops the implied `contain: layout`, which had
+     made every grid a containing block for `position: fixed` descendants. */
 
 
   /* ── Gap modifiers ── */
@@ -52,87 +58,33 @@
   &.wal-gap-lg { gap: var(--wal-space-xl); }
 
 
-  /* ── Explicit column variants ──
-     Each switches to single-column below its own
-     container-query breakpoint, chosen to prevent
-     columns from becoming uncomfortably narrow.  */
-
+  /* Column variants. `auto-fit` + `minmax(min(100%, Xrem), 1fr)` caps the count
+     at N on wide parents and sheds columns as the parent narrows — the intended
+     behaviour, achieved without a container query. The min track is tuned per
+     variant so columns never get uncomfortably narrow before they wrap. */
   &.wal-cols-2 {
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 22rem), 1fr));
+    max-width: 100%;
   }
 
   &.wal-cols-3 {
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 16rem), 1fr));
   }
 
   &.wal-cols-4 {
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 14rem), 1fr));
   }
 
   &.wal-cols-5 {
-    grid-template-columns: repeat(5, 1fr);
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 11rem), 1fr));
+  }
+
+  &.wal-cols-6 {
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 9rem), 1fr));
   }
 }
 
-/* ── Container-query collapse rules ──
-   The grid responds to its own width, not the viewport.
-   Breakpoints are tuned so columns stay ≥ ~240px.  */
-
-/* 2-column → 1 when grid < 480px */
-@container grid (max-width: 480px) {
-  .wal-grid.wal-cols-2 {
-    grid-template-columns: 1fr;
-  }
-}
-
-/* 3-column → 1 when grid < 520px */
-@container grid (max-width: 520px) {
-  .wal-grid.wal-cols-3 {
-    grid-template-columns: 1fr;
-  }
-}
-
-/* 3-column → 2 when grid is mid-range (520–780px) */
-@container grid (min-width: 521px) and (max-width: 780px) {
-  .wal-grid.wal-cols-3 {
-    grid-template-columns: repeat(2, 1fr);
-  }
-}
-
-/* 4-column → 1 when grid < 480px */
-@container grid (max-width: 480px) {
-  .wal-grid.wal-cols-4 {
-    grid-template-columns: 1fr;
-  }
-}
-
-/* 4-column → 2 when grid is mid-range (480–860px) */
-@container grid (min-width: 481px) and (max-width: 860px) {
-  .wal-grid.wal-cols-4 {
-    grid-template-columns: repeat(2, 1fr);
-  }
-}
-
-/* 5-column → 1 when grid < 480px */
-@container grid (max-width: 480px) {
-  .wal-grid.wal-cols-5 {
-    grid-template-columns: 1fr;
-  }
-}
-
-/* 5-column → 2 when grid 480–720px */
-@container grid (min-width: 481px) and (max-width: 720px) {
-  .wal-grid.wal-cols-5 {
-    grid-template-columns: repeat(2, 1fr);
-  }
-}
-
-/* 5-column → 3 when grid 721–1000px */
-@container grid (min-width: 721px) and (max-width: 1000px) {
-  .wal-grid.wal-cols-5 {
-    grid-template-columns: repeat(3, 1fr);
-  }
-}
+/* Column collapse is intrinsic (see .wal-grid above) — no container queries. */
 
 
 /* ─── .wal-flex ──────────────────────────────────
@@ -219,8 +171,11 @@
   flex-wrap: wrap;
   gap: var(--wal-space-xl);
 
-  container-type: inline-size;
-  container-name: sidebar;
+  /* Not a query container, for the same reason as .wal-grid: the old
+     `@container sidebar` block below queried this element from within itself
+     and never matched. It was also redundant — flex-wrap plus the basis/grow
+     pair below already collapses to a single column once the content panel
+     can no longer hold its 55% floor. */
 
   /* Sidebar panel (first child by convention) */
   & > :first-child {
@@ -237,20 +192,7 @@
   }
 }
 
-/* Collapse to single-column when container < 540px */
-@container sidebar (max-width: 540px) {
-  .wal-sidebar {
-    flex-direction: column;
-
-    & > :first-child {
-      flex-basis: auto;
-    }
-
-    & > :last-child {
-      min-width: 0;
-    }
-  }
-}
+/* Collapse is intrinsic (flex-wrap + flex-basis) — no container query needed. */
 
 
 /* ─── .wal-section ───────────────────────────────

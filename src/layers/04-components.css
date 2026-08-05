@@ -1,4 +1,7 @@
-@layer components {
+/* Do NOT wrap this file in `@layer components { }` — build.js wraps every layer
+   file uniformly. Wrapping here too produced a nested sublayer
+   (`components.components`) in dist, which outranks the outer `components`
+   layer and made consumer `@layer components { }` overrides silently lose. */
 
   /* ═══ 1. Navbar ═══ */
   .wal-nav {
@@ -150,7 +153,9 @@
     font-family: var(--wal-font-display);
     font-weight: 700;
     font-size: var(--wal-text-sm);
-    border-radius: var(--wal-radius-full);
+    /* Own token, not --wal-radius-full directly: a consumer with square
+       geometry can flatten buttons without also flattening chips and badges. */
+    border-radius: var(--wal-btn-radius, var(--wal-radius-full));
     padding: 0.65rem 1.3rem;
     cursor: pointer;
     text-decoration: none;
@@ -218,18 +223,24 @@
 
   /* ═══ 4. Card ═══ */
   .wal-card {
-    background: var(--wal-surface);
+    background: var(--wal-card-bg);
+    color: var(--wal-card-ink);
     border: 1px solid var(--wal-line);
     border-radius: var(--wal-radius);
     padding: var(--wal-space-lg);
     position: relative;
     overflow: hidden;
     transition: all var(--wal-duration) var(--wal-ease);
-    container-type: inline-size;
-    container-name: card;
     display: flex;
     flex-direction: column;
     gap: var(--wal-space-md);
+
+    /* Rebind the inherited ink scale to the card's own, so every descendant
+       that reads --wal-text* flips with the surface automatically. See the
+       cycle warning on --wal-card-ink in 01-tokens.css. */
+    --wal-text:       var(--wal-card-ink);
+    --wal-text-soft:  var(--wal-card-ink-soft);
+    --wal-text-muted: var(--wal-card-ink-muted);
 
     &:hover {
       box-shadow: var(--wal-shadow);
@@ -282,32 +293,39 @@
     }
   }
 
-  /* ═══ 5. Plate ═══ */
+  /* ═══ 5. Plate ═══
+     A spec strip: a row of dt/dd cells divided by hairlines.
+
+     Cells shed intrinsically via auto-fit rather than by container query. The
+     old version set `container-type` on .wal-plate and then queried
+     `@container` from inside it — an element cannot query itself, so those
+     rules never matched and the plate never collapsed.
+
+     The dividers are a 1px `gap` over a line-coloured background, so the
+     hairlines land correctly at *any* wrap configuration. That removes the
+     whole nth-child border dance the container queries used to need. */
   .wal-plate {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(0, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, var(--wal-plate-min, 10rem)), 1fr));
+    gap: 1px;
+    background: var(--wal-line);
     border: 1px solid var(--wal-line);
     border-radius: var(--wal-radius);
-    background: var(--wal-surface);
     overflow: hidden;
-    container-type: inline-size;
 
     > div {
+      background: var(--wal-plate-bg, var(--wal-card-bg, var(--wal-surface)));
+      color: var(--wal-card-ink, var(--wal-text));
       padding: var(--wal-space-md);
-      border-right: 1px solid var(--wal-line);
       display: flex;
       flex-direction: column;
       gap: var(--wal-space-xs);
-
-      &:last-child {
-        border-right: none;
-      }
     }
 
     dt {
       font-family: var(--wal-font-mono);
       font-size: var(--wal-text-xs);
-      color: var(--wal-text-muted);
+      color: var(--wal-card-ink-muted, var(--wal-text-muted));
       text-transform: uppercase;
       letter-spacing: 0.05em;
       margin: 0;
@@ -317,38 +335,8 @@
       font-family: var(--wal-font-display);
       font-size: var(--wal-text-lg);
       font-weight: 700;
-      color: var(--wal-text);
+      color: var(--wal-card-ink, var(--wal-text));
       margin: 0;
-    }
-    
-    @container (max-width: 600px) {
-      grid-template-columns: 1fr 1fr;
-      
-      > div {
-        border-bottom: 1px solid var(--wal-line);
-      }
-      
-      > div:nth-child(even) {
-        border-right: none;
-      }
-      
-      > div:nth-last-child(-n+2):nth-child(odd),
-      > div:last-child {
-        border-bottom: none;
-      }
-    }
-    
-    @container (max-width: 300px) {
-      grid-template-columns: 1fr;
-      
-      > div {
-        border-right: none !important;
-        border-bottom: 1px solid var(--wal-line);
-      }
-      
-      > div:last-child {
-        border-bottom: none;
-      }
     }
   }
 
@@ -358,23 +346,24 @@
     flex-direction: column;
     gap: var(--wal-space-xs);
     padding: var(--wal-space-md);
-    background: var(--wal-surface);
+    background: var(--wal-card-bg);
+    color: var(--wal-card-ink);
     border: 1px solid var(--wal-line);
     border-radius: var(--wal-radius);
-    border-top: 3px solid var(--wal-metric-color, var(--wal-accent));
+    border-top: var(--wal-metric-border-width, 3px) solid var(--wal-metric-color, var(--wal-accent));
 
     .wal-metric-value {
       font-family: var(--wal-font-display);
       font-size: var(--wal-text-4xl);
       font-weight: 800;
-      color: var(--wal-text);
+      color: var(--wal-card-ink);
       line-height: 1.1;
     }
 
     .wal-metric-label {
       font-family: var(--wal-font-mono);
       font-size: var(--wal-text-sm);
-      color: var(--wal-text-muted);
+      color: var(--wal-card-ink-muted);
       text-transform: uppercase;
       letter-spacing: 0.02em;
     }
@@ -401,10 +390,11 @@
     border-radius: var(--wal-radius);
     overflow: hidden;
     border: 1px solid var(--wal-line);
-    background: var(--wal-surface);
+    background: var(--wal-card-bg);
+    color: var(--wal-card-ink);
 
     .wal-swatch-color {
-      height: 100px;
+      height: var(--wal-swatch-h, 100px);
       width: 100%;
       background: var(--wal-swatch-bg, var(--wal-bg));
     }
@@ -419,13 +409,13 @@
         font-family: var(--wal-font-display);
         font-weight: 600;
         font-size: var(--wal-text-sm);
-        color: var(--wal-text);
+        color: var(--wal-card-ink);
       }
-      
+
       .wal-swatch-hex {
         font-family: var(--wal-font-mono);
         font-size: var(--wal-text-xs);
-        color: var(--wal-text-muted);
+        color: var(--wal-card-ink-muted);
       }
     }
   }
@@ -805,11 +795,11 @@
 
   /* ═══ 17. Eyebrow ═══ */
   .wal-eyebrow {
-    font-family: var(--wal-font-mono);
+    font-family: var(--wal-eyebrow-font, var(--wal-font-mono));
     font-size: var(--wal-text-xs);
     text-transform: uppercase;
     letter-spacing: 0.1em;
-    color: var(--wal-accent);
+    color: var(--wal-eyebrow-color, var(--wal-accent));
     margin-bottom: var(--wal-space-xs);
     display: block;
     font-weight: 600;
@@ -830,11 +820,11 @@
       border-radius: 50%;
       background-color: var(--wal-success, #10b981);
       box-shadow: 0 0 0 0 color-mix(in oklch, var(--wal-success, #10b981) 70%, transparent);
-      animation: wal-pulse 2s infinite var(--wal-ease);
+      animation: wal-ping 2s infinite var(--wal-ease);
     }
   }
 
-  @keyframes wal-pulse {
+  @keyframes wal-ping {
     0% {
       box-shadow: 0 0 0 0 color-mix(in oklch, var(--wal-success, #10b981) 70%, transparent);
     }
@@ -846,4 +836,159 @@
     }
   }
 
-}
+
+  /* ═══ 19. Footer ═══
+     End-credits colophon: a top rule and a row of role/value pairs. */
+  .wal-footer {
+    border-top: 1px solid var(--wal-line);
+    padding-block: var(--wal-space-xl) var(--wal-space-2xl);
+  }
+
+  .wal-footer-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, var(--wal-footer-min, 11rem)), 1fr));
+    gap: var(--wal-space-md);
+    font-family: var(--wal-font-mono);
+    font-size: var(--wal-text-xs);
+    color: var(--wal-text-soft);
+
+    dt {
+      text-transform: uppercase;
+      letter-spacing: 0.13em;
+      font-size: var(--wal-text-xs);
+      color: var(--wal-text-muted);
+      margin: 0 0 var(--wal-space-xs);
+    }
+
+    dd {
+      margin: 0;
+      color: var(--wal-text);
+    }
+  }
+
+  /* ═══ 20. Icon button ═══
+     Circular icon-only control. Pairs with .wal-btn in an action cluster. */
+  .wal-iconbtn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: var(--wal-iconbtn-size, 38px);
+    height: var(--wal-iconbtn-size, 38px);
+    border-radius: var(--wal-radius-full);
+    border: 1px solid var(--wal-line);
+    background: transparent;
+    color: var(--wal-text-soft);
+    cursor: pointer;
+    text-decoration: none;
+    transition: color var(--wal-duration) var(--wal-ease),
+                border-color var(--wal-duration) var(--wal-ease);
+
+    &:hover {
+      color: var(--wal-accent);
+      border-color: var(--wal-accent);
+    }
+  }
+
+  /* ═══ 21. Arrow link ═══
+     Text link whose gap opens on hover, so the arrow steps away from the word. */
+  .wal-link-arrow {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--wal-space-xs);
+    font-family: var(--wal-font-display);
+    font-weight: 600;
+    font-size: var(--wal-text-sm);
+    color: var(--wal-accent);
+    text-decoration: none;
+    transition: gap var(--wal-duration) var(--wal-ease);
+
+    &:hover { gap: var(--wal-space-sm); }
+  }
+
+  /* ═══ 22. Stat ═══
+     A metric without the box — for stat rows inside an existing card. */
+  .wal-stat {
+    .wal-stat-value {
+      font-family: var(--wal-font-display);
+      font-weight: 600;
+      font-size: var(--wal-text-3xl);
+      line-height: 1;
+      color: var(--wal-stat-color, var(--wal-accent));
+    }
+
+    .wal-stat-label {
+      font-family: var(--wal-font-mono);
+      font-size: var(--wal-text-xs);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--wal-text-muted);
+      margin-top: var(--wal-space-xs);
+    }
+  }
+
+  /* ═══ 23. Note ═══
+     A titled block under a coloured top rule. No box, no fill. */
+  .wal-note {
+    border-top: 3px solid var(--wal-note-color, var(--wal-accent));
+    padding-top: var(--wal-space-md);
+
+    h4 {
+      font-family: var(--wal-font-display);
+      font-weight: 600;
+      margin: 0 0 var(--wal-space-sm);
+    }
+  }
+
+  /* ═══ 24. Dash list ═══
+     Bulleted list whose marker is a short rule rather than a disc. */
+  .wal-list-dash {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--wal-space-sm);
+
+    li {
+      position: relative;
+      padding-left: 17px;
+      color: var(--wal-text-soft);
+
+      &::before {
+        content: "";
+        position: absolute;
+        left: 0;
+        top: 0.6em;
+        width: 7px;
+        height: 2px;
+        background: var(--wal-list-marker, var(--wal-gold));
+      }
+    }
+  }
+
+  /* ═══ 25. Frame ═══
+     A fixed-ratio letterboxed window with an optional caption rail — the
+     "shot" device. Ratio is a token so a consumer can pick 2.39, 1.85, 1.43. */
+  .wal-frame {
+    margin: 0;
+
+    .wal-frame-window {
+      aspect-ratio: var(--wal-frame-ratio, 1.43);
+      overflow: hidden;
+      position: relative;
+      background: var(--wal-frame-bg, var(--wal-bg-subtle));
+      border: 1px solid var(--wal-line);
+    }
+
+    figcaption {
+      display: flex;
+      justify-content: space-between;
+      gap: var(--wal-space-md);
+      padding-top: var(--wal-space-sm);
+      font-family: var(--wal-font-mono);
+      font-size: var(--wal-text-xs);
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--wal-text-muted);
+    }
+  }

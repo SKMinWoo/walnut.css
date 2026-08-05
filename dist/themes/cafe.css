@@ -1,0 +1,117 @@
+/* ═══════════════════════════════════════════════════
+   THEME — CAFÉ
+   Coffee shop in golden hour light.
+   Walnut wood, bone china, brass fixtures.
+   ─────────────────────────────────────────────────
+   Hue:    55  (warm amber)
+   Accent: 25  (terracotta)
+   Gold:   85  (goldenrod)
+   Olive:  130 (botanical green)
+
+   This file re-states the default tokens from
+   01-tokens.css so users can import it as an
+   explicit theme and have a single source of truth
+   when switching between themes at runtime.
+═══════════════════════════════════════════════════ */
+
+
+/* ─── Café Dark (default) ─── */
+
+.wal-cafe,
+[data-theme="cafe"] {
+  /* Hue control rods */
+  --wal-hue:        55;
+  --wal-chroma:     0.04;
+  --wal-accent-hue: 25;
+  --wal-gold-hue:   85;
+  --wal-olive-hue:  130;
+
+  /* Surface scale — warm walnut darks */
+  --wal-bg:         oklch(16% var(--wal-chroma) var(--wal-hue));
+  --wal-bg-subtle:  oklch(19% var(--wal-chroma) var(--wal-hue));
+  --wal-surface:    oklch(22% calc(var(--wal-chroma) + 0.005) var(--wal-hue));
+  --wal-surface-2:  oklch(26% calc(var(--wal-chroma) + 0.008) var(--wal-hue));
+  --wal-line:       oklch(32% 0.025 var(--wal-hue));
+  --wal-line-soft:  oklch(28% 0.02 var(--wal-hue));
+
+  /* Text — warm cream to dusty brown */
+  --wal-text:       oklch(92% 0.015 var(--wal-hue));
+  --wal-text-soft:  oklch(68% 0.03 var(--wal-hue));
+  --wal-text-muted: oklch(52% 0.025 var(--wal-hue));
+
+  /* Accent — terracotta */
+  --wal-accent:       oklch(62% 0.17 var(--wal-accent-hue));
+  --wal-accent-hover: oklch(68% 0.19 var(--wal-accent-hue));
+  --wal-accent-soft:  oklch(62% 0.17 var(--wal-accent-hue) / 0.12);
+  --wal-accent-fg:    oklch(96% 0.01 var(--wal-accent-hue));
+
+  /* Secondary — goldenrod */
+  --wal-gold:      oklch(75% 0.15 var(--wal-gold-hue));
+  --wal-gold-soft: oklch(75% 0.15 var(--wal-gold-hue) / 0.15);
+
+  /* Tertiary — botanical olive */
+  --wal-olive:      oklch(55% 0.10 var(--wal-olive-hue));
+  --wal-olive-soft: oklch(55% 0.10 var(--wal-olive-hue) / 0.12);
+
+  /* Shadows — warm dark penumbra */
+  --wal-shadow:    0 20px 44px -18px oklch(10% 0.02 var(--wal-hue) / 0.45);
+  --wal-shadow-sm: 0 4px 12px -4px  oklch(10% 0.02 var(--wal-hue) / 0.3);
+  --wal-shadow-lg: 0 32px 64px -24px oklch(8% 0.02 var(--wal-hue) / 0.55);
+}
+
+
+/* ─── Café Light ─── */
+
+.wal-cafe.wal-light,
+.wal-cafe[data-theme="light"],
+[data-theme="cafe"].wal-light,
+[data-theme="cafe"][data-theme="light"],
+[data-theme="cafe-light"] {
+  /* Surface scale — bone china, sun-bleached linen */
+  --wal-bg:         oklch(93% 0.025 var(--wal-hue));
+  --wal-bg-subtle:  oklch(90% 0.03 var(--wal-hue));
+  --wal-surface:    oklch(97% 0.015 var(--wal-hue));
+  --wal-surface-2:  oklch(91% 0.025 var(--wal-hue));
+  --wal-line:       oklch(84% 0.03 var(--wal-hue));
+  --wal-line-soft:  oklch(88% 0.02 var(--wal-hue));
+
+  /* Text — espresso to café-au-lait */
+  --wal-text:       oklch(20% 0.03 var(--wal-hue));
+  --wal-text-soft:  oklch(42% 0.04 var(--wal-hue));
+  --wal-text-muted: oklch(58% 0.03 var(--wal-hue));
+
+  /* Accent — darker terracotta for legibility on light */
+  --wal-accent:       oklch(52% 0.18 var(--wal-accent-hue));
+  --wal-accent-hover: oklch(46% 0.20 var(--wal-accent-hue));
+  --wal-accent-fg:    oklch(97% 0.01 var(--wal-accent-hue));
+
+  /* Shadows — warm, subtle */
+  --wal-shadow:    0 20px 44px -18px oklch(50% 0.03 var(--wal-hue) / 0.18);
+  --wal-shadow-sm: 0 4px 12px -4px  oklch(50% 0.03 var(--wal-hue) / 0.12);
+  --wal-shadow-lg: 0 32px 64px -24px oklch(50% 0.03 var(--wal-hue) / 0.22);
+}
+
+/* Auto light — system preference */
+@media (prefers-color-scheme: light) {
+  .wal-cafe:not(.wal-dark):not([data-theme="dark"]),
+  [data-theme="cafe"]:not(.wal-dark):not([data-theme="dark"]) {
+    --wal-bg:         oklch(93% 0.025 var(--wal-hue));
+    --wal-bg-subtle:  oklch(90% 0.03 var(--wal-hue));
+    --wal-surface:    oklch(97% 0.015 var(--wal-hue));
+    --wal-surface-2:  oklch(91% 0.025 var(--wal-hue));
+    --wal-line:       oklch(84% 0.03 var(--wal-hue));
+    --wal-line-soft:  oklch(88% 0.02 var(--wal-hue));
+
+    --wal-text:       oklch(20% 0.03 var(--wal-hue));
+    --wal-text-soft:  oklch(42% 0.04 var(--wal-hue));
+    --wal-text-muted: oklch(58% 0.03 var(--wal-hue));
+
+    --wal-accent:       oklch(52% 0.18 var(--wal-accent-hue));
+    --wal-accent-hover: oklch(46% 0.20 var(--wal-accent-hue));
+    --wal-accent-fg:    oklch(97% 0.01 var(--wal-accent-hue));
+
+    --wal-shadow:    0 20px 44px -18px oklch(50% 0.03 var(--wal-hue) / 0.18);
+    --wal-shadow-sm: 0 4px 12px -4px  oklch(50% 0.03 var(--wal-hue) / 0.12);
+    --wal-shadow-lg: 0 32px 64px -24px oklch(50% 0.03 var(--wal-hue) / 0.22);
+  }
+}

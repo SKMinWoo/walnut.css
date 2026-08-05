@@ -52,6 +52,22 @@
   --wal-text-soft:    oklch(68% 0.03 var(--wal-hue));
   --wal-text-muted:   oklch(52% 0.025 var(--wal-hue));
 
+  /* ── Card surface ──
+     A surface that may deliberately NOT follow the page theme — a printed
+     plate, receipt, ticket, or code card that stays light on a dark page.
+     .wal-card and friends rebind --wal-text* from these, so every descendant
+     flips with the surface and no per-child override is needed.
+
+     These MUST be literal values, never `var(--wal-text)`. Custom properties
+     inherit as unsubstituted token streams, so pointing --wal-card-ink at
+     --wal-text here while .wal-card points --wal-text at --wal-card-ink is a
+     substitution cycle: both resolve invalid and every card loses its text
+     colour. It reads as a random rendering bug and is painful to trace. */
+  --wal-card-bg:        var(--wal-surface);
+  --wal-card-ink:       oklch(92% 0.015 var(--wal-hue));
+  --wal-card-ink-soft:  oklch(68% 0.03 var(--wal-hue));
+  --wal-card-ink-muted: oklch(52% 0.025 var(--wal-hue));
+
   /* Accent: terracotta */
   --wal-accent:       oklch(62% 0.17 var(--wal-accent-hue));
   --wal-accent-hover: oklch(68% 0.19 var(--wal-accent-hue));

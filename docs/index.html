@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html lang="en" class="theme-cafe">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>walnut.css · cinematic CSS</title>
+  <meta name="description" content="A cinematic, nature-inspired CSS framework. Café warmth. Botanical texture. Zero JavaScript.">
+  
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Courier+Prime:ital,wght@0,400;0,700;1,400;1,700&family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300;1,400;1,500&family=Inter:wght@100..900&family=Jost:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+  
+  <!-- CSS -->
+  <link rel="stylesheet" href="../dist/walnut.css">
+  <style>
+    /* Demo-specific styles */
+    body {
+      margin: 0;
+      padding: 0;
+    }
+    
+    .demo-code-block {
+      position: relative;
+    }
+    .demo-code-block pre {
+      background: var(--wal-surface-2, #f5f5f5);
+      padding: var(--wal-space-md, 1rem);
+      border-radius: var(--wal-radius, 8px);
+      border: 1px solid var(--wal-line, #e0e0e0);
+      overflow-x: auto;
+      font-family: var(--wal-font-mono, monospace);
+      font-size: var(--wal-text-sm, 0.875rem);
+      color: var(--wal-text, #333);
+    }
+    .demo-code-block .copy-btn {
+      position: absolute;
+      top: 0.5rem;
+      right: 0.5rem;
+    }
+    
+    .demo-showcase {
+      padding: var(--wal-space-lg, 1.5rem);
+      border: 1px solid var(--wal-line, #e0e0e0);
+      border-radius: var(--wal-radius-lg, 12px);
+      background: var(--wal-surface, #fff);
+      margin-bottom: var(--wal-space-sm, 0.5rem);
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--wal-space-md, 1rem);
+      align-items: center;
+    }
+    
+    .theme-swatch-container {
+      display: flex;
+      gap: var(--wal-space-md, 1rem);
+      margin-top: var(--wal-space-md, 1rem);
+    }
+    
+    .demo-swatch {
+      width: 60px;
+      height: 60px;
+      border-radius: var(--wal-radius, 8px);
+      cursor: pointer;
+      border: 2px solid transparent;
+      transition: all var(--wal-duration, 0.3s) var(--wal-ease, ease);
+    }
+    
+    .demo-swatch:hover, .demo-swatch.active {
+      transform: translateY(-4px);
+      border-color: var(--wal-text, #333);
+    }
+    
+    /* Support for anchor positioning tooltip demo */
+    .wal-tooltip-trigger {
+      anchor-name: --demo-tooltip;
+    }
+    .wal-tooltip {
+      position: absolute;
+      position-anchor: --demo-tooltip;
+      top: anchor(bottom);
+      left: anchor(center);
+      transform: translateX(-50%);
+      margin-top: 8px;
+      opacity: 0;
+      transition: opacity 0.2s;
+      pointer-events: none;
+    }
+    .wal-tooltip-trigger:hover .wal-tooltip,
+    .wal-tooltip-trigger:focus .wal-tooltip {
+      opacity: 1;
+    }
+  </style>
+</head>
+<body class="wal-bg">
+  <div class="wal-progress-bar"></div>
+
+  <!-- Navbar -->
+  <nav class="wal-nav">
+    <div class="wal-wrap wal-nav-inner">
+      <div class="wal-nav-brand">
+        <strong>walnut.css</strong>
+        <span class="wal-text-muted wal-text-sm">cinematic CSS</span>
+      </div>
+      <div class="wal-nav-links">
+        <a href="#features" class="wal-nav-link">Features</a>
+        <a href="#components" class="wal-nav-link">Components</a>
+        <a href="#themes" class="wal-nav-link">Themes</a>
+        <a href="#install" class="wal-nav-link">Install</a>
+      </div>
+      <div class="wal-nav-actions">
+        <a href="https://github.com/alexkim/walnut" class="wal-btn wal-btn-ghost wal-btn-sm" target="_blank" rel="noopener">GitHub</a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Hero Section -->
+  <header class="wal-hero wal-hero-glow wal-section">
+    <div class="wal-wrap">
+      <div class="wal-hero-content wal-reveal">
+        <div class="wal-badge wal-badge-gold">v0.1.0</div>
+        <h1 class="wal-hero-name wal-font-display wal-text-5xl">walnut.css</h1>
+        <p class="wal-hero-tagline wal-text-lg wal-text-soft">
+          A cinematic, nature-inspired CSS framework.<br>
+          Café warmth. Botanical texture. Zero JavaScript.
+        </p>
+        <div class="wal-hero-actions wal-mt-lg">
+          <a href="#components" class="wal-btn wal-btn-primary">View components</a>
+          <a href="https://github.com/alexkim/walnut" class="wal-btn wal-btn-secondary" target="_blank" rel="noopener">GitHub</a>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <div class="wal-divider wal-divider-ornament"></div>
+
+  <!-- Features Section -->
+  <section id="features" class="wal-section">
+    <div class="wal-wrap">
+      <div class="wal-section-header wal-reveal">
+        <span class="wal-eyebrow">Philosophy</span>
+        <h2>Modern, Cinematic CSS</h2>
+        <p class="wal-text-soft">Built with cutting-edge CSS features and an eye for pacing.</p>
+      </div>
+      
+      <div class="wal-grid wal-cols-3 wal-mt-xl">
+        <div class="wal-card wal-reveal">
+          <span class="wal-eyebrow">Color</span>
+          <h3>oklch System</h3>
+          <p class="wal-text-soft">Vibrant, perceptually uniform colors that gracefully degrade for older browsers.</p>
+        </div>
+        <div class="wal-card wal-reveal">
+          <span class="wal-eyebrow">Architecture</span>
+          <h3>@layer Cascade</h3>
+          <p class="wal-text-soft">Avoid specificity wars. Everything is neatly organized into reset, base, components, and utilities layers.</p>
+        </div>
+        <div class="wal-card wal-reveal">
+          <span class="wal-eyebrow">Responsive</span>
+          <h3>Container Queries</h3>
+          <p class="wal-text-soft">Components adapt to their containers, not just the viewport. Build truly modular interfaces.</p>
+        </div>
+        <div class="wal-card wal-reveal">
+          <span class="wal-eyebrow">Motion</span>
+          <h3>Scroll Animations</h3>
+          <p class="wal-text-soft">Cinematic, scroll-driven reveals that respect prefers-reduced-motion preferences.</p>
+        </div>
+        <div class="wal-card wal-reveal">
+          <span class="wal-eyebrow">Design</span>
+          <h3>4 Curated Themes</h3>
+          <p class="wal-text-soft">Café, Botanical, Midnight, and Snow. Switch with a single class change on the root.</p>
+        </div>
+        <div class="wal-card wal-reveal">
+          <span class="wal-eyebrow">Clean</span>
+          <h3>Zero JS</h3>
+          <p class="wal-text-soft">Interactions powered by modern CSS features like :has(), popover, and anchor positioning.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Theme Switcher Section -->
+  <section id="themes" class="wal-section wal-bg-subtle">
+    <div class="wal-wrap">
+      <div class="wal-section-header wal-reveal">
+        <span class="wal-eyebrow">Atmosphere</span>
+        <h2>Themes</h2>
+        <p class="wal-text-soft">Choose the mood that fits your narrative.</p>
+      </div>
+      
+      <div class="wal-reveal wal-mt-xl">
+        <div class="theme-swatch-container">
+          <div class="demo-swatch active" data-theme="theme-cafe" style="background: #efe9e1;" title="Café"></div>
+          <div class="demo-swatch" data-theme="theme-botanical" style="background: #e8efe9;" title="Botanical"></div>
+          <div class="demo-swatch" data-theme="theme-midnight" style="background: #1a1c23;" title="Midnight"></div>
+          <div class="demo-swatch" data-theme="theme-snow" style="background: #ffffff;" title="Snow"></div>
+        </div>
+        
+        <div class="wal-plate wal-mt-lg">
+          <div class="wal-plate-col">
+            <span class="wal-plate-label">Background</span>
+            <span class="wal-plate-value wal-font-mono">var(--wal-bg)</span>
+          </div>
+          <div class="wal-plate-col">
+            <span class="wal-plate-label">Surface</span>
+            <span class="wal-plate-value wal-font-mono">var(--wal-surface)</span>
+          </div>
+          <div class="wal-plate-col">
+            <span class="wal-plate-label">Text</span>
+            <span class="wal-plate-value wal-font-mono">var(--wal-text)</span>
+          </div>
+          <div class="wal-plate-col">
+            <span class="wal-plate-label">Accent</span>
+            <span class="wal-plate-value wal-font-mono">var(--wal-accent)</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Components Showcase -->
+  <section id="components" class="wal-section">
+    <div class="wal-wrap">
+      <div class="wal-section-header wal-reveal">
+        <span class="wal-eyebrow">Building Blocks</span>
+        <h2>Components</h2>
+        <p class="wal-text-soft">Designed for beauty, built for durability.</p>
+      </div>
+
+      <!-- Buttons -->
+      <div class="wal-mb-xl wal-reveal wal-mt-xl">
+        <h3>Buttons</h3>
+        <div class="demo-showcase">
+          <button class="wal-btn wal-btn-primary">Primary Action</button>
+          <button class="wal-btn wal-btn-secondary">Secondary</button>
+          <button class="wal-btn wal-btn-ghost">Ghost</button>
+          <button class="wal-btn wal-btn-primary wal-btn-sm">Small</button>
+          <button class="wal-btn wal-btn-primary wal-btn-lg">Large</button>
+          <button class="wal-btn wal-btn-primary" disabled>Disabled</button>
+        </div>
+      </div>
+
+      <!-- Cards -->
+      <div class="wal-mb-xl wal-reveal">
+        <h3>Cards</h3>
+        <div class="wal-grid wal-cols-2">
+          <div class="wal-card">
+            <h4>Standard Card</h4>
+            <p class="wal-text-soft">A basic card with standard padding and subtle shadow. Adapts seamlessly to the active theme.</p>
+          </div>
+          <div class="wal-card wal-card-flora">
+            <h4>Flora Card</h4>
+            <p class="wal-text-soft">A specialized card variant that adds botanical flourishes and warmth for special callouts.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Badges & Chips -->
+      <div class="wal-mb-xl wal-reveal">
+        <h3>Badges & Chips</h3>
+        <div class="demo-showcase">
+          <span class="wal-badge wal-badge-accent">New Release</span>
+          <span class="wal-badge wal-badge-olive">Stable</span>
+          <span class="wal-badge wal-badge-gold">Premium</span>
+          <div class="wal-chip">CSS</div>
+          <div class="wal-chip">HTML</div>
+          <div class="wal-chip">Design</div>
+        </div>
+      </div>
+
+      <!-- Plate -->
+      <div class="wal-mb-xl wal-reveal">
+        <h3>Spec Plate</h3>
+        <div class="wal-plate">
+          <div class="wal-plate-col">
+            <span class="wal-plate-label">Role</span>
+            <span class="wal-plate-value">Senior Engineer</span>
+          </div>
+          <div class="wal-plate-col">
+            <span class="wal-plate-label">Experience</span>
+            <span class="wal-plate-value">8 Years</span>
+          </div>
+          <div class="wal-plate-col">
+            <span class="wal-plate-label">Status</span>
+            <span class="wal-plate-value" style="display: flex; align-items: center; gap: 8px;">
+              <span class="wal-status-indicator wal-status-pulse"></span> Available
+            </span>
+          </div>
+          <div class="wal-plate-col">
+            <span class="wal-plate-label">Location</span>
+            <span class="wal-plate-value">Remote</span>
+          </div>
+          <div class="wal-plate-col">
+            <span class="wal-plate-label">Timezone</span>
+            <span class="wal-plate-value">PST / UTC-8</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Metrics -->
+      <div class="wal-mb-xl wal-reveal">
+        <h3>Metrics</h3>
+        <div class="wal-grid wal-cols-4">
+          <div class="wal-metric">
+            <span class="wal-metric-value">0</span>
+            <span class="wal-metric-label">JavaScript</span>
+          </div>
+          <div class="wal-metric">
+            <span class="wal-metric-value">4</span>
+            <span class="wal-metric-label">Themes</span>
+          </div>
+          <div class="wal-metric">
+            <span class="wal-metric-value">12kb</span>
+            <span class="wal-metric-label">Gzipped</span>
+          </div>
+          <div class="wal-metric">
+            <span class="wal-metric-value">100%</span>
+            <span class="wal-metric-label">Modern CSS</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Timeline -->
+      <div class="wal-mb-xl wal-reveal">
+        <h3>Timeline</h3>
+        <div class="wal-timeline">
+          <div class="wal-timeline-item">
+            <div class="wal-timeline-date">2026</div>
+            <div class="wal-timeline-content">
+              <h4>walnut.css Released</h4>
+              <p class="wal-text-soft">The first stable version brings cinematic CSS to the masses.</p>
+              <div class="wal-chip wal-mt-sm">v1.0</div>
+            </div>
+          </div>
+          <div class="wal-timeline-item">
+            <div class="wal-timeline-date">2025</div>
+            <div class="wal-timeline-content">
+              <h4>Development Began</h4>
+              <p class="wal-text-soft">Initial explorations into oklch and scroll-driven animations.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Table -->
+      <div class="wal-mb-xl wal-reveal">
+        <h3>Data Table</h3>
+        <div class="demo-showcase" style="display: block; overflow-x: auto;">
+          <table class="wal-table">
+            <thead>
+              <tr>
+                <th>Variable</th>
+                <th>Type</th>
+                <th>Default Value</th>
+                <th>Description</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><code>--wal-bg</code></td>
+                <td>Color</td>
+                <td><code>#efe9e1</code> (Cafe)</td>
+                <td>Primary background color</td>
+              </tr>
+              <tr>
+                <td><code>--wal-radius</code></td>
+                <td>Size</td>
+                <td><code>0.5rem</code></td>
+                <td>Standard border radius</td>
+              </tr>
+              <tr>
+                <td><code>--wal-duration</code></td>
+                <td>Time</td>
+                <td><code>0.3s</code></td>
+                <td>Standard cinematic transition duration</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Inputs -->
+      <div class="wal-mb-xl wal-reveal">
+        <h3>Inputs</h3>
+        <div class="demo-showcase">
+          <div style="width: 100%; max-width: 300px; display: flex; flex-direction: column; gap: var(--wal-space-md, 1rem);">
+            <div>
+              <label class="wal-label" for="demo-input">Name</label>
+              <input type="text" id="demo-input" class="wal-input" placeholder="Jane Doe">
+            </div>
+            <div>
+              <label class="wal-label" for="demo-textarea">Message</label>
+              <textarea id="demo-textarea" class="wal-input" rows="3" placeholder="A cinematic message..."></textarea>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Interactive (Dialog, Tooltip) -->
+      <div class="wal-mb-xl wal-reveal">
+        <h3>Interactive</h3>
+        <div class="demo-showcase">
+          <!-- Popover API Dialog -->
+          <button class="wal-btn wal-btn-primary" popovertarget="demo-dialog">Open Dialog</button>
+          
+          <div id="demo-dialog" class="wal-dialog" popover>
+            <div class="wal-dialog-content">
+              <h3>Cinematic Reveal</h3>
+              <p class="wal-text-soft wal-mb-md">This dialog is powered entirely by the native HTML popover attribute and styled with CSS. No JavaScript required.</p>
+              <button class="wal-btn wal-btn-secondary" popovertarget="demo-dialog" popovertargetaction="hide">Close</button>
+            </div>
+          </div>
+
+          <!-- Anchor Tooltip -->
+          <button class="wal-btn wal-btn-ghost wal-tooltip-trigger">
+            Hover me
+            <div class="wal-tooltip wal-badge wal-badge-accent">A native CSS tooltip</div>
+          </button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Cinema Section -->
+  <section id="cinema" class="wal-section wal-bg-subtle">
+    <div class="wal-wrap">
+      <div class="wal-section-header wal-reveal">
+        <span class="wal-eyebrow">Pacing</span>
+        <h2>Cinematic Motion</h2>
+        <p class="wal-text-soft">Scroll down slowly.</p>
+      </div>
+      
+      <div class="wal-grid wal-cols-2 wal-mt-xl">
+        <div class="wal-card wal-reveal-left">
+          <h3>Fade from left</h3>
+          <p class="wal-text-soft">Using .wal-reveal-left for staggered entries.</p>
+        </div>
+        <div class="wal-card wal-reveal-right">
+          <h3>Fade from right</h3>
+          <p class="wal-text-soft">Using .wal-reveal-right to complement.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Install Section -->
+  <section id="install" class="wal-section">
+    <div class="wal-wrap">
+      <div class="wal-section-header wal-reveal">
+        <span class="wal-eyebrow">Get Started</span>
+        <h2>Installation</h2>
+      </div>
+
+      <div class="wal-reveal wal-mt-xl">
+        <p class="wal-mb-sm">Via npm:</p>
+        <div class="demo-code-block wal-mb-lg">
+          <button class="wal-btn wal-btn-ghost wal-btn-sm copy-btn" onclick="copyCode(this)">Copy</button>
+          <pre><code>npm install walnut.css</code></pre>
+        </div>
+
+        <p class="wal-mb-sm wal-mt-lg">Via CDN:</p>
+        <div class="demo-code-block wal-mb-lg">
+          <button class="wal-btn wal-btn-ghost wal-btn-sm copy-btn" onclick="copyCode(this)">Copy</button>
+          <pre><code>&lt;link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/walnut.css/dist/walnut.css"&gt;</code></pre>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="wal-footer wal-mt-2xl">
+    <div class="wal-wrap" style="text-align: center; padding: var(--wal-space-xl, 2rem) 0; border-top: 1px solid var(--wal-line, #e0e0e0);">
+      <p class="wal-text-muted">walnut.css &middot; MIT License &middot; Built by Alex Kim</p>
+      <div class="wal-mt-md">
+        <a href="https://github.com/alexkim/walnut" class="wal-text-soft" target="_blank" rel="noopener">GitHub</a>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Scripts -->
+  <script>
+    // 1. Scroll-aware navbar
+    window.addEventListener('scroll', () => {
+      const nav = document.querySelector('.wal-nav');
+      if (nav) {
+        nav.classList.toggle('is-scrolled', window.scrollY > 20);
+      }
+    });
+
+    // 2. Theme switcher
+    const swatches = document.querySelectorAll('.demo-swatch');
+    swatches.forEach(swatch => {
+      swatch.addEventListener('click', () => {
+        // Remove active class from all
+        swatches.forEach(s => s.classList.remove('active'));
+        // Add active class to clicked
+        swatch.classList.add('active');
+        
+        // Update root theme
+        const theme = swatch.getAttribute('data-theme');
+        if (theme) {
+          // Remove existing theme classes (assuming they start with theme-)
+          document.documentElement.className = document.documentElement.className.replace(/\btheme-\S+/g, '');
+          // Add new theme
+          document.documentElement.classList.add(theme);
+        }
+      });
+    });
+
+    // 3. Copy to clipboard
+    function copyCode(btn) {
+      const codeBlock = btn.nextElementSibling;
+      if (codeBlock) {
+        const code = codeBlock.innerText;
+        navigator.clipboard.writeText(code).then(() => {
+          const originalText = btn.innerText;
+          btn.innerText = 'Copied!';
+          setTimeout(() => {
+            btn.innerText = originalText;
+          }, 2000);
+        });
+      }
+    }
+  </script>
+</body>
+</html>

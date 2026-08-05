@@ -153,6 +153,7 @@
 .wal-text-xs { font-size: var(--wal-text-xs); }
 .wal-text-sm { font-size: var(--wal-text-sm); }
 .wal-text-base { font-size: var(--wal-text-base); }
+.wal-text-md { font-size: var(--wal-text-md); }
 .wal-text-lg { font-size: var(--wal-text-lg); }
 .wal-text-xl { font-size: var(--wal-text-xl); }
 .wal-text-2xl { font-size: var(--wal-text-2xl); }

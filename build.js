@@ -25,7 +25,7 @@ const THEMES = ["cafe", "forest", "dusk", "bone"];
 fs.mkdirSync(path.join(DIST, "themes"), { recursive: true });
 
 // ─── Build main bundle ───
-const banner = `/*! walnut.css v0.1.0 | MIT License | github.com/SKMinWoo/walnut.css */\n`;
+const banner = `/*! walnut.css v0.2.0 | MIT License | github.com/SKMinWoo/walnut.css */\n`;
 
 let bundle = banner;
 bundle += `@layer reset, tokens, base, layout, components, utilities, cinema;\n\n`;
