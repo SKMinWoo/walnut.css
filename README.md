@@ -64,8 +64,8 @@ Grab [`walnut.min.css`](dist/walnut.min.css) and drop it in your project.
 <body>
   <nav class="wal-nav">
     <a class="wal-nav-brand" href="/">
-      <span class="wal-nav-name">My Site</span>
-      <span class="wal-nav-subtitle">Made with walnut.css</span>
+      My Site
+      <small>Made with walnut.css</small>
     </a>
   </nav>
 
