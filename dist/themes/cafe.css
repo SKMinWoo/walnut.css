@@ -39,19 +39,26 @@
   --wal-text-soft:  oklch(68% 0.03 var(--wal-hue));
   --wal-text-muted: oklch(52% 0.025 var(--wal-hue));
 
+  /* Saturation rods. A theme sets these rather than inlining the number, so a
+     consumer rotating --wal-*-hue can lower chroma to stay inside the sRGB
+     gamut without having to re-declare every derived token. */
+  --wal-accent-chroma: 0.17;
+  --wal-gold-chroma:   0.15;
+  --wal-olive-chroma:  0.10;
+
   /* Accent — terracotta */
-  --wal-accent:       oklch(62% 0.17 var(--wal-accent-hue));
-  --wal-accent-hover: oklch(68% 0.19 var(--wal-accent-hue));
-  --wal-accent-soft:  oklch(62% 0.17 var(--wal-accent-hue) / 0.12);
+  --wal-accent:       oklch(62% var(--wal-accent-chroma) var(--wal-accent-hue));
+  --wal-accent-hover: oklch(68% calc(var(--wal-accent-chroma) + 0.02) var(--wal-accent-hue));
+  --wal-accent-soft:  oklch(62% var(--wal-accent-chroma) var(--wal-accent-hue) / 0.12);
   --wal-accent-fg:    oklch(96% 0.01 var(--wal-accent-hue));
 
   /* Secondary — goldenrod */
-  --wal-gold:      oklch(75% 0.15 var(--wal-gold-hue));
-  --wal-gold-soft: oklch(75% 0.15 var(--wal-gold-hue) / 0.15);
+  --wal-gold:      oklch(75% var(--wal-gold-chroma) var(--wal-gold-hue));
+  --wal-gold-soft: oklch(75% var(--wal-gold-chroma) var(--wal-gold-hue) / 0.15);
 
   /* Tertiary — botanical olive */
-  --wal-olive:      oklch(55% 0.10 var(--wal-olive-hue));
-  --wal-olive-soft: oklch(55% 0.10 var(--wal-olive-hue) / 0.12);
+  --wal-olive:      oklch(55% var(--wal-olive-chroma) var(--wal-olive-hue));
+  --wal-olive-soft: oklch(55% var(--wal-olive-chroma) var(--wal-olive-hue) / 0.12);
 
   /* Shadows — warm dark penumbra */
   --wal-shadow:    0 20px 44px -18px oklch(10% 0.02 var(--wal-hue) / 0.45);
@@ -62,10 +69,13 @@
 
 /* ─── Café Light ─── */
 
+/* Palette by class, mode by attribute. There is deliberately no
+   [data-theme="cafe"][data-theme="light"] here: one element has exactly one
+   data-theme value, so that selector can never match. Combine the two axes
+   with .wal-cafe[data-theme="light"], or use the fused [data-theme="cafe-light"]. */
 .wal-cafe.wal-light,
 .wal-cafe[data-theme="light"],
 [data-theme="cafe"].wal-light,
-[data-theme="cafe"][data-theme="light"],
 [data-theme="cafe-light"] {
   /* Surface scale — bone china, sun-bleached linen */
   --wal-bg:         oklch(93% 0.025 var(--wal-hue));
@@ -81,8 +91,9 @@
   --wal-text-muted: oklch(58% 0.03 var(--wal-hue));
 
   /* Accent — darker terracotta for legibility on light */
-  --wal-accent:       oklch(52% 0.18 var(--wal-accent-hue));
-  --wal-accent-hover: oklch(46% 0.20 var(--wal-accent-hue));
+  --wal-accent-chroma: 0.18;
+  --wal-accent:       oklch(52% var(--wal-accent-chroma) var(--wal-accent-hue));
+  --wal-accent-hover: oklch(46% calc(var(--wal-accent-chroma) + 0.02) var(--wal-accent-hue));
   --wal-accent-fg:    oklch(97% 0.01 var(--wal-accent-hue));
 
   /* Shadows — warm, subtle */
@@ -106,8 +117,9 @@
     --wal-text-soft:  oklch(42% 0.04 var(--wal-hue));
     --wal-text-muted: oklch(58% 0.03 var(--wal-hue));
 
-    --wal-accent:       oklch(52% 0.18 var(--wal-accent-hue));
-    --wal-accent-hover: oklch(46% 0.20 var(--wal-accent-hue));
+    --wal-accent-chroma: 0.18;
+    --wal-accent:       oklch(52% var(--wal-accent-chroma) var(--wal-accent-hue));
+    --wal-accent-hover: oklch(46% calc(var(--wal-accent-chroma) + 0.02) var(--wal-accent-hue));
     --wal-accent-fg:    oklch(97% 0.01 var(--wal-accent-hue));
 
     --wal-shadow:    0 20px 44px -18px oklch(50% 0.03 var(--wal-hue) / 0.18);

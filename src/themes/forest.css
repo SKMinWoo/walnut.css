@@ -40,19 +40,24 @@
   --wal-text-soft:  oklch(66% 0.025 var(--wal-hue));
   --wal-text-muted: oklch(50% 0.02 var(--wal-hue));
 
+  /* Saturation rods — see the note in cafe.css. */
+  --wal-accent-chroma: 0.16;
+  --wal-gold-chroma:   0.10;
+  --wal-olive-chroma:  0.08;
+
   /* Accent — warm copper/amber (campfire against canopy) */
-  --wal-accent:       oklch(65% 0.16 var(--wal-accent-hue));
-  --wal-accent-hover: oklch(72% 0.18 var(--wal-accent-hue));
-  --wal-accent-soft:  oklch(65% 0.16 var(--wal-accent-hue) / 0.12);
+  --wal-accent:       oklch(65% var(--wal-accent-chroma) var(--wal-accent-hue));
+  --wal-accent-hover: oklch(72% calc(var(--wal-accent-chroma) + 0.02) var(--wal-accent-hue));
+  --wal-accent-soft:  oklch(65% var(--wal-accent-chroma) var(--wal-accent-hue) / 0.12);
   --wal-accent-fg:    oklch(96% 0.01 var(--wal-accent-hue));
 
   /* Secondary — soft sage */
-  --wal-gold:      oklch(68% 0.10 var(--wal-gold-hue));
-  --wal-gold-soft: oklch(68% 0.10 var(--wal-gold-hue) / 0.15);
+  --wal-gold:      oklch(68% var(--wal-gold-chroma) var(--wal-gold-hue));
+  --wal-gold-soft: oklch(68% var(--wal-gold-chroma) var(--wal-gold-hue) / 0.15);
 
   /* Tertiary — moss */
-  --wal-olive:      oklch(52% 0.08 var(--wal-olive-hue));
-  --wal-olive-soft: oklch(52% 0.08 var(--wal-olive-hue) / 0.12);
+  --wal-olive:      oklch(52% var(--wal-olive-chroma) var(--wal-olive-hue));
+  --wal-olive-soft: oklch(52% var(--wal-olive-chroma) var(--wal-olive-hue) / 0.12);
 
   /* Functional — tuned for forest context */
   --wal-success: oklch(65% 0.14 145);
@@ -71,7 +76,6 @@
 .wal-forest.wal-light,
 .wal-forest[data-theme="light"],
 [data-theme="forest"].wal-light,
-[data-theme="forest"][data-theme="light"],
 [data-theme="forest-light"] {
   /* Surfaces — sun-dappled clearing, birch paper */
   --wal-bg:         oklch(93% 0.02 var(--wal-hue));
@@ -87,8 +91,9 @@
   --wal-text-muted: oklch(55% 0.025 var(--wal-hue));
 
   /* Accent — burnt copper, darker for legibility */
-  --wal-accent:       oklch(50% 0.17 var(--wal-accent-hue));
-  --wal-accent-hover: oklch(44% 0.19 var(--wal-accent-hue));
+  --wal-accent-chroma: 0.17;
+  --wal-accent:       oklch(50% var(--wal-accent-chroma) var(--wal-accent-hue));
+  --wal-accent-hover: oklch(44% calc(var(--wal-accent-chroma) + 0.02) var(--wal-accent-hue));
   --wal-accent-fg:    oklch(97% 0.01 var(--wal-accent-hue));
 
   /* Shadows — leaf shadow, gentle */
@@ -112,8 +117,9 @@
     --wal-text-soft:  oklch(38% 0.035 var(--wal-hue));
     --wal-text-muted: oklch(55% 0.025 var(--wal-hue));
 
-    --wal-accent:       oklch(50% 0.17 var(--wal-accent-hue));
-    --wal-accent-hover: oklch(44% 0.19 var(--wal-accent-hue));
+    --wal-accent-chroma: 0.17;
+    --wal-accent:       oklch(50% var(--wal-accent-chroma) var(--wal-accent-hue));
+    --wal-accent-hover: oklch(44% calc(var(--wal-accent-chroma) + 0.02) var(--wal-accent-hue));
     --wal-accent-fg:    oklch(97% 0.01 var(--wal-accent-hue));
 
     --wal-shadow:    0 20px 44px -18px oklch(45% 0.03 var(--wal-hue) / 0.16);

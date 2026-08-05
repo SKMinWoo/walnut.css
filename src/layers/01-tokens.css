@@ -182,7 +182,13 @@
   --wal-font-display: "Jost", Futura, system-ui, sans-serif;
   --wal-font-body:    "Inter", system-ui, sans-serif;
   --wal-font-mono:    "DM Mono", ui-monospace, "Cascadia Code", monospace;
-  --wal-font-serif:   "Courier Prime", Courier, monospace;
+
+  /* Typewriter — screenplay/call-sheet texture. This is what --wal-font-serif
+     used to hold, which was simply a wrong name: Courier Prime is monospace,
+     so `.wal-font-serif` set a typewriter face and anyone asking for a serif
+     got one silently. The two are separate tokens as of v0.2.0. */
+  --wal-font-typewriter: "Courier Prime", Courier, monospace;
+  --wal-font-serif:      ui-serif, Georgia, "Iowan Old Style", "Times New Roman", serif;
 
   /* Type scale — minor third (1.2) */
   --wal-text-xs:   0.694rem;   /* ~11.1px */

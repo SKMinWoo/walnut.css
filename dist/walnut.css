@@ -287,7 +287,13 @@ table {
   --wal-font-display: "Jost", Futura, system-ui, sans-serif;
   --wal-font-body:    "Inter", system-ui, sans-serif;
   --wal-font-mono:    "DM Mono", ui-monospace, "Cascadia Code", monospace;
-  --wal-font-serif:   "Courier Prime", Courier, monospace;
+
+  /* Typewriter — screenplay/call-sheet texture. This is what --wal-font-serif
+     used to hold, which was simply a wrong name: Courier Prime is monospace,
+     so `.wal-font-serif` set a typewriter face and anyone asking for a serif
+     got one silently. The two are separate tokens as of v0.2.0. */
+  --wal-font-typewriter: "Courier Prime", Courier, monospace;
+  --wal-font-serif:      ui-serif, Georgia, "Iowan Old Style", "Times New Roman", serif;
 
   /* Type scale — minor third (1.2) */
   --wal-text-xs:   0.694rem;   /* ~11.1px */
@@ -818,7 +824,7 @@ mark {
     }
 
     .wal-hero-tagline {
-      font-family: var(--wal-font-serif);
+      font-family: var(--wal-font-typewriter);
       font-size: var(--wal-text-xl);
       color: var(--wal-text-soft);
       max-width: 600px;
@@ -1371,6 +1377,62 @@ mark {
     padding-right: 2.5rem;
   }
 
+  /* ═══ 13b. Field, label, checkbox, radio ═══
+     .wal-input shipped without the furniture around it, so every consumer was
+     inventing its own label and help-text styling. */
+
+  .wal-field {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+  }
+
+  /* Also usable as a bare <label>; the flex row is what puts a checkbox or
+     radio on the same line as its text without extra wrapper markup. */
+  .wal-label {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-family: var(--wal-font-body);
+    font-size: var(--wal-text-sm);
+    font-weight: 500;
+    color: var(--wal-text);
+
+    /* A required marker, opt-in via [data-required] so it needs no extra span. */
+    &[data-required]::after {
+      content: "*";
+      color: var(--wal-accent);
+      font-weight: 700;
+    }
+  }
+
+  .wal-hint {
+    font-size: var(--wal-text-xs);
+    color: var(--wal-text-muted);
+  }
+
+  .wal-error {
+    font-size: var(--wal-text-xs);
+    color: var(--wal-danger);
+  }
+
+  /* accent-color themes the native control in one declaration and keeps the
+     platform's own focus ring, keyboard behaviour and indeterminate state —
+     all of which a re-drawn appearance:none control has to reimplement badly. */
+  .wal-check,
+  .wal-radio {
+    accent-color: var(--wal-accent);
+    width: 1rem;
+    height: 1rem;
+    flex: none;
+    cursor: pointer;
+
+    &:disabled {
+      cursor: not-allowed;
+      opacity: 0.5;
+    }
+  }
+
   /* ═══ 14. Badge ═══ */
   .wal-badge {
     display: inline-flex;
@@ -1840,6 +1902,7 @@ mark {
 .wal-font-body { font-family: var(--wal-font-body); }
 .wal-font-mono { font-family: var(--wal-font-mono); }
 .wal-font-serif { font-family: var(--wal-font-serif); }
+.wal-font-typewriter { font-family: var(--wal-font-typewriter); }
 
 /* Sizes */
 .wal-text-xs { font-size: var(--wal-text-xs); }

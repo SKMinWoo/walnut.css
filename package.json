@@ -22,13 +22,24 @@
   "homepage": "https://github.com/SKMinWoo/walnut.css",
   "main": "dist/walnut.css",
   "style": "dist/walnut.css",
+  "exports": {
+    ".": "./dist/walnut.css",
+    "./min": "./dist/walnut.min.css",
+    "./themes/*": "./dist/themes/*.css",
+    "./src/*": "./src/*",
+    "./package.json": "./package.json"
+  },
+  "sideEffects": [
+    "*.css"
+  ],
   "files": [
     "dist/",
     "src/"
   ],
   "scripts": {
     "build": "node build.js",
-    "dev": "npx serve docs"
+    "dev": "npx serve docs",
+    "prepublishOnly": "node build.js"
   },
   "devDependencies": {}
 }

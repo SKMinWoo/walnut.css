@@ -148,6 +148,7 @@
 .wal-font-body { font-family: var(--wal-font-body); }
 .wal-font-mono { font-family: var(--wal-font-mono); }
 .wal-font-serif { font-family: var(--wal-font-serif); }
+.wal-font-typewriter { font-family: var(--wal-font-typewriter); }
 
 /* Sizes */
 .wal-text-xs { font-size: var(--wal-text-xs); }
