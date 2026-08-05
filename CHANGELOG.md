@@ -110,16 +110,16 @@ which is why none of them were obvious.
   texture) now points at it. If you were relying on `--wal-font-serif` for
   Courier, switch to `--wal-font-typewriter`.
 
+- **`docs/index.html` rewritten against the real API.** It documented a
+  framework that was never shipped: ten classes with no definition, a GitHub
+  link to a nonexistent repo, wrong token defaults, and ~20 uses of
+  `.wal-text-soft` / `.wal-text-muted` as colours — neither is a class, only a
+  token, so they did nothing. The theme switcher was inert because it toggled
+  `theme-cafe` / `theme-botanical` / `theme-midnight` / `theme-snow`, none of
+  which exist. It now switches the four real palettes live.
+
 ### Known issues
 
-- `docs/index.html` is still out of sync with the CSS. It references classes
-  that do not exist (`.theme-cafe`, `.wal-plate-col`, `.wal-nav-link`,
-  `.wal-label`, `.wal-dialog-content`, …) so its theme switcher does nothing.
-  The real theme classes are `.wal-cafe` / `.wal-forest` / `.wal-dusk` /
-  `.wal-bone`.
-- The docs also use `.wal-text-muted` / `.wal-text-soft` as **colours**. They
-  are font **sizes**. The naming split is: **`wal-text-*` = size,
-  `wal-color-*` = colour.**
 - Still no switch or fieldset styling; `.wal-field` is layout only and does not
   wire up `aria-describedby` for you.
 - The chroma tokens are inputs, not guards. walnut cannot clamp them to the
