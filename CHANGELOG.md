@@ -1,5 +1,72 @@
 # Changelog
 
+## 0.3.0
+
+Continues the same exercise as 0.2.0 — everything here came from driving the
+framework from an application rather than from reading the source. The one
+breaking change is a token rename that was a mislabelling, not a redesign.
+
+### Changed (breaking)
+
+- **`--wal-font-serif` is now an actual serif stack.** It used to hold
+  `"Courier Prime", Courier, monospace` — a typewriter face under a serif name,
+  so `.wal-font-serif` silently gave you monospace. The typewriter stack moved
+  to the new **`--wal-font-typewriter`** / `.wal-font-typewriter`, and
+  `.wal-hero-tagline` (the only internal consumer, which wanted the screenplay
+  texture) now points at it. If you were relying on `--wal-font-serif` for
+  Courier, switch to `--wal-font-typewriter`.
+
+### Fixed
+
+- **Dead theme selectors.** Every theme file carried
+  `[data-theme="cafe"][data-theme="light"]` and friends. One element has exactly
+  one value per attribute, so these could never match. Removed; the working
+  forms are `.wal-cafe[data-theme="light"]`, `[data-theme="cafe"].wal-light`,
+  and the fused `[data-theme="cafe-light"]`. The convention is now stated in the
+  source: **palette by class, mode by attribute.**
+
+- **Theme files defeated the chroma tokens.** The base tokens derive
+  `--wal-accent` from `var(--wal-accent-chroma)`, but each theme re-declared
+  `--wal-accent` with the number inlined — so setting the token had no effect
+  the moment a theme class was applied. Themes now *set* the chroma tokens and
+  share the derivation, which is what makes gamut-aware dynamic theming
+  possible under a theme.
+
+- **`docs/index.html` rewritten against the real API.** It documented a
+  framework that was never shipped: ten classes with no definition, a GitHub
+  link to a nonexistent repo, wrong token defaults, and ~20 uses of
+  `.wal-text-soft` / `.wal-text-muted` as colours — neither is a class, only a
+  token, so they did nothing. The theme switcher was inert because it toggled
+  `theme-cafe` / `theme-botanical` / `theme-midnight` / `theme-snow`, none of
+  which exist. It now switches the four real palettes live.
+
+### Added
+
+- **`--wal-accent-chroma`, `--wal-gold-chroma`, `--wal-olive-chroma`.** The
+  saturated tokens used to inline their chroma. The sRGB gamut is not the same
+  width at every hue: at 62% lightness `c=0.17` is in gamut around terracotta
+  and clips across much of the green–blue arc, where the browser silently
+  flattens it and the rendered colour stops matching the requested hue. Anyone
+  rotating `--wal-*-hue` therefore needs to lower chroma with it, and CSS cannot
+  compute the gamut boundary — so it has to be an input.
+
+- **Form primitives:** `.wal-field`, `.wal-label` (with `[data-required]`),
+  `.wal-hint`, `.wal-error`, `.wal-check`, `.wal-radio`. The controls use
+  `accent-color` rather than re-drawing the native widget, which keeps the
+  platform's focus ring, keyboard behaviour and indeterminate state.
+
+- **Packaging:** an `exports` map (`.`, `./min`, `./themes/*`, `./src/*`),
+  `"sideEffects": ["*.css"]` so bundlers don't tree-shake the stylesheet away,
+  and `prepublishOnly` so `dist/` can never be published stale.
+
+### Known issues
+
+- Still no switch or fieldset styling; `.wal-field` is layout only and does not
+  wire up `aria-describedby` for you.
+- The chroma tokens are inputs, not guards. walnut cannot clamp them to the
+  gamut itself — CSS has no way to compute the sRGB boundary — so a consumer
+  driving hue at runtime has to fit chroma on its own side.
+
 ## 0.2.0
 
 First release with real consumers. Everything below was found by adopting the
@@ -45,20 +112,6 @@ which is why none of them were obvious.
 - **README** documented `.wal-nav-name` / `.wal-nav-subtitle`, neither of which
   exists. The real API is `.wal-nav-brand` with a nested `<small>`.
 
-- **Dead theme selectors.** Every theme file carried
-  `[data-theme="cafe"][data-theme="light"]` and friends. One element has exactly
-  one value per attribute, so these could never match. Removed; the working
-  forms are `.wal-cafe[data-theme="light"]`, `[data-theme="cafe"].wal-light`,
-  and the fused `[data-theme="cafe-light"]`. The convention is now stated in the
-  source: **palette by class, mode by attribute.**
-
-- **Theme files defeated the chroma tokens.** The base tokens derive
-  `--wal-accent` from `var(--wal-accent-chroma)`, but each theme re-declared
-  `--wal-accent` with the number inlined — so setting the token had no effect
-  the moment a theme class was applied. Themes now *set* the chroma tokens and
-  share the derivation, which is what makes gamut-aware dynamic theming
-  possible under a theme.
-
 ### Added
 
 - **`--wal-card-bg` and `--wal-card-ink{,-soft,-muted}`** — lets a surface
@@ -82,49 +135,6 @@ which is why none of them were obvious.
   `--wal-metric-border-width`, `--wal-swatch-h`, `--wal-iconbtn-size`,
   `--wal-frame-ratio`, `--wal-note-color`, `--wal-stat-color`,
   `--wal-list-marker`, `--wal-footer-min`.
-
-- **`--wal-accent-chroma`, `--wal-gold-chroma`, `--wal-olive-chroma`.** The
-  saturated tokens used to inline their chroma. The sRGB gamut is not the same
-  width at every hue: at 62% lightness `c=0.17` is in gamut around terracotta
-  and clips across much of the green–blue arc, where the browser silently
-  flattens it and the rendered colour stops matching the requested hue. Anyone
-  rotating `--wal-*-hue` therefore needs to lower chroma with it, and CSS cannot
-  compute the gamut boundary — so it has to be an input.
-
-- **Form primitives:** `.wal-field`, `.wal-label` (with `[data-required]`),
-  `.wal-hint`, `.wal-error`, `.wal-check`, `.wal-radio`. The controls use
-  `accent-color` rather than re-drawing the native widget, which keeps the
-  platform's focus ring, keyboard behaviour and indeterminate state.
-
-- **Packaging:** an `exports` map (`.`, `./min`, `./themes/*`, `./src/*`),
-  `"sideEffects": ["*.css"]` so bundlers don't tree-shake the stylesheet away,
-  and `prepublishOnly` so `dist/` can never be published stale.
-
-### Changed (breaking)
-
-- **`--wal-font-serif` is now an actual serif stack.** It used to hold
-  `"Courier Prime", Courier, monospace` — a typewriter face under a serif name,
-  so `.wal-font-serif` silently gave you monospace. The typewriter stack moved
-  to the new **`--wal-font-typewriter`** / `.wal-font-typewriter`, and
-  `.wal-hero-tagline` (the only internal consumer, which wanted the screenplay
-  texture) now points at it. If you were relying on `--wal-font-serif` for
-  Courier, switch to `--wal-font-typewriter`.
-
-- **`docs/index.html` rewritten against the real API.** It documented a
-  framework that was never shipped: ten classes with no definition, a GitHub
-  link to a nonexistent repo, wrong token defaults, and ~20 uses of
-  `.wal-text-soft` / `.wal-text-muted` as colours — neither is a class, only a
-  token, so they did nothing. The theme switcher was inert because it toggled
-  `theme-cafe` / `theme-botanical` / `theme-midnight` / `theme-snow`, none of
-  which exist. It now switches the four real palettes live.
-
-### Known issues
-
-- Still no switch or fieldset styling; `.wal-field` is layout only and does not
-  wire up `aria-describedby` for you.
-- The chroma tokens are inputs, not guards. walnut cannot clamp them to the
-  gamut itself — CSS has no way to compute the sRGB boundary — so a consumer
-  driving hue at runtime has to fit chroma on its own side.
 
 ## 0.1.0
 
