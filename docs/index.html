@@ -1,44 +1,144 @@
 <!DOCTYPE html>
-<html lang="en" class="wal-cafe" data-theme="dark">
+<html lang="en" class="wal-press" data-finish="catalogue">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>walnut.css · cinematic CSS</title>
-  <meta name="description" content="A cinematic, nature-inspired CSS framework. Café warmth. Botanical texture. Zero JavaScript.">
+  <title>walnut.css · theme a whole site from seven numbers</title>
+  <meta name="description" content="A zero-JavaScript CSS framework. Seven numbers generate every surface, hairline, ink, shadow and foreground — in light and dark, from one declaration each.">
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Courier+Prime:ital,wght@0,400;0,700;1,400;1,700&family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300;1,400;1,500&family=Inter:wght@100..900&family=Jost:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Courier+Prime:ital,wght@0,400;0,700;1,400&family=DM+Mono:ital,wght@0,300;0,400;0,500&family=Inter:wght@100..900&family=Jost:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
 
-  <!-- Themes ship as separate files so a site using one palette pays for one
-       palette. The docs load all four in order to switch them live. -->
   <link rel="stylesheet" href="../dist/walnut.css">
+  <link rel="stylesheet" href="../dist/themes/press.css">
   <link rel="stylesheet" href="../dist/themes/cafe.css">
   <link rel="stylesheet" href="../dist/themes/forest.css">
   <link rel="stylesheet" href="../dist/themes/dusk.css">
   <link rel="stylesheet" href="../dist/themes/bone.css">
 
   <style>
-    /* Demo-only styles. Everything else on this page is walnut itself. */
-    .demo-swatches { display: flex; gap: .4rem; }
+    /* Demo-only styles. Every component on this page is walnut itself; what
+       follows is page furniture — the workbench split, the slider tracks, and
+       the specimen frame. */
+
+    .demo-code { white-space: pre; overflow-x: auto; margin: 0; }
+
+    /* ── Hero workbench ──
+       The hero is not a poster. Controls and the CSS they generate on the
+       left, a page rendering from that CSS on the right. */
+    .wal-hero.demo-top {
+      min-height: auto;
+      padding-block: var(--wal-space-2xl) var(--wal-space-3xl);
+    }
+    .demo-bench {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(min(100%, 21rem), 1fr));
+      gap: var(--wal-space-xl);
+      align-items: start;
+      text-align: start;
+      inline-size: 100%;
+    }
+
+    /* Rods */
+    .demo-rod { display: grid; grid-template-columns: 1fr auto; gap: .1rem .5rem; align-items: center; }
+    .demo-rod > label { grid-column: 1; font-family: var(--wal-font-label); font-size: var(--wal-text-xs); text-transform: uppercase; letter-spacing: var(--wal-tracking-label); color: var(--wal-text-soft); }
+    .demo-rod > output { grid-column: 2; font-family: var(--wal-font-mono); font-size: var(--wal-text-xs); font-variant-numeric: tabular-nums; color: var(--wal-text); }
+    .demo-rod > input { grid-column: 1 / -1; inline-size: 100%; accent-color: var(--wal-accent); min-block-size: 24px; }
+
+    /* A hue track drawn in oklch at the cue's own chroma: the slider IS the palette. */
+    .demo-rod > input[data-track="hue"] {
+      appearance: none; block-size: 12px; border-radius: 2px; cursor: ew-resize;
+      border: var(--wal-hairline) solid var(--wal-line);
+      background: linear-gradient(to right,
+        oklch(var(--l) var(--c) 0), oklch(var(--l) var(--c) 60), oklch(var(--l) var(--c) 120),
+        oklch(var(--l) var(--c) 180), oklch(var(--l) var(--c) 240), oklch(var(--l) var(--c) 300),
+        oklch(var(--l) var(--c) 360));
+    }
+    .demo-rod > input[data-track="hue"]::-webkit-slider-thumb {
+      appearance: none; inline-size: 14px; block-size: 20px; border-radius: 2px;
+      background: var(--wal-text); border: 2px solid var(--wal-bg); cursor: ew-resize;
+    }
+    .demo-rod > input[data-track="hue"]::-moz-range-thumb {
+      inline-size: 12px; block-size: 20px; border-radius: 2px;
+      background: var(--wal-text); border: 2px solid var(--wal-bg); cursor: ew-resize;
+    }
+
+    /* The specimen — a miniature page, built only from walnut classes. */
+    .demo-specimen {
+      border: var(--wal-hairline) solid var(--wal-line);
+      border-radius: var(--wal-radius);
+      background: var(--wal-bg);
+      overflow: hidden;
+    }
+    .demo-specimen-bar {
+      display: flex; align-items: center; justify-content: space-between; gap: var(--wal-space-sm);
+      padding: .5rem .75rem;
+      border-bottom: var(--wal-hairline) solid var(--wal-line);
+      background: var(--wal-bg-subtle);
+    }
+    .demo-specimen-body { padding: var(--wal-space-md); display: grid; gap: var(--wal-space-md); }
+    .demo-dot { inline-size: 9px; block-size: 9px; border-radius: var(--wal-radius-full); }
+
+    /* Palette tiles — each shows its own real cues. */
+    .demo-tile {
+      display: grid; gap: .5rem; inline-size: 100%; text-align: start; cursor: pointer;
+      padding: var(--wal-space-sm);
+      background: var(--wal-surface); color: var(--wal-text);
+      border: var(--wal-hairline) solid var(--wal-line); border-radius: var(--wal-radius);
+    }
+    .demo-tile:hover { border-color: var(--wal-accent); }
+    .demo-tile[aria-pressed="true"] { border-color: var(--wal-accent); box-shadow: inset 0 0 0 1px var(--wal-accent); }
+    .demo-tile-cues { display: grid; grid-template-columns: repeat(5, 1fr); block-size: 30px; border-radius: 2px; overflow: hidden; }
+    .demo-tile-ground { block-size: 10px; border-radius: 2px; border: var(--wal-hairline) solid var(--wal-line); }
+
+    /* Swatch buttons in the masthead. 24px is the accessible floor. */
+    .demo-swatches { display: flex; gap: .3rem; }
     .demo-swatch {
-      width: 26px; height: 26px; border-radius: 50%; cursor: pointer; padding: 0;
-      border: 2px solid var(--wal-line); transition: transform .2s, border-color .2s;
+      inline-size: 24px; block-size: 24px; padding: 0; cursor: pointer;
+      border: var(--wal-hairline) solid var(--wal-line); border-radius: 2px;
+      outline: 2px solid transparent; outline-offset: 0;
     }
-    .demo-swatch:hover { transform: scale(1.12); }
-    .demo-swatch[aria-pressed="true"] { border-color: var(--wal-accent); transform: scale(1.12); }
-    .demo-code {
-      background: var(--wal-bg-subtle); border: 1px solid var(--wal-line);
-      border-radius: var(--wal-radius-sm); padding: var(--wal-space-md);
-      overflow-x: auto; font-family: var(--wal-font-mono);
-      font-size: var(--wal-text-sm); color: var(--wal-text-soft);
-      margin: 0; white-space: pre;
+    .demo-swatch[aria-pressed="true"] { outline-color: var(--wal-accent); outline-offset: 2px; }
+
+    /* Side-by-side evidence panels. */
+    .demo-pair { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 15rem), 1fr)); gap: var(--wal-space-md); }
+    .demo-panel {
+      padding: var(--wal-space-md);
+      background: var(--wal-bg); color: var(--wal-text);
+      border: var(--wal-hairline) solid var(--wal-line); border-radius: var(--wal-radius);
+      display: grid; gap: var(--wal-space-sm); align-content: start;
     }
-    .demo-ramp { display: flex; flex-wrap: wrap; gap: var(--wal-space-sm); }
-    .demo-ramp > div {
-      width: 76px; height: 52px; border-radius: var(--wal-radius-sm);
-      border: 1px solid var(--wal-line);
+
+    /* A block big enough to actually judge a foreground against. The chip-sized
+       version of this demo was technically correct and visually unreadable. */
+    .demo-onCue {
+      margin: 0;
+      padding: var(--wal-space-lg) var(--wal-space-md);
+      text-align: center;
+      border-radius: var(--wal-radius-sm);
+      font-family: var(--wal-font-display);
+      font-size: var(--wal-text-lg);
+      font-weight: 600;
+      background: var(--wal-gold);
+      color: var(--wal-gold-fg);
     }
+
+    /* Reference disclosures — the long-form material, out of the pitch's way. */
+    .demo-ref {
+      border-top: var(--wal-hairline) solid var(--wal-line);
+      padding-block: var(--wal-space-md);
+    }
+    .demo-ref > summary {
+      cursor: pointer; list-style: none;
+      font-family: var(--wal-font-display); font-weight: 600; font-size: var(--wal-text-md);
+      display: flex; align-items: center; justify-content: space-between; gap: var(--wal-space-md);
+    }
+    .demo-ref > summary::-webkit-details-marker { display: none; }
+    .demo-ref > summary::after { content: "+"; font-family: var(--wal-font-mono); color: var(--wal-accent-ink); }
+    .demo-ref[open] > summary::after { content: "–"; }
+    .demo-ref > summary:focus-visible { outline: 2px solid var(--wal-accent); outline-offset: 3px; }
+    .demo-ref-body { padding-block-start: var(--wal-space-md); display: grid; gap: var(--wal-space-md); }
   </style>
 </head>
 <body>
@@ -49,468 +149,763 @@
   <nav class="wal-nav">
     <a class="wal-nav-brand" href="#main">
       walnut.css
-      <small>cinematic css</small>
+      <small>form no. 0.4.0</small>
     </a>
     <div class="wal-nav-links">
-      <a href="#naming">Naming</a>
-      <a href="#tokens">Tokens</a>
+      <a href="#script">Colour script</a>
+      <a href="#modes">Light &amp; dark</a>
+      <a href="#finish">Finish</a>
       <a href="#components">Components</a>
-      <a href="#forms">Forms</a>
-      <a href="#utilities">Utilities</a>
+      <a href="#install">Install</a>
     </div>
     <div class="wal-nav-actions">
-      <div class="demo-swatches" id="themes" role="group" aria-label="Palette">
-        <button class="demo-swatch" type="button" data-palette="wal-cafe"   style="background:#d9432f" title="Café"   aria-pressed="true"></button>
-        <button class="demo-swatch" type="button" data-palette="wal-forest" style="background:#7d9455" title="Forest" aria-pressed="false"></button>
-        <button class="demo-swatch" type="button" data-palette="wal-dusk"   style="background:#e08a4e" title="Dusk"   aria-pressed="false"></button>
-        <button class="demo-swatch" type="button" data-palette="wal-bone"   style="background:#efe9e1" title="Bone"   aria-pressed="false"></button>
+      <div class="demo-swatches" id="palette-switch" role="group" aria-label="Palette">
+        <button class="demo-swatch" type="button" data-palette="wal-press"  style="background:#d94a2f" title="Press"  aria-pressed="true"></button>
+        <button class="demo-swatch" type="button" data-palette="wal-cafe"   style="background:#c0562f" title="Café"   aria-pressed="false"></button>
+        <button class="demo-swatch" type="button" data-palette="wal-forest" style="background:#7d7a35" title="Forest" aria-pressed="false"></button>
+        <button class="demo-swatch" type="button" data-palette="wal-dusk"   style="background:#c96a30" title="Dusk"   aria-pressed="false"></button>
+        <button class="demo-swatch" type="button" data-palette="wal-bone"   style="background:#e8e2d6" title="Bone"   aria-pressed="false"></button>
       </div>
-      <button class="wal-btn wal-btn-secondary wal-btn-sm" type="button" id="mode">Light</button>
+      <button class="wal-btn wal-btn-secondary wal-btn-sm" type="button" id="mode">Dark</button>
     </div>
   </nav>
 
   <main id="main">
 
-    <header class="wal-hero wal-hero-glow">
-      <div class="wal-wrap wal-hero-content">
-        <p class="wal-eyebrow">Zero JavaScript · MIT</p>
-        <h1 class="wal-hero-name">walnut.css</h1>
-        <p class="wal-hero-tagline">
-          A CSS framework built on cascade layers, an oklch palette and intrinsic
-          layout. Café warmth, botanical texture, and no runtime.
+    <!-- ══════════ Hero: the workbench ══════════ -->
+    <header class="wal-hero demo-top">
+      <div class="wal-wrap">
+        <p class="wal-eyebrow">CSS framework · zero JavaScript · MIT</p>
+        <h1 style="max-inline-size: 20ch">Theme a whole site from seven numbers.</h1>
+        <p class="wal-text-md wal-mt-md" style="max-width: 58ch">
+          Drag a rod. Every surface, hairline, ink, hover state, shadow and foreground
+          re-derives — in light and dark, from one declaration each.
         </p>
-        <div class="wal-hero-actions wal-mt-lg">
-          <a class="wal-btn wal-btn-primary" href="https://github.com/SKMinWoo/walnut.css">Get walnut.css</a>
-          <a class="wal-btn wal-btn-secondary" href="#components">See components</a>
+
+        <div class="demo-bench wal-mt-xl">
+
+          <!-- Left: the inputs, and the CSS they produce -->
+          <div class="wal-stack wal-gap-md">
+            <p class="wal-caption">The whole input surface</p>
+
+            <div class="demo-rod">
+              <label for="rod-hue">Ground hue</label><output id="out-hue"></output>
+              <input type="range" id="rod-hue" data-track="hue" data-prop="--wal-hue" min="0" max="360" step="0.5" style="--l:.6;--c:.05">
+            </div>
+            <div class="demo-rod">
+              <label for="rod-chroma">Ground chroma</label><output id="out-chroma"></output>
+              <input type="range" id="rod-chroma" data-prop="--wal-chroma" min="0" max="0.09" step="0.002">
+            </div>
+            <div class="demo-rod">
+              <label for="rod-accent">Accent hue</label><output id="out-accent"></output>
+              <input type="range" id="rod-accent" data-track="hue" data-prop="--wal-accent-hue" min="0" max="360" step="1" style="--l:.6;--c:.17">
+            </div>
+            <div class="demo-rod">
+              <label for="rod-accent-c">Accent chroma</label><output id="out-accent-c"></output>
+              <input type="range" id="rod-accent-c" data-prop="--wal-accent-chroma" min="0" max="0.32" step="0.005">
+            </div>
+
+            <pre class="demo-code" id="generated" aria-live="polite" aria-label="Generated CSS"></pre>
+
+            <div class="wal-cluster">
+              <button class="wal-btn wal-btn-primary wal-btn-sm" type="button" id="copy">Copy this CSS</button>
+              <button class="wal-btn wal-btn-secondary wal-btn-sm" type="button" id="reset">Reset</button>
+              <span class="wal-badge" id="copied" hidden>Copied</span>
+            </div>
+          </div>
+
+          <!-- Right: a page rendered from exactly that CSS -->
+          <div class="wal-stack wal-gap-sm">
+            <p class="wal-caption">What it renders</p>
+
+            <div class="demo-specimen">
+              <div class="demo-specimen-bar">
+                <strong style="font-family: var(--wal-font-display); font-size: var(--wal-text-sm)">Acme Optical</strong>
+                <span class="wal-caption" style="font-size: var(--wal-text-xs)">Catalogue</span>
+              </div>
+              <div class="demo-specimen-body">
+                <div>
+                  <p class="wal-index">Plate 14</p>
+                  <h3 style="margin:0">Field binoculars</h3>
+                  <p class="wal-text-sm" style="margin:0">
+                    Roof prism, nitrogen filled. <a href="#script">Specifications</a>.
+                  </p>
+                </div>
+
+                <div class="wal-cluster">
+                  <button class="wal-btn wal-btn-primary wal-btn-sm" type="button">Order</button>
+                  <button class="wal-btn wal-btn-secondary wal-btn-sm" type="button">Compare</button>
+                  <span class="wal-badge wal-badge-gold">In stock</span>
+                  <span class="wal-badge wal-badge-cool">8 × 42</span>
+                </div>
+
+                <dl class="wal-plate" style="--wal-plate-min: 6rem">
+                  <div><dt>Weight</dt><dd>640 g</dd></div>
+                  <div><dt>Field</dt><dd>7.4°</dd></div>
+                  <div><dt>Coating</dt><dd>FMC</dd></div>
+                </dl>
+
+                <ol class="wal-script" style="--wal-script-h: 2rem; --wal-script-min: 3rem">
+                  <li></li><li></li><li></li><li></li><li></li>
+                </ol>
+              </div>
+            </div>
+
+            <p class="wal-caption">Every element above is a walnut class. None knows the palette changed.</p>
+          </div>
         </div>
-        <p class="wal-avail wal-mt-lg"><span class="wal-avail-dot"></span> v0.2.0</p>
+
+        <dl class="wal-plate wal-mt-xl">
+          <div><dt>Runtime</dt><dd>None</dd></div>
+          <div><dt>Install</dt><dd>1 link tag</dd></div>
+          <div><dt>Palettes</dt><dd>5</dd></div>
+          <div><dt>Licence</dt><dd>MIT</dd></div>
+        </dl>
       </div>
     </header>
 
-    <!-- ══ Naming ══ -->
-    <section class="wal-section" id="naming">
+    <!-- ══════════ 01 · Colour script ══════════ -->
+    <section class="wal-section" id="script">
       <div class="wal-wrap">
-        <p class="wal-eyebrow">Read this first</p>
-        <h2>Two prefixes that are easy to confuse</h2>
-
-        <div class="wal-note" style="--wal-note-color: var(--wal-gold)">
-          <p>
-            <code>wal-text-*</code> sets a font <strong>size</strong>.
-            <code>wal-color-*</code> sets a <strong>colour</strong>.
-            There is no <code>.wal-text-muted</code> class —
-            <code>--wal-text-muted</code> is a <em>token</em>, and the class you want is
-            <code>.wal-color-muted</code>. Using the token name as a class fails
-            silently, which is how the previous version of this page ended up applying
-            roughly twenty rules that did nothing.
-          </p>
-        </div>
-
-        <pre class="demo-code wal-mt-md">&lt;p class="wal-text-sm wal-color-muted"&gt;small and muted&lt;/p&gt;
-
-&lt;!-- does nothing: .wal-text-muted is not a class --&gt;
-&lt;p class="wal-text-muted"&gt;still full size, full contrast&lt;/p&gt;</pre>
-      </div>
-    </section>
-
-    <!-- ══ Tokens ══ -->
-    <section class="wal-section" id="tokens">
-      <div class="wal-wrap">
-        <p class="wal-eyebrow">Tokens</p>
-        <h2>Five hue rods generate the palette</h2>
-        <p>
-          Every colour is derived in <code>oklch()</code> from a handful of numbers, so
-          retheming is arithmetic rather than a second stylesheet.
-        </p>
-
-        <pre class="demo-code">:root {
-  --wal-hue: 55;             /* surfaces and text   */
-  --wal-chroma: 0.04;        /* how warm they are   */
-  --wal-accent-hue: 25;      /* terracotta          */
-  --wal-gold-hue: 85;        /* goldenrod           */
-  --wal-olive-hue: 130;      /* botanical green     */
-
-  --wal-accent-chroma: 0.17; /* saturation, per rod */
-  --wal-gold-chroma:   0.15;
-  --wal-olive-chroma:  0.10;
-}</pre>
-
-        <div class="wal-note wal-mt-lg" style="--wal-note-color: var(--wal-olive)">
-          <p>
-            The chroma tokens exist because <strong>the sRGB gamut is not the same width
-            at every hue</strong>. At 62% lightness <code>c=0.17</code> sits in gamut
-            around terracotta and clips across much of the green–blue arc, where the
-            browser flattens it silently and the rendered colour stops matching the hue
-            you asked for. So if you rotate a hue rod at runtime, lower its chroma with
-            it. CSS cannot compute the gamut boundary, which is why this is an input
-            rather than something walnut can guard for you.
-          </p>
-        </div>
-
-        <h3 class="wal-mt-xl">Palette</h3>
-        <div class="demo-ramp">
-          <div style="background: var(--wal-bg)"        title="--wal-bg"></div>
-          <div style="background: var(--wal-surface)"   title="--wal-surface"></div>
-          <div style="background: var(--wal-surface-2)" title="--wal-surface-2"></div>
-          <div style="background: var(--wal-accent)"    title="--wal-accent"></div>
-          <div style="background: var(--wal-gold)"      title="--wal-gold"></div>
-          <div style="background: var(--wal-olive)"     title="--wal-olive"></div>
-          <div style="background: var(--wal-success)"   title="--wal-success"></div>
-          <div style="background: var(--wal-danger)"    title="--wal-danger"></div>
-        </div>
-
-        <h3 class="wal-mt-xl">Themes</h3>
-        <p>
-          Palette travels by <strong>class</strong>, light/dark travels by
-          <strong>attribute</strong>. They are separate axes, so they compose — and a
-          selector like <code>[data-theme="cafe"][data-theme="light"]</code> can never
-          match, because an element has one value per attribute.
-        </p>
-        <pre class="demo-code">&lt;html class="wal-cafe"   data-theme="dark"&gt;   &lt;!-- café, dark   --&gt;
-&lt;html class="wal-forest" data-theme="light"&gt;  &lt;!-- forest, light --&gt;
-&lt;html data-theme="bone-light"&gt;                &lt;!-- fused form    --&gt;</pre>
-        <p class="wal-text-sm wal-color-muted">
-          Palettes: <code>wal-cafe</code>, <code>wal-forest</code>,
-          <code>wal-dusk</code>, <code>wal-bone</code>. Omit <code>data-theme</code>
-          and the system preference decides.
-        </p>
-      </div>
-    </section>
-
-    <!-- ══ Components ══ -->
-    <section class="wal-section" id="components">
-      <div class="wal-wrap">
-        <p class="wal-eyebrow">Components</p>
-        <h2>Plain markup plus one class</h2>
-
-        <h3>Buttons</h3>
-        <div class="wal-cluster">
-          <button class="wal-btn wal-btn-primary">Primary</button>
-          <button class="wal-btn wal-btn-secondary">Secondary</button>
-          <button class="wal-btn wal-btn-ghost">Ghost</button>
-          <button class="wal-btn wal-btn-primary wal-btn-sm">Small</button>
-          <button class="wal-btn wal-btn-primary wal-btn-lg">Large</button>
-          <button class="wal-btn wal-btn-primary" disabled>Disabled</button>
-        </div>
-
-        <h3 class="wal-mt-xl">Cards</h3>
-        <div class="wal-grid wal-cols-3">
-          <div class="wal-card">
-            <h4>Standard</h4>
-            <p>Rebinds the inherited ink scale from <code>--wal-card-ink</code>, so a
-               card can stay light on a dark page and every descendant follows.</p>
-          </div>
-          <div class="wal-card wal-card-flora">
-            <h4>Flora</h4>
-            <p>A variant with botanical warmth, for callouts.</p>
-          </div>
-          <div class="wal-card wal-glass">
-            <h4>Glass</h4>
-            <p>Backdrop blur over whatever sits behind it.</p>
-          </div>
-        </div>
-
-        <h3 class="wal-mt-xl">Plate</h3>
-        <p class="wal-text-sm wal-color-muted">
-          A spec strip built from <code>&lt;dl&gt;</code>. The hairlines are a 1px
-          <code>gap</code> over a line-coloured background, so they land correctly at
-          any wrap instead of depending on a fixed column count.
-        </p>
-        <dl class="wal-plate">
-          <div><dt>Layers</dt><dd>6</dd></div>
-          <div><dt>Runtime</dt><dd>None</dd></div>
-          <div><dt>Minified</dt><dd>38 KB</dd></div>
-          <div><dt>Licence</dt><dd>MIT</dd></div>
-        </dl>
-
-        <h3 class="wal-mt-xl">Metrics</h3>
-        <div class="wal-grid wal-cols-4">
-          <div class="wal-metric">
-            <span class="wal-metric-value">6</span><span class="wal-metric-label">Layers</span>
-          </div>
-          <div class="wal-metric" style="--wal-metric-color: var(--wal-gold)">
-            <span class="wal-metric-value">4</span><span class="wal-metric-label">Themes</span>
-          </div>
-          <div class="wal-metric" style="--wal-metric-color: var(--wal-olive)">
-            <span class="wal-metric-value">0</span><span class="wal-metric-label">Dependencies</span>
-          </div>
-          <div class="wal-metric">
-            <span class="wal-metric-value">38 KB</span><span class="wal-metric-label">Minified</span>
-          </div>
-        </div>
-
-        <h3 class="wal-mt-xl">Swatches</h3>
-        <div class="wal-grid wal-cols-4">
-          <div class="wal-swatch" style="--wal-swatch-bg: var(--wal-accent)">
-            <div class="wal-swatch-color"></div>
-            <div class="wal-swatch-info">
-              <div class="wal-swatch-name">Accent</div><div class="wal-swatch-hex">--wal-accent</div>
-            </div>
-          </div>
-          <div class="wal-swatch" style="--wal-swatch-bg: var(--wal-gold)">
-            <div class="wal-swatch-color"></div>
-            <div class="wal-swatch-info">
-              <div class="wal-swatch-name">Gold</div><div class="wal-swatch-hex">--wal-gold</div>
-            </div>
-          </div>
-          <div class="wal-swatch" style="--wal-swatch-bg: var(--wal-olive)">
-            <div class="wal-swatch-color"></div>
-            <div class="wal-swatch-info">
-              <div class="wal-swatch-name">Olive</div><div class="wal-swatch-hex">--wal-olive</div>
-            </div>
-          </div>
-          <div class="wal-swatch" style="--wal-swatch-bg: var(--wal-surface-2)">
-            <div class="wal-swatch-color"></div>
-            <div class="wal-swatch-info">
-              <div class="wal-swatch-name">Surface 2</div><div class="wal-swatch-hex">--wal-surface-2</div>
-            </div>
-          </div>
-        </div>
-
-        <h3 class="wal-mt-xl">Timeline</h3>
-        <div class="wal-timeline">
-          <div class="wal-timeline-item">
-            <div class="wal-timeline-date">2026</div>
-            <div class="wal-timeline-content">
-              <h3>v0.2.0</h3>
-              <p>Cascade, container-query and keyframe fixes — all found by adopting the
-                 framework in a production site rather than by reading the source.</p>
-            </div>
-            <div class="wal-timeline-tags">
-              <span class="wal-chip">cascade</span>
-              <span class="wal-chip">layout</span>
-            </div>
-          </div>
-          <div class="wal-timeline-item">
-            <div class="wal-timeline-date">2025</div>
-            <div class="wal-timeline-content">
-              <h3>v0.1.0</h3>
-              <p>Initial release. oklch palette, scroll-driven reveals, four themes.</p>
-            </div>
-            <div class="wal-timeline-tags"><span class="wal-chip">oklch</span></div>
-          </div>
-        </div>
-
-        <h3 class="wal-mt-xl">Chips, badges, notes</h3>
-        <div class="wal-cluster">
-          <span class="wal-chip">chip</span>
-          <span class="wal-badge">badge</span>
-          <span class="wal-badge wal-badge-accent">accent</span>
-          <span class="wal-badge wal-badge-gold">gold</span>
-          <span class="wal-badge wal-badge-olive">olive</span>
-        </div>
-        <div class="wal-note wal-mt-md" style="--wal-note-color: var(--wal-accent)">
-          <p>A note takes its top rule from <code>--wal-note-color</code>.</p>
-        </div>
-
-        <h3 class="wal-mt-xl">Table</h3>
-        <table class="wal-table">
-          <thead><tr><th>Token</th><th>Default</th><th>Controls</th></tr></thead>
-          <tbody>
-            <tr><td><code>--wal-radius</code></td><td>12px</td><td>Corner rounding</td></tr>
-            <tr><td><code>--wal-nav-h</code></td><td>64px</td><td>Navbar height</td></tr>
-            <tr><td><code>--wal-duration</code></td><td>0.2s</td><td>Transition length</td></tr>
-            <tr><td><code>--wal-plate-min</code></td><td>10rem</td><td>Plate column floor</td></tr>
-          </tbody>
-        </table>
-
-        <h3 class="wal-mt-xl">Lists and links</h3>
-        <ul class="wal-list-dash">
-          <li>No build step and no JavaScript.</li>
-          <li>Cascade layers, so your unlayered CSS always wins.</li>
-          <li>Intrinsic layout — nothing to configure per breakpoint.</li>
-        </ul>
-        <a class="wal-link-arrow" href="#utilities">See the utilities</a>
-
-        <h3 class="wal-mt-xl">Interactive</h3>
-        <div class="wal-cluster">
-          <button class="wal-btn wal-btn-primary" popovertarget="demo-dialog">Open dialog</button>
-          <div id="demo-dialog" class="wal-dialog" popover>
-            <h3>Native popover</h3>
-            <p>Driven by the HTML <code>popover</code> attribute and styled in CSS —
-               no JavaScript, and it lands in the top layer for free.</p>
-            <button class="wal-btn wal-btn-secondary" popovertarget="demo-dialog" popovertargetaction="hide">Close</button>
-          </div>
-
-          <button class="wal-btn wal-btn-ghost wal-tooltip-trigger">
-            Hover me
-            <span class="wal-tooltip">A CSS-only tooltip</span>
-          </button>
-        </div>
-      </div>
-    </section>
-
-    <!-- ══ Forms ══ -->
-    <section class="wal-section" id="forms">
-      <div class="wal-wrap">
-        <p class="wal-eyebrow">Forms</p>
-        <h2>Inputs, labels and native controls</h2>
+        <header class="wal-section-head">
+          <p class="wal-index">01</p>
+          <h2>Write three cues, get five</h2>
+          <p class="wal-caption">The script stays in tune when you rotate it</p>
+        </header>
 
         <div class="wal-grid wal-cols-2">
           <div class="wal-stack wal-gap-md">
+            <pre class="demo-code">--wal-accent-hue: 31;   /* you write this  */
+--wal-gold-hue:   78;   /* and this        */
+--wal-olive-hue:  140;  /* and this        */
+
+/* bloom  = accent + 27°   ← derived */
+/* cool   = accent + 209°  ← derived */</pre>
+            <p class="wal-text-sm">
+              Bloom is a warm step from the lead; cool is its near-exact complement.
+              Both are defaults, so moving the accent moves them with it — drag the
+              accent rod above and watch cues 2 and 5 follow.
+            </p>
+          </div>
+
+          <div>
+            <ol class="wal-script" id="strip">
+              <li><b>Accent</b><small data-hue>—</small></li>
+              <li><b>Bloom</b><small data-hue>—</small></li>
+              <li><b>Gold</b><small data-hue>—</small></li>
+              <li><b>Olive</b><small data-hue>—</small></li>
+              <li><b>Cool</b><small data-hue>—</small></li>
+            </ol>
+          </div>
+        </div>
+
+        <div class="wal-rule wal-mt-xl"><span>One hue, nine stops</span></div>
+        <p class="wal-text-sm wal-color-muted">
+          Every neutral — page, card stock, hairlines, ink — is the ground rod at a
+          different lightness. That is what makes a palette a system rather than a
+          collection.
+        </p>
+        <ol class="wal-script wal-mt-sm" style="--wal-script-h: 2.75rem; --wal-script-min: 6rem">
+          <li style="--wal-cue: var(--wal-bg)"><small>bg</small></li>
+          <li style="--wal-cue: var(--wal-bg-subtle)"><small>bg-subtle</small></li>
+          <li style="--wal-cue: var(--wal-surface)"><small>surface</small></li>
+          <li style="--wal-cue: var(--wal-surface-2)"><small>surface-2</small></li>
+          <li style="--wal-cue: var(--wal-line)"><small>line</small></li>
+          <li style="--wal-cue: var(--wal-text-muted)"><small>text-muted</small></li>
+          <li style="--wal-cue: var(--wal-text-soft)"><small>text-soft</small></li>
+          <li style="--wal-cue: var(--wal-text)"><small>text</small></li>
+        </ol>
+      </div>
+    </section>
+
+    <!-- ══════════ 02 · Light & dark ══════════ -->
+    <section class="wal-section" id="modes">
+      <div class="wal-wrap">
+        <header class="wal-section-head">
+          <p class="wal-index">02</p>
+          <h2>One declaration covers both modes</h2>
+          <p class="wal-caption">And any subtree that wants the other one</p>
+        </header>
+
+        <div class="wal-grid wal-cols-2">
+          <div class="wal-stack wal-gap-md">
+            <pre class="demo-code">--wal-bg: light-dark(
+  oklch(93% …),   /* light */
+  oklch(16% …)    /* dark  */
+);</pre>
+            <p class="wal-text-sm">
+              Custom properties store an unsubstituted token stream, so
+              <code>light-dark()</code> resolves where the token is <em>used</em>, not
+              where it is declared. Both panels here run the same markup and the same
+              tokens — only <code>color-scheme</code> differs.
+            </p>
+            <p class="wal-text-sm wal-color-muted">
+              Because it is a real <code>color-scheme</code>, native form controls and
+              scrollbars follow it too.
+            </p>
+          </div>
+
+          <div class="demo-pair">
+            <div class="demo-panel wal-light">
+              <p class="wal-caption">.wal-light</p>
+              <p class="wal-text-sm" style="margin:0">Same markup. No second palette.</p>
+              <div class="wal-cluster">
+                <span class="wal-badge wal-badge-accent">accent</span>
+                <span class="wal-badge wal-badge-gold">gold</span>
+              </div>
+              <input class="wal-input" placeholder="native control">
+            </div>
+            <div class="demo-panel wal-dark">
+              <p class="wal-caption">.wal-dark</p>
+              <p class="wal-text-sm" style="margin:0">Same markup. No second palette.</p>
+              <div class="wal-cluster">
+                <span class="wal-badge wal-badge-accent">accent</span>
+                <span class="wal-badge wal-badge-gold">gold</span>
+              </div>
+              <input class="wal-input" placeholder="native control">
+            </div>
+          </div>
+        </div>
+
+        <div class="wal-rule wal-mt-xl"><span>Foregrounds are computed, not chosen</span></div>
+        <div class="wal-grid wal-cols-2">
+          <div class="demo-pair">
+            <div class="demo-panel wal-light">
+              <p class="wal-caption">light · gold sits at L 0.62</p>
+              <p class="demo-onCue">Text on gold</p>
+            </div>
+            <div class="demo-panel wal-dark">
+              <p class="wal-caption">dark · gold sits at L 0.75</p>
+              <p class="demo-onCue">Text on gold</p>
+            </div>
+          </div>
+          <p class="wal-text-sm">
+            Those two chips carry <strong>opposite</strong> foregrounds, and no rule names
+            either one. Gold crosses the legibility threshold between modes, so
+            <code>--wal-gold-fg</code> derives near-white on paper and near-black on a dark
+            ground — from the cue's own lightness, every time you rotate it.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ══════════ 03 · Finish ══════════ -->
+    <section class="wal-section" id="finish">
+      <div class="wal-wrap">
+        <header class="wal-section-head">
+          <p class="wal-index">03</p>
+          <h2>One attribute changes the whole object</h2>
+          <p class="wal-caption">Same palette, same markup, different kind of thing</p>
+        </header>
+
+        <div class="demo-pair">
+          <div class="demo-panel" data-finish="catalogue">
+            <p class="wal-caption">data-finish="catalogue"</p>
+            <div class="wal-card">
+              <h4 style="margin:0">Field binoculars</h4>
+              <p class="wal-text-sm" style="margin:0">Roof prism, nitrogen filled.</p>
+              <div class="wal-cluster">
+                <button class="wal-btn wal-btn-primary wal-btn-sm" type="button">Order</button>
+                <span class="wal-badge wal-badge-gold">In stock</span>
+              </div>
+            </div>
+          </div>
+          <div class="demo-panel" data-finish="soft">
+            <p class="wal-caption">data-finish="soft"</p>
+            <div class="wal-card">
+              <h4 style="margin:0">Field binoculars</h4>
+              <p class="wal-text-sm" style="margin:0">Roof prism, nitrogen filled.</p>
+              <div class="wal-cluster">
+                <button class="wal-btn wal-btn-primary wal-btn-sm" type="button">Order</button>
+                <span class="wal-badge wal-badge-gold">In stock</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="wal-grid wal-cols-2 wal-mt-lg">
+          <pre class="demo-code">[data-finish="catalogue"] {
+  --wal-radius: 3px;
+  --wal-btn-radius: 2px;
+  --wal-elevation: 0.35;
+  --wal-wash: 0;
+  --wal-line-boost: 1.7;
+  --wal-tracking-label: 0.16em;
+  --wal-font-label: var(--wal-font-typewriter);
+}</pre>
+          <p class="wal-text-sm">
+            A finish is a retune of the geometry and atmosphere tokens every component
+            already reads — no component selectors, so adding a component never means
+            updating a finish. Palette answers <em>what colour</em>; finish answers
+            <em>what kind of object</em>. They compose freely.
+          </p>
+        </div>
+
+        <div class="wal-cluster wal-mt-md">
+          <button class="wal-btn wal-btn-secondary wal-btn-sm" type="button" id="finish-toggle">Apply the soft finish to this page</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ══════════ 04 · Palettes ══════════ -->
+    <section class="wal-section" id="palettes">
+      <div class="wal-wrap">
+        <header class="wal-section-head">
+          <p class="wal-index">04</p>
+          <h2>Five palettes, thirty lines each</h2>
+          <p class="wal-caption">Ground rod on top, five cues below — click to apply</p>
+        </header>
+
+        <div class="wal-grid wal-cols-3" id="palette-tiles">
+          <button class="demo-tile wal-press" type="button" data-palette="wal-press" aria-pressed="true">
+            <span class="demo-tile-ground" style="background: var(--wal-bg)"></span>
+            <span class="demo-tile-cues">
+              <span style="background: var(--wal-cue-1)"></span><span style="background: var(--wal-cue-2)"></span>
+              <span style="background: var(--wal-cue-3)"></span><span style="background: var(--wal-cue-4)"></span>
+              <span style="background: var(--wal-cue-5)"></span>
+            </span>
+            <span><b style="font-family: var(--wal-font-display)">Press</b>
+              <small class="wal-caption" style="display:block">1960s parts catalogue</small></span>
+          </button>
+
+          <button class="demo-tile wal-cafe" type="button" data-palette="wal-cafe" aria-pressed="false">
+            <span class="demo-tile-ground" style="background: var(--wal-bg)"></span>
+            <span class="demo-tile-cues">
+              <span style="background: var(--wal-cue-1)"></span><span style="background: var(--wal-cue-2)"></span>
+              <span style="background: var(--wal-cue-3)"></span><span style="background: var(--wal-cue-4)"></span>
+              <span style="background: var(--wal-cue-5)"></span>
+            </span>
+            <span><b style="font-family: var(--wal-font-display)">Café</b>
+              <small class="wal-caption" style="display:block">Walnut, bone china, brass</small></span>
+          </button>
+
+          <button class="demo-tile wal-forest" type="button" data-palette="wal-forest" aria-pressed="false">
+            <span class="demo-tile-ground" style="background: var(--wal-bg)"></span>
+            <span class="demo-tile-cues">
+              <span style="background: var(--wal-cue-1)"></span><span style="background: var(--wal-cue-2)"></span>
+              <span style="background: var(--wal-cue-3)"></span><span style="background: var(--wal-cue-4)"></span>
+              <span style="background: var(--wal-cue-5)"></span>
+            </span>
+            <span><b style="font-family: var(--wal-font-display)">Forest</b>
+              <small class="wal-caption" style="display:block">Mossy floor, copper firelight</small></span>
+          </button>
+
+          <button class="demo-tile wal-dusk" type="button" data-palette="wal-dusk" aria-pressed="false">
+            <span class="demo-tile-ground" style="background: var(--wal-bg)"></span>
+            <span class="demo-tile-cues">
+              <span style="background: var(--wal-cue-1)"></span><span style="background: var(--wal-cue-2)"></span>
+              <span style="background: var(--wal-cue-3)"></span><span style="background: var(--wal-cue-4)"></span>
+              <span style="background: var(--wal-cue-5)"></span>
+            </span>
+            <span><b style="font-family: var(--wal-font-display)">Dusk</b>
+              <small class="wal-caption" style="display:block">Sunset, lantern, twilight</small></span>
+          </button>
+
+          <button class="demo-tile wal-bone" type="button" data-palette="wal-bone" aria-pressed="false">
+            <span class="demo-tile-ground" style="background: var(--wal-bg)"></span>
+            <span class="demo-tile-cues">
+              <span style="background: var(--wal-cue-1)"></span><span style="background: var(--wal-cue-2)"></span>
+              <span style="background: var(--wal-cue-3)"></span><span style="background: var(--wal-cue-4)"></span>
+              <span style="background: var(--wal-cue-5)"></span>
+            </span>
+            <span><b style="font-family: var(--wal-font-display)">Bone</b>
+              <small class="wal-caption" style="display:block">Linen, watercolour, light-first</small></span>
+          </button>
+
+          <div class="demo-tile" style="cursor:default">
+            <span class="demo-tile-ground" style="background: var(--wal-surface-2)"></span>
+            <span class="demo-tile-cues" style="place-items:center; grid-template-columns:1fr; border:var(--wal-hairline) dashed var(--wal-line)">
+              <span class="wal-caption" style="align-self:center; justify-self:center">7 numbers</span>
+            </span>
+            <span><b style="font-family: var(--wal-font-display)">Yours</b>
+              <small class="wal-caption" style="display:block">One :root block</small></span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ══════════ 05 · Components ══════════ -->
+    <section class="wal-section" id="components">
+      <div class="wal-wrap">
+        <header class="wal-section-head">
+          <p class="wal-index">05</p>
+          <h2>Components</h2>
+          <p class="wal-caption">Plain markup plus one class · all re-theme with the rods</p>
+        </header>
+
+        <div class="wal-grid wal-cols-2">
+          <div class="wal-stack wal-gap-sm">
+            <p class="wal-caption">.wal-btn</p>
+            <div class="wal-cluster">
+              <button class="wal-btn wal-btn-primary">Primary</button>
+              <button class="wal-btn wal-btn-secondary">Secondary</button>
+              <button class="wal-btn wal-btn-ghost">Ghost</button>
+              <button class="wal-btn wal-btn-primary" disabled>Disabled</button>
+            </div>
+          </div>
+
+          <div class="wal-stack wal-gap-sm">
+            <p class="wal-caption">.wal-badge · .wal-chip</p>
+            <div class="wal-cluster">
+              <span class="wal-chip">chip</span>
+              <span class="wal-badge wal-badge-accent">accent</span>
+              <span class="wal-badge wal-badge-bloom">bloom</span>
+              <span class="wal-badge wal-badge-gold">gold</span>
+              <span class="wal-badge wal-badge-olive">olive</span>
+              <span class="wal-badge wal-badge-cool">cool</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="wal-grid wal-cols-3 wal-mt-lg">
+          <div class="wal-card">
+            <p class="wal-caption">.wal-card</p>
+            <h4 style="margin:0">Printed plate</h4>
+            <p class="wal-text-sm" style="margin:0">Rebinds the ink scale, so it can stay
+              light on a dark page and every descendant follows.</p>
+          </div>
+          <div class="wal-metric">
+            <span class="wal-metric-value">640</span>
+            <span class="wal-metric-label">.wal-metric</span>
+          </div>
+          <div class="wal-card">
+            <p class="wal-caption">.wal-note</p>
+            <div class="wal-note" style="--wal-note-color: var(--wal-cool)">
+              <p class="wal-text-sm" style="margin:0">A titled block under a coloured rule.</p>
+            </div>
+          </div>
+        </div>
+
+        <p class="wal-caption wal-mt-lg">.wal-plate</p>
+        <dl class="wal-plate">
+          <div><dt>Layers</dt><dd>8</dd></div>
+          <div><dt>Runtime</dt><dd>None</dd></div>
+          <div><dt>Cues</dt><dd>5</dd></div>
+          <div><dt>Licence</dt><dd>MIT</dd></div>
+        </dl>
+
+        <div class="wal-grid wal-cols-2 wal-mt-lg">
+          <div class="wal-stack wal-gap-sm">
+            <p class="wal-caption">.wal-field · .wal-input · .wal-check</p>
             <div class="wal-field">
               <label class="wal-label" for="d-name" data-required>Name</label>
               <input class="wal-input" id="d-name" placeholder="Ada Lovelace">
               <span class="wal-hint">Shown on your public profile.</span>
             </div>
-
-            <div class="wal-field">
-              <label class="wal-label" for="d-brief">Brief</label>
-              <textarea class="wal-input" id="d-brief" rows="3" placeholder="a rainy Tokyo alley at midnight"></textarea>
-              <span class="wal-error">Keep it under 280 characters.</span>
-            </div>
-
-            <div class="wal-field">
-              <label class="wal-label" for="d-palette">Palette</label>
-              <select class="wal-input" id="d-palette">
-                <option>Café</option><option>Forest</option><option>Dusk</option><option>Bone</option>
-              </select>
-            </div>
+            <label class="wal-label"><input class="wal-check" type="checkbox" checked> Themed with accent-color</label>
           </div>
 
-          <div class="wal-stack wal-gap-md">
-            <label class="wal-label"><input class="wal-check" type="checkbox" checked> Cascade layers</label>
-            <label class="wal-label"><input class="wal-check" type="checkbox"> Scroll-driven animation</label>
-            <label class="wal-label"><input class="wal-check" type="checkbox" disabled> Unavailable</label>
-
-            <label class="wal-label"><input class="wal-radio" type="radio" name="d-mode" checked> Dark</label>
-            <label class="wal-label"><input class="wal-radio" type="radio" name="d-mode"> Light</label>
-            <label class="wal-label"><input class="wal-radio" type="radio" name="d-mode"> System</label>
-
-            <div class="wal-note" style="--wal-note-color: var(--wal-olive)">
-              <p class="wal-text-sm">
-                Checkboxes and radios are themed with <code>accent-color</code> rather
-                than redrawn with <code>appearance: none</code>, so the platform's focus
-                ring, keyboard behaviour and indeterminate state all survive.
-              </p>
+          <div class="wal-stack wal-gap-sm">
+            <p class="wal-caption">.wal-dialog · .wal-tooltip · .wal-timeline</p>
+            <div class="wal-cluster">
+              <button class="wal-btn wal-btn-primary wal-btn-sm" popovertarget="demo-dialog">Open dialog</button>
+              <div id="demo-dialog" class="wal-dialog" popover>
+                <h3>Native popover</h3>
+                <p>Driven by the HTML <code>popover</code> attribute and styled in CSS —
+                   no JavaScript, and it lands in the top layer for free.</p>
+                <button class="wal-btn wal-btn-secondary" popovertarget="demo-dialog" popovertargetaction="hide">Close</button>
+              </div>
+              <button class="wal-btn wal-btn-ghost wal-btn-sm wal-tooltip-trigger">
+                Hover me
+                <span class="wal-tooltip">A CSS-only tooltip</span>
+              </button>
+            </div>
+            <div class="wal-timeline">
+              <div class="wal-timeline-item">
+                <div class="wal-timeline-date">0.4.0</div>
+                <div class="wal-timeline-content">
+                  <h3>Themed by colour script</h3>
+                  <p>One rod, five cues, one declaration per colour.</p>
+                </div>
+                <div class="wal-timeline-tags"><span class="wal-chip">tokens</span></div>
+              </div>
             </div>
           </div>
         </div>
       </div>
     </section>
 
-    <!-- ══ Utilities ══ -->
-    <section class="wal-section" id="utilities">
+    <!-- ══════════ 06 · Install ══════════ -->
+    <section class="wal-section" id="install">
       <div class="wal-wrap">
-        <p class="wal-eyebrow">Utilities</p>
-        <h2>Layout and type helpers</h2>
+        <header class="wal-section-head">
+          <p class="wal-index">06</p>
+          <h2>Install</h2>
+          <p class="wal-caption">One link tag · no build step · no runtime</p>
+        </header>
 
-        <h3>Grid</h3>
-        <p class="wal-text-sm wal-color-muted">
-          <code>.wal-cols-*</code> sizes intrinsically with <code>auto-fit</code> over a
-          <code>minmax()</code> floor. It needs no container query, so it collapses
-          correctly at any nesting depth — including inside a card or a sidebar.
-        </p>
-        <pre class="demo-code">&lt;div class="wal-grid wal-cols-3"&gt;…&lt;/div&gt;   &lt;!-- 16rem floor --&gt;</pre>
+        <div class="wal-grid wal-cols-2">
+          <pre class="demo-code">npm install walnut.css</pre>
+          <pre class="demo-code">&lt;link rel="stylesheet"
+      href="walnut.css/dist/walnut.css"&gt;
 
-        <h3 class="wal-mt-xl">Type</h3>
-        <div class="wal-stack wal-gap-xs">
-          <p class="wal-text-3xl wal-font-display">Display 3xl — Jost</p>
-          <p class="wal-text-lg">Body lg — Inter</p>
-          <p class="wal-text-sm wal-font-mono">Mono sm — DM Mono</p>
-          <p class="wal-text-sm wal-font-typewriter">Typewriter — Courier Prime</p>
-          <p class="wal-text-sm wal-font-serif">Serif — Georgia</p>
+&lt;html class="wal-press"
+      data-finish="catalogue"&gt;</pre>
         </div>
+
         <p class="wal-text-sm wal-color-muted wal-mt-md">
-          <code>--wal-font-serif</code> used to hold Courier Prime, which is monospace.
-          As of v0.2.0 the typewriter stack lives in
-          <code>--wal-font-typewriter</code> and the serif token is an actual serif.
+          The base stylesheet already carries a complete script, so a palette file is
+          optional — and unnecessary if you are writing your own.
         </p>
 
-        <h3 class="wal-mt-xl">Colour</h3>
-        <div class="wal-stack wal-gap-xs">
-          <p class="wal-color-accent">.wal-color-accent</p>
-          <p class="wal-color-gold">.wal-color-gold</p>
-          <p class="wal-color-olive">.wal-color-olive</p>
-          <p class="wal-color-soft">.wal-color-soft</p>
-          <p class="wal-color-muted">.wal-color-muted</p>
-        </div>
-      </div>
-    </section>
+        <div class="wal-rule wal-mt-xl"><span>Reference</span></div>
 
-    <!-- ══ Cascade ══ -->
-    <section class="wal-section" id="cascade">
-      <div class="wal-wrap">
-        <p class="wal-eyebrow">Cascade</p>
-        <h2>Your CSS wins by default</h2>
-        <p>
-          walnut ships entirely inside <code>@layer</code>. Unlayered declarations beat
-          every layered one regardless of specificity, so an ordinary rule of yours
-          overrides the framework with no <code>!important</code> and no specificity
-          games.
-        </p>
-        <pre class="demo-code">@layer wal.reset, wal.tokens, wal.base, wal.layout, wal.components, wal.utilities, wal.cinema;
+        <details class="demo-ref">
+          <summary>Every token you can tune</summary>
+          <div class="demo-ref-body">
+            <table class="wal-table">
+              <thead><tr><th>Token</th><th>Controls</th></tr></thead>
+              <tbody>
+                <tr><td><code>--wal-hue</code> · <code>--wal-chroma</code></td><td>The ground rod — every neutral</td></tr>
+                <tr><td><code>--wal-&lt;cue&gt;-hue</code> · <code>-chroma</code></td><td>Each of the five cues</td></tr>
+                <tr><td><code>--wal-&lt;cue&gt;-ink</code></td><td>The cue as type, not as fill</td></tr>
+                <tr><td><code>--wal-&lt;cue&gt;-soft</code> · <code>-fg</code></td><td>Wash background · computed foreground</td></tr>
+                <tr><td><code>--wal-cue-1…5</code></td><td>Positional aliases, for iterating</td></tr>
+                <tr><td><code>--wal-l-*-light</code> · <code>-dark</code></td><td>Lightness stop per surface, per mode</td></tr>
+                <tr><td><code>--wal-cx-*</code></td><td>Chroma as a fraction of the rod</td></tr>
+                <tr><td><code>--wal-elevation</code> · <code>--wal-wash</code></td><td>Shadow depth · tinted light on body</td></tr>
+                <tr><td><code>--wal-line-boost</code></td><td>Hairline strength, without owning a colour</td></tr>
+                <tr><td><code>--wal-radius</code> and friends</td><td>Geometry, per component family</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </details>
+
+        <details class="demo-ref">
+          <summary>Fills and type are different colours</summary>
+          <div class="demo-ref-body">
+            <p class="wal-text-sm">
+              Goldenrod is a fine button and an illegible paragraph. Each cue therefore has
+              four forms, and picking the right one is most of what good theming is.
+            </p>
+            <table class="wal-table">
+              <thead><tr><th>Token</th><th>Use</th><th></th></tr></thead>
+              <tbody>
+                <tr><td><code>--wal-gold</code></td><td>The cue as a <strong>fill</strong></td>
+                    <td><span class="wal-badge" style="background: var(--wal-gold); color: var(--wal-gold-fg)">fill</span></td></tr>
+                <tr><td><code>--wal-gold-ink</code></td><td>The cue as <strong>type</strong></td>
+                    <td><span class="wal-color-gold">goldenrod text</span></td></tr>
+                <tr><td><code>--wal-gold-soft</code></td><td>A 15% wash</td>
+                    <td><span class="wal-badge wal-badge-gold">soft</span></td></tr>
+                <tr><td><code>--wal-gold-fg</code></td><td>Legible <strong>on</strong> the cue</td>
+                    <td><span class="wal-badge" style="background: var(--wal-gold); color: var(--wal-gold-fg)">on gold</span></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </details>
+
+        <details class="demo-ref">
+          <summary>Chroma is an input because the sRGB gamut is not a circle</summary>
+          <div class="demo-ref-body">
+            <p class="wal-text-sm">
+              The gamut is not the same width at every hue. At 62% lightness
+              <code>c = 0.17</code> is in gamut around terracotta and clips across much of
+              the green–blue arc, where the browser flattens it silently and the rendered
+              colour stops matching the hue you asked for. CSS cannot compute the gamut
+              boundary, so rotating a hue far from its shipped value means lowering its
+              chroma with it. Push the accent chroma to maximum in the workbench and sweep
+              the hue to see exactly where it stops tracking.
+            </p>
+          </div>
+        </details>
+
+        <details class="demo-ref">
+          <summary>Your CSS wins by default</summary>
+          <div class="demo-ref-body">
+            <pre class="demo-code">@layer reset, tokens, base, layout, components, finish, utilities, cinema;
 
 /* unlayered — beats all of the above */
 .wal-card { border-radius: 3px; }</pre>
+            <p class="wal-text-sm">
+              Unlayered declarations beat every layered one regardless of specificity, so
+              an ordinary rule of yours overrides the framework with no
+              <code>!important</code>. Two caveats: an unlayered rule only outranks the
+              framework <strong>for the properties it declares</strong> — override
+              <code>flex-direction</code> and walnut's <code>gap</code> still applies — and
+              <code>!important</code> inverts layer order, so walnut's reduced-motion block
+              deliberately still wins.
+            </p>
+          </div>
+        </details>
 
-        <div class="wal-note wal-mt-md" style="--wal-note-color: var(--wal-gold)">
-          <p>
-            Two caveats worth knowing before you debug one of them. An unlayered rule
-            only outranks the framework <strong>for the properties it actually
-            declares</strong> — override <code>flex-direction</code> and walnut's
-            <code>gap</code> still applies. And <code>!important</code> inverts layer
-            order, so walnut's reduced-motion block deliberately still wins.
-          </p>
-        </div>
-      </div>
-    </section>
+        <details class="demo-ref">
+          <summary>The one naming trap</summary>
+          <div class="demo-ref-body">
+            <p class="wal-text-sm">
+              <code>wal-text-*</code> sets a font <strong>size</strong>.
+              <code>wal-color-*</code> sets a <strong>colour</strong>. There is no
+              <code>.wal-text-muted</code> class — that is a token name, and using it as a
+              class fails silently.
+            </p>
+            <pre class="demo-code">&lt;p class="wal-text-sm wal-color-muted"&gt;small and muted&lt;/p&gt;
 
-    <!-- ══ Install ══ -->
-    <section class="wal-section" id="install">
-      <div class="wal-wrap">
-        <p class="wal-eyebrow">Get started</p>
-        <h2>Install</h2>
-        <pre class="demo-code">npm install walnut.css</pre>
-        <pre class="demo-code wal-mt-md">&lt;link rel="stylesheet" href="node_modules/walnut.css/dist/walnut.css"&gt;
-&lt;link rel="stylesheet" href="node_modules/walnut.css/dist/themes/cafe.css"&gt;</pre>
-        <p class="wal-text-sm wal-color-muted wal-mt-md">
-          The base stylesheet already carries the café palette on <code>:root</code>.
-          Add a theme file only if you want to switch palettes by class.
-        </p>
+&lt;!-- does nothing: .wal-text-muted is not a class --&gt;
+&lt;p class="wal-text-muted"&gt;still full size, full contrast&lt;/p&gt;</pre>
+          </div>
+        </details>
+
+        <details class="demo-ref">
+          <summary>Browser support</summary>
+          <div class="demo-ref-body">
+            <p class="wal-text-sm">
+              <code>light-dark()</code> sets the floor: Chrome / Edge 123, Safari 17.5,
+              Firefox 120. Relative colour syntax — the computed <code>-fg</code> tokens —
+              sits behind <code>@supports</code> and degrades to a stated value.
+            </p>
+          </div>
+        </details>
       </div>
     </section>
   </main>
 
   <footer class="wal-footer">
-    <div class="wal-footer-grid">
-      <div>
-        <p class="wal-eyebrow">walnut.css</p>
-        <p class="wal-text-sm wal-color-muted">Cinematic CSS. Zero JavaScript. MIT.</p>
-      </div>
-      <div>
-        <p class="wal-eyebrow">Links</p>
-        <ul class="wal-list-dash">
-          <li><a href="https://github.com/SKMinWoo/walnut.css">GitHub</a></li>
-          <li><a href="https://github.com/SKMinWoo/walnut.css/blob/master/CHANGELOG.md">Changelog</a></li>
-        </ul>
-      </div>
+    <div class="wal-wrap">
+      <dl class="wal-footer-grid">
+        <div><dt>Form</dt><dd>walnut.css 0.4.0</dd></div>
+        <div><dt>Licence</dt><dd>MIT</dd></div>
+        <div><dt>Source</dt><dd><a href="https://github.com/SKMinWoo/walnut.css">github.com/SKMinWoo/walnut.css</a></dd></div>
+        <div><dt>Changelog</dt><dd><a href="https://github.com/SKMinWoo/walnut.css/blob/master/CHANGELOG.md">CHANGELOG.md</a></dd></div>
+      </dl>
+      <p class="wal-caption wal-mt-lg">Set in Jost, Inter, DM Mono and Courier Prime · Built by Alex Kim</p>
     </div>
-    <p class="wal-text-sm wal-color-muted">walnut.css &middot; MIT License &middot; Built by Alex Kim</p>
   </footer>
 
   <script>
-    // Palette by class, mode by attribute — the same two axes the CSS uses.
-    const PALETTES = ["wal-cafe", "wal-forest", "wal-dusk", "wal-bone"];
     const root = document.documentElement;
+    const PALETTES = ["wal-press", "wal-cafe", "wal-forest", "wal-dusk", "wal-bone"];
 
-    document.getElementById("themes").addEventListener("click", (e) => {
-      const btn = e.target.closest("[data-palette]");
-      if (!btn) return;
+    /* ── Rods ──
+       Each slider writes one custom property on <html>. Nothing else is told
+       about the change: the specimen, the strip and the sliders' own tracks are
+       all downstream of these. */
+    const rods = [...document.querySelectorAll("[data-prop]")];
+    const generated = document.getElementById("generated");
+
+    const round = (prop, v) =>
+      prop.includes("chroma") ? Number(v).toFixed(3) : Number(v).toFixed(prop === "--wal-hue" ? 1 : 0);
+
+    function paintRod(el) {
+      const out = document.getElementById("out-" + el.id.replace("rod-", ""));
+      if (!out) return;
+      const v = round(el.dataset.prop, el.value);
+      out.textContent = el.dataset.prop.includes("chroma") ? v : v + "°";
+    }
+
+    /* The CSS block is generated from the live computed values rather than from
+       the slider positions, so it stays correct when the palette — not the
+       slider — is what moved. */
+    function paintGenerated() {
+      const cs = getComputedStyle(root);
+      const n = (p, d) => Number(parseFloat(cs.getPropertyValue(p)).toFixed(d));
+      generated.textContent = [
+        ":root {",
+        "  --wal-hue: " + n("--wal-hue", 1) + ";",
+        "  --wal-chroma: " + n("--wal-chroma", 3) + ";",
+        "",
+        "  --wal-accent-hue: " + n("--wal-accent-hue", 0) + ";",
+        "  --wal-accent-chroma: " + n("--wal-accent-chroma", 3) + ";",
+        "  --wal-gold-hue: " + n("--wal-gold-hue", 0) + ";",
+        "  --wal-olive-hue: " + n("--wal-olive-hue", 0) + ";",
+        "}",
+      ].join("\n");
+    }
+
+    /* Live hue readout under each cue in the strip — this is what makes the
+       "+27° and +209°" relationship visible rather than merely claimed. */
+    const strip = document.getElementById("strip");
+    const CUE_PROPS = ["--wal-accent-hue", "--wal-bloom-hue", "--wal-gold-hue", "--wal-olive-hue", "--wal-cool-hue"];
+    function paintStrip() {
+      const cs = getComputedStyle(root);
+      strip.querySelectorAll("[data-hue]").forEach((el, i) => {
+        const h = parseFloat(cs.getPropertyValue(CUE_PROPS[i]));
+        el.textContent = Number.isNaN(h) ? "—" : (((h % 360) + 360) % 360).toFixed(0) + "°";
+      });
+    }
+
+    function readRods() {
+      const cs = getComputedStyle(root);
+      for (const el of rods) {
+        const v = parseFloat(cs.getPropertyValue(el.dataset.prop));
+        if (!Number.isNaN(v)) el.value = v;
+        paintRod(el);
+      }
+      paintGenerated();
+      paintStrip();
+    }
+
+    for (const el of rods) {
+      el.addEventListener("input", () => {
+        root.style.setProperty(el.dataset.prop, el.value);
+        paintRod(el);
+        paintGenerated();
+        paintStrip();
+      });
+    }
+
+    document.getElementById("reset").addEventListener("click", () => {
+      for (const el of rods) root.style.removeProperty(el.dataset.prop);
+      readRods();
+    });
+
+    /* ── Palette by class ── */
+    function applyPalette(name) {
       root.classList.remove(...PALETTES);
-      root.classList.add(btn.dataset.palette);
+      root.classList.add(name);
       for (const b of document.querySelectorAll("[data-palette]")) {
-        b.setAttribute("aria-pressed", String(b === btn));
+        b.setAttribute("aria-pressed", String(b.dataset.palette === name));
+      }
+      // A palette IS a script, so hand-turned rods are stale once one is picked.
+      for (const el of rods) root.style.removeProperty(el.dataset.prop);
+      readRods();
+    }
+
+    for (const group of ["palette-switch", "palette-tiles"]) {
+      document.getElementById(group).addEventListener("click", (e) => {
+        const btn = e.target.closest("[data-palette]");
+        if (btn) applyPalette(btn.dataset.palette);
+      });
+    }
+
+    /* ── Mode by attribute ──
+       Read the computed color-scheme rather than tracking a variable, so the
+       first click flips away from whatever the palette or the system chose. */
+    const modeBtn = document.getElementById("mode");
+    const currentMode = () =>
+      getComputedStyle(root).colorScheme.trim() === "light" ? "light" : "dark";
+    const syncModeBtn = () => { modeBtn.textContent = currentMode() === "dark" ? "Light" : "Dark"; };
+    modeBtn.addEventListener("click", () => {
+      root.setAttribute("data-theme", currentMode() === "dark" ? "light" : "dark");
+      syncModeBtn();
+    });
+    syncModeBtn();
+
+    /* ── Finish by attribute ── */
+    const finishBtn = document.getElementById("finish-toggle");
+    finishBtn.addEventListener("click", () => {
+      const next = root.getAttribute("data-finish") === "catalogue" ? "soft" : "catalogue";
+      root.setAttribute("data-finish", next);
+      finishBtn.textContent = next === "catalogue"
+        ? "Apply the soft finish to this page"
+        : "Apply the catalogue finish to this page";
+    });
+
+    /* ── Copy ── */
+    const copied = document.getElementById("copied");
+    document.getElementById("copy").addEventListener("click", async () => {
+      try {
+        await navigator.clipboard.writeText(generated.textContent);
+        copied.hidden = false;
+        setTimeout(() => { copied.hidden = true; }, 1600);
+      } catch {
+        // Clipboard denied (insecure context, or the user declined). Show the
+        // CSS rather than failing silently — the point is to get it out.
+        window.prompt("Copy your colour script:", generated.textContent);
       }
     });
 
-    const modeBtn = document.getElementById("mode");
-    modeBtn.addEventListener("click", () => {
-      const next = root.getAttribute("data-theme") === "dark" ? "light" : "dark";
-      root.setAttribute("data-theme", next);
-      modeBtn.textContent = next === "dark" ? "Light" : "Dark";
-    });
+    readRods();
 
-    // Nav hairline appears once the page has moved.
+    /* Masthead hairline appears once the page has moved. */
     const nav = document.querySelector(".wal-nav");
     const onScroll = () => nav.classList.toggle("is-scrolled", window.scrollY > 8);
     addEventListener("scroll", onScroll, { passive: true });
