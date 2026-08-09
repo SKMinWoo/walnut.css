@@ -1,11 +1,16 @@
-/*! walnut.css v0.1.0 | MIT License | github.com/SKMinWoo/walnut.css
- *  A cinematic, nature-inspired CSS framework.
+/*! walnut.css v0.4.0 | MIT License | github.com/SKMinWoo/walnut.css
+ *  A cinematic CSS framework themed by colour script.
  *  Zero JavaScript. Modern CSS only.
  * ──────────────────────────────────────────── */
 
 /* Cascade layer ordering — this is the backbone of the override system.
-   Users can add `@layer overrides { ... }` and always win. */
-@layer reset, tokens, base, layout, components, utilities, cinema;
+   Users can add `@layer overrides { ... }` and always win; unlayered CSS wins
+   without doing even that.
+
+   `finish` sits between components and utilities on purpose: a finish has to
+   be able to restyle a component, and a utility has to be able to beat a
+   finish. */
+@layer reset, tokens, base, layout, components, finish, utilities, cinema;
 
 /* Layers */
 @import "./layers/00-reset.css"       layer(reset);
@@ -13,11 +18,18 @@
 @import "./layers/02-base.css"        layer(base);
 @import "./layers/03-layout.css"      layer(layout);
 @import "./layers/04-components.css"  layer(components);
+@import "./layers/07-finish.css"      layer(finish);
 @import "./layers/05-utilities.css"   layer(utilities);
 @import "./layers/06-cinema.css"      layer(cinema);
 
-/* Default theme (café) is baked into tokens.
-   Import a theme file to override: */
+/* Theming, in full:
+
+     <html class="wal-press" data-theme="light" data-finish="catalogue">
+            └ palette         └ mode            └ finish
+
+   The café script is baked into tokens, so none of the three is required.
+   Import a palette file only to switch palettes by class: */
+/* @import "./themes/press.css"  layer(tokens); */
 /* @import "./themes/forest.css" layer(tokens); */
 /* @import "./themes/dusk.css"   layer(tokens); */
 /* @import "./themes/bone.css"   layer(tokens); */

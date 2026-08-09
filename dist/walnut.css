@@ -1,5 +1,5 @@
-/*! walnut.css v0.2.0 | MIT License | github.com/SKMinWoo/walnut.css */
-@layer reset, tokens, base, layout, components, utilities, cinema;
+/*! walnut.css v0.4.0 | MIT License | github.com/SKMinWoo/walnut.css */
+@layer reset, tokens, base, layout, components, finish, utilities, cinema;
 
 /* ── reset ── */
 @layer reset {
@@ -104,118 +104,178 @@ table {
 /* ── tokens ── */
 @layer tokens {
 /* ═══════════════════════════════════════════════════
-   01 — TOKENS
-   Type-safe design tokens via @property.
-   Entire palette generated from oklch().
-   Default theme: Café (warm walnut darks, bone lights).
+   01 — TOKENS · THE COLOUR SCRIPT
+   ───────────────────────────────────────────────────
+   A film's colour script is the sequence of colours that carries its emotional
+   arc — fixed by intent, not derived from a formula. walnut borrows the term
+   literally. Theming walnut means writing a colour script:
+
+       ONE GROUND ROD      every neutral — page, card stock, hairline, ink —
+                           is the same hue at a different lightness.
+       FIVE CUES           accent · bloom · gold · olive · cool. Each is a
+                           hue + a chroma. Everything else is derived.
+
+   That is the whole input surface. A theme file is those numbers and nothing
+   else; see src/themes/*.css, which are ~30 lines each.
+
+   ───────────────────────────────────────────────────
+   HOW THE DERIVATION WORKS, AND WHY THERE IS ONLY ONE OF IT
+
+   Every colour below is declared exactly once, as `light-dark(light, dark)`.
+   Two properties of CSS make that sufficient:
+
+     1. A custom property's value is stored as an unsubstituted token stream.
+        `light-dark()` is therefore NOT resolved where it is declared — it is
+        resolved where the token is finally *used*.
+     2. `light-dark()` picks its branch from the used element's `color-scheme`,
+        which inherits.
+
+   So one declaration at :root covers dark mode, light mode, and any subtree
+   that sets a different `color-scheme` — a light island on a dark page needs
+   no second palette, just `.wal-light` on a wrapper.
+
+   Before this, each theme restated all ~30 derived tokens three times (dark,
+   light-by-class, light-by-media-query). That is why v0.3.0 had to fix "theme
+   files defeated the chroma tokens": the moment a theme restates a derived
+   value, the rod stops driving it. Nothing here restates anything.
+
+   ───────────────────────────────────────────────────
+   THE KNOBS, IN THE ORDER YOU WILL REACH FOR THEM
+
+     --wal-hue / --wal-chroma        the ground rod
+     --wal-<cue>-hue / -chroma       the five cues
+     --wal-l-*                       lightness stops (the ramp)
+     --wal-cx-*                      chroma multipliers per surface family
+     --wal-radius / --wal-elevation / --wal-wash    geometry and atmosphere
+
+   Only the first two are needed for a coherent theme. The rest exist so a
+   theme can nudge one stop without inheriting the job of restating the ramp.
 ═══════════════════════════════════════════════════ */
 
-/* ─── Animatable custom properties ─── */
-@property --wal-hue {
-  syntax: "<number>";
-  inherits: true;
-  initial-value: 55;
-}
-@property --wal-chroma {
-  syntax: "<number>";
-  inherits: true;
-  initial-value: 0.04;
-}
-@property --wal-accent-hue {
-  syntax: "<number>";
-  inherits: true;
-  initial-value: 25;
-}
-@property --wal-gold-hue {
-  syntax: "<number>";
-  inherits: true;
-  initial-value: 85;
-}
-@property --wal-olive-hue {
-  syntax: "<number>";
-  inherits: true;
-  initial-value: 130;
-}
-@property --wal-radius {
-  syntax: "<length>";
-  inherits: true;
-  initial-value: 12px;
-}
 
-/* ─── CAFÉ PALETTE (dark default) ─── */
+/* ═══ REGISTRATION ═══
+   @property buys three things: type checking (a typo'd hue falls back to the
+   initial value instead of invalidating every colour that reads it), animation
+   (a registered <number> interpolates, so a palette change can crossfade), and
+   a documented initial value.
+
+   Only scalars are registered. The colour tokens are deliberately left
+   unregistered — registering them as <color> would force `light-dark()` to
+   resolve at the declaring element, which is exactly the behaviour this file
+   depends on NOT happening. */
+
+/* ── The ground rod ── */
+@property --wal-hue        { syntax: "<number>"; inherits: true; initial-value: 55; }
+@property --wal-chroma     { syntax: "<number>"; inherits: true; initial-value: 0.04; }
+
+/* ── The five cues ──
+   Hue is an angle on the oklch wheel; chroma is how far from grey it sits.
+   Chroma is a per-cue input rather than a constant because the sRGB gamut is
+   not the same width at every hue: at 62% lightness c=0.17 is in gamut around
+   terracotta and clips across much of the green–blue arc, where the browser
+   silently flattens it and the rendered colour stops matching the hue you
+   asked for. CSS cannot compute the gamut boundary, so rotating a hue rod far
+   from its shipped value means lowering its chroma too. */
+@property --wal-accent-hue    { syntax: "<number>"; inherits: true; initial-value: 25; }
+@property --wal-accent-chroma { syntax: "<number>"; inherits: true; initial-value: 0.17; }
+@property --wal-bloom-hue     { syntax: "<number>"; inherits: true; initial-value: 52; }
+@property --wal-bloom-chroma  { syntax: "<number>"; inherits: true; initial-value: 0.12; }
+@property --wal-gold-hue      { syntax: "<number>"; inherits: true; initial-value: 85; }
+@property --wal-gold-chroma   { syntax: "<number>"; inherits: true; initial-value: 0.15; }
+@property --wal-olive-hue     { syntax: "<number>"; inherits: true; initial-value: 130; }
+@property --wal-olive-chroma  { syntax: "<number>"; inherits: true; initial-value: 0.10; }
+@property --wal-cool-hue      { syntax: "<number>"; inherits: true; initial-value: 234; }
+@property --wal-cool-chroma   { syntax: "<number>"; inherits: true; initial-value: 0.11; }
+
+/* ── Geometry and atmosphere ── */
+@property --wal-radius     { syntax: "<length>";     inherits: true; initial-value: 12px; }
+@property --wal-elevation  { syntax: "<number>";     inherits: true; initial-value: 1; }
+@property --wal-wash       { syntax: "<number>";     inherits: true; initial-value: 1; }
+@property --wal-hairline   { syntax: "<length>";     inherits: true; initial-value: 1px; }
+@property --wal-line-boost { syntax: "<number>";     inherits: true; initial-value: 1; }
+@property --wal-tracking-label { syntax: "<length-percentage>"; inherits: true; initial-value: 0.1em; }
+
+
+/* ═══ THE DEFAULT SCRIPT — CAFÉ ═══
+   Coffee shop in golden hour. Walnut wood, bone china, brass fixtures.
+   Restated as an explicit theme in src/themes/cafe.css. */
 :root {
-  /* Core surface scale — derived from hue + chroma */
-  --wal-bg:           oklch(16% var(--wal-chroma) var(--wal-hue));
-  --wal-bg-subtle:    oklch(19% var(--wal-chroma) var(--wal-hue));
-  --wal-surface:      oklch(22% calc(var(--wal-chroma) + 0.005) var(--wal-hue));
-  --wal-surface-2:    oklch(26% calc(var(--wal-chroma) + 0.008) var(--wal-hue));
-  --wal-line:         oklch(32% 0.025 var(--wal-hue));
-  --wal-line-soft:    oklch(28% 0.02 var(--wal-hue));
+  /* ── The ground rod ── */
+  --wal-hue:    55;
+  --wal-chroma: 0.04;
 
-  /* Text scale */
-  --wal-text:         oklch(92% 0.015 var(--wal-hue));
-  --wal-text-soft:    oklch(68% 0.03 var(--wal-hue));
-  --wal-text-muted:   oklch(52% 0.025 var(--wal-hue));
+  /* ── The five cues ──
+     bloom and cool default to *offsets from the accent* rather than to fixed
+     numbers, so rotating one rod keeps the script in tune instead of pulling
+     the lead colour away from the rest of the cast. The offsets are not
+     arbitrary: +27° is the warm step from a tomato red to a soft apricot, and
+     +209° lands within a few degrees of the accent's exact complement — the
+     structure a hand-mixed mid-century palette tends to converge on anyway.
+     Override either with a plain number to break the relationship. */
+  --wal-accent-hue:    25;    --wal-accent-chroma: 0.17;  /* terracotta   */
+  --wal-bloom-hue:     calc(var(--wal-accent-hue) + 27);
+  --wal-bloom-chroma:  0.12;                              /* apricot      */
+  --wal-gold-hue:      85;    --wal-gold-chroma:   0.15;  /* goldenrod    */
+  --wal-olive-hue:     130;   --wal-olive-chroma:  0.10;  /* botanical    */
+  --wal-cool-hue:      calc(var(--wal-accent-hue) + 209);
+  --wal-cool-chroma:   0.11;                              /* adriatic     */
 
-  /* ── Card surface ──
-     A surface that may deliberately NOT follow the page theme — a printed
-     plate, receipt, ticket, or code card that stays light on a dark page.
-     .wal-card and friends rebind --wal-text* from these, so every descendant
-     flips with the surface and no per-child override is needed.
+  /* ── The ramp: lightness stops ──
+     `-light` is the value used when the page is light; `-dark` when it is
+     dark. Neutrals invert across the pair, which is the whole of mode support. */
+  --wal-l-bg-light:          93%;   --wal-l-bg-dark:          16%;
+  --wal-l-subtle-light:      90%;   --wal-l-subtle-dark:      19%;
+  --wal-l-surface-light:     97%;   --wal-l-surface-dark:     22%;
+  --wal-l-surface-2-light:   91%;   --wal-l-surface-2-dark:   26%;
+  --wal-l-line-light:        84%;   --wal-l-line-dark:        32%;
+  --wal-l-line-soft-light:   88%;   --wal-l-line-soft-dark:   28%;
+  --wal-l-text-light:        20%;   --wal-l-text-dark:        92%;
+  --wal-l-text-soft-light:   42%;   --wal-l-text-soft-dark:   68%;
+  --wal-l-text-muted-light:  58%;   --wal-l-text-muted-dark:  52%;
 
-     These MUST be literal values, never `var(--wal-text)`. Custom properties
-     inherit as unsubstituted token streams, so pointing --wal-card-ink at
-     --wal-text here while .wal-card points --wal-text at --wal-card-ink is a
-     substitution cycle: both resolve invalid and every card loses its text
-     colour. It reads as a random rendering bug and is painful to trace. */
-  --wal-card-bg:        var(--wal-surface);
-  --wal-card-ink:       oklch(92% 0.015 var(--wal-hue));
-  --wal-card-ink-soft:  oklch(68% 0.03 var(--wal-hue));
-  --wal-card-ink-muted: oklch(52% 0.025 var(--wal-hue));
+  /* Cue lightness. Cues do NOT invert — a terracotta stays terracotta — they
+     only shift enough to hold their weight against the ground. */
+  --wal-l-accent-light: 52%;   --wal-l-accent-dark: 62%;
+  --wal-l-bloom-light:  58%;   --wal-l-bloom-dark:  70%;
+  --wal-l-gold-light:   62%;   --wal-l-gold-dark:   75%;
+  --wal-l-olive-light:  48%;   --wal-l-olive-dark:  55%;
+  --wal-l-cool-light:   46%;   --wal-l-cool-dark:   62%;
 
-  /* Chroma is a token, not a literal, because the sRGB gamut is not the same
-     width at every hue. The defaults below are tuned for the shipped hues; at
-     62% lightness, for example, c=0.17 is in gamut around terracotta but clips
-     across much of the green–blue arc, where the browser silently flattens it
-     and the rendered colour stops matching the requested hue.
-     Rotating --wal-*-hue far from a shipped theme should therefore come with a
-     lowered chroma. CSS cannot compute the gamut boundary, so a consumer doing
-     dynamic theming needs to set these itself. */
-  --wal-accent-chroma: 0.17;
-  --wal-gold-chroma:   0.15;
-  --wal-olive-chroma:  0.10;
+  /* Two shifts applied on top of the cue stops:
+     hover  — a cue as an interactive fill brightens on dark, deepens on light.
+     ink    — a cue used as TEXT needs more separation from the ground than the
+              same cue used as a fill. This is the single most common way a
+              hand-made palette fails: goldenrod is a fine button and an
+              illegible paragraph. `--wal-<cue>-ink` is the text-safe variant
+              and every component that puts a cue on type reads it. */
+  --wal-hover-shift-light: -6%;   --wal-hover-shift-dark:  6%;
+  --wal-ink-shift-light:  -12%;   --wal-ink-shift-dark:    8%;
 
-  /* Accent: terracotta */
-  --wal-accent:       oklch(62% var(--wal-accent-chroma) var(--wal-accent-hue));
-  --wal-accent-hover: oklch(68% calc(var(--wal-accent-chroma) + 0.02) var(--wal-accent-hue));
-  --wal-accent-soft:  oklch(62% var(--wal-accent-chroma) var(--wal-accent-hue) / 0.12);
-  --wal-accent-fg:    oklch(96% 0.01 var(--wal-accent-hue));
+  /* ── The ramp: chroma multipliers ──
+     Fractions of --wal-chroma, grouped by surface family rather than per
+     token, so the ground stays one hue at one saturation logic. Light grounds
+     need less chroma than dark ones to read as the same warmth; light ink
+     needs more. */
+  --wal-cx-ground-light:  0.65;   --wal-cx-ground-dark:  1;
+  --wal-cx-surface-light: 0.40;   --wal-cx-surface-dark: 1.15;
+  --wal-cx-line-light:    0.75;   --wal-cx-line-dark:    0.60;
+  --wal-cx-ink-light:     0.85;   --wal-cx-ink-dark:     0.45;
 
-  /* Secondary: goldenrod */
-  --wal-gold:         oklch(75% var(--wal-gold-chroma) var(--wal-gold-hue));
-  --wal-gold-soft:    oklch(75% var(--wal-gold-chroma) var(--wal-gold-hue) / 0.15);
-
-  /* Tertiary: olive / botanical green */
-  --wal-olive:        oklch(55% var(--wal-olive-chroma) var(--wal-olive-hue));
-  --wal-olive-soft:   oklch(55% var(--wal-olive-chroma) var(--wal-olive-hue) / 0.12);
-
-  /* Functional */
-  --wal-success:      oklch(65% 0.16 145);
-  --wal-warning:      oklch(75% 0.15 85);
-  --wal-danger:       oklch(62% 0.20 25);
-
-  /* Shadows */
-  --wal-shadow:       0 20px 44px -18px oklch(10% 0.02 var(--wal-hue) / 0.45);
-  --wal-shadow-sm:    0 4px 12px -4px oklch(10% 0.02 var(--wal-hue) / 0.3);
-  --wal-shadow-lg:    0 32px 64px -24px oklch(8% 0.02 var(--wal-hue) / 0.55);
-
-  /* Radius */
+  /* ── Geometry ── */
   --wal-radius:       12px;
   --wal-radius-sm:    6px;
   --wal-radius-lg:    18px;
   --wal-radius-full:  999px;
+  --wal-hairline:     1px;
+  --wal-line-boost:   1;
 
-  /* Spacing scale */
+  /* Atmosphere. --wal-elevation scales every shadow offset (0 flattens the
+     page completely); --wal-wash scales the tinted light on <body>. Both are
+     how a finish changes the *feel* without touching a single colour. */
+  --wal-elevation:    1;
+  --wal-wash:         1;
+
+  /* ── Spacing scale ── */
   --wal-space-xs:     0.25rem;
   --wal-space-sm:     0.5rem;
   --wal-space-md:     1rem;
@@ -224,66 +284,280 @@ table {
   --wal-space-2xl:    4rem;
   --wal-space-3xl:    6rem;
 
-  /* Transition presets */
-  --wal-ease:         cubic-bezier(0.16, 1, 0.3, 1);
-  --wal-duration:     0.2s;
+  /* ── Motion ── */
+  --wal-ease:          cubic-bezier(0.16, 1, 0.3, 1);
+  --wal-duration:      0.2s;
   --wal-duration-slow: 0.4s;
 
-  /* Navbar */
-  --wal-nav-h:        64px;
+  /* ── Furniture ── */
+  --wal-nav-h:         64px;
+  --wal-tracking-label: 0.1em;
 }
 
-/* ─── CAFÉ LIGHT MODE ─── */
-:root[data-theme="light"],
-.wal-light {
-  --wal-bg:           oklch(93% 0.025 var(--wal-hue));
-  --wal-bg-subtle:    oklch(90% 0.03 var(--wal-hue));
-  --wal-surface:      oklch(97% 0.015 var(--wal-hue));
-  --wal-surface-2:    oklch(91% 0.025 var(--wal-hue));
-  --wal-line:         oklch(84% 0.03 var(--wal-hue));
-  --wal-line-soft:    oklch(88% 0.02 var(--wal-hue));
 
-  --wal-text:         oklch(20% 0.03 var(--wal-hue));
-  --wal-text-soft:    oklch(42% 0.04 var(--wal-hue));
-  --wal-text-muted:   oklch(58% 0.03 var(--wal-hue));
+/* ═══ MODE ═══
+   Mode is `color-scheme`, not a palette. Setting it is the *only* thing these
+   rules do, because `light-dark()` above does the rest — including for native
+   form controls, scrollbars and the canvas, which a class-based dark mode has
+   to chase separately.
 
-  --wal-accent:       oklch(52% var(--wal-accent-chroma) var(--wal-accent-hue));
-  --wal-accent-hover: oklch(46% calc(var(--wal-accent-chroma) + 0.02) var(--wal-accent-hue));
-  --wal-accent-fg:    oklch(97% 0.01 var(--wal-accent-hue));
+   `light dark` means "follow the system", so the default is dark-by-night,
+   light-by-day with no media query anywhere in this framework.
 
-  --wal-shadow:       0 20px 44px -18px oklch(50% 0.03 var(--wal-hue) / 0.18);
-  --wal-shadow-sm:    0 4px 12px -4px oklch(50% 0.03 var(--wal-hue) / 0.12);
-  --wal-shadow-lg:    0 32px 64px -24px oklch(50% 0.03 var(--wal-hue) / 0.22);
+   Two axes, two syntaxes, deliberately: PALETTE BY CLASS, MODE BY ATTRIBUTE
+   (or by .wal-light / .wal-dark, which are the same axis in class form).
+   A selector like [data-theme="cafe"][data-theme="light"] can never match —
+   an element has exactly one value per attribute — so the fused
+   [data-theme="cafe-light"] forms exist for when you only have one hook.
+
+   The default is written `:where(:root)` rather than `:root`, and that matters.
+   `:root` is a pseudo-class and therefore carries specificity (0,1,0), while
+   the mode rules below are inside :where() at (0,0,0) — so a plain `:root`
+   default would OUTRANK every one of them and `data-theme="light"` would do
+   nothing at all. With all three at zero specificity, source order expresses
+   the intent (a stated mode beats the default) and any consumer rule of any
+   kind beats all of them. */
+:where(:root) { color-scheme: light dark; }
+
+:where(.wal-light, [data-theme="light"], [data-theme$="-light"]) { color-scheme: light; }
+:where(.wal-dark,  [data-theme="dark"],  [data-theme$="-dark"])  { color-scheme: dark; }
+
+
+/* ═══ THE DERIVATION ═══
+   Every derived colour, declared once.
+
+   The selector list is what makes a palette *scopable*. On the common path
+   only `:root` matches and this is a single rule on <html>. Add `.wal-palette`
+   (or a palette class) to any element and the whole script re-derives from
+   whatever rods are in effect there — so a section can carry its own colour
+   script without a second stylesheet.
+
+   Why the theme class names are listed here rather than in the theme files:
+   the derivation must not live in the theme files, or we are back to four
+   copies that drift. Listing the names centrally costs one line each and is
+   harmless when a theme file is not loaded. */
+:root,
+:where(.wal-palette,
+       .wal-cafe, .wal-forest, .wal-dusk, .wal-bone, .wal-press,
+       [data-theme="cafe"],  [data-theme^="cafe-"],
+       [data-theme="forest"],[data-theme^="forest-"],
+       [data-theme="dusk"],  [data-theme^="dusk-"],
+       [data-theme="bone"],  [data-theme^="bone-"],
+       [data-theme="press"], [data-theme^="press-"]) {
+
+  /* ── Ground: surfaces ── */
+  --wal-bg: light-dark(
+    oklch(var(--wal-l-bg-light) calc(var(--wal-chroma) * var(--wal-cx-ground-light)) var(--wal-hue)),
+    oklch(var(--wal-l-bg-dark)  calc(var(--wal-chroma) * var(--wal-cx-ground-dark))  var(--wal-hue)));
+  --wal-bg-subtle: light-dark(
+    oklch(var(--wal-l-subtle-light) calc(var(--wal-chroma) * var(--wal-cx-ground-light)) var(--wal-hue)),
+    oklch(var(--wal-l-subtle-dark)  calc(var(--wal-chroma) * var(--wal-cx-ground-dark))  var(--wal-hue)));
+  --wal-surface: light-dark(
+    oklch(var(--wal-l-surface-light) calc(var(--wal-chroma) * var(--wal-cx-surface-light)) var(--wal-hue)),
+    oklch(var(--wal-l-surface-dark)  calc(var(--wal-chroma) * var(--wal-cx-surface-dark))  var(--wal-hue)));
+  --wal-surface-2: light-dark(
+    oklch(var(--wal-l-surface-2-light) calc(var(--wal-chroma) * var(--wal-cx-ground-light)) var(--wal-hue)),
+    oklch(var(--wal-l-surface-2-dark)  calc(var(--wal-chroma) * var(--wal-cx-ground-dark))  var(--wal-hue)));
+
+  /* ── Ground: hairlines ──
+     --wal-line-boost pushes the rule AWAY from the page ground: darker on
+     light, lighter on dark. It is one knob rather than two overrides so a
+     finish can ask for stronger rules on any palette without owning a colour
+     — see 07-finish.css, where the catalogue finish turns it to 1.7. */
+  --wal-line: light-dark(
+    oklch(calc(var(--wal-l-line-light) - (var(--wal-line-boost) - 1) * 9%)
+          calc(var(--wal-chroma) * var(--wal-cx-line-light)) var(--wal-hue)),
+    oklch(calc(var(--wal-l-line-dark)  + (var(--wal-line-boost) - 1) * 9%)
+          calc(var(--wal-chroma) * var(--wal-cx-line-dark))  var(--wal-hue)));
+  --wal-line-soft: light-dark(
+    oklch(calc(var(--wal-l-line-soft-light) - (var(--wal-line-boost) - 1) * 6%)
+          calc(var(--wal-chroma) * var(--wal-cx-line-light)) var(--wal-hue)),
+    oklch(calc(var(--wal-l-line-soft-dark)  + (var(--wal-line-boost) - 1) * 6%)
+          calc(var(--wal-chroma) * var(--wal-cx-line-dark))  var(--wal-hue)));
+
+  /* ── Ground: ink ── */
+  --wal-text: light-dark(
+    oklch(var(--wal-l-text-light) calc(var(--wal-chroma) * var(--wal-cx-ink-light)) var(--wal-hue)),
+    oklch(var(--wal-l-text-dark)  calc(var(--wal-chroma) * var(--wal-cx-ink-dark))  var(--wal-hue)));
+  --wal-text-soft: light-dark(
+    oklch(var(--wal-l-text-soft-light) calc(var(--wal-chroma) * var(--wal-cx-ink-light) * 1.1) var(--wal-hue)),
+    oklch(var(--wal-l-text-soft-dark)  calc(var(--wal-chroma) * var(--wal-cx-ink-dark) * 1.6) var(--wal-hue)));
+  --wal-text-muted: light-dark(
+    oklch(var(--wal-l-text-muted-light) calc(var(--wal-chroma) * var(--wal-cx-ink-light)) var(--wal-hue)),
+    oklch(var(--wal-l-text-muted-dark)  calc(var(--wal-chroma) * var(--wal-cx-ink-dark) * 1.4) var(--wal-hue)));
+
+  /* ── Card surface ──
+     A surface that may deliberately NOT follow the page — a printed plate,
+     receipt, ticket or code card that stays light on a dark page. .wal-card
+     and friends rebind --wal-text* from these, so every descendant flips with
+     the surface and no per-child override is needed.
+
+     These MUST be independent expressions, never `var(--wal-text)`. Custom
+     properties inherit as unsubstituted token streams, so pointing
+     --wal-card-ink at --wal-text here while .wal-card points --wal-text at
+     --wal-card-ink is a substitution cycle: both resolve invalid and every
+     card loses its text colour. It reads as a random rendering bug and is
+     painful to trace. Repeating the expression is the cheap price of not
+     having that bug. */
+  --wal-card-bg: light-dark(
+    oklch(var(--wal-l-surface-light) calc(var(--wal-chroma) * var(--wal-cx-surface-light)) var(--wal-hue)),
+    oklch(var(--wal-l-surface-dark)  calc(var(--wal-chroma) * var(--wal-cx-surface-dark))  var(--wal-hue)));
+  --wal-card-ink: light-dark(
+    oklch(var(--wal-l-text-light) calc(var(--wal-chroma) * var(--wal-cx-ink-light)) var(--wal-hue)),
+    oklch(var(--wal-l-text-dark)  calc(var(--wal-chroma) * var(--wal-cx-ink-dark))  var(--wal-hue)));
+  --wal-card-ink-soft: light-dark(
+    oklch(var(--wal-l-text-soft-light) calc(var(--wal-chroma) * var(--wal-cx-ink-light) * 1.1) var(--wal-hue)),
+    oklch(var(--wal-l-text-soft-dark)  calc(var(--wal-chroma) * var(--wal-cx-ink-dark) * 1.6) var(--wal-hue)));
+  --wal-card-ink-muted: light-dark(
+    oklch(var(--wal-l-text-muted-light) calc(var(--wal-chroma) * var(--wal-cx-ink-light)) var(--wal-hue)),
+    oklch(var(--wal-l-text-muted-dark)  calc(var(--wal-chroma) * var(--wal-cx-ink-dark) * 1.4) var(--wal-hue)));
+
+  /* ══ THE FIVE CUES ══
+     Each cue gets four forms, and picking the right one is most of what good
+     theming is:
+
+       --wal-<cue>        the colour. A fill, a rule, a swatch.
+       --wal-<cue>-ink    the same cue, shifted to be legible AS TEXT.
+       --wal-<cue>-soft   a 12% wash, for chip and badge backgrounds.
+       --wal-<cue>-fg     a foreground that is legible ON the cue. Computed,
+                          not chosen — see the @supports block below.
+     Plus --wal-accent-hover, since the accent is the one interactive cue. */
+
+  /* Cue 1 — accent. The lead: the one cue that means "you can act on this". */
+  --wal-accent: light-dark(
+    oklch(var(--wal-l-accent-light) var(--wal-accent-chroma) var(--wal-accent-hue)),
+    oklch(var(--wal-l-accent-dark)  var(--wal-accent-chroma) var(--wal-accent-hue)));
+  --wal-accent-hover: light-dark(
+    oklch(calc(var(--wal-l-accent-light) + var(--wal-hover-shift-light)) calc(var(--wal-accent-chroma) + 0.02) var(--wal-accent-hue)),
+    oklch(calc(var(--wal-l-accent-dark)  + var(--wal-hover-shift-dark))  calc(var(--wal-accent-chroma) + 0.02) var(--wal-accent-hue)));
+  --wal-accent-ink: light-dark(
+    oklch(calc(var(--wal-l-accent-light) + var(--wal-ink-shift-light)) var(--wal-accent-chroma) var(--wal-accent-hue)),
+    oklch(calc(var(--wal-l-accent-dark)  + var(--wal-ink-shift-dark))  var(--wal-accent-chroma) var(--wal-accent-hue)));
+  --wal-accent-soft: color-mix(in oklch, var(--wal-accent) 12%, transparent);
+
+  /* Cue 2 — bloom. The warm mid: gradients, washes, the second voice. */
+  --wal-bloom: light-dark(
+    oklch(var(--wal-l-bloom-light) var(--wal-bloom-chroma) var(--wal-bloom-hue)),
+    oklch(var(--wal-l-bloom-dark)  var(--wal-bloom-chroma) var(--wal-bloom-hue)));
+  --wal-bloom-ink: light-dark(
+    oklch(calc(var(--wal-l-bloom-light) + var(--wal-ink-shift-light)) var(--wal-bloom-chroma) var(--wal-bloom-hue)),
+    oklch(calc(var(--wal-l-bloom-dark)  + var(--wal-ink-shift-dark))  var(--wal-bloom-chroma) var(--wal-bloom-hue)));
+  --wal-bloom-soft: color-mix(in oklch, var(--wal-bloom) 12%, transparent);
+
+  /* Cue 3 — gold. The metal: rules, markers, ornament. */
+  --wal-gold: light-dark(
+    oklch(var(--wal-l-gold-light) var(--wal-gold-chroma) var(--wal-gold-hue)),
+    oklch(var(--wal-l-gold-dark)  var(--wal-gold-chroma) var(--wal-gold-hue)));
+  --wal-gold-ink: light-dark(
+    oklch(calc(var(--wal-l-gold-light) + var(--wal-ink-shift-light)) var(--wal-gold-chroma) var(--wal-gold-hue)),
+    oklch(calc(var(--wal-l-gold-dark)  + var(--wal-ink-shift-dark))  var(--wal-gold-chroma) var(--wal-gold-hue)));
+  --wal-gold-soft: color-mix(in oklch, var(--wal-gold) 15%, transparent);
+
+  /* Cue 4 — olive. The botanical: the calm, receding cue. */
+  --wal-olive: light-dark(
+    oklch(var(--wal-l-olive-light) var(--wal-olive-chroma) var(--wal-olive-hue)),
+    oklch(var(--wal-l-olive-dark)  var(--wal-olive-chroma) var(--wal-olive-hue)));
+  --wal-olive-ink: light-dark(
+    oklch(calc(var(--wal-l-olive-light) + var(--wal-ink-shift-light)) var(--wal-olive-chroma) var(--wal-olive-hue)),
+    oklch(calc(var(--wal-l-olive-dark)  + var(--wal-ink-shift-dark))  var(--wal-olive-chroma) var(--wal-olive-hue)));
+  --wal-olive-soft: color-mix(in oklch, var(--wal-olive) 12%, transparent);
+
+  /* Cue 5 — cool. The complement: the only cue that argues with the others,
+     which is exactly why a catalogue needs one. */
+  --wal-cool: light-dark(
+    oklch(var(--wal-l-cool-light) var(--wal-cool-chroma) var(--wal-cool-hue)),
+    oklch(var(--wal-l-cool-dark)  var(--wal-cool-chroma) var(--wal-cool-hue)));
+  --wal-cool-ink: light-dark(
+    oklch(calc(var(--wal-l-cool-light) + var(--wal-ink-shift-light)) var(--wal-cool-chroma) var(--wal-cool-hue)),
+    oklch(calc(var(--wal-l-cool-dark)  + var(--wal-ink-shift-dark))  var(--wal-cool-chroma) var(--wal-cool-hue)));
+  --wal-cool-soft: color-mix(in oklch, var(--wal-cool) 12%, transparent);
+
+  /* Numbered aliases. The named cues are what you write; the numbers are what
+     you *iterate* — a swatch strip, a chart series, an nth-child rule can walk
+     1..5 without knowing whether a given script calls cue 3 "gold" or "brass". */
+  --wal-cue-1: var(--wal-accent);
+  --wal-cue-2: var(--wal-bloom);
+  --wal-cue-3: var(--wal-gold);
+  --wal-cue-4: var(--wal-olive);
+  --wal-cue-5: var(--wal-cool);
+
+  /* ── Functional ──
+     Off-script by design: success/warning/danger must survive any rotation of
+     the cues, so they are anchored to fixed hues and only ride the shared cue
+     lightness stops. Chroma is a touch lower than a cue's so they read as
+     signal rather than as part of the palette. */
+  --wal-success: light-dark(oklch(var(--wal-l-olive-light) 0.14 145), oklch(var(--wal-l-gold-dark) 0.16 145));
+  --wal-warning: light-dark(oklch(var(--wal-l-gold-light)  0.14 85),  oklch(var(--wal-l-gold-dark) 0.15 85));
+  --wal-danger:  light-dark(oklch(var(--wal-l-accent-light) 0.18 25), oklch(var(--wal-l-accent-dark) 0.20 25));
+
+  /* ── Shadows ──
+     light-dark() takes colours, not whole shadow values, so the mode split
+     lives in the colour and the geometry is shared. --wal-elevation scales the
+     offsets, which is how a flat finish stays flat without overriding three
+     separate shadows. */
+  --wal-shadow-ink:    light-dark(oklch(50% 0.03 var(--wal-hue) / 0.18), oklch(10% 0.02 var(--wal-hue) / 0.45));
+  --wal-shadow-ink-sm: light-dark(oklch(50% 0.03 var(--wal-hue) / 0.12), oklch(10% 0.02 var(--wal-hue) / 0.30));
+  --wal-shadow-ink-lg: light-dark(oklch(50% 0.03 var(--wal-hue) / 0.22), oklch(8%  0.02 var(--wal-hue) / 0.55));
+
+  --wal-shadow:    0 calc(20px * var(--wal-elevation)) calc(44px * var(--wal-elevation)) -18px var(--wal-shadow-ink);
+  --wal-shadow-sm: 0 calc(4px  * var(--wal-elevation)) calc(12px * var(--wal-elevation)) -4px  var(--wal-shadow-ink-sm);
+  --wal-shadow-lg: 0 calc(32px * var(--wal-elevation)) calc(64px * var(--wal-elevation)) -24px var(--wal-shadow-ink-lg);
+
+  /* ── Foregrounds ON a cue ──
+     Plain fallback; the @supports block below replaces these with a computed
+     contrast pick. Kept as a real value so a browser without relative colour
+     syntax still gets a legible button rather than an invalid one. */
+  --wal-accent-fg: light-dark(oklch(97% 0.01 var(--wal-accent-hue)), oklch(96% 0.01 var(--wal-accent-hue)));
+  --wal-bloom-fg:  oklch(18% 0.02 var(--wal-bloom-hue));
+  --wal-gold-fg:   oklch(18% 0.02 var(--wal-gold-hue));
+  --wal-olive-fg:  oklch(97% 0.01 var(--wal-olive-hue));
+  --wal-cool-fg:   oklch(97% 0.01 var(--wal-cool-hue));
 }
 
-/* Auto light mode from system preference */
-@media (prefers-color-scheme: light) {
-  :root:not([data-theme="dark"]):not(.wal-dark) {
-    --wal-bg:           oklch(93% 0.025 var(--wal-hue));
-    --wal-bg-subtle:    oklch(90% 0.03 var(--wal-hue));
-    --wal-surface:      oklch(97% 0.015 var(--wal-hue));
-    --wal-surface-2:    oklch(91% 0.025 var(--wal-hue));
-    --wal-line:         oklch(84% 0.03 var(--wal-hue));
-    --wal-line-soft:    oklch(88% 0.02 var(--wal-hue));
 
-    --wal-text:         oklch(20% 0.03 var(--wal-hue));
-    --wal-text-soft:    oklch(42% 0.04 var(--wal-hue));
-    --wal-text-muted:   oklch(58% 0.03 var(--wal-hue));
+/* ═══ AUTOMATIC FOREGROUND CONTRAST ═══
+   The single most tedious part of hand-theming: every time you rotate a cue
+   you have to re-decide whether text on it should be black or white, and
+   getting it wrong is an accessibility bug rather than a taste one.
 
-    --wal-accent:       oklch(52% var(--wal-accent-chroma) var(--wal-accent-hue));
-    --wal-accent-hover: oklch(46% calc(var(--wal-accent-chroma) + 0.02) var(--wal-accent-hue));
-    --wal-accent-fg:    oklch(97% 0.01 var(--wal-accent-hue));
+   Relative colour syntax can decide it arithmetically. `l` is the cue's own
+   lightness as a 0–1 number, so
 
-    --wal-shadow:       0 20px 44px -18px oklch(50% 0.03 var(--wal-hue) / 0.18);
-    --wal-shadow-sm:    0 4px 12px -4px oklch(50% 0.03 var(--wal-hue) / 0.12);
-    --wal-shadow-lg:    0 32px 64px -24px oklch(50% 0.03 var(--wal-hue) / 0.22);
+       clamp(0.16, (0.63 - l) * 1000, 0.97)
+
+   is a step function: below the 0.63 threshold the middle term is a large
+   positive number and clamps to 0.97 (near-white ink); above it the term goes
+   negative and clamps to 0.16 (near-black ink). The ×1000 makes the crossover
+   effectively instant rather than a mushy grey band.
+
+   Not pure white and black: `calc(c * 0.08)` keeps a trace of the cue's own
+   chroma in its foreground, which is why a terracotta button reads as warm
+   cream on terracotta rather than as a sticker.
+
+   0.63 is a perceptual crossover for oklch lightness, not a WCAG computation.
+   It lands correctly for every cue in the shipped themes; a cue sitting right
+   at the threshold with low chroma is the case to check by eye. */
+@supports (color: oklch(from white l c h)) {
+  :root,
+  :where(.wal-palette,
+         .wal-cafe, .wal-forest, .wal-dusk, .wal-bone, .wal-press,
+         [data-theme="cafe"],  [data-theme^="cafe-"],
+         [data-theme="forest"],[data-theme^="forest-"],
+         [data-theme="dusk"],  [data-theme^="dusk-"],
+         [data-theme="bone"],  [data-theme^="bone-"],
+         [data-theme="press"], [data-theme^="press-"]) {
+    --wal-accent-fg: oklch(from var(--wal-accent) clamp(0.16, (0.63 - l) * 1000, 0.97) calc(c * 0.08) h);
+    --wal-bloom-fg:  oklch(from var(--wal-bloom)  clamp(0.16, (0.63 - l) * 1000, 0.97) calc(c * 0.08) h);
+    --wal-gold-fg:   oklch(from var(--wal-gold)   clamp(0.16, (0.63 - l) * 1000, 0.97) calc(c * 0.08) h);
+    --wal-olive-fg:  oklch(from var(--wal-olive)  clamp(0.16, (0.63 - l) * 1000, 0.97) calc(c * 0.08) h);
+    --wal-cool-fg:   oklch(from var(--wal-cool)   clamp(0.16, (0.63 - l) * 1000, 0.97) calc(c * 0.08) h);
   }
 }
 
 
-/* ─── TYPOGRAPHY ─── */
+/* ═══ TYPOGRAPHY ═══ */
 :root {
-  /* Font stacks — users override these vars */
+  /* Font stacks — override these vars, not the rules that read them. */
   --wal-font-display: "Jost", Futura, system-ui, sans-serif;
   --wal-font-body:    "Inter", system-ui, sans-serif;
   --wal-font-mono:    "DM Mono", ui-monospace, "Cascadia Code", monospace;
@@ -294,6 +568,11 @@ table {
      got one silently. The two are separate tokens as of v0.2.0. */
   --wal-font-typewriter: "Courier Prime", Courier, monospace;
   --wal-font-serif:      ui-serif, Georgia, "Iowan Old Style", "Times New Roman", serif;
+
+  /* The face used for catalogue furniture — eyebrows, plate keys, captions,
+     figure numbers. Its own token because a finish may want the label voice to
+     differ from the data voice even though both default to mono. */
+  --wal-font-label: var(--wal-font-mono);
 
   /* Type scale — minor third (1.2) */
   --wal-text-xs:   0.694rem;   /* ~11.1px */
@@ -324,14 +603,18 @@ body {
   font-family: var(--wal-font-body);
   font-size: var(--wal-text-base);
 
-  /* Warm light wash — the ground never reads as flat */
+  /* Warm light wash — three cues lighting the ground from off-screen, so it
+     never reads as flat. Scaled by --wal-wash rather than declared outright:
+     a finish that wants printed paper sets --wal-wash: 0 and the gradients
+     collapse to transparent, with no rule here to override and no second
+     `background-image` to keep in sync. */
   background-image:
     radial-gradient(60% 45% at 12% 0%,
-      color-mix(in oklch, var(--wal-gold) 10%, transparent), transparent 70%),
+      color-mix(in oklch, var(--wal-gold) calc(10% * var(--wal-wash)), transparent), transparent 70%),
     radial-gradient(55% 50% at 100% 20%,
-      color-mix(in oklch, var(--wal-olive) 10%, transparent), transparent 72%),
+      color-mix(in oklch, var(--wal-olive) calc(10% * var(--wal-wash)), transparent), transparent 72%),
     radial-gradient(70% 60% at 80% 100%,
-      color-mix(in oklch, var(--wal-accent) 6%, transparent), transparent 70%);
+      color-mix(in oklch, var(--wal-bloom) calc(8% * var(--wal-wash)), transparent), transparent 70%);
   background-attachment: fixed;
 }
 
@@ -362,9 +645,13 @@ strong, b { color: var(--wal-text); font-weight: 700; }
 em, i { font-style: italic; }
 small { font-size: var(--wal-text-sm); }
 
-/* ─── Links ─── */
+/* ─── Links ───
+   --wal-accent-ink, not --wal-accent: a link is the accent used as *type* on
+   the page ground, which needs more separation from that ground than the same
+   accent needs as a button fill. This is the distinction the -ink forms exist
+   to carry; see the cue block in 01-tokens.css. */
 a {
-  color: var(--wal-accent);
+  color: var(--wal-accent-ink);
   text-decoration: underline;
   text-underline-offset: 0.15em;
   transition: color var(--wal-duration) ease;
@@ -437,11 +724,21 @@ mark {
   outline-offset: 3px;
 }
 
-/* ─── Scrollbar (warm) ─── */
+/* ─── Scrollbar (warm) ───
+   Scoped to `html`, which is where the document scrollbar takes its styling
+   from. It used to be `*`, which meant walnut silently restyled every scroll
+   container in a consuming app — and because Chromium ignores the
+   ::-webkit-scrollbar-* pseudos entirely whenever `scrollbar-width` is any
+   non-auto value, a consumer had to reset BOTH properties to get its own bar
+   back. One selector change removes that whole class of surprise. */
+:root {
+  --wal-scrollbar-thumb: color-mix(in oklch, var(--wal-olive) 45%, var(--wal-line));
+}
+
 ::-webkit-scrollbar { width: 10px; }
 ::-webkit-scrollbar-track { background: var(--wal-bg); }
 ::-webkit-scrollbar-thumb {
-  background: color-mix(in oklch, var(--wal-olive) 45%, var(--wal-line));
+  background: var(--wal-scrollbar-thumb);
   border-radius: 6px;
   border: 2px solid var(--wal-bg);
 }
@@ -449,8 +746,8 @@ mark {
 
 /* Firefox scrollbar */
 @supports (scrollbar-color: auto) {
-  * {
-    scrollbar-color: color-mix(in oklch, var(--wal-olive) 45%, var(--wal-line)) var(--wal-bg);
+  html {
+    scrollbar-color: var(--wal-scrollbar-thumb) var(--wal-bg);
     scrollbar-width: thin;
   }
 }
@@ -708,11 +1005,19 @@ mark {
     background: color-mix(in oklch, var(--wal-bg) 80%, transparent);
     backdrop-filter: blur(18px);
     -webkit-backdrop-filter: blur(18px);
-    height: var(--wal-nav-h, 64px);
+    /* min-height, not height, and allowed to wrap. At narrow widths the links
+       drop to a second row instead of overlapping the brand and running off
+       the page — which is what a fixed height plus nowrap did. Nothing is
+       hidden and no JavaScript is involved; .wal-drawer is still there if you
+       want a real mobile menu instead. */
+    min-height: var(--wal-nav-h, 64px);
     display: flex;
+    flex-wrap: wrap;
     align-items: center;
     justify-content: space-between;
-    padding: 0 var(--wal-space-md);
+    gap: var(--wal-space-sm);
+    padding-block: var(--wal-space-sm);
+    padding-inline: var(--wal-space-md);
     transition: box-shadow var(--wal-duration) var(--wal-ease), border-bottom var(--wal-duration) var(--wal-ease);
     border-bottom: 1px solid transparent;
 
@@ -728,9 +1033,10 @@ mark {
       font-weight: 700;
       color: var(--wal-text);
       line-height: 1.2;
+      white-space: nowrap;
 
       small {
-        font-family: var(--wal-font-mono);
+        font-family: var(--wal-font-label);
         font-size: var(--wal-text-xs);
         font-weight: 400;
         color: var(--wal-text-muted);
@@ -743,6 +1049,17 @@ mark {
       display: flex;
       gap: var(--wal-space-md);
       align-items: center;
+
+      /* Scroll rather than wrap once the row itself is too long: a nav whose
+         links reflow into three ragged lines is harder to scan than one you
+         swipe. The scrollbar is suppressed because the row is 30px tall and a
+         visible bar would take a third of it. */
+      max-inline-size: 100%;
+      overflow-x: auto;
+      scrollbar-width: none;
+      &::-webkit-scrollbar { display: none; }
+
+      a { white-space: nowrap; }
 
       a {
         color: var(--wal-text);
@@ -998,14 +1315,23 @@ mark {
      `@container` from inside it — an element cannot query itself, so those
      rules never matched and the plate never collapsed.
 
-     The dividers are a 1px `gap` over a line-coloured background, so the
+     The dividers are 1px `gap`s filled by each cell's own outline, so the
      hairlines land correctly at *any* wrap configuration. That removes the
-     whole nth-child border dance the container queries used to need. */
+     whole nth-child border dance the container queries used to need.
+
+     The outline is what fixes a ragged last row. The previous version painted
+     the CONTAINER line-coloured and let it show through the gaps — which meant
+     any grid area with no cell in it (three items across two columns, say)
+     rendered as a solid line-coloured block that looked like a fourth, empty
+     spec. Now the container carries the cell colour and the cells draw their
+     own dividers, so unfilled areas are simply blank. `outline` rather than
+     `border` because it is drawn outside the box and does not affect layout,
+     so adjacent cells' outlines meet inside the 1px gap. */
   .wal-plate {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(min(100%, var(--wal-plate-min, 10rem)), 1fr));
     gap: 1px;
-    background: var(--wal-line);
+    background: var(--wal-plate-bg, var(--wal-card-bg, var(--wal-surface)));
     border: 1px solid var(--wal-line);
     border-radius: var(--wal-radius);
     overflow: hidden;
@@ -1013,6 +1339,7 @@ mark {
     > div {
       background: var(--wal-plate-bg, var(--wal-card-bg, var(--wal-surface)));
       color: var(--wal-card-ink, var(--wal-text));
+      outline: 1px solid var(--wal-line);
       padding: var(--wal-space-md);
       display: flex;
       flex-direction: column;
@@ -1020,11 +1347,11 @@ mark {
     }
 
     dt {
-      font-family: var(--wal-font-mono);
+      font-family: var(--wal-font-label);
       font-size: var(--wal-text-xs);
       color: var(--wal-card-ink-muted, var(--wal-text-muted));
       text-transform: uppercase;
-      letter-spacing: 0.05em;
+      letter-spacing: var(--wal-tracking-label);
       margin: 0;
     }
 
@@ -1058,11 +1385,11 @@ mark {
     }
 
     .wal-metric-label {
-      font-family: var(--wal-font-mono);
+      font-family: var(--wal-font-label);
       font-size: var(--wal-text-sm);
       color: var(--wal-card-ink-muted);
       text-transform: uppercase;
-      letter-spacing: 0.02em;
+      letter-spacing: var(--wal-tracking-label);
     }
   }
 
@@ -1070,7 +1397,7 @@ mark {
   .wal-chip {
     display: inline-flex;
     align-items: center;
-    font-family: var(--wal-font-mono);
+    font-family: var(--wal-font-label);
     font-size: var(--wal-text-xs);
     padding: 0.2rem 0.6rem;
     /* Own token so a consumer with square geometry can flatten chips
@@ -1136,9 +1463,9 @@ mark {
       }
 
       .wal-timeline-date {
-        font-family: var(--wal-font-mono);
+        font-family: var(--wal-font-label);
         font-size: var(--wal-text-sm);
-        color: var(--wal-gold);
+        color: var(--wal-gold-ink);
         padding-top: var(--wal-space-xs);
       }
 
@@ -1202,10 +1529,10 @@ mark {
     text-align: left;
     
     th {
-      font-family: var(--wal-font-mono);
+      font-family: var(--wal-font-label);
       font-size: var(--wal-text-xs);
       text-transform: uppercase;
-      letter-spacing: 0.05em;
+      letter-spacing: var(--wal-tracking-label);
       color: var(--wal-text-muted);
       padding: var(--wal-space-md) var(--wal-space-lg);
       border-bottom: 1px solid var(--wal-line);
@@ -1433,33 +1760,49 @@ mark {
     }
   }
 
-  /* ═══ 14. Badge ═══ */
+  /* ═══ 14. Badge ═══
+     Every variant is a cue's -soft as the fill and the SAME cue's -ink as the
+     type. Using the plain cue for both is the classic failure: goldenrod on a
+     goldenrod wash is a badge you cannot read. See the cue block in
+     01-tokens.css for why the two forms exist. */
   .wal-badge {
     display: inline-flex;
     align-items: center;
-    font-family: var(--wal-font-mono);
+    font-family: var(--wal-font-label);
     font-size: 0.7rem;
     text-transform: uppercase;
     letter-spacing: 0.05em;
     padding: 0.15rem 0.5rem;
-    border-radius: var(--wal-radius-full);
+    /* Own token so a consumer with square geometry can flatten badges
+       independently of buttons and chips. */
+    border-radius: var(--wal-badge-radius, var(--wal-radius-full));
     background: var(--wal-surface-2);
     color: var(--wal-text-soft);
     font-weight: 600;
-    
+
     &.wal-badge-accent {
       background: var(--wal-accent-soft);
-      color: var(--wal-accent);
+      color: var(--wal-accent-ink);
     }
-    
+
+    &.wal-badge-bloom {
+      background: var(--wal-bloom-soft);
+      color: var(--wal-bloom-ink);
+    }
+
     &.wal-badge-olive {
       background: var(--wal-olive-soft);
-      color: var(--wal-olive);
+      color: var(--wal-olive-ink);
     }
-    
+
     &.wal-badge-gold {
       background: var(--wal-gold-soft);
-      color: var(--wal-gold);
+      color: var(--wal-gold-ink);
+    }
+
+    &.wal-badge-cool {
+      background: var(--wal-cool-soft);
+      color: var(--wal-cool-ink);
     }
   }
 
@@ -1550,11 +1893,11 @@ mark {
 
   /* ═══ 17. Eyebrow ═══ */
   .wal-eyebrow {
-    font-family: var(--wal-eyebrow-font, var(--wal-font-mono));
+    font-family: var(--wal-eyebrow-font, var(--wal-font-label));
     font-size: var(--wal-text-xs);
     text-transform: uppercase;
-    letter-spacing: 0.1em;
-    color: var(--wal-eyebrow-color, var(--wal-accent));
+    letter-spacing: var(--wal-tracking-label);
+    color: var(--wal-eyebrow-color, var(--wal-accent-ink));
     margin-bottom: var(--wal-space-xs);
     display: block;
     font-weight: 600;
@@ -1603,13 +1946,13 @@ mark {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(min(100%, var(--wal-footer-min, 11rem)), 1fr));
     gap: var(--wal-space-md);
-    font-family: var(--wal-font-mono);
+    font-family: var(--wal-font-label);
     font-size: var(--wal-text-xs);
     color: var(--wal-text-soft);
 
     dt {
       text-transform: uppercase;
-      letter-spacing: 0.13em;
+      letter-spacing: calc(var(--wal-tracking-label) * 1.3);
       font-size: var(--wal-text-xs);
       color: var(--wal-text-muted);
       margin: 0 0 var(--wal-space-xs);
@@ -1653,7 +1996,7 @@ mark {
     font-family: var(--wal-font-display);
     font-weight: 600;
     font-size: var(--wal-text-sm);
-    color: var(--wal-accent);
+    color: var(--wal-accent-ink);
     text-decoration: none;
     transition: gap var(--wal-duration) var(--wal-ease);
 
@@ -1668,14 +2011,14 @@ mark {
       font-weight: 600;
       font-size: var(--wal-text-3xl);
       line-height: 1;
-      color: var(--wal-stat-color, var(--wal-accent));
+      color: var(--wal-stat-color, var(--wal-accent-ink));
     }
 
     .wal-stat-label {
-      font-family: var(--wal-font-mono);
+      font-family: var(--wal-font-label);
       font-size: var(--wal-text-xs);
       text-transform: uppercase;
-      letter-spacing: 0.1em;
+      letter-spacing: var(--wal-tracking-label);
       color: var(--wal-text-muted);
       margin-top: var(--wal-space-xs);
     }
@@ -1740,13 +2083,374 @@ mark {
       justify-content: space-between;
       gap: var(--wal-space-md);
       padding-top: var(--wal-space-sm);
-      font-family: var(--wal-font-mono);
+      font-family: var(--wal-font-label);
       font-size: var(--wal-text-xs);
-      letter-spacing: 0.16em;
+      letter-spacing: calc(var(--wal-tracking-label) * 1.6);
       text-transform: uppercase;
       color: var(--wal-text-muted);
     }
   }
+
+  /* ═══ 26. Colour script ═══
+     The palette, printed. A catalogue shows its own ink chart, and a design
+     system that renders its cues on the page treats them as content rather
+     than as decoration — which is the fastest way to notice a cue has drifted.
+
+     Zero-config form: five empty <li>s.
+
+         <ol class="wal-script">
+           <li></li><li></li><li></li><li></li><li></li>
+         </ol>
+
+     Each cell falls back to --wal-cue-N by position, so the strip is correct
+     without a single inline style. Override any cell with `--wal-cue:` when you
+     want a specific colour rather than the script in order, and put
+     <b>name</b> / <small>value</small> inside for a caption. */
+  .wal-script {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, var(--wal-script-min, 8rem)), 1fr));
+    gap: var(--wal-space-sm);
+    counter-reset: wal-cue;
+
+    > * {
+      counter-increment: wal-cue;
+      display: flex;
+      flex-direction: column;
+      gap: var(--wal-space-xs);
+      margin: 0;
+
+      /* The swatch itself. A hairline rather than a shadow, because a colour
+         chart is printed, and a border in the cue's own colour would hide
+         exactly the edge you are trying to judge. */
+      &::before {
+        content: "";
+        display: block;
+        block-size: var(--wal-script-h, 4.5rem);
+        background: var(--wal-cue, var(--wal-surface-2));
+        border: var(--wal-hairline) solid var(--wal-line);
+        border-radius: var(--wal-radius-sm);
+      }
+
+      /* Cue number, from the counter — never hand-typed, so reordering the
+         strip cannot leave the numbering behind. */
+      &::after {
+        content: counter(wal-cue, decimal-leading-zero);
+        font-family: var(--wal-font-label);
+        font-size: var(--wal-text-xs);
+        letter-spacing: var(--wal-tracking-label);
+        color: var(--wal-text-muted);
+        order: -1;
+      }
+
+      b {
+        font-family: var(--wal-font-display);
+        font-weight: 600;
+        font-size: var(--wal-text-sm);
+        color: var(--wal-text);
+      }
+
+      small {
+        font-family: var(--wal-font-mono);
+        font-size: var(--wal-text-xs);
+        color: var(--wal-text-muted);
+        overflow-wrap: anywhere;
+      }
+    }
+
+    /* Positional defaults. Inline `--wal-cue` beats these, because an inline
+       style outranks any layered rule regardless of specificity. */
+    > *:nth-child(1) { --wal-cue: var(--wal-cue-1); }
+    > *:nth-child(2) { --wal-cue: var(--wal-cue-2); }
+    > *:nth-child(3) { --wal-cue: var(--wal-cue-3); }
+    > *:nth-child(4) { --wal-cue: var(--wal-cue-4); }
+    > *:nth-child(5) { --wal-cue: var(--wal-cue-5); }
+  }
+
+  /* ═══ 27. Rule ═══
+     A hairline with a label sitting in it — the catalogue's section divider.
+     Distinct from .wal-divider, which is the gold flourish: this one is flat,
+     square and structural.
+
+         <div class="wal-rule"><span>Plates 1–8</span></div>
+
+     With no child it is a plain full-width hairline. */
+  .wal-rule {
+    display: flex;
+    align-items: center;
+    gap: var(--wal-space-md);
+    margin-block: var(--wal-space-lg);
+    font-family: var(--wal-font-label);
+    font-size: var(--wal-text-xs);
+    text-transform: uppercase;
+    letter-spacing: calc(var(--wal-tracking-label) * 1.6);
+    color: var(--wal-rule-color, var(--wal-text-muted));
+
+    &::before,
+    &::after {
+      content: "";
+      flex: 1;
+      block-size: var(--wal-hairline);
+      background: var(--wal-line);
+    }
+
+    /* Label to the left by default — a catalogue reads down the left margin.
+       .wal-rule-center puts it in the middle instead. */
+    &::before { flex: 0 0 var(--wal-space-xl); }
+    &.wal-rule-center::before { flex: 1; }
+    &:empty::before { flex: 1; }
+  }
+
+  /* ═══ 28. Caption ═══
+     The label voice: mono, uppercase, widely tracked. Figure captions, plate
+     notes, table sources, the line under a photograph. */
+  .wal-caption {
+    font-family: var(--wal-font-label);
+    font-size: var(--wal-text-xs);
+    text-transform: uppercase;
+    letter-spacing: calc(var(--wal-tracking-label) * 1.6);
+    color: var(--wal-caption-color, var(--wal-text-muted));
+    margin: 0;
+  }
+
+  /* ═══ 29. Index ═══
+     A plate number. Tabular figures so a column of them aligns on the digit
+     rather than on the glyph, which is the difference between a catalogue and
+     a list of numbers. */
+  .wal-index {
+    font-family: var(--wal-font-label);
+    font-size: var(--wal-index-size, var(--wal-text-sm));
+    font-variant-numeric: tabular-nums;
+    letter-spacing: calc(var(--wal-tracking-label) * 1.6);
+    color: var(--wal-index-color, var(--wal-accent-ink));
+    margin: 0;
+  }
+
+  /* ═══ 30. Section head ═══
+     Index, title and standfirst as one block, with the index in a left margin
+     wide enough to hold it. Collapses to a stack when the margin no longer
+     fits, which is the only breakpoint the component needs.
+
+         <header class="wal-section-head">
+           <p class="wal-index">01</p>
+           <h2>Colour</h2>
+           <p class="wal-caption">Five cues and a ground</p>
+         </header> */
+  .wal-section-head {
+    display: grid;
+    /* `max-content minmax(0, 1fr)`, not a fixed margin plus a floor: the index
+       column is exactly as wide as "01" needs and the content column can
+       shrink to zero, so this needs no breakpoint and cannot overflow at any
+       width. A minmax() floor on the second column would have done both. */
+    grid-template-columns: max-content minmax(0, 1fr);
+    gap: var(--wal-space-xs) var(--wal-space-lg);
+    align-items: baseline;
+    margin-bottom: var(--wal-space-xl);
+
+    .wal-index { grid-column: 1; grid-row: 1; }
+    > h2, > h3 { grid-column: 2; margin: 0; }
+    .wal-caption { grid-column: 2; }
+  }
+
+}
+
+/* ── finish ── */
+@layer finish {
+/* ═══════════════════════════════════════════════════
+   07 — FINISH
+   ───────────────────────────────────────────────────
+   A finish is the THIRD theming axis. The three are deliberately independent
+   and use three different syntaxes so they can never be confused:
+
+       PALETTE   by class       .wal-press          which colours
+       MODE      by attribute   data-theme="light"  light or dark
+       FINISH    by attribute   data-finish="…"     the geometry and the voice
+
+   Palette answers "what colour is this". Finish answers "what KIND of object
+   is this page" — printed or lit, square or rounded, ruled or floated. They
+   are orthogonal: every finish works with every palette in both modes.
+
+   ───────────────────────────────────────────────────
+   WHY THIS IS ALMOST ENTIRELY TOKENS
+
+   Nearly all of a finish is retuning the geometry and atmosphere tokens that
+   01-tokens.css already routes every component through — radius, hairline,
+   elevation, wash, label tracking, label face. That is the point of those
+   tokens existing: a finish should not have to know the selector of every
+   component it affects, or it will fall out of date the first time a component
+   is added.
+
+   The handful of real rules below are the cases where the catalogue look needs
+   a different *structure*, not a different value: a card that is a printed
+   plate rather than a floating panel, a nav that is a ruled masthead rather
+   than a frosted bar.
+═══════════════════════════════════════════════════ */
+
+
+/* ═══ CATALOGUE ═══
+   A 1960s parts catalogue: square corners, visible rules, tabular figures,
+   type set in the label voice, no glow and almost no shadow. Everything is
+   printed on stock — nothing floats.
+
+       <html class="wal-press" data-finish="catalogue"> */
+
+[data-finish="catalogue"] {
+  /* ── Geometry ──
+     3px rather than 0: a true square corner reads as an unstyled box at small
+     sizes, while a hair of radius reads as a trimmed edge. The component-level
+     radius tokens are set separately because pills are the single strongest
+     signal of a *web app*, and a catalogue has none of them. */
+  --wal-radius:      3px;
+  --wal-radius-sm:   2px;
+  --wal-radius-lg:   3px;
+  --wal-btn-radius:  2px;
+  --wal-chip-radius: 2px;
+  --wal-badge-radius: 2px;
+  /* --wal-radius-full is deliberately untouched: it still has to make the
+     availability dot a circle. */
+
+  /* ── Atmosphere ──
+     Print does not glow and barely casts. Both are scalars rather than
+     overrides, so no shadow rule and no background-image rule is restated. */
+  --wal-elevation: 0.35;
+  --wal-wash:      0;
+
+  /* ── Voice ──
+     Wider tracking on labels; the typewriter face carries the catalogue's
+     furniture, which is what separates it from a modern dashboard using the
+     same mono for code. */
+  --wal-tracking-label: 0.16em;
+  --wal-font-label: var(--wal-font-typewriter);
+}
+
+/* Hairlines are the catalogue's entire visual language, so they have to read
+   on any palette, including the soft ones. This turns the knob rather than
+   overriding --wal-line: the finish must not own a colour, or it stops being
+   orthogonal to the palette and a light rule ends up hard-coded onto a dark
+   theme. --wal-line-boost is consumed inside the derivation in 01-tokens.css,
+   and reaches it because both land on the same element — custom property
+   substitution uses the winning value on that element, whichever layer
+   declared it. */
+[data-finish="catalogue"] {
+  --wal-line-boost: 1.7;
+}
+
+/* ─── Headings ───
+   Tighter and quieter. A catalogue's hierarchy comes from rules and numbering,
+   not from typographic shouting, so headings lose a weight step and gain
+   balanced wrapping. */
+[data-finish="catalogue"] {
+  h1, h2, h3, h4 {
+    font-weight: 600;
+    text-wrap: balance;
+  }
+
+  h2 { letter-spacing: -0.015em; }
+
+  /* Tabular figures everywhere numbers are read in a column. */
+  .wal-metric-value,
+  .wal-stat-value,
+  .wal-plate dd,
+  .wal-table td {
+    font-variant-numeric: tabular-nums;
+  }
+}
+
+/* ─── Masthead ───
+   A ruled bar, not a frosted floating one. The blur is removed rather than
+   reduced: backdrop-filter over a paper ground reads as a smudge. */
+[data-finish="catalogue"] .wal-nav {
+  background: var(--wal-bg);
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  border-bottom: var(--wal-hairline) solid var(--wal-line);
+
+  &.is-scrolled {
+    box-shadow: none;
+    border-bottom-color: var(--wal-text);
+  }
+}
+
+/* ─── Plates ───
+   A card becomes a printed plate: it sits ON the page rather than above it, so
+   it does not lift, and the hover response moves to the rule instead of to the
+   geometry. Keeping a translate on hover is what makes an otherwise correct
+   catalogue still feel like a SaaS dashboard. */
+[data-finish="catalogue"] .wal-card {
+  border-color: var(--wal-line);
+
+  &:hover {
+    transform: none;
+    box-shadow: none;
+    border-color: var(--wal-accent);
+  }
+}
+
+/* ─── Sections ───
+   Sections are separated by a rule at the top and generous air, and the first
+   one still has none — the same intent as the stock section, drawn flat. */
+[data-finish="catalogue"] .wal-section {
+  border-top-width: var(--wal-hairline);
+}
+
+/* ─── Tables ───
+   No zebra. A catalogue's table is ruled, and the stripes fight the rules for
+   the reader's sense of where a row ends. */
+[data-finish="catalogue"] .wal-table {
+  tbody tr:nth-child(even) { background: none; }
+  tbody tr:hover { background: var(--wal-accent-soft); }
+  th { border-bottom-color: var(--wal-text); }
+}
+
+/* ─── Buttons ───
+   A secondary button becomes a boxed control with a real rule; the primary
+   keeps the accent fill, which is the one place the catalogue lets a colour
+   carry weight. */
+[data-finish="catalogue"] .wal-btn {
+  letter-spacing: 0.04em;
+
+  &.wal-btn-secondary {
+    border-color: var(--wal-line);
+
+    &:hover { background: var(--wal-accent-soft); }
+  }
+
+  &.wal-btn-primary:hover {
+    transform: none;
+    box-shadow: none;
+  }
+}
+
+/* ─── Hero ───
+   No radial glow: the catalogue's cover is a ruled sheet. The tagline keeps
+   the typewriter face, which now matches the rest of the furniture rather than
+   being the one screenplay-flavoured element on the page. */
+[data-finish="catalogue"] .wal-hero .wal-hero-glow {
+  display: none;
+}
+
+
+/* ═══ SOFT ═══
+   The stock finish, named so it can be asked for explicitly — useful when a
+   subtree should opt out of an inherited catalogue finish. Restates the
+   defaults from 01-tokens.css rather than unsetting them, because `unset` on a
+   custom property would fall back to the registered initial value and lose a
+   consumer's own override. */
+[data-finish="soft"] {
+  --wal-radius:       12px;
+  --wal-radius-sm:    6px;
+  --wal-radius-lg:    18px;
+  --wal-btn-radius:   var(--wal-radius-full);
+  --wal-chip-radius:  var(--wal-radius-full);
+  --wal-badge-radius: var(--wal-radius-full);
+  --wal-elevation:    1;
+  --wal-wash:         1;
+  --wal-line-boost:   1;
+  --wal-tracking-label: 0.1em;
+  --wal-font-label:   var(--wal-font-mono);
+}
 
 }
 
@@ -1903,6 +2607,7 @@ mark {
 .wal-font-mono { font-family: var(--wal-font-mono); }
 .wal-font-serif { font-family: var(--wal-font-serif); }
 .wal-font-typewriter { font-family: var(--wal-font-typewriter); }
+.wal-font-label { font-family: var(--wal-font-label); }
 
 /* Sizes */
 .wal-text-xs { font-size: var(--wal-text-xs); }
@@ -1940,10 +2645,16 @@ mark {
 .wal-tracking-wide { letter-spacing: 0.05em; }
 
 /* ── Color Utilities ─────────────────────────────────────────────────── */
-/* Text Colors */
-.wal-color-accent { color: var(--wal-accent); }
-.wal-color-gold { color: var(--wal-gold); }
-.wal-color-olive { color: var(--wal-olive); }
+/* Text Colors.
+   These set `color`, so they resolve to the -ink form of each cue — the same
+   cue shifted to stay legible as type on the page ground. .wal-color-gold with
+   the plain --wal-gold was a paragraph you had to squint at on a light theme.
+   Reach for --wal-gold directly when you want the cue as a FILL. */
+.wal-color-accent { color: var(--wal-accent-ink); }
+.wal-color-bloom { color: var(--wal-bloom-ink); }
+.wal-color-gold { color: var(--wal-gold-ink); }
+.wal-color-olive { color: var(--wal-olive-ink); }
+.wal-color-cool { color: var(--wal-cool-ink); }
 .wal-color-soft { color: var(--wal-text-soft); }
 .wal-color-muted { color: var(--wal-text-muted); }
 
@@ -1951,10 +2662,34 @@ mark {
 .wal-bg-surface { background-color: var(--wal-surface); }
 .wal-bg-surface-2 { background-color: var(--wal-surface-2); }
 .wal-bg-accent-soft { background-color: var(--wal-accent-soft); }
+.wal-bg-bloom-soft { background-color: var(--wal-bloom-soft); }
 .wal-bg-gold-soft { background-color: var(--wal-gold-soft); }
 .wal-bg-olive-soft { background-color: var(--wal-olive-soft); }
+.wal-bg-cool-soft { background-color: var(--wal-cool-soft); }
+
+/* Fills — the cue itself, with a foreground that is computed to stay legible
+   on it. Handy for a callout or a filled cell without writing both colours. */
+.wal-fill-accent { background-color: var(--wal-accent); color: var(--wal-accent-fg); }
+.wal-fill-bloom { background-color: var(--wal-bloom); color: var(--wal-bloom-fg); }
+.wal-fill-gold { background-color: var(--wal-gold); color: var(--wal-gold-fg); }
+.wal-fill-olive { background-color: var(--wal-olive); color: var(--wal-olive-fg); }
+.wal-fill-cool { background-color: var(--wal-cool); color: var(--wal-cool-fg); }
 
 /* ── Display & Visibility ────────────────────────────────────────────── */
+
+/* The HTML `hidden` attribute has to keep working on a walnut component.
+   Every component that sets `display` — .wal-badge, .wal-chip, .wal-btn,
+   .wal-cluster and a dozen others — outranks the UA sheet's
+   `[hidden] { display: none }`, so `<span class="wal-badge" hidden>` rendered
+   anyway. It is a genuinely confusing bug: the attribute is right there in the
+   markup and the element is on screen.
+
+   This belongs conceptually in the reset layer, but reset LOSES to components,
+   so restating it there would do nothing. It lives here because utilities sit
+   after components in the layer order — and this is the one rule in the file
+   that is not a utility class. Consumer CSS is unlayered and still wins. */
+[hidden] { display: none; }
+
 .wal-hidden { display: none; }
 .wal-block { display: block; }
 .wal-inline { display: inline; }

@@ -1,163 +1,49 @@
 /* ═══════════════════════════════════════════════════
    THEME — BONE
-   Sunlit linen paper, watercolor illustration,
+   Sunlit linen paper, watercolour illustration,
    Japanese stationery. Washi tape and pressed flowers.
-   ─────────────────────────────────────────────────
-   Hue:    55  (warm amber — same family as café)
-   Chroma: 0.025 (whisper-soft saturation)
-   Accent: 25  (terracotta — deliberate warmth)
-   Gold:   85  (goldenrod)
-   Olive:  130 (botanical green)
-
-   LIGHT-FIRST: Unlike the other themes which
-   default to dark, Bone is bright by nature.
-   Backgrounds live at 94-97% lightness.
-   Text is deep walnut brown at 18-25%.
-   Dark mode is available but secondary — it
-   inverts to a standard dark palette.
+   ───────────────────────────────────────────────────
+   LIGHT-FIRST. The other palettes follow the system and land dark at night;
+   Bone is bright by nature and stays bright unless a mode is asked for
+   explicitly. That used to require restating the entire palette under a
+   flipped media query. Now it is one declaration — `color-scheme: light` —
+   because mode and palette are finally separate axes.
 ═══════════════════════════════════════════════════ */
 
-
-/* ─── Bone Light (default — this is the primary mode) ─── */
-
 .wal-bone,
-[data-theme="bone"] {
-  /* Hue control rods */
-  --wal-hue:        55;
-  --wal-chroma:     0.025;
-  --wal-accent-hue: 25;
-  --wal-gold-hue:   85;
-  --wal-olive-hue:  130;
+[data-theme="bone"],
+[data-theme^="bone-"] {
+  /* ── The ground rod ── the same warm amber as café, at a whisper */
+  --wal-hue:    55;
+  --wal-chroma: 0.025;
 
-  /* Surface scale — sunlit paper, cream, eggshell
-     The key difference: backgrounds are BRIGHT.
-     Surface > bg creates a layered paper effect. */
-  --wal-bg:         oklch(95% 0.018 var(--wal-hue));
-  --wal-bg-subtle:  oklch(92% 0.022 var(--wal-hue));
-  --wal-surface:    oklch(97% 0.012 var(--wal-hue));
-  --wal-surface-2:  oklch(93% 0.018 var(--wal-hue));
-  --wal-line:       oklch(86% 0.025 var(--wal-hue));
-  --wal-line-soft:  oklch(90% 0.016 var(--wal-hue));
+  /* ── The five cues ── watercolour: pigment, not ink */
+  --wal-accent-hue: 25;   --wal-accent-chroma: 0.17;  /* terracotta stamp */
+  --wal-gold-hue:   85;   --wal-gold-chroma:   0.13;  /* dried stem       */
+  --wal-olive-hue:  130;  --wal-olive-chroma:  0.09;  /* pressed leaf     */
+  --wal-cool-hue:   225;  --wal-cool-chroma:   0.09;  /* indigo thread    */
 
-  /* Text — deep walnut ink, pressed into paper */
-  --wal-text:       oklch(18% 0.025 var(--wal-hue));
-  --wal-text-soft:  oklch(38% 0.035 var(--wal-hue));
-  --wal-text-muted: oklch(56% 0.025 var(--wal-hue));
+  /* ── Ramp nudges ── layered paper: the card stock sits ABOVE the page, so
+     surface runs brighter than bg rather than darker. */
+  --wal-l-bg-light:        95%;
+  --wal-l-subtle-light:    92%;
+  --wal-l-surface-light:   97%;
+  --wal-l-surface-2-light: 93%;
+  --wal-l-line-light:      86%;
+  --wal-l-line-soft-light: 90%;
+  --wal-l-text-light:      18%;
+  --wal-l-text-soft-light: 38%;
+  --wal-l-text-muted-light: 56%;
 
-  /* Saturation rods — see the note in cafe.css. */
-  --wal-accent-chroma: 0.17;
-  --wal-gold-chroma:   0.13;
-  --wal-olive-chroma:  0.09;
-
-  /* Accent — terracotta, warm ink stamp */
-  --wal-accent:       oklch(50% var(--wal-accent-chroma) var(--wal-accent-hue));
-  --wal-accent-hover: oklch(44% calc(var(--wal-accent-chroma) + 0.02) var(--wal-accent-hue));
-  --wal-accent-soft:  oklch(50% var(--wal-accent-chroma) var(--wal-accent-hue) / 0.10);
-  --wal-accent-fg:    oklch(97% 0.01 var(--wal-accent-hue));
-
-  /* Secondary — goldenrod, dried flower stem */
-  --wal-gold:      oklch(62% var(--wal-gold-chroma) var(--wal-gold-hue));
-  --wal-gold-soft: oklch(62% var(--wal-gold-chroma) var(--wal-gold-hue) / 0.12);
-
-  /* Tertiary — botanical green, watercolor leaf */
-  --wal-olive:      oklch(48% var(--wal-olive-chroma) var(--wal-olive-hue));
-  --wal-olive-soft: oklch(48% var(--wal-olive-chroma) var(--wal-olive-hue) / 0.10);
-
-  /* Functional */
-  --wal-success: oklch(45% 0.14 145);
-  --wal-warning: oklch(55% 0.14 85);
-  --wal-danger:  oklch(48% 0.18 25);
-
-  /* Shadows — barely there, pencil-edge softness */
-  --wal-shadow:    0 20px 44px -18px oklch(55% 0.02 var(--wal-hue) / 0.12);
-  --wal-shadow-sm: 0 4px 12px -4px  oklch(55% 0.02 var(--wal-hue) / 0.08);
-  --wal-shadow-lg: 0 32px 64px -24px oklch(55% 0.02 var(--wal-hue) / 0.16);
+  /* Pencil-edge softness rather than a cast shadow. */
+  --wal-elevation: 0.75;
 }
 
-
-/* ─── Bone Dark (secondary — for night reading) ─── */
-
-.wal-bone.wal-dark,
-.wal-bone[data-theme="dark"],
-[data-theme="bone"].wal-dark,
-[data-theme="bone-dark"] {
-  /* Surfaces — warm dark, but softer than café */
-  --wal-bg:         oklch(16% 0.025 var(--wal-hue));
-  --wal-bg-subtle:  oklch(19% 0.03 var(--wal-hue));
-  --wal-surface:    oklch(22% 0.03 var(--wal-hue));
-  --wal-surface-2:  oklch(26% 0.033 var(--wal-hue));
-  --wal-line:       oklch(32% 0.025 var(--wal-hue));
-  --wal-line-soft:  oklch(28% 0.02 var(--wal-hue));
-
-  /* Text — warm cream, candlelight */
-  --wal-text:       oklch(92% 0.015 var(--wal-hue));
-  --wal-text-soft:  oklch(68% 0.025 var(--wal-hue));
-  --wal-text-muted: oklch(52% 0.02 var(--wal-hue));
-
-  /* Accent — brighter terracotta for dark bg */
-  --wal-accent-chroma: 0.17;
-  --wal-gold-chroma:   0.15;
-  --wal-olive-chroma:  0.10;
-
-  --wal-accent:       oklch(62% var(--wal-accent-chroma) var(--wal-accent-hue));
-  --wal-accent-hover: oklch(68% calc(var(--wal-accent-chroma) + 0.02) var(--wal-accent-hue));
-  --wal-accent-soft:  oklch(62% var(--wal-accent-chroma) var(--wal-accent-hue) / 0.12);
-  --wal-accent-fg:    oklch(96% 0.01 var(--wal-accent-hue));
-
-  /* Secondary/tertiary — restored brightness for dark */
-  --wal-gold:      oklch(75% var(--wal-gold-chroma) var(--wal-gold-hue));
-  --wal-gold-soft: oklch(75% var(--wal-gold-chroma) var(--wal-gold-hue) / 0.15);
-  --wal-olive:      oklch(55% var(--wal-olive-chroma) var(--wal-olive-hue));
-  --wal-olive-soft: oklch(55% var(--wal-olive-chroma) var(--wal-olive-hue) / 0.12);
-
-  /* Functional — standard dark mode values */
-  --wal-success: oklch(65% 0.16 145);
-  --wal-warning: oklch(75% 0.15 85);
-  --wal-danger:  oklch(62% 0.20 25);
-
-  /* Shadows — deeper for dark surfaces */
-  --wal-shadow:    0 20px 44px -18px oklch(10% 0.02 var(--wal-hue) / 0.45);
-  --wal-shadow-sm: 0 4px 12px -4px  oklch(10% 0.02 var(--wal-hue) / 0.3);
-  --wal-shadow-lg: 0 32px 64px -24px oklch(8% 0.02 var(--wal-hue) / 0.55);
-}
-
-/* Auto dark — system preference
-   Because Bone is light-first, we flip the logic:
-   dark-mode media query triggers the dark variant. */
-@media (prefers-color-scheme: dark) {
-  .wal-bone:not(.wal-light):not([data-theme="light"]),
-  [data-theme="bone"]:not(.wal-light):not([data-theme="light"]) {
-    --wal-bg:         oklch(16% 0.025 var(--wal-hue));
-    --wal-bg-subtle:  oklch(19% 0.03 var(--wal-hue));
-    --wal-surface:    oklch(22% 0.03 var(--wal-hue));
-    --wal-surface-2:  oklch(26% 0.033 var(--wal-hue));
-    --wal-line:       oklch(32% 0.025 var(--wal-hue));
-    --wal-line-soft:  oklch(28% 0.02 var(--wal-hue));
-
-    --wal-text:       oklch(92% 0.015 var(--wal-hue));
-    --wal-text-soft:  oklch(68% 0.025 var(--wal-hue));
-    --wal-text-muted: oklch(52% 0.02 var(--wal-hue));
-
-    --wal-accent-chroma: 0.17;
-    --wal-gold-chroma:   0.15;
-    --wal-olive-chroma:  0.10;
-
-    --wal-accent:       oklch(62% var(--wal-accent-chroma) var(--wal-accent-hue));
-    --wal-accent-hover: oklch(68% calc(var(--wal-accent-chroma) + 0.02) var(--wal-accent-hue));
-    --wal-accent-soft:  oklch(62% var(--wal-accent-chroma) var(--wal-accent-hue) / 0.12);
-    --wal-accent-fg:    oklch(96% 0.01 var(--wal-accent-hue));
-
-    --wal-gold:      oklch(75% var(--wal-gold-chroma) var(--wal-gold-hue));
-    --wal-gold-soft: oklch(75% var(--wal-gold-chroma) var(--wal-gold-hue) / 0.15);
-    --wal-olive:      oklch(55% var(--wal-olive-chroma) var(--wal-olive-hue));
-    --wal-olive-soft: oklch(55% var(--wal-olive-chroma) var(--wal-olive-hue) / 0.12);
-
-    --wal-success: oklch(65% 0.16 145);
-    --wal-warning: oklch(75% 0.15 85);
-    --wal-danger:  oklch(62% 0.20 25);
-
-    --wal-shadow:    0 20px 44px -18px oklch(10% 0.02 var(--wal-hue) / 0.45);
-    --wal-shadow-sm: 0 4px 12px -4px  oklch(10% 0.02 var(--wal-hue) / 0.3);
-    --wal-shadow-lg: 0 32px 64px -24px oklch(8% 0.02 var(--wal-hue) / 0.55);
-  }
+/* Light-first, stated so it still LOSES to an explicit mode request.
+   The :not() chain matters: the generic mode rules in 01-tokens.css sit inside
+   :where() and therefore carry zero specificity, so a plain `.wal-bone` rule
+   would outrank `.wal-dark` and make the dark variant unreachable. */
+.wal-bone:not(.wal-dark):not([data-theme="dark"]):not([data-theme$="-dark"]),
+[data-theme="bone"]:not(.wal-dark) {
+  color-scheme: light;
 }

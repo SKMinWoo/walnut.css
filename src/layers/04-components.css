@@ -11,11 +11,19 @@
     background: color-mix(in oklch, var(--wal-bg) 80%, transparent);
     backdrop-filter: blur(18px);
     -webkit-backdrop-filter: blur(18px);
-    height: var(--wal-nav-h, 64px);
+    /* min-height, not height, and allowed to wrap. At narrow widths the links
+       drop to a second row instead of overlapping the brand and running off
+       the page — which is what a fixed height plus nowrap did. Nothing is
+       hidden and no JavaScript is involved; .wal-drawer is still there if you
+       want a real mobile menu instead. */
+    min-height: var(--wal-nav-h, 64px);
     display: flex;
+    flex-wrap: wrap;
     align-items: center;
     justify-content: space-between;
-    padding: 0 var(--wal-space-md);
+    gap: var(--wal-space-sm);
+    padding-block: var(--wal-space-sm);
+    padding-inline: var(--wal-space-md);
     transition: box-shadow var(--wal-duration) var(--wal-ease), border-bottom var(--wal-duration) var(--wal-ease);
     border-bottom: 1px solid transparent;
 
@@ -31,9 +39,10 @@
       font-weight: 700;
       color: var(--wal-text);
       line-height: 1.2;
+      white-space: nowrap;
 
       small {
-        font-family: var(--wal-font-mono);
+        font-family: var(--wal-font-label);
         font-size: var(--wal-text-xs);
         font-weight: 400;
         color: var(--wal-text-muted);
@@ -46,6 +55,17 @@
       display: flex;
       gap: var(--wal-space-md);
       align-items: center;
+
+      /* Scroll rather than wrap once the row itself is too long: a nav whose
+         links reflow into three ragged lines is harder to scan than one you
+         swipe. The scrollbar is suppressed because the row is 30px tall and a
+         visible bar would take a third of it. */
+      max-inline-size: 100%;
+      overflow-x: auto;
+      scrollbar-width: none;
+      &::-webkit-scrollbar { display: none; }
+
+      a { white-space: nowrap; }
 
       a {
         color: var(--wal-text);
@@ -301,14 +321,23 @@
      `@container` from inside it — an element cannot query itself, so those
      rules never matched and the plate never collapsed.
 
-     The dividers are a 1px `gap` over a line-coloured background, so the
+     The dividers are 1px `gap`s filled by each cell's own outline, so the
      hairlines land correctly at *any* wrap configuration. That removes the
-     whole nth-child border dance the container queries used to need. */
+     whole nth-child border dance the container queries used to need.
+
+     The outline is what fixes a ragged last row. The previous version painted
+     the CONTAINER line-coloured and let it show through the gaps — which meant
+     any grid area with no cell in it (three items across two columns, say)
+     rendered as a solid line-coloured block that looked like a fourth, empty
+     spec. Now the container carries the cell colour and the cells draw their
+     own dividers, so unfilled areas are simply blank. `outline` rather than
+     `border` because it is drawn outside the box and does not affect layout,
+     so adjacent cells' outlines meet inside the 1px gap. */
   .wal-plate {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(min(100%, var(--wal-plate-min, 10rem)), 1fr));
     gap: 1px;
-    background: var(--wal-line);
+    background: var(--wal-plate-bg, var(--wal-card-bg, var(--wal-surface)));
     border: 1px solid var(--wal-line);
     border-radius: var(--wal-radius);
     overflow: hidden;
@@ -316,6 +345,7 @@
     > div {
       background: var(--wal-plate-bg, var(--wal-card-bg, var(--wal-surface)));
       color: var(--wal-card-ink, var(--wal-text));
+      outline: 1px solid var(--wal-line);
       padding: var(--wal-space-md);
       display: flex;
       flex-direction: column;
@@ -323,11 +353,11 @@
     }
 
     dt {
-      font-family: var(--wal-font-mono);
+      font-family: var(--wal-font-label);
       font-size: var(--wal-text-xs);
       color: var(--wal-card-ink-muted, var(--wal-text-muted));
       text-transform: uppercase;
-      letter-spacing: 0.05em;
+      letter-spacing: var(--wal-tracking-label);
       margin: 0;
     }
 
@@ -361,11 +391,11 @@
     }
 
     .wal-metric-label {
-      font-family: var(--wal-font-mono);
+      font-family: var(--wal-font-label);
       font-size: var(--wal-text-sm);
       color: var(--wal-card-ink-muted);
       text-transform: uppercase;
-      letter-spacing: 0.02em;
+      letter-spacing: var(--wal-tracking-label);
     }
   }
 
@@ -373,7 +403,7 @@
   .wal-chip {
     display: inline-flex;
     align-items: center;
-    font-family: var(--wal-font-mono);
+    font-family: var(--wal-font-label);
     font-size: var(--wal-text-xs);
     padding: 0.2rem 0.6rem;
     /* Own token so a consumer with square geometry can flatten chips
@@ -439,9 +469,9 @@
       }
 
       .wal-timeline-date {
-        font-family: var(--wal-font-mono);
+        font-family: var(--wal-font-label);
         font-size: var(--wal-text-sm);
-        color: var(--wal-gold);
+        color: var(--wal-gold-ink);
         padding-top: var(--wal-space-xs);
       }
 
@@ -505,10 +535,10 @@
     text-align: left;
     
     th {
-      font-family: var(--wal-font-mono);
+      font-family: var(--wal-font-label);
       font-size: var(--wal-text-xs);
       text-transform: uppercase;
-      letter-spacing: 0.05em;
+      letter-spacing: var(--wal-tracking-label);
       color: var(--wal-text-muted);
       padding: var(--wal-space-md) var(--wal-space-lg);
       border-bottom: 1px solid var(--wal-line);
@@ -736,33 +766,49 @@
     }
   }
 
-  /* ═══ 14. Badge ═══ */
+  /* ═══ 14. Badge ═══
+     Every variant is a cue's -soft as the fill and the SAME cue's -ink as the
+     type. Using the plain cue for both is the classic failure: goldenrod on a
+     goldenrod wash is a badge you cannot read. See the cue block in
+     01-tokens.css for why the two forms exist. */
   .wal-badge {
     display: inline-flex;
     align-items: center;
-    font-family: var(--wal-font-mono);
+    font-family: var(--wal-font-label);
     font-size: 0.7rem;
     text-transform: uppercase;
     letter-spacing: 0.05em;
     padding: 0.15rem 0.5rem;
-    border-radius: var(--wal-radius-full);
+    /* Own token so a consumer with square geometry can flatten badges
+       independently of buttons and chips. */
+    border-radius: var(--wal-badge-radius, var(--wal-radius-full));
     background: var(--wal-surface-2);
     color: var(--wal-text-soft);
     font-weight: 600;
-    
+
     &.wal-badge-accent {
       background: var(--wal-accent-soft);
-      color: var(--wal-accent);
+      color: var(--wal-accent-ink);
     }
-    
+
+    &.wal-badge-bloom {
+      background: var(--wal-bloom-soft);
+      color: var(--wal-bloom-ink);
+    }
+
     &.wal-badge-olive {
       background: var(--wal-olive-soft);
-      color: var(--wal-olive);
+      color: var(--wal-olive-ink);
     }
-    
+
     &.wal-badge-gold {
       background: var(--wal-gold-soft);
-      color: var(--wal-gold);
+      color: var(--wal-gold-ink);
+    }
+
+    &.wal-badge-cool {
+      background: var(--wal-cool-soft);
+      color: var(--wal-cool-ink);
     }
   }
 
@@ -853,11 +899,11 @@
 
   /* ═══ 17. Eyebrow ═══ */
   .wal-eyebrow {
-    font-family: var(--wal-eyebrow-font, var(--wal-font-mono));
+    font-family: var(--wal-eyebrow-font, var(--wal-font-label));
     font-size: var(--wal-text-xs);
     text-transform: uppercase;
-    letter-spacing: 0.1em;
-    color: var(--wal-eyebrow-color, var(--wal-accent));
+    letter-spacing: var(--wal-tracking-label);
+    color: var(--wal-eyebrow-color, var(--wal-accent-ink));
     margin-bottom: var(--wal-space-xs);
     display: block;
     font-weight: 600;
@@ -906,13 +952,13 @@
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(min(100%, var(--wal-footer-min, 11rem)), 1fr));
     gap: var(--wal-space-md);
-    font-family: var(--wal-font-mono);
+    font-family: var(--wal-font-label);
     font-size: var(--wal-text-xs);
     color: var(--wal-text-soft);
 
     dt {
       text-transform: uppercase;
-      letter-spacing: 0.13em;
+      letter-spacing: calc(var(--wal-tracking-label) * 1.3);
       font-size: var(--wal-text-xs);
       color: var(--wal-text-muted);
       margin: 0 0 var(--wal-space-xs);
@@ -956,7 +1002,7 @@
     font-family: var(--wal-font-display);
     font-weight: 600;
     font-size: var(--wal-text-sm);
-    color: var(--wal-accent);
+    color: var(--wal-accent-ink);
     text-decoration: none;
     transition: gap var(--wal-duration) var(--wal-ease);
 
@@ -971,14 +1017,14 @@
       font-weight: 600;
       font-size: var(--wal-text-3xl);
       line-height: 1;
-      color: var(--wal-stat-color, var(--wal-accent));
+      color: var(--wal-stat-color, var(--wal-accent-ink));
     }
 
     .wal-stat-label {
-      font-family: var(--wal-font-mono);
+      font-family: var(--wal-font-label);
       font-size: var(--wal-text-xs);
       text-transform: uppercase;
-      letter-spacing: 0.1em;
+      letter-spacing: var(--wal-tracking-label);
       color: var(--wal-text-muted);
       margin-top: var(--wal-space-xs);
     }
@@ -1043,10 +1089,173 @@
       justify-content: space-between;
       gap: var(--wal-space-md);
       padding-top: var(--wal-space-sm);
-      font-family: var(--wal-font-mono);
+      font-family: var(--wal-font-label);
       font-size: var(--wal-text-xs);
-      letter-spacing: 0.16em;
+      letter-spacing: calc(var(--wal-tracking-label) * 1.6);
       text-transform: uppercase;
       color: var(--wal-text-muted);
     }
+  }
+
+  /* ═══ 26. Colour script ═══
+     The palette, printed. A catalogue shows its own ink chart, and a design
+     system that renders its cues on the page treats them as content rather
+     than as decoration — which is the fastest way to notice a cue has drifted.
+
+     Zero-config form: five empty <li>s.
+
+         <ol class="wal-script">
+           <li></li><li></li><li></li><li></li><li></li>
+         </ol>
+
+     Each cell falls back to --wal-cue-N by position, so the strip is correct
+     without a single inline style. Override any cell with `--wal-cue:` when you
+     want a specific colour rather than the script in order, and put
+     <b>name</b> / <small>value</small> inside for a caption. */
+  .wal-script {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, var(--wal-script-min, 8rem)), 1fr));
+    gap: var(--wal-space-sm);
+    counter-reset: wal-cue;
+
+    > * {
+      counter-increment: wal-cue;
+      display: flex;
+      flex-direction: column;
+      gap: var(--wal-space-xs);
+      margin: 0;
+
+      /* The swatch itself. A hairline rather than a shadow, because a colour
+         chart is printed, and a border in the cue's own colour would hide
+         exactly the edge you are trying to judge. */
+      &::before {
+        content: "";
+        display: block;
+        block-size: var(--wal-script-h, 4.5rem);
+        background: var(--wal-cue, var(--wal-surface-2));
+        border: var(--wal-hairline) solid var(--wal-line);
+        border-radius: var(--wal-radius-sm);
+      }
+
+      /* Cue number, from the counter — never hand-typed, so reordering the
+         strip cannot leave the numbering behind. */
+      &::after {
+        content: counter(wal-cue, decimal-leading-zero);
+        font-family: var(--wal-font-label);
+        font-size: var(--wal-text-xs);
+        letter-spacing: var(--wal-tracking-label);
+        color: var(--wal-text-muted);
+        order: -1;
+      }
+
+      b {
+        font-family: var(--wal-font-display);
+        font-weight: 600;
+        font-size: var(--wal-text-sm);
+        color: var(--wal-text);
+      }
+
+      small {
+        font-family: var(--wal-font-mono);
+        font-size: var(--wal-text-xs);
+        color: var(--wal-text-muted);
+        overflow-wrap: anywhere;
+      }
+    }
+
+    /* Positional defaults. Inline `--wal-cue` beats these, because an inline
+       style outranks any layered rule regardless of specificity. */
+    > *:nth-child(1) { --wal-cue: var(--wal-cue-1); }
+    > *:nth-child(2) { --wal-cue: var(--wal-cue-2); }
+    > *:nth-child(3) { --wal-cue: var(--wal-cue-3); }
+    > *:nth-child(4) { --wal-cue: var(--wal-cue-4); }
+    > *:nth-child(5) { --wal-cue: var(--wal-cue-5); }
+  }
+
+  /* ═══ 27. Rule ═══
+     A hairline with a label sitting in it — the catalogue's section divider.
+     Distinct from .wal-divider, which is the gold flourish: this one is flat,
+     square and structural.
+
+         <div class="wal-rule"><span>Plates 1–8</span></div>
+
+     With no child it is a plain full-width hairline. */
+  .wal-rule {
+    display: flex;
+    align-items: center;
+    gap: var(--wal-space-md);
+    margin-block: var(--wal-space-lg);
+    font-family: var(--wal-font-label);
+    font-size: var(--wal-text-xs);
+    text-transform: uppercase;
+    letter-spacing: calc(var(--wal-tracking-label) * 1.6);
+    color: var(--wal-rule-color, var(--wal-text-muted));
+
+    &::before,
+    &::after {
+      content: "";
+      flex: 1;
+      block-size: var(--wal-hairline);
+      background: var(--wal-line);
+    }
+
+    /* Label to the left by default — a catalogue reads down the left margin.
+       .wal-rule-center puts it in the middle instead. */
+    &::before { flex: 0 0 var(--wal-space-xl); }
+    &.wal-rule-center::before { flex: 1; }
+    &:empty::before { flex: 1; }
+  }
+
+  /* ═══ 28. Caption ═══
+     The label voice: mono, uppercase, widely tracked. Figure captions, plate
+     notes, table sources, the line under a photograph. */
+  .wal-caption {
+    font-family: var(--wal-font-label);
+    font-size: var(--wal-text-xs);
+    text-transform: uppercase;
+    letter-spacing: calc(var(--wal-tracking-label) * 1.6);
+    color: var(--wal-caption-color, var(--wal-text-muted));
+    margin: 0;
+  }
+
+  /* ═══ 29. Index ═══
+     A plate number. Tabular figures so a column of them aligns on the digit
+     rather than on the glyph, which is the difference between a catalogue and
+     a list of numbers. */
+  .wal-index {
+    font-family: var(--wal-font-label);
+    font-size: var(--wal-index-size, var(--wal-text-sm));
+    font-variant-numeric: tabular-nums;
+    letter-spacing: calc(var(--wal-tracking-label) * 1.6);
+    color: var(--wal-index-color, var(--wal-accent-ink));
+    margin: 0;
+  }
+
+  /* ═══ 30. Section head ═══
+     Index, title and standfirst as one block, with the index in a left margin
+     wide enough to hold it. Collapses to a stack when the margin no longer
+     fits, which is the only breakpoint the component needs.
+
+         <header class="wal-section-head">
+           <p class="wal-index">01</p>
+           <h2>Colour</h2>
+           <p class="wal-caption">Five cues and a ground</p>
+         </header> */
+  .wal-section-head {
+    display: grid;
+    /* `max-content minmax(0, 1fr)`, not a fixed margin plus a floor: the index
+       column is exactly as wide as "01" needs and the content column can
+       shrink to zero, so this needs no breakpoint and cannot overflow at any
+       width. A minmax() floor on the second column would have done both. */
+    grid-template-columns: max-content minmax(0, 1fr);
+    gap: var(--wal-space-xs) var(--wal-space-lg);
+    align-items: baseline;
+    margin-bottom: var(--wal-space-xl);
+
+    .wal-index { grid-column: 1; grid-row: 1; }
+    > h2, > h3 { grid-column: 2; margin: 0; }
+    .wal-caption { grid-column: 2; }
   }

@@ -1,5 +1,142 @@
 # Changelog
 
+## 0.4.0
+
+The theming release. A theme used to be a 130-line file that restated every
+derived token three times; it is now a **colour script** — one ground rod and
+five cues — and everything else is derived from it, once, for both modes.
+
+### Changed (breaking)
+
+- **Mode is now `color-scheme`, driven by `light-dark()`.** Every colour token
+  is declared exactly once as `light-dark(light, dark)` instead of being
+  restated under a class rule and again under a `prefers-color-scheme` media
+  query. `.wal-light` / `.wal-dark` / `data-theme` now set `color-scheme` and
+  nothing else.
+
+  **If your app does its own dark mode with a class, add `color-scheme` to it**
+  or walnut's tokens will resolve to their light branch:
+
+  ```css
+  .dark { color-scheme: dark; }   /* one line */
+  ```
+
+  In exchange: native form controls, scrollbars and the canvas follow the mode
+  for free, and a subtree can flip mode on its own (`<section class="wal-light">`)
+  without a second palette, because `light-dark()` resolves where a token is
+  *used*, not where it is declared.
+
+- **Browser floor raised to Chrome 123 / Safari 17.5 / Firefox 120**, which is
+  what `light-dark()` requires.
+
+- **`.wal-color-*` utilities now resolve to the `-ink` form of their cue.**
+  `.wal-color-gold` was setting `--wal-gold`, a fill colour, as paragraph text —
+  legible on a dark ground and a squint on a light one. Use `--wal-gold`
+  directly where you want the fill.
+
+- **`--wal-accent-fg` and friends are computed, not stated.** If you were
+  overriding them, you still can; they are now derived by default.
+
+### Added
+
+- **Two more cues: `--wal-bloom` and `--wal-cool`**, completing the five-cue
+  script. Their hues default to *offsets from the accent* — `+27°` and `+209°`,
+  a warm step and a near-exact complement — so rotating the accent rotates the
+  whole script in tune instead of pulling the lead colour away from the cast.
+  Both offsets were measured off a palette that had been mixed by hand over
+  months; the structure was already there, it just was not written down.
+
+- **`--wal-<cue>-ink` for all five cues.** A cue used as *type* needs more
+  separation from the ground than the same cue used as a *fill*. This is the
+  single most common way a hand-made palette fails — goldenrod is a fine button
+  and an illegible paragraph — and it is now a token rather than something every
+  consumer rediscovers. Badges, links, eyebrows, timeline dates and stat values
+  all read the `-ink` form.
+
+- **Computed foreground contrast.** `--wal-<cue>-fg` picks near-black or
+  near-white arithmetically from the cue's own lightness using relative colour
+  syntax, keeping a trace of the cue's chroma so it reads as warm cream rather
+  than as a sticker. Behind `@supports`, with a stated fallback.
+
+- **`--wal-cue-1` … `--wal-cue-5`.** Positional aliases, for iterating the
+  script without knowing the cue names.
+
+- **A third theming axis: finish.** `data-finish="catalogue"` applies a
+  mid-century catalogued look — square corners, visible rules, tabular figures,
+  typewriter labels, no glow, almost no shadow — to any palette in either mode.
+  `data-finish="soft"` names the stock look. New `finish` cascade layer, between
+  `components` and `utilities`.
+
+- **New palette: `press`.** A 1960s parts catalogue on a walnut desk. Paper
+  stock, tomato plate numbers, goldenrod rules, one cold blue. Paper-first, and
+  the palette the catalogue finish was designed against.
+
+- **Catalogue components:** `.wal-script` (the palette, printed — five empty
+  `<li>`s and it fills itself from the cues), `.wal-rule` (a hairline with a
+  label in it), `.wal-caption`, `.wal-index`, `.wal-section-head`.
+
+- **Atmosphere and geometry scalars:** `--wal-elevation` scales every shadow
+  offset, `--wal-wash` scales the tinted light on `<body>`, `--wal-line-boost`
+  strengthens hairlines without owning a colour, `--wal-badge-radius` joins the
+  existing per-component radius tokens. A finish is mostly just these.
+
+- **`.wal-palette`** — a scoping hook. Any element carrying it re-derives the
+  whole script from the rods in effect there.
+
+- **`--wal-font-label`** — the face used for catalogue furniture (eyebrows,
+  plate keys, captions, figure numbers), separate from `--wal-font-mono` so a
+  finish can change the label voice without changing the code voice.
+
+### Fixed
+
+- **`walnut.min.css` was not the same stylesheet as `walnut.css`.** Two
+  independent minifier bugs, both silent, in the file the README tells you to
+  install:
+
+  1. **`//` "line comment" stripping.** CSS has no `//` comments, so the step
+     could only ever destroy real content — and it did. The `//` in
+     `xmlns="http://www.w3.org/2000/svg"` inside the inline SVG data URIs
+     matched, deleting the rest of the line and leaving `url('data:…<svg
+     xmlns="http:` unterminated. An unterminated string swallows the CSS after
+     it, so **every rule following `.wal-card-flora` stopped applying** — the
+     back half of the components layer and the entire finish layer. Step
+     removed.
+
+  2. **Whitespace stripped around `+`.** CSS *requires* whitespace on both sides
+     of `+` and `-` inside `calc()`, so `calc(var(--a) + 27)` became
+     `calc(var(--a)+27)` — invalid, and silently computed to black. Every
+     derived hue and lightness goes through that path. `+` and `~` are no longer
+     stripped.
+
+- **The `hidden` attribute did not work on walnut components.** Every component
+  that sets `display` — `.wal-badge`, `.wal-chip`, `.wal-btn` and a dozen others
+  — outranks the UA sheet's `[hidden] { display: none }`, so
+  `<span class="wal-badge" hidden>` rendered anyway. Restated in the utilities
+  layer, which is the only layer that sits after components.
+
+- **`.wal-nav` overlapped its own brand at narrow widths.** A fixed `height`
+  plus no wrapping meant the links ran off the page. It now wraps to a second
+  row and the link row scrolls, so nothing is hidden and no JavaScript is
+  involved.
+
+- **`.wal-plate` drew a solid block in a ragged last row.** The hairlines were a
+  line-coloured *container* showing through 1px gaps, so any grid area with no
+  cell in it — three specs across two columns, which is just a narrow viewport —
+  rendered as a filled block that read as a fourth, empty spec. The container
+  now carries the cell colour and each cell draws its own dividers with
+  `outline` (drawn outside the box, so it does not affect layout and adjacent
+  cells meet inside the gap). Unfilled areas are simply blank.
+
+- **walnut restyled every scroll container in a consuming app.** The Firefox
+  scrollbar rule was on `*`; it is now on `html`, where the document scrollbar
+  actually takes its styling from. Consumers no longer have to reset both
+  `scrollbar-color` and `scrollbar-width` to get their own bars back.
+
+- **Themes could not be scoped.** The derivation now also matches
+  `.wal-palette` and the palette classes, so a palette on `<body>` or on a
+  section works rather than silently inheriting `:root`'s already-substituted
+  colours.
+
 ## 0.3.0
 
 Continues the same exercise as 0.2.0 — everything here came from driving the

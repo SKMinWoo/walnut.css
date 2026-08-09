@@ -10,14 +10,18 @@ body {
   font-family: var(--wal-font-body);
   font-size: var(--wal-text-base);
 
-  /* Warm light wash — the ground never reads as flat */
+  /* Warm light wash — three cues lighting the ground from off-screen, so it
+     never reads as flat. Scaled by --wal-wash rather than declared outright:
+     a finish that wants printed paper sets --wal-wash: 0 and the gradients
+     collapse to transparent, with no rule here to override and no second
+     `background-image` to keep in sync. */
   background-image:
     radial-gradient(60% 45% at 12% 0%,
-      color-mix(in oklch, var(--wal-gold) 10%, transparent), transparent 70%),
+      color-mix(in oklch, var(--wal-gold) calc(10% * var(--wal-wash)), transparent), transparent 70%),
     radial-gradient(55% 50% at 100% 20%,
-      color-mix(in oklch, var(--wal-olive) 10%, transparent), transparent 72%),
+      color-mix(in oklch, var(--wal-olive) calc(10% * var(--wal-wash)), transparent), transparent 72%),
     radial-gradient(70% 60% at 80% 100%,
-      color-mix(in oklch, var(--wal-accent) 6%, transparent), transparent 70%);
+      color-mix(in oklch, var(--wal-bloom) calc(8% * var(--wal-wash)), transparent), transparent 70%);
   background-attachment: fixed;
 }
 
@@ -48,9 +52,13 @@ strong, b { color: var(--wal-text); font-weight: 700; }
 em, i { font-style: italic; }
 small { font-size: var(--wal-text-sm); }
 
-/* ─── Links ─── */
+/* ─── Links ───
+   --wal-accent-ink, not --wal-accent: a link is the accent used as *type* on
+   the page ground, which needs more separation from that ground than the same
+   accent needs as a button fill. This is the distinction the -ink forms exist
+   to carry; see the cue block in 01-tokens.css. */
 a {
-  color: var(--wal-accent);
+  color: var(--wal-accent-ink);
   text-decoration: underline;
   text-underline-offset: 0.15em;
   transition: color var(--wal-duration) ease;
@@ -123,11 +131,21 @@ mark {
   outline-offset: 3px;
 }
 
-/* ─── Scrollbar (warm) ─── */
+/* ─── Scrollbar (warm) ───
+   Scoped to `html`, which is where the document scrollbar takes its styling
+   from. It used to be `*`, which meant walnut silently restyled every scroll
+   container in a consuming app — and because Chromium ignores the
+   ::-webkit-scrollbar-* pseudos entirely whenever `scrollbar-width` is any
+   non-auto value, a consumer had to reset BOTH properties to get its own bar
+   back. One selector change removes that whole class of surprise. */
+:root {
+  --wal-scrollbar-thumb: color-mix(in oklch, var(--wal-olive) 45%, var(--wal-line));
+}
+
 ::-webkit-scrollbar { width: 10px; }
 ::-webkit-scrollbar-track { background: var(--wal-bg); }
 ::-webkit-scrollbar-thumb {
-  background: color-mix(in oklch, var(--wal-olive) 45%, var(--wal-line));
+  background: var(--wal-scrollbar-thumb);
   border-radius: 6px;
   border: 2px solid var(--wal-bg);
 }
@@ -135,8 +153,8 @@ mark {
 
 /* Firefox scrollbar */
 @supports (scrollbar-color: auto) {
-  * {
-    scrollbar-color: color-mix(in oklch, var(--wal-olive) 45%, var(--wal-line)) var(--wal-bg);
+  html {
+    scrollbar-color: var(--wal-scrollbar-thumb) var(--wal-bg);
     scrollbar-width: thin;
   }
 }

@@ -1,0 +1,83 @@
+/* ═══════════════════════════════════════════════════
+   THEME — PRESS
+   A 1960s parts catalogue on a walnut desk. Warm paper stock, tomato-red
+   plate numbers, goldenrod rules, one cold blue for the technical diagrams.
+   ───────────────────────────────────────────────────
+   This is the palette walnut's catalogue finish was designed against; pair it
+   with `data-finish="catalogue"` for the full look:
+
+       <html class="wal-press" data-finish="catalogue">
+
+   ───────────────────────────────────────────────────
+   WHY THESE FIVE, AND WHY THEY ARE NOT RANDOM
+
+   The cues came out of a hand-mixed palette that had been tuned by eye over
+   months, then measured. Two relationships fell out of the measurement:
+
+     tomato 31° → apricot 58°     a 27° warm step
+     tomato 31° → adriatic 240°   209°, within a few degrees of exact complement
+
+   Those are the two offsets walnut ships as the DEFAULTS for --wal-bloom-hue
+   and --wal-cool-hue, which is why this file does not state them: setting the
+   accent to 31 puts bloom at 58 and cool at 240 on its own. Rotate the accent
+   and the whole script rotates with it, holding its internal structure.
+
+   The ground is a single rod at 78.5°. Every neutral on the page — paper,
+   card stock, hairline, ink, the walnut desk itself — is that one hue at a
+   different lightness. Nine degrees of unmeasured drift is invisible in
+   isolation and is exactly what stops a palette from being a system.
+   KEEP NEW NEUTRALS ON THE ROD.
+═══════════════════════════════════════════════════ */
+
+.wal-press,
+[data-theme="press"],
+[data-theme^="press-"] {
+  /* ── The ground rod ── warm paper stock; the walnut desk at the dark end */
+  --wal-hue:    78.5;
+  --wal-chroma: 0.024;
+
+  /* ── The five cues ──
+     Only three are stated. bloom (58°) and cool (240°) are the shipped
+     defaults measured off this very accent — see the header. */
+  --wal-accent-hue: 31;   --wal-accent-chroma: 0.19;  /* tomato    */
+  --wal-gold-hue:   78;   --wal-gold-chroma:   0.14;  /* goldenrod */
+  --wal-olive-hue:  140;  --wal-olive-chroma:  0.09;  /* olive     */
+
+  /* ── Ramp nudges ──
+     Paper is warmer and the ink deeper than the stock ramp: this is print, not
+     a screen. The hairline multipliers run high because a catalogue is drawn
+     in rules — a hairline you cannot see is a hairline that is not doing its
+     job of dividing the page. */
+  --wal-l-bg-light:        93%;
+  --wal-l-subtle-light:    90.5%;
+  --wal-l-surface-light:   97.6%;
+  --wal-l-surface-2-light: 89.6%;
+  --wal-l-line-light:      84.6%;
+  --wal-l-line-soft-light: 88%;
+  --wal-l-text-light:      23.3%;
+  --wal-l-text-soft-light: 50.2%;
+
+  --wal-cx-line-light: 1.6;
+  --wal-cx-ink-light:  1.0;
+
+  /* The night reading IS the desk — walnut, not a generic dark grey. */
+  --wal-l-bg-dark:        23.6%;
+  --wal-l-subtle-dark:    27%;
+  --wal-l-surface-dark:   31.3%;
+  --wal-l-surface-2-dark: 35%;
+  --wal-l-line-dark:      36.9%;
+  --wal-l-line-soft-dark: 32%;
+  --wal-l-text-dark:      94.7%;
+  --wal-cx-line-dark:     1.4;
+
+  /* Print does not cast shadows; the wash belongs to a lit room, not a page. */
+  --wal-elevation: 0.5;
+  --wal-wash:      0.5;
+}
+
+/* Paper-first, for the same reason and by the same mechanism as Bone —
+   see the note in bone.css about why the :not() chain is required. */
+.wal-press:not(.wal-dark):not([data-theme="dark"]):not([data-theme$="-dark"]),
+[data-theme="press"]:not(.wal-dark) {
+  color-scheme: light;
+}

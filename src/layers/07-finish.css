@@ -1,0 +1,193 @@
+/* ═══════════════════════════════════════════════════
+   07 — FINISH
+   ───────────────────────────────────────────────────
+   A finish is the THIRD theming axis. The three are deliberately independent
+   and use three different syntaxes so they can never be confused:
+
+       PALETTE   by class       .wal-press          which colours
+       MODE      by attribute   data-theme="light"  light or dark
+       FINISH    by attribute   data-finish="…"     the geometry and the voice
+
+   Palette answers "what colour is this". Finish answers "what KIND of object
+   is this page" — printed or lit, square or rounded, ruled or floated. They
+   are orthogonal: every finish works with every palette in both modes.
+
+   ───────────────────────────────────────────────────
+   WHY THIS IS ALMOST ENTIRELY TOKENS
+
+   Nearly all of a finish is retuning the geometry and atmosphere tokens that
+   01-tokens.css already routes every component through — radius, hairline,
+   elevation, wash, label tracking, label face. That is the point of those
+   tokens existing: a finish should not have to know the selector of every
+   component it affects, or it will fall out of date the first time a component
+   is added.
+
+   The handful of real rules below are the cases where the catalogue look needs
+   a different *structure*, not a different value: a card that is a printed
+   plate rather than a floating panel, a nav that is a ruled masthead rather
+   than a frosted bar.
+═══════════════════════════════════════════════════ */
+
+
+/* ═══ CATALOGUE ═══
+   A 1960s parts catalogue: square corners, visible rules, tabular figures,
+   type set in the label voice, no glow and almost no shadow. Everything is
+   printed on stock — nothing floats.
+
+       <html class="wal-press" data-finish="catalogue"> */
+
+[data-finish="catalogue"] {
+  /* ── Geometry ──
+     3px rather than 0: a true square corner reads as an unstyled box at small
+     sizes, while a hair of radius reads as a trimmed edge. The component-level
+     radius tokens are set separately because pills are the single strongest
+     signal of a *web app*, and a catalogue has none of them. */
+  --wal-radius:      3px;
+  --wal-radius-sm:   2px;
+  --wal-radius-lg:   3px;
+  --wal-btn-radius:  2px;
+  --wal-chip-radius: 2px;
+  --wal-badge-radius: 2px;
+  /* --wal-radius-full is deliberately untouched: it still has to make the
+     availability dot a circle. */
+
+  /* ── Atmosphere ──
+     Print does not glow and barely casts. Both are scalars rather than
+     overrides, so no shadow rule and no background-image rule is restated. */
+  --wal-elevation: 0.35;
+  --wal-wash:      0;
+
+  /* ── Voice ──
+     Wider tracking on labels; the typewriter face carries the catalogue's
+     furniture, which is what separates it from a modern dashboard using the
+     same mono for code. */
+  --wal-tracking-label: 0.16em;
+  --wal-font-label: var(--wal-font-typewriter);
+}
+
+/* Hairlines are the catalogue's entire visual language, so they have to read
+   on any palette, including the soft ones. This turns the knob rather than
+   overriding --wal-line: the finish must not own a colour, or it stops being
+   orthogonal to the palette and a light rule ends up hard-coded onto a dark
+   theme. --wal-line-boost is consumed inside the derivation in 01-tokens.css,
+   and reaches it because both land on the same element — custom property
+   substitution uses the winning value on that element, whichever layer
+   declared it. */
+[data-finish="catalogue"] {
+  --wal-line-boost: 1.7;
+}
+
+/* ─── Headings ───
+   Tighter and quieter. A catalogue's hierarchy comes from rules and numbering,
+   not from typographic shouting, so headings lose a weight step and gain
+   balanced wrapping. */
+[data-finish="catalogue"] {
+  h1, h2, h3, h4 {
+    font-weight: 600;
+    text-wrap: balance;
+  }
+
+  h2 { letter-spacing: -0.015em; }
+
+  /* Tabular figures everywhere numbers are read in a column. */
+  .wal-metric-value,
+  .wal-stat-value,
+  .wal-plate dd,
+  .wal-table td {
+    font-variant-numeric: tabular-nums;
+  }
+}
+
+/* ─── Masthead ───
+   A ruled bar, not a frosted floating one. The blur is removed rather than
+   reduced: backdrop-filter over a paper ground reads as a smudge. */
+[data-finish="catalogue"] .wal-nav {
+  background: var(--wal-bg);
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  border-bottom: var(--wal-hairline) solid var(--wal-line);
+
+  &.is-scrolled {
+    box-shadow: none;
+    border-bottom-color: var(--wal-text);
+  }
+}
+
+/* ─── Plates ───
+   A card becomes a printed plate: it sits ON the page rather than above it, so
+   it does not lift, and the hover response moves to the rule instead of to the
+   geometry. Keeping a translate on hover is what makes an otherwise correct
+   catalogue still feel like a SaaS dashboard. */
+[data-finish="catalogue"] .wal-card {
+  border-color: var(--wal-line);
+
+  &:hover {
+    transform: none;
+    box-shadow: none;
+    border-color: var(--wal-accent);
+  }
+}
+
+/* ─── Sections ───
+   Sections are separated by a rule at the top and generous air, and the first
+   one still has none — the same intent as the stock section, drawn flat. */
+[data-finish="catalogue"] .wal-section {
+  border-top-width: var(--wal-hairline);
+}
+
+/* ─── Tables ───
+   No zebra. A catalogue's table is ruled, and the stripes fight the rules for
+   the reader's sense of where a row ends. */
+[data-finish="catalogue"] .wal-table {
+  tbody tr:nth-child(even) { background: none; }
+  tbody tr:hover { background: var(--wal-accent-soft); }
+  th { border-bottom-color: var(--wal-text); }
+}
+
+/* ─── Buttons ───
+   A secondary button becomes a boxed control with a real rule; the primary
+   keeps the accent fill, which is the one place the catalogue lets a colour
+   carry weight. */
+[data-finish="catalogue"] .wal-btn {
+  letter-spacing: 0.04em;
+
+  &.wal-btn-secondary {
+    border-color: var(--wal-line);
+
+    &:hover { background: var(--wal-accent-soft); }
+  }
+
+  &.wal-btn-primary:hover {
+    transform: none;
+    box-shadow: none;
+  }
+}
+
+/* ─── Hero ───
+   No radial glow: the catalogue's cover is a ruled sheet. The tagline keeps
+   the typewriter face, which now matches the rest of the furniture rather than
+   being the one screenplay-flavoured element on the page. */
+[data-finish="catalogue"] .wal-hero .wal-hero-glow {
+  display: none;
+}
+
+
+/* ═══ SOFT ═══
+   The stock finish, named so it can be asked for explicitly — useful when a
+   subtree should opt out of an inherited catalogue finish. Restates the
+   defaults from 01-tokens.css rather than unsetting them, because `unset` on a
+   custom property would fall back to the registered initial value and lose a
+   consumer's own override. */
+[data-finish="soft"] {
+  --wal-radius:       12px;
+  --wal-radius-sm:    6px;
+  --wal-radius-lg:    18px;
+  --wal-btn-radius:   var(--wal-radius-full);
+  --wal-chip-radius:  var(--wal-radius-full);
+  --wal-badge-radius: var(--wal-radius-full);
+  --wal-elevation:    1;
+  --wal-wash:         1;
+  --wal-line-boost:   1;
+  --wal-tracking-label: 0.1em;
+  --wal-font-label:   var(--wal-font-mono);
+}

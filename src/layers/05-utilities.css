@@ -149,6 +149,7 @@
 .wal-font-mono { font-family: var(--wal-font-mono); }
 .wal-font-serif { font-family: var(--wal-font-serif); }
 .wal-font-typewriter { font-family: var(--wal-font-typewriter); }
+.wal-font-label { font-family: var(--wal-font-label); }
 
 /* Sizes */
 .wal-text-xs { font-size: var(--wal-text-xs); }
@@ -186,10 +187,16 @@
 .wal-tracking-wide { letter-spacing: 0.05em; }
 
 /* ── Color Utilities ─────────────────────────────────────────────────── */
-/* Text Colors */
-.wal-color-accent { color: var(--wal-accent); }
-.wal-color-gold { color: var(--wal-gold); }
-.wal-color-olive { color: var(--wal-olive); }
+/* Text Colors.
+   These set `color`, so they resolve to the -ink form of each cue — the same
+   cue shifted to stay legible as type on the page ground. .wal-color-gold with
+   the plain --wal-gold was a paragraph you had to squint at on a light theme.
+   Reach for --wal-gold directly when you want the cue as a FILL. */
+.wal-color-accent { color: var(--wal-accent-ink); }
+.wal-color-bloom { color: var(--wal-bloom-ink); }
+.wal-color-gold { color: var(--wal-gold-ink); }
+.wal-color-olive { color: var(--wal-olive-ink); }
+.wal-color-cool { color: var(--wal-cool-ink); }
 .wal-color-soft { color: var(--wal-text-soft); }
 .wal-color-muted { color: var(--wal-text-muted); }
 
@@ -197,10 +204,34 @@
 .wal-bg-surface { background-color: var(--wal-surface); }
 .wal-bg-surface-2 { background-color: var(--wal-surface-2); }
 .wal-bg-accent-soft { background-color: var(--wal-accent-soft); }
+.wal-bg-bloom-soft { background-color: var(--wal-bloom-soft); }
 .wal-bg-gold-soft { background-color: var(--wal-gold-soft); }
 .wal-bg-olive-soft { background-color: var(--wal-olive-soft); }
+.wal-bg-cool-soft { background-color: var(--wal-cool-soft); }
+
+/* Fills — the cue itself, with a foreground that is computed to stay legible
+   on it. Handy for a callout or a filled cell without writing both colours. */
+.wal-fill-accent { background-color: var(--wal-accent); color: var(--wal-accent-fg); }
+.wal-fill-bloom { background-color: var(--wal-bloom); color: var(--wal-bloom-fg); }
+.wal-fill-gold { background-color: var(--wal-gold); color: var(--wal-gold-fg); }
+.wal-fill-olive { background-color: var(--wal-olive); color: var(--wal-olive-fg); }
+.wal-fill-cool { background-color: var(--wal-cool); color: var(--wal-cool-fg); }
 
 /* ── Display & Visibility ────────────────────────────────────────────── */
+
+/* The HTML `hidden` attribute has to keep working on a walnut component.
+   Every component that sets `display` — .wal-badge, .wal-chip, .wal-btn,
+   .wal-cluster and a dozen others — outranks the UA sheet's
+   `[hidden] { display: none }`, so `<span class="wal-badge" hidden>` rendered
+   anyway. It is a genuinely confusing bug: the attribute is right there in the
+   markup and the element is on screen.
+
+   This belongs conceptually in the reset layer, but reset LOSES to components,
+   so restating it there would do nothing. It lives here because utilities sit
+   after components in the layer order — and this is the one rule in the file
+   that is not a utility class. Consumer CSS is unlayered and still wins. */
+[hidden] { display: none; }
+
 .wal-hidden { display: none; }
 .wal-block { display: block; }
 .wal-inline { display: inline; }
