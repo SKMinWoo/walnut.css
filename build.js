@@ -86,6 +86,93 @@ for (const theme of THEMES) {
   }
 }
 
+/**
+ * Guard the ../dist/ → dist/ rewrite that assembles public/index.html.
+ *
+ * The rewrite is a regex over hand-written HTML, which means it fails open:
+ * if someone edits the docs page and the paths stop matching the pattern,
+ * `.replace()` returns the input unchanged, this build prints "built
+ * successfully", and the deployed site quietly serves an unstyled page. That
+ * is the same shape of failure as the two minifier bugs documented above — a
+ * build that reported success while shipping a stylesheet that wasn't the one
+ * anybody wrote. The build should refuse to produce a site it cannot vouch for.
+ *
+ * @param {string} original  docs/index.html exactly as read from disk
+ * @param {string} rewritten the same HTML after ../dist/ became dist/
+ * @throws to fail the build when the deployed page would be missing styles
+ */
+function assertDocsRewritten(original, rewritten) {
+  // One <link> per theme, plus the bundle itself. Derived from THEMES rather
+  // than hardcoded so adding a theme cannot quietly lower the bar.
+  const expected = THEMES.length + 1;
+  const found = (original.match(STYLESHEET_LINKS) || []).length;
+
+  if (found !== expected) {
+    throw new Error(
+      `docs/index.html: expected ${expected} "../dist/" stylesheet links, found ${found}.
+` +
+        `  The public/ rewrite is keyed to that exact pattern, so the deployed page
+` +
+        `  would have shipped with ${expected - found} stylesheet(s) pointing above the
+` +
+        `  site root. Update STYLESHEET_LINKS to match how the docs page links its CSS.`
+    );
+  }
+
+  // Catches the partial failure the count above cannot: a link that matched the
+  // pattern but survived the replace, or a new one written in some other shape.
+  if (rewritten.includes("../")) {
+    throw new Error(
+      `public/index.html still contains a "../" path after rewriting.
+` +
+        `  Nothing above the site root exists once deployed — it would 404.`
+    );
+  }
+}
+
+// ─── Assemble the deployable site ───
+//
+// A static host serves exactly one directory. The docs page and the
+// stylesheets it loads live in two — docs/ and dist/ — so neither is
+// deployable alone: point a host at dist/ and there is no index.html, point it
+// at docs/ and all six <link> tags 404. This step flattens both into public/,
+// which is the outputDirectory named in vercel.json.
+//
+// public/ is a build artifact, not source. It is gitignored and rebuilt from
+// scratch on every run, so a file deleted from docs/ or dist/ cannot linger
+// here and keep working in production after it stopped existing.
+const PUBLIC = path.join(__dirname, "public");
+const DOCS = path.join(__dirname, "docs");
+
+fs.rmSync(PUBLIC, { recursive: true, force: true });
+fs.mkdirSync(path.join(PUBLIC, "dist", "themes"), { recursive: true });
+
+for (const file of ["walnut.css", "walnut.min.css"]) {
+  fs.copyFileSync(path.join(DIST, file), path.join(PUBLIC, "dist", file));
+}
+for (const theme of THEMES) {
+  const src = path.join(DIST, "themes", `${theme}.css`);
+  if (fs.existsSync(src)) {
+    fs.copyFileSync(src, path.join(PUBLIC, "dist", "themes", `${theme}.css`));
+  }
+}
+
+/* docs/index.html links its stylesheets as `../dist/walnut.css` so that the
+   page renders when opened straight off disk, with no server at all. In
+   public/ the page sits at the root *beside* dist/, so that `../` has to go.
+
+   Rewriting on copy — rather than changing docs/index.html to `dist/` and
+   nesting the deployed copy to match — keeps the one-file, no-build-step
+   promise the docs page makes about itself in the Install section. The cost is
+   that the rewrite is a blind regex, which is what assertDocsRewritten guards. */
+const STYLESHEET_LINKS = /\.\.\/dist\//g;
+const docsHtml = fs.readFileSync(path.join(DOCS, "index.html"), "utf8");
+const siteHtml = docsHtml.replace(STYLESHEET_LINKS, "dist/");
+
+assertDocsRewritten(docsHtml, siteHtml);
+
+fs.writeFileSync(path.join(PUBLIC, "index.html"), siteHtml);
+
 // ─── Report sizes ───
 const fullSize = Buffer.byteLength(bundle, "utf8");
 const minSize = Buffer.byteLength(minified, "utf8");
