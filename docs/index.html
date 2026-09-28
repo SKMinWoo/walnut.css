@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>walnut.css · theme a whole site from seven numbers</title>
-  <meta name="description" content="A zero-JavaScript CSS framework. Seven numbers generate every surface, hairline, ink, shadow and foreground — in light and dark, from one declaration each.">
+  <title>walnut.css · theme a whole site from eight numbers</title>
+  <meta name="description" content="A zero-JavaScript CSS framework. Eight numbers generate every surface, hairline, ink, shadow and foreground — in light and dark, from one declaration each.">
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -176,7 +176,7 @@
     <header class="wal-hero demo-top">
       <div class="wal-wrap">
         <p class="wal-eyebrow">CSS framework · zero JavaScript · MIT</p>
-        <h1 style="max-inline-size: 20ch">Theme a whole site from seven numbers.</h1>
+        <h1 style="max-inline-size: 20ch">Theme a whole site from eight numbers.</h1>
         <p class="wal-text-md wal-mt-md" style="max-width: 58ch">
           Drag a rod. Every surface, hairline, ink, hover state, shadow and foreground
           re-derives — in light and dark, from one declaration each.
@@ -515,7 +515,7 @@
           <div class="demo-tile" style="cursor:default">
             <span class="demo-tile-ground" style="background: var(--wal-surface-2)"></span>
             <span class="demo-tile-cues" style="place-items:center; grid-template-columns:1fr; border:var(--wal-hairline) dashed var(--wal-line)">
-              <span class="wal-caption" style="align-self:center; justify-self:center">7 numbers</span>
+              <span class="wal-caption" style="align-self:center; justify-self:center">8 numbers</span>
             </span>
             <span><b style="font-family: var(--wal-font-display)">Yours</b>
               <small class="wal-caption" style="display:block">One :root block</small></span>
@@ -805,7 +805,9 @@
         "  --wal-accent-hue: " + n("--wal-accent-hue", 0) + ";",
         "  --wal-accent-chroma: " + n("--wal-accent-chroma", 3) + ";",
         "  --wal-gold-hue: " + n("--wal-gold-hue", 0) + ";",
+        "  --wal-gold-chroma: " + n("--wal-gold-chroma", 3) + ";",
         "  --wal-olive-hue: " + n("--wal-olive-hue", 0) + ";",
+        "  --wal-olive-chroma: " + n("--wal-olive-chroma", 3) + ";",
         "}",
       ].join("\n");
     }
@@ -857,6 +859,9 @@
       // A palette IS a script, so hand-turned rods are stale once one is picked.
       for (const el of rods) root.style.removeProperty(el.dataset.prop);
       readRods();
+      // Press and Bone force light; Café, Forest and Dusk follow the system. So a
+      // palette can change the mode, and the button must say where it goes next.
+      syncModeBtn();
     }
 
     for (const group of ["palette-switch", "palette-tiles"]) {
@@ -870,9 +875,17 @@
        Read the computed color-scheme rather than tracking a variable, so the
        first click flips away from whatever the palette or the system chose. */
     const modeBtn = document.getElementById("mode");
-    const currentMode = () =>
-      getComputedStyle(root).colorScheme.trim() === "light" ? "light" : "dark";
+    const systemDark = matchMedia("(prefers-color-scheme: dark)");
+    // "light dark" means the system is choosing (Café, Forest and Dusk follow
+    // it), so ask the system. Reading it as dark made the button labelled
+    // Dark set light on a light-system page.
+    const currentMode = () => {
+      const scheme = getComputedStyle(root).colorScheme.trim();
+      if (scheme === "light" || scheme === "dark") return scheme;
+      return systemDark.matches ? "dark" : "light";
+    };
     const syncModeBtn = () => { modeBtn.textContent = currentMode() === "dark" ? "Light" : "Dark"; };
+    systemDark.addEventListener("change", syncModeBtn);
     modeBtn.addEventListener("click", () => {
       root.setAttribute("data-theme", currentMode() === "dark" ? "light" : "dark");
       syncModeBtn();
