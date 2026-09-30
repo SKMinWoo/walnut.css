@@ -278,7 +278,9 @@ Every colour, radius and shadow in walnut is derived from registered numbers, an
 | Class | What moves |
 |-------|------------|
 | `.wal-cue-in` | On load the page prints itself: the paper first, then the five cues in script order, each rising from zero chroma. Lightness never moves, so contrast is final from the first frame. |
-| `.wal-retune` | Change a palette class, a finish, or a rod from script and the page travels to it instead of cutting. A hue goes round the wheel, so every in-between frame is still a coherent script, not a crossfade of two. Derived cues hold their offsets on every frame. |
+| `.wal-retune` | Change a palette class, a finish, or a rod from script and the page travels to it instead of cutting. A hue travels along the wheel, so every in-between frame is still a coherent script, not a crossfade of two. Derived cues hold their offsets on every frame. |
+
+A hue is a registered `<number>`, so it travels the *numeric* way between two values, not the short way round the wheel: Café's ground (55) to Dusk's (280) passes through green and blue on the way. Where that matters, write neighbouring palettes' hues within 180 of each other — Dusk's ground as `-80` instead of `280` is the same colour and travels through red and violet instead.
 
 Tune with `--wal-cue-in-pass` (0.7s), `--wal-cue-in-stagger` (0.14s), `--wal-retune-duration` (0.8s) and `--wal-ease-travel`.
 

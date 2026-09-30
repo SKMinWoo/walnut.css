@@ -16,8 +16,13 @@
      written from script tweens the *inputs*, and every surface, hairline,
      ink and shadow re-derives on each frame from wherever the inputs have
      got to. That is not a crossfade between two pictures of the page: a hue
-     travels round the wheel, so every intermediate frame is still a coherent
+     travels along the wheel, so every intermediate frame is still a coherent
      script rather than a muddy mix of two.
+
+     Along, not round: a registered <number> interpolates numerically, with
+     no notion of the short way round. Café's ground (55) to Dusk's (280)
+     passes through green and blue. A palette that wants the short path to
+     a neighbour writes its hue within 180 of it (-80 is the same hue as 280).
 
      Derived hues stay locked to their source. With the default
      `--wal-bloom-hue: calc(var(--wal-accent-hue) + 27)`, bloom's own
