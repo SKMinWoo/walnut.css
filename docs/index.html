@@ -129,8 +129,8 @@
       font-family: var(--wal-font-display);
       font-size: var(--wal-text-lg);
       font-weight: 600;
-      background: var(--wal-gold);
-      color: var(--wal-gold-fg);
+      background: var(--wal-accent);
+      color: var(--wal-accent-fg);
     }
 
     /* Reference disclosures — the long-form material, out of the pitch's way. */
@@ -499,19 +499,19 @@
         <div class="wal-grid wal-cols-2">
           <div class="demo-pair">
             <div class="demo-panel wal-light">
-              <p class="wal-caption">light · gold sits at L <span data-l="--wal-l-gold-light">0.62</span></p>
-              <p class="demo-onCue">Text on gold</p>
+              <p class="wal-caption">light · accent sits at L <span data-l="--wal-l-accent-light">0.52</span></p>
+              <p class="demo-onCue">Text on the accent</p>
             </div>
             <div class="demo-panel wal-dark">
-              <p class="wal-caption">dark · gold sits at L <span data-l="--wal-l-gold-dark">0.75</span></p>
-              <p class="demo-onCue">Text on gold</p>
+              <p class="wal-caption">dark · accent sits at L <span data-l="--wal-l-accent-dark">0.62</span></p>
+              <p class="demo-onCue">Text on the accent</p>
             </div>
           </div>
           <p class="wal-text-sm">
             Those two blocks carry <strong>opposite</strong> foregrounds, and no rule names
-            either one. Gold crosses the legibility threshold between modes, so
-            <code>--wal-gold-fg</code> derives near-white on paper and near-black on a dark
-            ground — from the cue's own lightness, every time you rotate it.
+            either one. The accent crosses the legibility threshold between modes, so
+            <code>--wal-accent-fg</code> derives near-white on paper and near-black on a
+            dark ground — from the cue's own lightness, every time you rotate it.
           </p>
         </div>
       </div>

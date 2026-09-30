@@ -217,12 +217,12 @@ table {
 @property --wal-l-text-muted-dark  { syntax: "<percentage>"; inherits: true; initial-value: 52%; }
 @property --wal-l-accent-light     { syntax: "<percentage>"; inherits: true; initial-value: 52%; }
 @property --wal-l-accent-dark      { syntax: "<percentage>"; inherits: true; initial-value: 62%; }
-@property --wal-l-bloom-light      { syntax: "<percentage>"; inherits: true; initial-value: 58%; }
+@property --wal-l-bloom-light      { syntax: "<percentage>"; inherits: true; initial-value: 54%; }
 @property --wal-l-bloom-dark       { syntax: "<percentage>"; inherits: true; initial-value: 70%; }
 @property --wal-l-gold-light       { syntax: "<percentage>"; inherits: true; initial-value: 62%; }
 @property --wal-l-gold-dark        { syntax: "<percentage>"; inherits: true; initial-value: 75%; }
 @property --wal-l-olive-light      { syntax: "<percentage>"; inherits: true; initial-value: 48%; }
-@property --wal-l-olive-dark       { syntax: "<percentage>"; inherits: true; initial-value: 55%; }
+@property --wal-l-olive-dark       { syntax: "<percentage>"; inherits: true; initial-value: 60%; }
 @property --wal-l-cool-light       { syntax: "<percentage>"; inherits: true; initial-value: 46%; }
 @property --wal-l-cool-dark        { syntax: "<percentage>"; inherits: true; initial-value: 62%; }
 @property --wal-cx-ground-light    { syntax: "<number>";     inherits: true; initial-value: 0.65; }
@@ -286,9 +286,9 @@ table {
   /* Cue lightness. Cues do NOT invert — a terracotta stays terracotta — they
      only shift enough to hold their weight against the ground. */
   --wal-l-accent-light: 52%;   --wal-l-accent-dark: 62%;
-  --wal-l-bloom-light:  58%;   --wal-l-bloom-dark:  70%;
+  --wal-l-bloom-light:  54%;   --wal-l-bloom-dark:  70%;
   --wal-l-gold-light:   62%;   --wal-l-gold-dark:   75%;
-  --wal-l-olive-light:  48%;   --wal-l-olive-dark:  55%;
+  --wal-l-olive-light:  48%;   --wal-l-olive-dark:  60%;
   --wal-l-cool-light:   46%;   --wal-l-cool-dark:   62%;
 
   /* Two shifts applied on top of the cue stops:
@@ -557,12 +557,15 @@ table {
   /* ── Foregrounds ON a cue ──
      Plain fallback; the @supports block below replaces these with a computed
      contrast pick. Kept as a real value so a browser without relative colour
-     syntax still gets a legible button rather than an invalid one. */
-  --wal-accent-fg: light-dark(oklch(97% 0.01 var(--wal-accent-hue)), oklch(96% 0.01 var(--wal-accent-hue)));
-  --wal-bloom-fg:  oklch(18% 0.02 var(--wal-bloom-hue));
-  --wal-gold-fg:   oklch(18% 0.02 var(--wal-gold-hue));
-  --wal-olive-fg:  oklch(97% 0.01 var(--wal-olive-hue));
-  --wal-cool-fg:   oklch(97% 0.01 var(--wal-cool-hue));
+     syntax (Firefox before 128) still gets a legible button rather than an
+     invalid one. Each is the pick the computed form makes for the stock stops
+     in each mode — so accent, olive and cool flip from light to dark ink with
+     the mode, as the computed form does. */
+  --wal-accent-fg: light-dark(oklch(97% 0.01 var(--wal-accent-hue)), oklch(16% 0.02 var(--wal-accent-hue)));
+  --wal-bloom-fg:  light-dark(oklch(97% 0.01 var(--wal-bloom-hue)),  oklch(16% 0.02 var(--wal-bloom-hue)));
+  --wal-gold-fg:   oklch(16% 0.02 var(--wal-gold-hue));
+  --wal-olive-fg:  light-dark(oklch(97% 0.01 var(--wal-olive-hue)),  oklch(16% 0.02 var(--wal-olive-hue)));
+  --wal-cool-fg:   light-dark(oklch(97% 0.01 var(--wal-cool-hue)),   oklch(16% 0.02 var(--wal-cool-hue)));
 }
 
 
@@ -574,9 +577,9 @@ table {
    Relative colour syntax can decide it arithmetically. `l` is the cue's own
    lightness as a 0–1 number, so
 
-       clamp(0.16, (0.63 - l) * 1000, 0.97)
+       clamp(0.16, (0.57 - l) * 1000, 0.97)
 
-   is a step function: below the 0.63 threshold the middle term is a large
+   is a step function: below the 0.57 threshold the middle term is a large
    positive number and clamps to 0.97 (near-white ink); above it the term goes
    negative and clamps to 0.16 (near-black ink). The ×1000 makes the crossover
    effectively instant rather than a mushy grey band.
@@ -585,9 +588,13 @@ table {
    chroma in its foreground, which is why a terracotta button reads as warm
    cream on terracotta rather than as a sticker.
 
-   0.63 is a perceptual crossover for oklch lightness, not a WCAG computation.
-   It lands correctly for every cue in the shipped themes; a cue sitting right
-   at the threshold with low chroma is the case to check by eye. */
+   0.57 is where the two candidates swap places under WCAG 2 contrast: for
+   every cue in the shipped palettes, in both modes, any threshold from 0.56
+   to 0.58 picks whichever of the two reads better. (It used to be 0.63, which
+   picked the worse one in 19 of those 50 cases — dark-mode primary buttons
+   at 3.6:1.) Near the threshold neither candidate may reach 4.5:1, so the
+   shipped cue stops keep clear of roughly 0.55–0.59; a cue you move into
+   that band is the case to check. */
 @supports (color: oklch(from white l c h)) {
   :root,
   :where(.wal-palette,
@@ -597,11 +604,11 @@ table {
          [data-theme="dusk"],  [data-theme^="dusk-"],
          [data-theme="bone"],  [data-theme^="bone-"],
          [data-theme="press"], [data-theme^="press-"]) {
-    --wal-accent-fg: oklch(from var(--wal-accent) clamp(0.16, (0.63 - l) * 1000, 0.97) calc(c * 0.08) h);
-    --wal-bloom-fg:  oklch(from var(--wal-bloom)  clamp(0.16, (0.63 - l) * 1000, 0.97) calc(c * 0.08) h);
-    --wal-gold-fg:   oklch(from var(--wal-gold)   clamp(0.16, (0.63 - l) * 1000, 0.97) calc(c * 0.08) h);
-    --wal-olive-fg:  oklch(from var(--wal-olive)  clamp(0.16, (0.63 - l) * 1000, 0.97) calc(c * 0.08) h);
-    --wal-cool-fg:   oklch(from var(--wal-cool)   clamp(0.16, (0.63 - l) * 1000, 0.97) calc(c * 0.08) h);
+    --wal-accent-fg: oklch(from var(--wal-accent) clamp(0.16, (0.57 - l) * 1000, 0.97) calc(c * 0.08) h);
+    --wal-bloom-fg:  oklch(from var(--wal-bloom)  clamp(0.16, (0.57 - l) * 1000, 0.97) calc(c * 0.08) h);
+    --wal-gold-fg:   oklch(from var(--wal-gold)   clamp(0.16, (0.57 - l) * 1000, 0.97) calc(c * 0.08) h);
+    --wal-olive-fg:  oklch(from var(--wal-olive)  clamp(0.16, (0.57 - l) * 1000, 0.97) calc(c * 0.08) h);
+    --wal-cool-fg:   oklch(from var(--wal-cool)   clamp(0.16, (0.57 - l) * 1000, 0.97) calc(c * 0.08) h);
   }
 }
 

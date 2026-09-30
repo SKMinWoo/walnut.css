@@ -103,7 +103,7 @@ Goldenrod is a fine button and an illegible paragraph. `--wal-gold` and `--wal-g
 
 ```css
 --wal-gold-fg: oklch(from var(--wal-gold)
-                 clamp(0.16, (0.63 - l) * 1000, 0.97)  /* near-black or near-white */
+                 clamp(0.16, (0.57 - l) * 1000, 0.97)  /* near-black or near-white */
                  calc(c * 0.08)                         /* keep a trace of the hue  */
                  h);
 ```
