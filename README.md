@@ -6,10 +6,10 @@
 One ground rod. Five cues. Zero JavaScript.
 
 [![License: MIT](https://img.shields.io/badge/license-MIT-E5A62E?style=flat-square)](LICENSE)
-[![CSS Only](https://img.shields.io/badge/javascript-zero-2D2418?style=flat-square)]()
-[![Modern CSS](https://img.shields.io/badge/modern_css-oklch_%7C_light--dark()_%7C_@layer-D9432F?style=flat-square)]()
+![CSS Only](https://img.shields.io/badge/javascript-zero-2D2418?style=flat-square)
+![Modern CSS](https://img.shields.io/badge/modern_css-oklch_%7C_light--dark()_%7C_@layer-D9432F?style=flat-square)
 
-[Demo](https://skminwoo.github.io/walnut.css) · [Colour script](#the-colour-script) · [Three axes](#three-axes) · [Install](#install)
+[Demo](https://walnut-css.vercel.app) · [Colour script](#the-colour-script) · [Three axes](#three-axes) · [Install](#install)
 
 </div>
 
@@ -80,9 +80,9 @@ Every neutral on the page — the page ground, the card stock, the ink, the hair
 | 2 | `--wal-bloom` | The warm mid — gradients, washes, the second voice. |
 | 3 | `--wal-gold` | The metal — rules, markers, ornament. |
 | 4 | `--wal-olive` | The botanical — the calm, receding cue. |
-| 5 | `--wal-cool` | The complement. The only cue that argues with the others. |
+| 5 | `--wal-cool` | The split complement. The only cue that argues with the others. |
 
-**You only have to write three of them.** `--wal-bloom-hue` defaults to the accent **+27°** and `--wal-cool-hue` to the accent **+209°** — a warm step and a near-exact complement. Those offsets were measured off a palette tuned by hand over months, and they are why rotating the accent rotates the whole script *in tune* rather than pulling the lead colour away from the rest of the cast. Set either to a plain number to break the relationship deliberately.
+**You only have to write three of them.** `--wal-bloom-hue` defaults to the accent **+27°** and `--wal-cool-hue` to the accent **+209°** — a warm step, and a split complement 29° past the accent's direct opposite. Those offsets were measured off a palette tuned by hand over months, and they are why rotating the accent rotates the whole script *in tune* rather than pulling the lead colour away from the rest of the cast. Set either to a plain number to break the relationship deliberately.
 
 `--wal-cue-1` … `--wal-cue-5` alias the same colours by position, for when you want to *iterate* the script — a swatch strip, a chart series, an `nth-child` rule — without knowing whether cue 3 is called "gold" or "brass".
 
@@ -172,12 +172,14 @@ A finish answers a different question from a palette: not *what colour is this* 
   --wal-elevation: 0.35;                        /* print barely casts */
   --wal-wash: 0;                                /* and does not glow */
   --wal-line-boost: 1.7;                        /* rules are the whole language */
-  --wal-tracking-label: 0.16em;
+  --wal-tracking-label: 0.12em;
   --wal-font-label: var(--wal-font-typewriter);
 }
 ```
 
 Pair it with `.wal-press` for the full mid-century catalogue.
+
+The two axes never write the same token: a palette sets only its colour script, and shadow depth, wash, radius and label voice belong to the finish. That is what lets every finish work on every palette, including a palette scoped to one section of a page with a different finish.
 
 ---
 
@@ -233,7 +235,7 @@ To scope a whole script to a subtree, add `.wal-palette`:
 | Field set | `.wal-field` `.wal-label` `.wal-hint` `.wal-error` | Form furniture |
 | Check / radio | `.wal-check` `.wal-radio` | Native controls themed with `accent-color` |
 | Dialog | `.wal-dialog` | Native dialog + Popover API |
-| Tooltip | `.wal-tooltip` | CSS Anchor Positioning tooltip |
+| Tooltip | `.wal-tooltip` | Inside a `.wal-tooltip-trigger`; shown on hover and keyboard focus |
 | Drawer | `.wal-drawer` | Mobile slide-in panel |
 | Swatch | `.wal-swatch` | Colour swatch display |
 
@@ -249,6 +251,27 @@ To scope a whole script to a subtree, add `.wal-palette`:
 ```
 
 ## Cinematic motion
+
+### Motion that comes from the script
+
+Every colour, radius and shadow in walnut is derived from registered numbers, and a registered number interpolates. So the two motion classes walnut is built around do not animate the page — they animate its **inputs**, and the page re-derives on every frame.
+
+```html
+<html class="wal-press wal-cue-in wal-retune">
+```
+
+| Class | What moves |
+|-------|------------|
+| `.wal-cue-in` | On load the page prints itself: the paper first, then the five cues in script order, each rising from zero chroma. Lightness never moves, so contrast is final from the first frame. |
+| `.wal-retune` | Change a palette class, a finish, or a rod from script and the page travels to it instead of cutting. A hue goes round the wheel, so every in-between frame is still a coherent script, not a crossfade of two. Derived cues hold their offsets on every frame. |
+
+Tune with `--wal-cue-in-pass` (0.7s), `--wal-cue-in-stagger` (0.14s), `--wal-retune-duration` (0.8s) and `--wal-ease-travel`.
+
+Take `.wal-retune` off while a slider bound to a rod is being dragged: direct manipulation should move the page under the thumb, not chase it. Mode can't tween — `color-scheme` is discrete — so switch it inside a view transition, which walnut crossfades at the root.
+
+Both need `@property` to interpolate (Chrome 85, Safari 16.4, Firefox 128). Below that the rods still apply; they step instead of gliding.
+
+### Scroll and view helpers
 
 Scroll-driven animations with no JavaScript:
 
@@ -269,6 +292,8 @@ walnut ships entirely inside `@layer`:
 ```
 
 Unlayered declarations beat every layered one regardless of specificity, so an ordinary rule of yours overrides the framework with no `!important` and no specificity games.
+
+The palette files in `dist/themes/` are the exception: they are plain, unlayered rules, so a palette's rods are overridden by an unlayered rule of yours, not by an `@layer` one. That never lets a palette override a finish, because a palette sets nothing a finish sets.
 
 Two caveats worth knowing before you debug one of them. An unlayered rule only outranks the framework **for the properties it actually declares** — override `flex-direction` and walnut's `gap` still applies. And `!important` inverts layer order, so walnut's reduced-motion block deliberately still wins.
 

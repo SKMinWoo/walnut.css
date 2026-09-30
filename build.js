@@ -77,6 +77,34 @@ let minified = bundle
 
 fs.writeFileSync(path.join(DIST, "walnut.min.css"), minified);
 
+/**
+ * Guard the rule stated in the header of 07-finish.css: a palette never sets
+ * a token that a finish sets.
+ *
+ * Nothing in CSS enforces it. A palette file that declares --wal-elevation
+ * builds, loads and renders without complaint — it just silently overrides
+ * every finish it is paired with, because dist/themes/ ship unlayered. That
+ * is how Press and Bone shipped in 0.4.0. Like the docs rewrite below, it
+ * fails open, so the build is the only place left to catch it.
+ *
+ * @param {string} finishCss  src/layers/07-finish.css exactly as read from disk
+ * @param {Record<string, string>} palettes  theme name → that palette file's CSS
+ * @throws naming each palette and the finish-owned token(s) it declares
+ */
+function assertPalettesLeaveFinishTokens(finishCss, palettes) {
+  // TODO(you): decide what a finish owns, find any palette that declares it,
+  // and throw. Returning without a check keeps the build passing meanwhile.
+}
+
+assertPalettesLeaveFinishTokens(
+  fs.readFileSync(path.join(SRC, "layers", "07-finish.css"), "utf8"),
+  Object.fromEntries(
+    THEMES.map((theme) => path.join(SRC, "themes", `${theme}.css`))
+      .filter((file) => fs.existsSync(file))
+      .map((file) => [path.basename(file, ".css"), fs.readFileSync(file, "utf8")])
+  )
+);
+
 // ─── Copy theme files ───
 for (const theme of THEMES) {
   const src = path.join(SRC, "themes", `${theme}.css`);

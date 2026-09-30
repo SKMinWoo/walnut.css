@@ -1,5 +1,126 @@
 # Changelog
 
+## Unreleased
+
+Motion that moves the colour script itself, rather than the elements on top
+of it.
+
+### Added
+
+- **`.wal-retune`.** Tweens the rods — the ground, all five cues, the ramp and
+  the geometry scalars — when a palette class, a finish or an inline rod
+  changes. Because every colour is derived per frame from the in-flight
+  numbers, a hue travels round the wheel and each intermediate frame is a
+  coherent script, not a crossfade of two screenshots. Derived cues stay locked
+  to the accent: bloom's transition runs on the accent's timing from a value
+  27° away to a value 27° away. Opt-in, and meant to be dropped while a control
+  bound to a rod is being dragged. `--wal-retune-duration`, `--wal-ease-travel`.
+
+- **`.wal-cue-in`.** The page prints itself on load: ground chroma first, then
+  the five cues in script order, each rising from zero. Only chroma moves, so
+  contrast is final from the first frame. Keyframes state only `from`, so the
+  same six print any palette, including one written inline.
+  `--wal-cue-in-pass`, `--wal-cue-in-stagger`.
+
+- **The ramp is registered.** All lightness stops (`--wal-l-*`), chroma
+  multipliers (`--wal-cx-*`), `--wal-radius-sm` and `--wal-radius-lg` now have
+  `@property` rules. Without them a palette switch snapped the stops a palette
+  nudges while its hues were still travelling. Registration is typed, so these
+  must be a `<percentage>`, `<number>` and `<length>` respectively; an invalid
+  value now falls back to the stock ramp instead of invalidating the colour.
+
+### Changed
+
+- **Root view transitions crossfade instead of zooming.** The breathe keyframes
+  scaled the whole-page snapshot to 0.98 / 1.02, which read as the browser
+  zooming. Named elements keep the breathe; `root` fades.
+
+- **Catalogue label tracking 0.16em → 0.12em.** Courier Prime is monospaced, so
+  its advance is already wide, and captions multiply the token by 1.6 — at
+  0.16em they set at 0.26em and read as spaced-out letters.
+
+- **The tooltip goes inside its trigger, and no longer uses anchor
+  positioning.** `<button class="wal-tooltip-trigger">… <span
+  class="wal-tooltip">…</span></button>`. The trigger is its containing block,
+  so plain offsets centre it in every supported browser. The sibling form and
+  the undocumented `:popover-open` form are gone. See Fixed for why.
+
+- **Removed the per-primitive gap modifiers** (`.wal-stack.wal-gap-lg` and
+  friends in the layout layer). They never applied: the `.wal-gap-*`
+  utilities sit in a later layer, and layer order outranks specificity. No
+  rendered spacing changes. `.wal-gap-lg` is `--wal-space-lg` everywhere, and
+  it always was.
+
+### Fixed
+
+- **The docs tooltip never appeared, and two tooltips could not coexist.** The
+  only rule that showed a `.wal-tooltip` expected it as the trigger's next
+  sibling, so the markup on the docs page stayed at opacity 0 on hover. Every
+  trigger also shared one `anchor-name`, which resolves to the *last* element
+  on the page carrying it, so a second tooltip pinned the first to the wrong
+  button.
+
+- **The `<select>` arrow vanished on dark grounds.** It was an SVG data URI
+  stroked with `currentColor`, but a background SVG is its own document, so
+  its `currentColor` is always black. It is now two gradients, which read the
+  element's real `currentColor`.
+
+- **A closed `.wal-drawer` kept its links in the tab order.** It was only
+  translated off-canvas, so keyboard focus walked into a panel nobody could
+  see. It is now `visibility: hidden` once the slide finishes.
+
+- **`.wal-progress-bar` sat at full width in browsers without scroll-driven
+  animations.** The timeline was dropped, the animation ran at its default 0s,
+  and nothing held the start frame. It is now hidden there.
+
+- **Colour contrast in two components.** The secondary button's hover label
+  used the plain accent as type (3.8:1 on dark); it now uses `--wal-accent-ink`,
+  as links do, and so does the drawer's hover. The skip link set `--wal-bg` on
+  gold (3.0:1 on light); it now uses the computed `--wal-gold-fg`.
+
+- **Scrollbar styling reached every scroll container in Safari.** A bare
+  `::-webkit-scrollbar` means `*::-webkit-scrollbar`, so the "scoped to `html`"
+  rule was not. It now says `html::-webkit-scrollbar`. The comment also now
+  admits that `scrollbar-color` inherits, and how to opt a container out.
+
+- **"+209° is a near-exact complement" was wrong.** The direct opposite is
+  +180°, so +209° is 29° past it: a split complement. Corrected in the
+  README, the tokens layer and `press.css`. The docs page already had it right.
+
+- **Docs page.** The mode button read "follow the system" as dark, so on a
+  light system with Café, Forest or Dusk its first click did nothing. The
+  install snippet put `class="wal-press"` on a page without `press.css`, which
+  renders Café. The two "gold sits at L …" captions were hard-coded and wrong
+  under Forest and Dusk; they are now read live, like every other number on
+  the page. Also corrected: heading levels no longer skip, the specimen's
+  link goes to its own spec plate instead of an unrelated section, the demo
+  inputs have labels, and the generated CSS is no longer a live region
+  announcing every animation frame. The specimen is now a walnut sideboard
+  from a mid-century furniture catalogue rather than a pair of binoculars. In
+  the README, the Demo link pointed at a GitHub Pages site that does not
+  exist.
+
+- **A finish could not change shadows or the body wash under Press or Bone.**
+  Both palettes set `--wal-elevation` (Press also `--wal-wash`), and
+  `dist/themes/*.css` ship unlayered, which beats the `finish` layer. On
+  `<html class="wal-press">` both `soft` and `catalogue` read 0.5 / 0.5, so
+  catalogue's "no glow" never applied on the palette it was designed against.
+  Importing the palette through `src/walnut.css` with `layer(tokens)` let the
+  finish win, so the two install paths also disagreed. Atmosphere now belongs
+  to the finish alone, and the palettes no longer set it. Layering the palette
+  files would not have been enough, because a layer cannot beat a descendant's
+  own declaration: `<section class="wal-bone">` on a catalogue page would
+  still have lifted its shadows back up.
+
+  **Without a finish, Press and Bone now get the stock shadow and wash.** For
+  the old look, put `data-finish="catalogue"` on Press, or set
+  `--wal-elevation: 0.75` on Bone yourself.
+
+- **`.wal-caption` broke after four words.** A caption is usually a `<p>`, and
+  base caps `<p>` at 65ch — measured in the caption's own tiny face, which is
+  under 30rem. Section-head standfirsts wrapped with their last two words on a
+  line of their own. Captions now take their container's measure.
+
 ## 0.4.0
 
 The theming release. A theme used to be a 130-line file that restated every
