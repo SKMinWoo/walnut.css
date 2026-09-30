@@ -75,10 +75,12 @@
   --wal-l-line-dark:      36.9%;
   --wal-l-line-soft-dark: 32%;
   --wal-l-text-dark:      94.7%;
-  /* The desk sits well above the stock dark ground, so the two quieter inks
-     rise with it to hold 4.5:1 on its lightest stock, surface-2. */
+  /* The desk sits well above the stock dark ground, so the inks rise with
+     it: soft and muted to hold 4.5:1 on its lightest stock, surface-2, and
+     the cue inks (links, badges, .wal-error) to hold it on a card. */
   --wal-l-text-soft-dark: 80%;
   --wal-l-text-muted-dark: 72.5%;
+  --wal-ink-shift-dark:   15%;
   --wal-cx-line-dark:     1.4;
 }
 

@@ -219,12 +219,16 @@ table {
 @property --wal-l-accent-dark      { syntax: "<percentage>"; inherits: true; initial-value: 62%; }
 @property --wal-l-bloom-light      { syntax: "<percentage>"; inherits: true; initial-value: 54%; }
 @property --wal-l-bloom-dark       { syntax: "<percentage>"; inherits: true; initial-value: 70%; }
-@property --wal-l-gold-light       { syntax: "<percentage>"; inherits: true; initial-value: 62%; }
+@property --wal-l-gold-light       { syntax: "<percentage>"; inherits: true; initial-value: 60%; }
 @property --wal-l-gold-dark        { syntax: "<percentage>"; inherits: true; initial-value: 75%; }
 @property --wal-l-olive-light      { syntax: "<percentage>"; inherits: true; initial-value: 48%; }
 @property --wal-l-olive-dark       { syntax: "<percentage>"; inherits: true; initial-value: 60%; }
 @property --wal-l-cool-light       { syntax: "<percentage>"; inherits: true; initial-value: 46%; }
 @property --wal-l-cool-dark        { syntax: "<percentage>"; inherits: true; initial-value: 62%; }
+@property --wal-hover-shift-light  { syntax: "<percentage>"; inherits: true; initial-value: -6%; }
+@property --wal-hover-shift-dark   { syntax: "<percentage>"; inherits: true; initial-value: 6%; }
+@property --wal-ink-shift-light    { syntax: "<percentage>"; inherits: true; initial-value: -12%; }
+@property --wal-ink-shift-dark     { syntax: "<percentage>"; inherits: true; initial-value: 8%; }
 @property --wal-cx-ground-light    { syntax: "<number>";     inherits: true; initial-value: 0.65; }
 @property --wal-cx-ground-dark     { syntax: "<number>";     inherits: true; initial-value: 1; }
 @property --wal-cx-surface-light   { syntax: "<number>";     inherits: true; initial-value: 0.40; }
@@ -290,7 +294,7 @@ table {
      only shift enough to hold their weight against the ground. */
   --wal-l-accent-light: 52%;   --wal-l-accent-dark: 62%;
   --wal-l-bloom-light:  54%;   --wal-l-bloom-dark:  70%;
-  --wal-l-gold-light:   62%;   --wal-l-gold-dark:   75%;
+  --wal-l-gold-light:   60%;   --wal-l-gold-dark:   75%;
   --wal-l-olive-light:  48%;   --wal-l-olive-dark:  60%;
   --wal-l-cool-light:   46%;   --wal-l-cool-dark:   62%;
 
@@ -539,10 +543,12 @@ table {
      Off-script by design: success/warning/danger must survive any rotation of
      the cues, so they are anchored to fixed hues and only ride the shared cue
      lightness stops. Chroma is a touch lower than a cue's so they read as
-     signal rather than as part of the palette. */
+     signal rather than as part of the palette. Danger is set as type (.wal-error)
+     far more than as a fill, so it rides the accent's ink stop, not its fill. */
   --wal-success: light-dark(oklch(var(--wal-l-olive-light) 0.14 145), oklch(var(--wal-l-gold-dark) 0.16 145));
   --wal-warning: light-dark(oklch(var(--wal-l-gold-light)  0.14 85),  oklch(var(--wal-l-gold-dark) 0.15 85));
-  --wal-danger:  light-dark(oklch(var(--wal-l-accent-light) 0.18 25), oklch(var(--wal-l-accent-dark) 0.20 25));
+  --wal-danger:  light-dark(oklch(calc(var(--wal-l-accent-light) + var(--wal-ink-shift-light)) 0.18 25),
+                            oklch(calc(var(--wal-l-accent-dark)  + var(--wal-ink-shift-dark))  0.20 25));
 
   /* ── Shadows ──
      light-dark() takes colours, not whole shadow values, so the mode split
@@ -2923,6 +2929,8 @@ html::-webkit-scrollbar-thumb:hover { background: var(--wal-accent); }
       --wal-l-gold-light, --wal-l-gold-dark,
       --wal-l-olive-light, --wal-l-olive-dark,
       --wal-l-cool-light, --wal-l-cool-dark,
+      --wal-hover-shift-light, --wal-hover-shift-dark,
+      --wal-ink-shift-light, --wal-ink-shift-dark,
       --wal-cx-ground-light, --wal-cx-ground-dark,
       --wal-cx-surface-light, --wal-cx-surface-dark,
       --wal-cx-line-light, --wal-cx-line-dark,
