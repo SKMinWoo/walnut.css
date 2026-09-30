@@ -320,7 +320,9 @@ Two caveats worth knowing before you debug one of them. An unlayered rule only o
 - Safari 17.5+
 - Firefox 120+
 
-Relative colour syntax (the computed `-fg` tokens) sits behind `@supports` and degrades to a stated value.
+Relative colour syntax (the computed `-fg` tokens) sits behind `@supports` and degrades to a stated value, which is what Firefox 120–127 gets.
+
+`.wal-retune` and `.wal-cue-in` need `@property` to interpolate, which Firefox has from 128. Below that the rods still apply; they cut instead of tweening.
 
 ## License
 
