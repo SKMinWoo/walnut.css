@@ -104,6 +104,8 @@
 @property --wal-l-line-dark        { syntax: "<percentage>"; inherits: true; initial-value: 32%; }
 @property --wal-l-line-soft-light  { syntax: "<percentage>"; inherits: true; initial-value: 88%; }
 @property --wal-l-line-soft-dark   { syntax: "<percentage>"; inherits: true; initial-value: 28%; }
+@property --wal-l-line-input-light { syntax: "<percentage>"; inherits: true; initial-value: 57%; }
+@property --wal-l-line-input-dark  { syntax: "<percentage>"; inherits: true; initial-value: 56%; }
 @property --wal-l-text-light       { syntax: "<percentage>"; inherits: true; initial-value: 20%; }
 @property --wal-l-text-dark        { syntax: "<percentage>"; inherits: true; initial-value: 92%; }
 @property --wal-l-text-soft-light  { syntax: "<percentage>"; inherits: true; initial-value: 42%; }
@@ -181,6 +183,7 @@
   --wal-l-surface-2-light:   91%;   --wal-l-surface-2-dark:   26%;
   --wal-l-line-light:        84%;   --wal-l-line-dark:        32%;
   --wal-l-line-soft-light:   88%;   --wal-l-line-soft-dark:   28%;
+  --wal-l-line-input-light:  57%;   --wal-l-line-input-dark:  56%;
   --wal-l-text-light:        20%;   --wal-l-text-dark:        92%;
   --wal-l-text-soft-light:   42%;   --wal-l-text-soft-dark:   72%;
   --wal-l-text-muted-light:  49%;   --wal-l-text-muted-dark:  64%;
@@ -326,6 +329,13 @@
           calc(var(--wal-chroma) * var(--wal-cx-line-light)) var(--wal-hue)),
     oklch(calc(var(--wal-l-line-soft-dark)  + (var(--wal-line-boost) - 1) * 6%)
           calc(var(--wal-chroma) * var(--wal-cx-line-dark))  var(--wal-hue)));
+
+  /* The edge of a form control. A hairline is a divider and may be faint; the
+     only thing marking an empty text field is its border, which WCAG 1.4.11
+     holds to 3:1 against everything around it. --wal-line measured 1.2–1.6. */
+  --wal-line-input: light-dark(
+    oklch(var(--wal-l-line-input-light) calc(var(--wal-chroma) * var(--wal-cx-line-light)) var(--wal-hue)),
+    oklch(var(--wal-l-line-input-dark)  calc(var(--wal-chroma) * var(--wal-cx-line-dark))  var(--wal-hue)));
 
   /* ── Ground: ink ── */
   --wal-text: light-dark(

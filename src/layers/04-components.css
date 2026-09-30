@@ -682,7 +682,7 @@
   .wal-input {
     width: 100%;
     background: var(--wal-surface);
-    border: 1px solid var(--wal-line);
+    border: 1px solid var(--wal-line-input);
     border-radius: var(--wal-radius-sm);
     padding: 0.65rem 1rem;
     font-family: var(--wal-font-body);
