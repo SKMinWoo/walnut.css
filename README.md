@@ -40,22 +40,17 @@ Add `data-finish="catalogue"` and you get a sophisticated mid-century catalogued
 
 ## Install
 
-```bash
-npm install walnut.css
-```
+From jsDelivr, pinned to a release tag:
 
 ```html
-<link rel="stylesheet" href="node_modules/walnut.css/dist/walnut.css">
-<link rel="stylesheet" href="node_modules/walnut.css/dist/themes/press.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/SKMinWoo/walnut.css@v0.4.0/dist/walnut.min.css">
+<!-- optional: a named palette -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/SKMinWoo/walnut.css@v0.4.0/dist/themes/press.css">
 
 <html class="wal-press" data-finish="catalogue">
 ```
 
-Or via CDN:
-
-```html
-<link rel="stylesheet" href="https://unpkg.com/walnut.css/dist/walnut.min.css">
-```
+Or copy `dist/` into your project and link it from there — it is plain CSS with no runtime.
 
 The base stylesheet already carries the café script on `:root`, so a palette file is optional — and unnecessary if you are writing your own script.
 
