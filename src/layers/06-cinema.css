@@ -322,3 +322,49 @@
   .wal-delay-1000 { animation-delay: 1000ms; }
 
 }
+
+/* ── Forced colours ────────────────────────────────────────────────────
+   Windows High Contrast and friends replace every colour with a handful of
+   system ones and drop gradient backgrounds. Anything walnut draws as a
+   filled box or a gradient rather than a border — rules, markers, the nav
+   underline, the progress bar — would vanish, so those are redrawn as
+   borders or in system colours. It lives in this, the last layer, so it
+   wins over whichever layer drew the original. */
+@media (forced-colors: active) {
+  .wal-rule::before,
+  .wal-rule::after,
+  .wal-divider::before,
+  .wal-divider::after {
+    background: none;
+    block-size: 0;
+    border-block-start: var(--wal-hairline) solid CanvasText;
+  }
+
+  .wal-nav .wal-nav-links a::after {
+    background: none;
+    border-block-end: 2px solid LinkText;
+  }
+
+  .wal-list-dash li::before,
+  .wal-avail .wal-avail-dot {
+    forced-color-adjust: none;
+    background: CanvasText;
+  }
+
+  .wal-progress-bar {
+    forced-color-adjust: none;
+    background: Highlight;
+  }
+
+  /* The gradient arrow is gone here; let the platform draw its own. */
+  select.wal-input {
+    appearance: auto;
+    background-image: none;
+  }
+
+  /* A colour chart's colours are its content. */
+  .wal-script > *::before,
+  .wal-swatch .wal-swatch-color {
+    forced-color-adjust: none;
+  }
+}
