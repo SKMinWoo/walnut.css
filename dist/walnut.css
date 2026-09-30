@@ -248,7 +248,6 @@ table {
 @property --wal-wash       { syntax: "<number>";     inherits: true; initial-value: 1; }
 @property --wal-hairline   { syntax: "<length>";     inherits: true; initial-value: 1px; }
 @property --wal-line-boost { syntax: "<number>";     inherits: true; initial-value: 1; }
-@property --wal-tracking-label { syntax: "<length-percentage>"; inherits: true; initial-value: 0.1em; }
 
 
 /* ═══ THE DEFAULT SCRIPT — CAFÉ ═══
@@ -2972,8 +2971,7 @@ html::-webkit-scrollbar-thumb:hover { background: var(--wal-accent); }
       --wal-cx-line-light, --wal-cx-line-dark,
       --wal-cx-ink-light, --wal-cx-ink-dark,
       --wal-radius, --wal-radius-sm, --wal-radius-lg,
-      --wal-elevation, --wal-wash, --wal-line-boost,
-      --wal-tracking-label;
+      --wal-elevation, --wal-wash, --wal-line-boost;
     transition-duration: var(--wal-retune-duration, 0.8s);
     /* Symmetric, unlike --wal-ease. Expo-out suits a thing arriving; a rod
        being turned from one setting to another should start and stop like a

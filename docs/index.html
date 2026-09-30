@@ -1099,8 +1099,8 @@
     }
 
     /* ── Finish by attribute ──
-       Radius, elevation, wash, rule strength and label tracking are all
-       registered, so under .wal-retune a finish switch tweens as well. */
+       Radius, elevation, wash and rule strength are registered, so under
+       .wal-retune a finish switch tweens them; the label voice cuts. */
     const finishBtn = document.getElementById("finish-toggle");
     finishBtn.addEventListener("click", () => {
       const next = root.getAttribute("data-finish") === "catalogue" ? "soft" : "catalogue";
