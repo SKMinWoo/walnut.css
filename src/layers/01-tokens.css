@@ -155,21 +155,13 @@
   --wal-chroma: 0.04;
 
   /* ── The five cues ──
-     bloom and cool default to *offsets from the accent* rather than to fixed
-     numbers, so rotating one rod keeps the script in tune instead of pulling
-     the lead colour away from the rest of the cast. The offsets are not
-     arbitrary: +27° is the warm step from a tomato red to a soft apricot, and
-     +209° lands 29° past the accent's direct opposite — a split complement,
-     across the wheel without being dead against it. That is the structure a
-     hand-mixed mid-century palette tends to converge on anyway.
-     Override either with a plain number to break the relationship. */
+     The bloom and cool hues are not stated here: they default to offsets from
+     the accent, declared with the derivation below. */
   --wal-accent-hue:    25;    --wal-accent-chroma: 0.17;  /* terracotta   */
-  --wal-bloom-hue:     calc(var(--wal-accent-hue) + 27);
-  --wal-bloom-chroma:  0.12;                              /* apricot      */
+                              --wal-bloom-chroma:  0.12;  /* apricot      */
   --wal-gold-hue:      85;    --wal-gold-chroma:   0.15;  /* goldenrod    */
   --wal-olive-hue:     130;   --wal-olive-chroma:  0.10;  /* botanical    */
-  --wal-cool-hue:      calc(var(--wal-accent-hue) + 209);
-  --wal-cool-chroma:   0.11;                              /* adriatic     */
+                              --wal-cool-chroma:   0.11;  /* adriatic     */
 
   /* ── The ramp: lightness stops ──
      `-light` is the value used when the page is light; `-dark` when it is
@@ -290,15 +282,30 @@
    Why the theme class names are listed here rather than in the theme files:
    the derivation must not live in the theme files, or we are back to four
    copies that drift. Listing the names centrally costs one line each and is
-   harmless when a theme file is not loaded. */
+   harmless when a theme file is not loaded. `[data-theme|="cafe"]` matches
+   both "cafe" and the fused "cafe-light" / "cafe-dark". */
 :root,
 :where(.wal-palette,
        .wal-cafe, .wal-forest, .wal-dusk, .wal-bone, .wal-press,
-       [data-theme="cafe"],  [data-theme^="cafe-"],
-       [data-theme="forest"],[data-theme^="forest-"],
-       [data-theme="dusk"],  [data-theme^="dusk-"],
-       [data-theme="bone"],  [data-theme^="bone-"],
-       [data-theme="press"], [data-theme^="press-"]) {
+       [data-theme|="cafe"], [data-theme|="forest"], [data-theme|="dusk"],
+       [data-theme|="bone"], [data-theme|="press"]) {
+
+  /* ── Derived cues ──
+     bloom and cool default to *offsets from the accent* rather than to fixed
+     numbers, so rotating one rod keeps the script in tune instead of pulling
+     the lead colour away from the rest of the cast. The offsets are not
+     arbitrary: +27° is the warm step from a tomato red to a soft apricot, and
+     +209° lands 29° past the accent's direct opposite — a split complement,
+     across the wheel without being dead against it. That is the structure a
+     hand-mixed mid-century palette tends to converge on anyway.
+     Override either with a plain number to break the relationship.
+
+     They live here, not in :root, because the hues are registered <number>s:
+     a registered value computes where it is declared and descendants inherit
+     the number, not the calc(). Stated only on :root, a scoped
+     <section class="wal-forest"> inherited bloom at 52° instead of 87°. */
+  --wal-bloom-hue: calc(var(--wal-accent-hue) + 27);
+  --wal-cool-hue:  calc(var(--wal-accent-hue) + 209);
 
   /* ── Ground: surfaces ── */
   --wal-bg: light-dark(
@@ -315,20 +322,8 @@
     oklch(var(--wal-l-surface-2-dark)  calc(var(--wal-chroma) * var(--wal-cx-ground-dark))  var(--wal-hue)));
 
   /* ── Ground: hairlines ──
-     --wal-line-boost pushes the rule AWAY from the page ground: darker on
-     light, lighter on dark. It is one knob rather than two overrides so a
-     finish can ask for stronger rules on any palette without owning a colour
-     — see 07-finish.css, where the catalogue finish turns it to 1.7. */
-  --wal-line: light-dark(
-    oklch(calc(var(--wal-l-line-light) - (var(--wal-line-boost) - 1) * 9%)
-          calc(var(--wal-chroma) * var(--wal-cx-line-light)) var(--wal-hue)),
-    oklch(calc(var(--wal-l-line-dark)  + (var(--wal-line-boost) - 1) * 9%)
-          calc(var(--wal-chroma) * var(--wal-cx-line-dark))  var(--wal-hue)));
-  --wal-line-soft: light-dark(
-    oklch(calc(var(--wal-l-line-soft-light) - (var(--wal-line-boost) - 1) * 6%)
-          calc(var(--wal-chroma) * var(--wal-cx-line-light)) var(--wal-hue)),
-    oklch(calc(var(--wal-l-line-soft-dark)  + (var(--wal-line-boost) - 1) * 6%)
-          calc(var(--wal-chroma) * var(--wal-cx-line-dark))  var(--wal-hue)));
+     --wal-line and --wal-line-soft are derived in the next rule, with the
+     shadows, because a finish scales them. */
 
   /* The edge of a form control. A hairline is a divider and may be faint; the
      only thing marking an empty text field is its border, which WCAG 1.4.11
@@ -455,21 +450,15 @@
   --wal-danger:  light-dark(oklch(calc(var(--wal-l-accent-light) + var(--wal-ink-shift-light)) 0.18 25),
                             oklch(calc(var(--wal-l-accent-dark)  + var(--wal-ink-shift-dark))  0.20 25));
 
-  /* ── Shadows ──
+  /* ── Shadow colour ──
      light-dark() takes colours, not whole shadow values, so the mode split
-     lives in the colour and the geometry is shared. --wal-elevation scales the
-     offsets, which is how a flat finish stays flat without overriding three
-     separate shadows. */
+     lives in the colour; the geometry is in the next rule. */
   --wal-shadow-ink:    light-dark(oklch(50% 0.03 var(--wal-hue) / 0.18), oklch(10% 0.02 var(--wal-hue) / 0.45));
   --wal-shadow-ink-sm: light-dark(oklch(50% 0.03 var(--wal-hue) / 0.12), oklch(10% 0.02 var(--wal-hue) / 0.30));
   --wal-shadow-ink-lg: light-dark(oklch(50% 0.03 var(--wal-hue) / 0.22), oklch(8%  0.02 var(--wal-hue) / 0.55));
 
-  --wal-shadow:    0 calc(20px * var(--wal-elevation)) calc(44px * var(--wal-elevation)) -18px var(--wal-shadow-ink);
-  --wal-shadow-sm: 0 calc(4px  * var(--wal-elevation)) calc(12px * var(--wal-elevation)) -4px  var(--wal-shadow-ink-sm);
-  --wal-shadow-lg: 0 calc(32px * var(--wal-elevation)) calc(64px * var(--wal-elevation)) -24px var(--wal-shadow-ink-lg);
-
   /* ── Foregrounds ON a cue ──
-     Plain fallback; the @supports block below replaces these with a computed
+     Plain fallback; the nested @supports below replaces these with a computed
      contrast pick. Kept as a real value so a browser without relative colour
      syntax (Firefox before 128) still gets a legible button rather than an
      invalid one. Each is the pick the computed form makes for the stock stops
@@ -480,50 +469,83 @@
   --wal-gold-fg:   oklch(16% 0.02 var(--wal-gold-hue));
   --wal-olive-fg:  light-dark(oklch(97% 0.01 var(--wal-olive-hue)),  oklch(16% 0.02 var(--wal-olive-hue)));
   --wal-cool-fg:   light-dark(oklch(97% 0.01 var(--wal-cool-hue)),   oklch(16% 0.02 var(--wal-cool-hue)));
-}
 
+  /* ── Automatic foreground contrast ──
+     The single most tedious part of hand-theming: every time you rotate a cue
+     you have to re-decide whether text on it should be black or white, and
+     getting it wrong is an accessibility bug rather than a taste one.
 
-/* ═══ AUTOMATIC FOREGROUND CONTRAST ═══
-   The single most tedious part of hand-theming: every time you rotate a cue
-   you have to re-decide whether text on it should be black or white, and
-   getting it wrong is an accessibility bug rather than a taste one.
+     Relative colour syntax can decide it arithmetically. `l` is the cue's own
+     lightness as a 0–1 number, so
 
-   Relative colour syntax can decide it arithmetically. `l` is the cue's own
-   lightness as a 0–1 number, so
+         clamp(0.16, (0.57 - l) * 1000, 0.97)
 
-       clamp(0.16, (0.57 - l) * 1000, 0.97)
+     is a step function: below the 0.57 threshold the middle term is a large
+     positive number and clamps to 0.97 (near-white ink); above it the term goes
+     negative and clamps to 0.16 (near-black ink). The ×1000 makes the crossover
+     effectively instant rather than a mushy grey band.
 
-   is a step function: below the 0.57 threshold the middle term is a large
-   positive number and clamps to 0.97 (near-white ink); above it the term goes
-   negative and clamps to 0.16 (near-black ink). The ×1000 makes the crossover
-   effectively instant rather than a mushy grey band.
+     Not pure white and black: `calc(c * 0.08)` keeps a trace of the cue's own
+     chroma in its foreground, which is why a terracotta button reads as warm
+     cream on terracotta rather than as a sticker.
 
-   Not pure white and black: `calc(c * 0.08)` keeps a trace of the cue's own
-   chroma in its foreground, which is why a terracotta button reads as warm
-   cream on terracotta rather than as a sticker.
+     0.57 is where the two candidates swap places under WCAG 2 contrast: for
+     every cue in the shipped palettes, in both modes, any threshold from 0.56
+     to 0.58 picks whichever of the two reads better. (It used to be 0.63, which
+     picked the worse one in 19 of those 50 cases — dark-mode primary buttons
+     at 3.6:1.) Near the threshold neither candidate may reach 4.5:1, so the
+     shipped cue stops keep clear of roughly 0.55–0.59; a cue you move into
+     that band is the case to check.
 
-   0.57 is where the two candidates swap places under WCAG 2 contrast: for
-   every cue in the shipped palettes, in both modes, any threshold from 0.56
-   to 0.58 picks whichever of the two reads better. (It used to be 0.63, which
-   picked the worse one in 19 of those 50 cases — dark-mode primary buttons
-   at 3.6:1.) Near the threshold neither candidate may reach 4.5:1, so the
-   shipped cue stops keep clear of roughly 0.55–0.59; a cue you move into
-   that band is the case to check. */
-@supports (color: oklch(from white l c h)) {
-  :root,
-  :where(.wal-palette,
-         .wal-cafe, .wal-forest, .wal-dusk, .wal-bone, .wal-press,
-         [data-theme="cafe"],  [data-theme^="cafe-"],
-         [data-theme="forest"],[data-theme^="forest-"],
-         [data-theme="dusk"],  [data-theme^="dusk-"],
-         [data-theme="bone"],  [data-theme^="bone-"],
-         [data-theme="press"], [data-theme^="press-"]) {
+     Nested rather than a separate rule, so the selector list above is the
+     only copy: a second copy that drifted would leave a scoped palette with
+     the root's foregrounds. */
+  @supports (color: oklch(from white l c h)) {
     --wal-accent-fg: oklch(from var(--wal-accent) clamp(0.16, (0.57 - l) * 1000, 0.97) calc(c * 0.08) h);
     --wal-bloom-fg:  oklch(from var(--wal-bloom)  clamp(0.16, (0.57 - l) * 1000, 0.97) calc(c * 0.08) h);
     --wal-gold-fg:   oklch(from var(--wal-gold)   clamp(0.16, (0.57 - l) * 1000, 0.97) calc(c * 0.08) h);
     --wal-olive-fg:  oklch(from var(--wal-olive)  clamp(0.16, (0.57 - l) * 1000, 0.97) calc(c * 0.08) h);
     --wal-cool-fg:   oklch(from var(--wal-cool)   clamp(0.16, (0.57 - l) * 1000, 0.97) calc(c * 0.08) h);
   }
+}
+
+
+/* ═══ WHAT A FINISH SCALES ═══
+   Hairlines and shadows read --wal-line-boost and --wal-elevation, which a
+   finish sets. A custom property substitutes its var()s where it is declared,
+   so derived only where a palette is, these froze at that element's finish:
+   `data-finish` on a subtree changed its radii and label voice but not its
+   rules or its shadows. Hence [data-finish] in this list and not in the one
+   above — a finish re-derives the geometry it owns and nothing else, so it
+   can never move a colour that a palette set. */
+:root,
+:where(.wal-palette,
+       .wal-cafe, .wal-forest, .wal-dusk, .wal-bone, .wal-press,
+       [data-theme|="cafe"], [data-theme|="forest"], [data-theme|="dusk"],
+       [data-theme|="bone"], [data-theme|="press"],
+       [data-finish]) {
+  /* ── Hairlines ──
+     --wal-line-boost pushes the rule AWAY from the page ground: darker on
+     light, lighter on dark. It is one knob rather than two overrides so a
+     finish can ask for stronger rules on any palette without owning a colour
+     — see 07-finish.css, where the catalogue finish turns it to 1.7. */
+  --wal-line: light-dark(
+    oklch(calc(var(--wal-l-line-light) - (var(--wal-line-boost) - 1) * 9%)
+          calc(var(--wal-chroma) * var(--wal-cx-line-light)) var(--wal-hue)),
+    oklch(calc(var(--wal-l-line-dark)  + (var(--wal-line-boost) - 1) * 9%)
+          calc(var(--wal-chroma) * var(--wal-cx-line-dark))  var(--wal-hue)));
+  --wal-line-soft: light-dark(
+    oklch(calc(var(--wal-l-line-soft-light) - (var(--wal-line-boost) - 1) * 6%)
+          calc(var(--wal-chroma) * var(--wal-cx-line-light)) var(--wal-hue)),
+    oklch(calc(var(--wal-l-line-soft-dark)  + (var(--wal-line-boost) - 1) * 6%)
+          calc(var(--wal-chroma) * var(--wal-cx-line-dark))  var(--wal-hue)));
+
+  /* ── Shadows ──
+     --wal-elevation scales the offsets, which is how a flat finish stays flat
+     without overriding three separate shadows. */
+  --wal-shadow:    0 calc(20px * var(--wal-elevation)) calc(44px * var(--wal-elevation)) -18px var(--wal-shadow-ink);
+  --wal-shadow-sm: 0 calc(4px  * var(--wal-elevation)) calc(12px * var(--wal-elevation)) -4px  var(--wal-shadow-ink-sm);
+  --wal-shadow-lg: 0 calc(32px * var(--wal-elevation)) calc(64px * var(--wal-elevation)) -24px var(--wal-shadow-ink-lg);
 }
 
 
