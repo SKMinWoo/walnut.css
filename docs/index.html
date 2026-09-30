@@ -1052,7 +1052,10 @@
       readerChoseMode = true;
       const next = currentMode() === "dark" ? "light" : "dark";
       const flip = () => { root.setAttribute("data-theme", next); syncModeBtn(); paint(); };
-      if (document.startViewTransition && !reduceMotion.matches) document.startViewTransition(flip);
+      // .ready rejects when a transition is skipped — a second click before
+      // the first finishes — and nothing else awaits it, so it would surface
+      // as an unhandled rejection. The flip itself has happened either way.
+      if (document.startViewTransition && !reduceMotion.matches) document.startViewTransition(flip).ready.catch(() => {});
       else flip();
     });
     syncModeBtn();
