@@ -217,9 +217,11 @@
       border-color: var(--wal-line);
       color: var(--wal-text);
 
+      /* The label is the accent used as type, so it takes the -ink form, as
+         links do. The plain accent measured 3.8:1 on a dark ground. */
       &:hover {
         border-color: var(--wal-accent);
-        color: var(--wal-accent);
+        color: var(--wal-accent-ink);
         background: var(--wal-bg-subtle);
       }
     }
@@ -624,13 +626,21 @@
     box-shadow: var(--wal-shadow-lg);
     z-index: 1001;
     transform: translateX(100%);
-    transition: transform var(--wal-duration) var(--wal-ease);
+    /* Off-canvas is not closed: a drawer that is only translated away keeps
+       every link in the tab order, so a keyboard user tabbed into a panel
+       they could not see. `visibility` takes it out of both the tab order and
+       the accessibility tree, and flips only after the slide has finished. */
+    visibility: hidden;
+    transition: transform var(--wal-duration) var(--wal-ease),
+                visibility 0s linear var(--wal-duration);
     display: flex;
     flex-direction: column;
     padding: var(--wal-space-lg);
-    
+
     &.is-open {
       transform: translateX(0);
+      visibility: visible;
+      transition-delay: 0s;
     }
 
     .wal-drawer-header {
@@ -660,7 +670,7 @@
         border-bottom: 1px solid var(--wal-line-soft);
         
         &:hover {
-          color: var(--wal-accent);
+          color: var(--wal-accent-ink);
           padding-left: var(--wal-space-sm);
           transition: padding var(--wal-duration) var(--wal-ease);
         }
@@ -702,11 +712,18 @@
     resize: vertical;
   }
 
+  /* The arrow is two gradients meeting in a point, because a gradient can
+     read currentColor and an SVG background cannot. The data-URI SVG this
+     replaces was its own document, so its `currentColor` was always black,
+     and the arrow disappeared on every dark ground. */
   select.wal-input {
     appearance: none;
-    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>');
+    background-image:
+      linear-gradient(45deg,  transparent 50%, currentColor 50%),
+      linear-gradient(135deg, currentColor 50%, transparent 50%);
+    background-size: 5px 5px;
     background-repeat: no-repeat;
-    background-position: right 1rem center;
+    background-position: right calc(1rem + 5px) center, right 1rem center;
     padding-right: 2.5rem;
   }
 
@@ -842,24 +859,47 @@
     }
   }
 
-  /* ═══ 16. Tooltip ═══ */
+  /* ═══ 16. Tooltip ═══
+     The tooltip goes INSIDE its trigger:
+
+         <button class="wal-tooltip-trigger">Save
+           <span class="wal-tooltip">Saves a draft</span>
+         </button>
+
+     The trigger is its containing block, so plain offsets centre it with no
+     anchor positioning at all. This used to anchor by name, and it had two
+     problems. The only selector that showed it expected the tooltip as the
+     trigger's next sibling, so the markup above never appeared. And every
+     trigger shared one anchor-name, which resolves to the LAST element in the
+     document carrying it, so a second tooltip anywhere on a page pinned the
+     first one to the wrong button. This version needs neither, and works in
+     every browser walnut supports. */
   .wal-tooltip-trigger {
-    anchor-name: --wal-tooltip;
+    position: relative;
   }
 
   .wal-tooltip {
     position: absolute;
-    position-anchor: --wal-tooltip;
-    top: anchor(bottom);
-    left: anchor(center);
-    justify-self: anchor-center;
+    top: 100%;
+    left: 50%;
+    translate: -50% 0;
     margin-top: var(--wal-space-sm);
-    
+    /* Sized to its text, not to the space left after `left: 50%`, which would
+       wrap a short tip inside half the width of a small button. */
+    inline-size: max-content;
+    max-inline-size: 16rem;
+
     padding: var(--wal-space-xs) var(--wal-space-sm);
     background: var(--wal-surface-2);
     color: var(--wal-text);
     font-family: var(--wal-font-body);
     font-size: var(--wal-text-xs);
+    /* Inside a .wal-btn it would otherwise inherit the button's weight,
+       tracking and (under a finish) its case. */
+    font-weight: 400;
+    letter-spacing: normal;
+    text-transform: none;
+    text-align: center;
     border: 1px solid var(--wal-line);
     border-radius: var(--wal-radius-sm);
     box-shadow: var(--wal-shadow-sm);
@@ -891,9 +931,7 @@
     }
   }
   
-  .wal-tooltip-trigger:hover + .wal-tooltip,
-  .wal-tooltip-trigger:focus + .wal-tooltip,
-  .wal-tooltip:popover-open {
+  .wal-tooltip-trigger:is(:hover, :focus-visible) > .wal-tooltip {
     opacity: 1;
   }
 
@@ -1219,6 +1257,11 @@
     letter-spacing: calc(var(--wal-tracking-label) * 1.6);
     color: var(--wal-caption-color, var(--wal-text-muted));
     margin: 0;
+    /* A caption is usually a <p>, and base caps <p> at 65ch — measured in
+       the caption's own tiny, widely tracked face, which is under 30rem. A
+       one-line standfirst broke after its fourth word and left the last two
+       on a line of their own. A caption takes its container's measure. */
+    max-width: none;
   }
 
   /* ═══ 29. Index ═══
@@ -1236,8 +1279,7 @@
 
   /* ═══ 30. Section head ═══
      Index, title and standfirst as one block, with the index in a left margin
-     wide enough to hold it. Collapses to a stack when the margin no longer
-     fits, which is the only breakpoint the component needs.
+     exactly as wide as it needs. No breakpoint: see the column note below.
 
          <header class="wal-section-head">
            <p class="wal-index">01</p>

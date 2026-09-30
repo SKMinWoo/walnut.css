@@ -8,6 +8,11 @@
 
        <html class="wal-press" data-finish="catalogue">
 
+   Print does not cast shadows and a page does not glow, but neither fact is
+   stated here. Shadow depth and the body wash are atmosphere, and atmosphere
+   belongs to the finish — see the header of 07-finish.css for why a palette
+   that sets it breaks every finish it is paired with.
+
    ───────────────────────────────────────────────────
    WHY THESE FIVE, AND WHY THEY ARE NOT RANDOM
 
@@ -15,7 +20,8 @@
    months, then measured. Two relationships fell out of the measurement:
 
      tomato 31° → apricot 58°     a 27° warm step
-     tomato 31° → adriatic 240°   209°, within a few degrees of exact complement
+     tomato 31° → adriatic 240°   209°, 29° past the direct opposite: a
+                                  split complement
 
    Those are the two offsets walnut ships as the DEFAULTS for --wal-bloom-hue
    and --wal-cool-hue, which is why this file does not state them: setting the
@@ -69,10 +75,6 @@
   --wal-l-line-soft-dark: 32%;
   --wal-l-text-dark:      94.7%;
   --wal-cx-line-dark:     1.4;
-
-  /* Print does not cast shadows; the wash belongs to a lit room, not a page. */
-  --wal-elevation: 0.5;
-  --wal-wash:      0.5;
 }
 
 /* Paper-first, for the same reason and by the same mechanism as Bone —

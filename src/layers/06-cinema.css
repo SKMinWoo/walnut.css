@@ -1,10 +1,112 @@
 /* ═══════════════════════════════════════════════════════════════════════
    06-cinema.css
-   Scroll-driven animations and cinematic motion effects.
+   Motion. The first two blocks move the colour script itself; the rest are
+   general-purpose scroll and view-transition helpers.
    ═══════════════════════════════════════════════════════════════════════ */
 
 @media (prefers-reduced-motion: no-preference) {
-  
+
+  /* ── Retune ────────────────────────────────────────────────────────────
+     When the rods move, the page travels with them instead of cutting.
+
+         <html class="wal-press wal-retune">
+
+     Every colour in walnut is derived from registered numbers, and a
+     registered number interpolates. So a palette class, a finish, or a rod
+     written from script tweens the *inputs*, and every surface, hairline,
+     ink and shadow re-derives on each frame from wherever the inputs have
+     got to. That is not a crossfade between two pictures of the page: a hue
+     travels round the wheel, so every intermediate frame is still a coherent
+     script rather than a muddy mix of two.
+
+     Derived hues stay locked to their source. With the default
+     `--wal-bloom-hue: calc(var(--wal-accent-hue) + 27)`, bloom's own
+     transition runs on the same timing as the accent's, from a value 27°
+     away to a value 27° away, so the offset holds on every frame.
+
+     Opt-in, because a tween is wrong for direct manipulation: a slider bound
+     to a rod should move the page under the thumb, not 800ms behind it.
+     Take the class off while a control is being dragged.
+
+     Mode is not included and cannot be. color-scheme is discrete, and
+     light-dark() picks a branch rather than blending two. A root view
+     transition is the tool for that; see the crossfade further down. */
+  .wal-retune {
+    transition-property:
+      --wal-hue, --wal-chroma,
+      --wal-accent-hue, --wal-accent-chroma,
+      --wal-bloom-hue,  --wal-bloom-chroma,
+      --wal-gold-hue,   --wal-gold-chroma,
+      --wal-olive-hue,  --wal-olive-chroma,
+      --wal-cool-hue,   --wal-cool-chroma,
+      --wal-l-bg-light, --wal-l-bg-dark,
+      --wal-l-subtle-light, --wal-l-subtle-dark,
+      --wal-l-surface-light, --wal-l-surface-dark,
+      --wal-l-surface-2-light, --wal-l-surface-2-dark,
+      --wal-l-line-light, --wal-l-line-dark,
+      --wal-l-line-soft-light, --wal-l-line-soft-dark,
+      --wal-l-text-light, --wal-l-text-dark,
+      --wal-l-text-soft-light, --wal-l-text-soft-dark,
+      --wal-l-text-muted-light, --wal-l-text-muted-dark,
+      --wal-l-accent-light, --wal-l-accent-dark,
+      --wal-l-bloom-light, --wal-l-bloom-dark,
+      --wal-l-gold-light, --wal-l-gold-dark,
+      --wal-l-olive-light, --wal-l-olive-dark,
+      --wal-l-cool-light, --wal-l-cool-dark,
+      --wal-cx-ground-light, --wal-cx-ground-dark,
+      --wal-cx-surface-light, --wal-cx-surface-dark,
+      --wal-cx-line-light, --wal-cx-line-dark,
+      --wal-cx-ink-light, --wal-cx-ink-dark,
+      --wal-radius, --wal-radius-sm, --wal-radius-lg,
+      --wal-elevation, --wal-wash, --wal-line-boost,
+      --wal-tracking-label;
+    transition-duration: var(--wal-retune-duration, 0.8s);
+    /* Symmetric, unlike --wal-ease. Expo-out suits a thing arriving; a rod
+       being turned from one setting to another should start and stop like a
+       dial under a hand. */
+    transition-timing-function: var(--wal-ease-travel, cubic-bezier(0.65, 0, 0.35, 1));
+  }
+
+  /* ── Cue in ────────────────────────────────────────────────────────────
+     The page prints itself on load: the paper first, then the five cues in
+     script order, each rising from zero chroma — a grey proof taking its
+     colour one plate at a time.
+
+         <html class="wal-press wal-cue-in">
+
+     Only the chroma rods move. Lightness never does, so contrast is final
+     from the first frame and nothing is unreadable while it runs. Each
+     keyframe states only `from`, which makes the end of every pass the
+     element's own value — the same six keyframes print any palette,
+     including one written inline.
+
+     Runs once, on first style resolution. A pass is --wal-cue-in-pass long
+     and each cue starts --wal-cue-in-stagger after the one before it; the
+     ground leads the first cue by twice that. `backwards` holds every cue
+     at zero until its turn. It uses animation-name as a list, so put it on
+     an element that has no other animation — <html> is the intended one. */
+  @keyframes wal-cue-in-ground { from { --wal-chroma: 0; } }
+  @keyframes wal-cue-in-accent { from { --wal-accent-chroma: 0; } }
+  @keyframes wal-cue-in-bloom  { from { --wal-bloom-chroma: 0; } }
+  @keyframes wal-cue-in-gold   { from { --wal-gold-chroma: 0; } }
+  @keyframes wal-cue-in-olive  { from { --wal-olive-chroma: 0; } }
+  @keyframes wal-cue-in-cool   { from { --wal-cool-chroma: 0; } }
+
+  .wal-cue-in {
+    animation-name: wal-cue-in-ground, wal-cue-in-accent, wal-cue-in-bloom,
+                    wal-cue-in-gold, wal-cue-in-olive, wal-cue-in-cool;
+    animation-duration: var(--wal-cue-in-pass, 0.7s);
+    animation-delay:
+      0s,
+      calc(var(--wal-cue-in-stagger, 0.14s) * 2),
+      calc(var(--wal-cue-in-stagger, 0.14s) * 3),
+      calc(var(--wal-cue-in-stagger, 0.14s) * 4),
+      calc(var(--wal-cue-in-stagger, 0.14s) * 5),
+      calc(var(--wal-cue-in-stagger, 0.14s) * 6);
+    animation-timing-function: var(--wal-ease, cubic-bezier(0.16, 1, 0.3, 1));
+    animation-fill-mode: backwards;
+  }
+
   /* ── Scroll-driven Reveals ─────────────────────────────────────────── */
   
   /* Shared keyframes for reveals */
@@ -100,6 +202,14 @@
     z-index: 1000;
   }
 
+  /* Without scroll timelines the declaration above is dropped, the animation
+     runs on the clock at its default 0s and leaves no fill — so the bar sat
+     at full width across the top of every page. Better absent than wrong.
+     The reveals need no guard: `fill-mode: both` leaves them visible. */
+  @supports not (animation-timeline: scroll()) {
+    .wal-progress-bar { display: none; }
+  }
+
   /* ── Parallax ──────────────────────────────────────────────────────── */
 
   @keyframes wal-parallax-move {
@@ -142,6 +252,16 @@
   @keyframes wal-breathe-in {
     from { opacity: 0; transform: scale(1.02); }
   }
+
+  /* The root snapshot is the whole page, and scaling the whole page reads as
+     the browser zooming rather than as a cut. Named elements keep the breathe
+     above; the root only crossfades — which is what a mode switch needs,
+     since color-scheme cannot tween (see Retune). */
+  ::view-transition-old(root) { animation-name: wal-fade-out; }
+  ::view-transition-new(root) { animation-name: wal-fade-in; }
+
+  @keyframes wal-fade-out { to   { opacity: 0; } }
+  @keyframes wal-fade-in  { from { opacity: 0; } }
 
   /* ── Cinematic Keyframes ───────────────────────────────────────────── */
 

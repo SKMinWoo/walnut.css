@@ -34,9 +34,6 @@
   --wal-l-text-light:      18%;
   --wal-l-text-soft-light: 38%;
   --wal-l-text-muted-light: 56%;
-
-  /* Pencil-edge softness rather than a cast shadow. */
-  --wal-elevation: 0.75;
 }
 
 /* Light-first, stated so it still LOSES to an explicit mode request.

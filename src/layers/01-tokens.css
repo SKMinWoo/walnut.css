@@ -43,8 +43,11 @@
      --wal-cx-*                      chroma multipliers per surface family
      --wal-radius / --wal-elevation / --wal-wash    geometry and atmosphere
 
-   Only the first two are needed for a coherent theme. The rest exist so a
-   theme can nudge one stop without inheriting the job of restating the ramp.
+   Only the first two are needed for a coherent theme. The ramp exists so a
+   theme can nudge one stop without inheriting the job of restating it.
+   Geometry and atmosphere are not a theme's to set at all: they are the
+   finish's knobs, and a palette that touches them overrides every finish it
+   is paired with (see 07-finish.css).
 ═══════════════════════════════════════════════════ */
 
 
@@ -82,8 +85,54 @@
 @property --wal-cool-hue      { syntax: "<number>"; inherits: true; initial-value: 234; }
 @property --wal-cool-chroma   { syntax: "<number>"; inherits: true; initial-value: 0.11; }
 
+/* ── The ramp ──
+   Registered for the same reasons as the rods, and for one more: .wal-retune
+   (06-cinema.css) can only tween what is registered. A palette nudges these
+   stops, and left unregistered they would snap on the first frame of a
+   palette switch while the hues were still travelling — Press → Café would
+   drop its body text eight points of lightness before anything else moved.
+   Initial values are the stock ramp in :root below. */
+@property --wal-l-bg-light         { syntax: "<percentage>"; inherits: true; initial-value: 93%; }
+@property --wal-l-bg-dark          { syntax: "<percentage>"; inherits: true; initial-value: 16%; }
+@property --wal-l-subtle-light     { syntax: "<percentage>"; inherits: true; initial-value: 90%; }
+@property --wal-l-subtle-dark      { syntax: "<percentage>"; inherits: true; initial-value: 19%; }
+@property --wal-l-surface-light    { syntax: "<percentage>"; inherits: true; initial-value: 97%; }
+@property --wal-l-surface-dark     { syntax: "<percentage>"; inherits: true; initial-value: 22%; }
+@property --wal-l-surface-2-light  { syntax: "<percentage>"; inherits: true; initial-value: 91%; }
+@property --wal-l-surface-2-dark   { syntax: "<percentage>"; inherits: true; initial-value: 26%; }
+@property --wal-l-line-light       { syntax: "<percentage>"; inherits: true; initial-value: 84%; }
+@property --wal-l-line-dark        { syntax: "<percentage>"; inherits: true; initial-value: 32%; }
+@property --wal-l-line-soft-light  { syntax: "<percentage>"; inherits: true; initial-value: 88%; }
+@property --wal-l-line-soft-dark   { syntax: "<percentage>"; inherits: true; initial-value: 28%; }
+@property --wal-l-text-light       { syntax: "<percentage>"; inherits: true; initial-value: 20%; }
+@property --wal-l-text-dark        { syntax: "<percentage>"; inherits: true; initial-value: 92%; }
+@property --wal-l-text-soft-light  { syntax: "<percentage>"; inherits: true; initial-value: 42%; }
+@property --wal-l-text-soft-dark   { syntax: "<percentage>"; inherits: true; initial-value: 68%; }
+@property --wal-l-text-muted-light { syntax: "<percentage>"; inherits: true; initial-value: 58%; }
+@property --wal-l-text-muted-dark  { syntax: "<percentage>"; inherits: true; initial-value: 52%; }
+@property --wal-l-accent-light     { syntax: "<percentage>"; inherits: true; initial-value: 52%; }
+@property --wal-l-accent-dark      { syntax: "<percentage>"; inherits: true; initial-value: 62%; }
+@property --wal-l-bloom-light      { syntax: "<percentage>"; inherits: true; initial-value: 58%; }
+@property --wal-l-bloom-dark       { syntax: "<percentage>"; inherits: true; initial-value: 70%; }
+@property --wal-l-gold-light       { syntax: "<percentage>"; inherits: true; initial-value: 62%; }
+@property --wal-l-gold-dark        { syntax: "<percentage>"; inherits: true; initial-value: 75%; }
+@property --wal-l-olive-light      { syntax: "<percentage>"; inherits: true; initial-value: 48%; }
+@property --wal-l-olive-dark       { syntax: "<percentage>"; inherits: true; initial-value: 55%; }
+@property --wal-l-cool-light       { syntax: "<percentage>"; inherits: true; initial-value: 46%; }
+@property --wal-l-cool-dark        { syntax: "<percentage>"; inherits: true; initial-value: 62%; }
+@property --wal-cx-ground-light    { syntax: "<number>";     inherits: true; initial-value: 0.65; }
+@property --wal-cx-ground-dark     { syntax: "<number>";     inherits: true; initial-value: 1; }
+@property --wal-cx-surface-light   { syntax: "<number>";     inherits: true; initial-value: 0.40; }
+@property --wal-cx-surface-dark    { syntax: "<number>";     inherits: true; initial-value: 1.15; }
+@property --wal-cx-line-light      { syntax: "<number>";     inherits: true; initial-value: 0.75; }
+@property --wal-cx-line-dark       { syntax: "<number>";     inherits: true; initial-value: 0.60; }
+@property --wal-cx-ink-light       { syntax: "<number>";     inherits: true; initial-value: 0.85; }
+@property --wal-cx-ink-dark        { syntax: "<number>";     inherits: true; initial-value: 0.45; }
+
 /* ── Geometry and atmosphere ── */
 @property --wal-radius     { syntax: "<length>";     inherits: true; initial-value: 12px; }
+@property --wal-radius-sm  { syntax: "<length>";     inherits: true; initial-value: 6px; }
+@property --wal-radius-lg  { syntax: "<length>";     inherits: true; initial-value: 18px; }
 @property --wal-elevation  { syntax: "<number>";     inherits: true; initial-value: 1; }
 @property --wal-wash       { syntax: "<number>";     inherits: true; initial-value: 1; }
 @property --wal-hairline   { syntax: "<length>";     inherits: true; initial-value: 1px; }
@@ -104,8 +153,9 @@
      numbers, so rotating one rod keeps the script in tune instead of pulling
      the lead colour away from the rest of the cast. The offsets are not
      arbitrary: +27° is the warm step from a tomato red to a soft apricot, and
-     +209° lands within a few degrees of the accent's exact complement — the
-     structure a hand-mixed mid-century palette tends to converge on anyway.
+     +209° lands 29° past the accent's direct opposite — a split complement,
+     across the wheel without being dead against it. That is the structure a
+     hand-mixed mid-century palette tends to converge on anyway.
      Override either with a plain number to break the relationship. */
   --wal-accent-hue:    25;    --wal-accent-chroma: 0.17;  /* terracotta   */
   --wal-bloom-hue:     calc(var(--wal-accent-hue) + 27);
@@ -313,7 +363,8 @@
 
        --wal-<cue>        the colour. A fill, a rule, a swatch.
        --wal-<cue>-ink    the same cue, shifted to be legible AS TEXT.
-       --wal-<cue>-soft   a 12% wash, for chip and badge backgrounds.
+       --wal-<cue>-soft   a 12% wash (15% for gold), for chip and badge
+                          backgrounds.
        --wal-<cue>-fg     a foreground that is legible ON the cue. Computed,
                           not chosen — see the @supports block below.
      Plus --wal-accent-hover, since the accent is the one interactive cue. */
@@ -357,7 +408,7 @@
     oklch(calc(var(--wal-l-olive-dark)  + var(--wal-ink-shift-dark))  var(--wal-olive-chroma) var(--wal-olive-hue)));
   --wal-olive-soft: color-mix(in oklch, var(--wal-olive) 12%, transparent);
 
-  /* Cue 5 — cool. The complement: the only cue that argues with the others,
+  /* Cue 5 — cool. The split complement: the only cue that argues with the others,
      which is exactly why a catalogue needs one. */
   --wal-cool: light-dark(
     oklch(var(--wal-l-cool-light) var(--wal-cool-chroma) var(--wal-cool-hue)),

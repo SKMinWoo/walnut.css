@@ -48,14 +48,16 @@
      now collapse intrinsically via auto-fit + minmax, which needs no container
      at all and works at any nesting depth.
      Removing container-type also drops the implied `contain: layout`, which had
-     made every grid a containing block for `position: fixed` descendants. */
+     made every grid a containing block for `position: fixed` descendants.
 
-
-  /* ── Gap modifiers ── */
-
-  &.wal-gap-sm { gap: var(--wal-space-sm); }
-  &.wal-gap-md { gap: var(--wal-space-md); }
-  &.wal-gap-lg { gap: var(--wal-space-xl); }
+     Gaps are the .wal-gap-* utilities, which mean the same step on every
+     primitive: .wal-gap-lg is --wal-space-lg on a grid, a stack, a flex row
+     and a cluster alike. This file used to restate them per primitive with
+     different steps (a stack's -lg was space-xl, a cluster's -sm space-xs).
+     Those never applied: the utilities layer comes later, and layer order
+     outranks specificity, so .wal-gap-lg beat .wal-stack.wal-gap-lg. They
+     were deleted rather than revived, because reviving them would silently
+     change the spacing of every page already built on what actually rendered. */
 
 
   /* Column variants. `auto-fit` + `minmax(min(100%, Xrem), 1fr)` caps the count
@@ -116,11 +118,6 @@
     justify-content: flex-end;
     align-items: center;
   }
-
-  /* Gap modifiers (re-use the same class names as grid) */
-  &.wal-gap-sm { gap: var(--wal-space-sm); }
-  &.wal-gap-md { gap: var(--wal-space-md); }
-  &.wal-gap-lg { gap: var(--wal-space-xl); }
 }
 
 
@@ -133,11 +130,6 @@
   display: flex;
   flex-direction: column;
   gap: var(--wal-space-lg);
-
-  /* Size variants */
-  &.wal-gap-sm { gap: var(--wal-space-sm); }
-  &.wal-gap-md { gap: var(--wal-space-md); }
-  &.wal-gap-lg { gap: var(--wal-space-xl); }
 }
 
 
@@ -151,11 +143,6 @@
   flex-wrap: wrap;
   gap: var(--wal-space-sm);
   align-items: center;
-
-  /* Size variants */
-  &.wal-gap-sm { gap: var(--wal-space-xs); }
-  &.wal-gap-md { gap: var(--wal-space-md); }
-  &.wal-gap-lg { gap: var(--wal-space-lg); }
 }
 
 

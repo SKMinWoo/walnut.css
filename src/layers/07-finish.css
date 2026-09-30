@@ -26,6 +26,29 @@
    a different *structure*, not a different value: a card that is a printed
    plate rather than a floating panel, a nav that is a ruled masthead rather
    than a frosted bar.
+
+   ───────────────────────────────────────────────────
+   A PALETTE NEVER SETS WHAT A FINISH SETS
+
+   Every token declared in this file belongs to the finish axis alone. No
+   palette file sets elevation, wash, radius, rule strength or the label
+   voice, however much its mood seems to ask for it — "print does not cast
+   shadows" is the catalogue finish's sentence, not Press's.
+
+   The `finish` layer cannot protect these tokens on its own, for two reasons:
+
+     1. dist/themes/*.css ship unlayered, and unlayered beats every layer. A
+        palette that set --wal-elevation won on <html class="wal-press"
+        data-finish="soft">, so switching finishes changed nothing.
+     2. Even inside @layer tokens, a layer only arbitrates between
+        declarations on the SAME element. <section class="wal-bone"> on a
+        catalogue page declares its own value there, and an element's own
+        declaration beats an inherited one from any layer.
+
+   So orthogonality is kept by ownership, not by order: the two axes compose
+   in any combination and at any depth because they never write the same
+   token. It also keeps `soft` honest — it restates the stock values, which
+   is only the same thing as "no finish" if no palette has moved them.
 ═══════════════════════════════════════════════════ */
 
 
@@ -60,8 +83,11 @@
   /* ── Voice ──
      Wider tracking on labels; the typewriter face carries the catalogue's
      furniture, which is what separates it from a modern dashboard using the
-     same mono for code. */
-  --wal-tracking-label: 0.16em;
+     same mono for code. Only a little wider: Courier Prime is monospaced, so
+     its advance is already generous, and captions multiply this by 1.6.
+     At 0.16em a caption set at 0.26em and read as spaced-out letters rather
+     than as words. */
+  --wal-tracking-label: 0.12em;
   --wal-font-label: var(--wal-font-typewriter);
 }
 
