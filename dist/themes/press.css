@@ -61,7 +61,8 @@
   --wal-l-line-light:      84.6%;
   --wal-l-line-soft-light: 88%;
   --wal-l-text-light:      23.3%;
-  --wal-l-text-soft-light: 50.2%;
+  --wal-l-text-soft-light: 44%;
+  --wal-l-text-muted-light: 48.5%;
 
   --wal-cx-line-light: 1.6;
   --wal-cx-ink-light:  1.0;
@@ -74,6 +75,10 @@
   --wal-l-line-dark:      36.9%;
   --wal-l-line-soft-dark: 32%;
   --wal-l-text-dark:      94.7%;
+  /* The desk sits well above the stock dark ground, so the two quieter inks
+     rise with it to hold 4.5:1 on its lightest stock, surface-2. */
+  --wal-l-text-soft-dark: 80%;
+  --wal-l-text-muted-dark: 72.5%;
   --wal-cx-line-dark:     1.4;
 }
 

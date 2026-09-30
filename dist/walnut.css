@@ -212,9 +212,9 @@ table {
 @property --wal-l-text-light       { syntax: "<percentage>"; inherits: true; initial-value: 20%; }
 @property --wal-l-text-dark        { syntax: "<percentage>"; inherits: true; initial-value: 92%; }
 @property --wal-l-text-soft-light  { syntax: "<percentage>"; inherits: true; initial-value: 42%; }
-@property --wal-l-text-soft-dark   { syntax: "<percentage>"; inherits: true; initial-value: 68%; }
-@property --wal-l-text-muted-light { syntax: "<percentage>"; inherits: true; initial-value: 58%; }
-@property --wal-l-text-muted-dark  { syntax: "<percentage>"; inherits: true; initial-value: 52%; }
+@property --wal-l-text-soft-dark   { syntax: "<percentage>"; inherits: true; initial-value: 72%; }
+@property --wal-l-text-muted-light { syntax: "<percentage>"; inherits: true; initial-value: 49%; }
+@property --wal-l-text-muted-dark  { syntax: "<percentage>"; inherits: true; initial-value: 64%; }
 @property --wal-l-accent-light     { syntax: "<percentage>"; inherits: true; initial-value: 52%; }
 @property --wal-l-accent-dark      { syntax: "<percentage>"; inherits: true; initial-value: 62%; }
 @property --wal-l-bloom-light      { syntax: "<percentage>"; inherits: true; initial-value: 54%; }
@@ -272,7 +272,10 @@ table {
 
   /* ── The ramp: lightness stops ──
      `-light` is the value used when the page is light; `-dark` when it is
-     dark. Neutrals invert across the pair, which is the whole of mode support. */
+     dark. Neutrals invert across the pair, which is the whole of mode support.
+     text-muted is set as far from text as it can go and still clear 4.5:1 on
+     all four grounds, surface-2 included; a palette that moves a ground has
+     to move it too (see press.css). */
   --wal-l-bg-light:          93%;   --wal-l-bg-dark:          16%;
   --wal-l-subtle-light:      90%;   --wal-l-subtle-dark:      19%;
   --wal-l-surface-light:     97%;   --wal-l-surface-dark:     22%;
@@ -280,8 +283,8 @@ table {
   --wal-l-line-light:        84%;   --wal-l-line-dark:        32%;
   --wal-l-line-soft-light:   88%;   --wal-l-line-soft-dark:   28%;
   --wal-l-text-light:        20%;   --wal-l-text-dark:        92%;
-  --wal-l-text-soft-light:   42%;   --wal-l-text-soft-dark:   68%;
-  --wal-l-text-muted-light:  58%;   --wal-l-text-muted-dark:  52%;
+  --wal-l-text-soft-light:   42%;   --wal-l-text-soft-dark:   72%;
+  --wal-l-text-muted-light:  49%;   --wal-l-text-muted-dark:  64%;
 
   /* Cue lightness. Cues do NOT invert — a terracotta stays terracotta — they
      only shift enough to hold their weight against the ground. */

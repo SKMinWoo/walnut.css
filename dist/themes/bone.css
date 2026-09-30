@@ -33,7 +33,7 @@
   --wal-l-line-soft-light: 90%;
   --wal-l-text-light:      18%;
   --wal-l-text-soft-light: 38%;
-  --wal-l-text-muted-light: 56%;
+  --wal-l-text-muted-light: 50.5%;
 }
 
 /* Light-first, stated so it still LOSES to an explicit mode request.
