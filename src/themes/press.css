@@ -87,7 +87,7 @@
 
 /* Paper-first, for the same reason and by the same mechanism as Bone —
    see the note in bone.css about why the :not() chain is required. */
-.wal-press:not(.wal-dark):not([data-theme="dark"]):not([data-theme$="-dark"]),
-[data-theme="press"]:not(.wal-dark) {
+:where(.wal-press:not(.wal-dark):not([data-theme="dark"]):not([data-theme$="-dark"]),
+       [data-theme="press"]:not(.wal-dark)) {
   color-scheme: light;
 }
