@@ -923,6 +923,19 @@
     const CUE_HUES = ["--wal-accent-hue", "--wal-bloom-hue", "--wal-gold-hue", "--wal-olive-hue", "--wal-cool-hue"];
 
     const deg = (h) => ((h % 360) + 360) % 360;
+    const OFFSETS = { bloom: 27, cool: 209 };
+
+    /* The stock value of every registered token, read from the @property
+       rules themselves rather than restated here. The ramp is every
+       registered lightness stop, chroma multiplier and shift. */
+    const STOCK = {};
+    (function walk(rules) {
+      for (const r of rules) {
+        if (typeof CSSPropertyRule !== "undefined" && r instanceof CSSPropertyRule) STOCK[r.name] = r.initialValue;
+        else if (r.cssRules) walk(r.cssRules);
+      }
+    })([...document.styleSheets].flatMap((sheet) => { try { return [...sheet.cssRules]; } catch { return []; } }));
+    const RAMP = Object.keys(STOCK).filter((p) => /^--wal-(l|cx)-|^--wal-(ink|hover)-shift-/.test(p));
     const places = (prop) => (prop.includes("chroma") ? 3 : prop === "--wal-hue" ? 1 : 0);
     const fmt = (prop, v) => v.toFixed(places(prop));
 
@@ -955,6 +968,21 @@
         const n = fmt(hue, val(hue));
         return "  " + decl(hue, 18) + " ".repeat(Math.max(1, 5 - n.length)) + decl(chroma, 21);
       };
+      // Everything else the page is running on that a stock :root would not
+      // give you, so the copied block really does render what is on the
+      // right: a palette's own bloom or cool, its ramp nudges, and a mode it
+      // forces. Bloom and cool are left out while they sit at their stock
+      // offset and chroma, because stating them would pin them.
+      const hue0 = val("--wal-accent-hue");
+      const derived = Object.entries(OFFSETS)
+        .filter(([cue, off]) =>
+          Math.abs(deg(val(`--wal-${cue}-hue`) - hue0) - off) > 0.5 ||
+          Math.abs(val(`--wal-${cue}-chroma`) - parseFloat(STOCK[`--wal-${cue}-chroma`])) > 0.0005)
+        .map(([cue]) => pair(cue));
+      const nudges = RAMP
+        .filter((p) => Math.abs(val(p) - parseFloat(STOCK[p])) > 0.05)
+        .map((p) => `  <span class="demo-k">${p}:</span> <b>${+val(p).toFixed(2)}${STOCK[p].trim().endsWith("%") ? "%" : ""}</b>;`);
+      const scheme = cs.colorScheme.trim();
       generated.innerHTML = [
         ":root {",
         "  " + decl("--wal-hue", 14),
@@ -963,6 +991,9 @@
         pair("accent"),
         pair("gold"),
         pair("olive"),
+        ...derived,
+        ...(nudges.length ? ["", ...nudges] : []),
+        ...(scheme === "light" || scheme === "dark" ? ["", `  <span class="demo-k">color-scheme:</span> <b>${scheme}</b>;`] : []),
         "}",
       ].join("\n");
 
