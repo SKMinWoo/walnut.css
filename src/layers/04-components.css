@@ -694,8 +694,11 @@
       color: var(--wal-text-muted);
     }
     
+    /* A transparent outline, not `none`: forced-colors mode discards the
+       box-shadow ring and paints outlines in a system colour, so this is the
+       one focus indicator that survives there. */
     &:focus {
-      outline: none;
+      outline: 2px solid transparent;
       border-color: var(--wal-accent);
       box-shadow: 0 0 0 3px color-mix(in oklch, var(--wal-accent) 20%, transparent);
     }
