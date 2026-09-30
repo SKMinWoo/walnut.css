@@ -80,6 +80,16 @@ table {
   width: 100%;
 }
 
+/* The `hidden` attribute has to beat every walnut rule that sets `display`.
+   Specificity cannot do it: .wal-flex, .wal-badge and a dozen others outrank
+   the UA sheet's [hidden], and utilities come after every other layer, so
+   `<div class="wal-flex" hidden>` rendered. `!important` inverts layer order,
+   which puts the earliest layer on top — so this sits in reset, and even an
+   unlayered `!important` cannot un-hide the element: remove the attribute,
+   which is what it means. `until-found` is excluded: it hides with
+   content-visibility and must stay findable. */
+[hidden]:not([hidden="until-found"]) { display: none !important; }
+
 /* Remove animations and transitions for users who prefer not to see them */
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
