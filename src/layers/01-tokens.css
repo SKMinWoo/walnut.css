@@ -539,6 +539,11 @@
     oklch(calc(var(--wal-l-line-soft-dark)  + (var(--wal-line-boost) - 1) * 6%)
           calc(var(--wal-chroma) * var(--wal-cx-line-dark))  var(--wal-hue)));
 
+  /* The standard rule, as one shorthand, so a component never states a
+     width of its own and --wal-hairline reaches every border. Declared here
+     rather than in :root because it has to pick up this scope's --wal-line. */
+  --wal-border: var(--wal-hairline) solid var(--wal-line);
+
   /* ── Shadows ──
      --wal-elevation scales the offsets, which is how a flat finish stays flat
      without overriding three separate shadows. */

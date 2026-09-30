@@ -25,10 +25,10 @@
     padding-block: var(--wal-space-sm);
     padding-inline: var(--wal-space-md);
     transition: box-shadow var(--wal-duration) var(--wal-ease), border-bottom var(--wal-duration) var(--wal-ease);
-    border-bottom: 1px solid transparent;
+    border-bottom: var(--wal-hairline) solid transparent;
 
     &.is-scrolled {
-      border-bottom: 1px solid var(--wal-line);
+      border-bottom: var(--wal-border);
       box-shadow: var(--wal-shadow-sm);
     }
 
@@ -179,7 +179,7 @@
     padding: 0.65rem 1.3rem;
     cursor: pointer;
     text-decoration: none;
-    border: 1px solid transparent;
+    border: var(--wal-hairline) solid transparent;
     transition: all var(--wal-duration) var(--wal-ease);
     line-height: 1.2;
 
@@ -247,7 +247,7 @@
   .wal-card {
     background: var(--wal-card-bg);
     color: var(--wal-card-ink);
-    border: 1px solid var(--wal-line);
+    border: var(--wal-border);
     border-radius: var(--wal-radius);
     padding: var(--wal-space-lg);
     position: relative;
@@ -284,7 +284,7 @@
         height: auto;
         aspect-ratio: 16 / 9;
         object-fit: cover;
-        border-bottom: 1px solid var(--wal-line);
+        border-bottom: var(--wal-border);
       }
       
       > *:not(img:first-child) {
@@ -323,7 +323,7 @@
      `@container` from inside it — an element cannot query itself, so those
      rules never matched and the plate never collapsed.
 
-     The dividers are 1px `gap`s filled by each cell's own outline, so the
+     The dividers are hairline `gap`s filled by each cell's own outline, so the
      hairlines land correctly at *any* wrap configuration. That removes the
      whole nth-child border dance the container queries used to need.
 
@@ -334,20 +334,20 @@
      spec. Now the container carries the cell colour and the cells draw their
      own dividers, so unfilled areas are simply blank. `outline` rather than
      `border` because it is drawn outside the box and does not affect layout,
-     so adjacent cells' outlines meet inside the 1px gap. */
+     so adjacent cells' outlines meet inside the gap. */
   .wal-plate {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(min(100%, var(--wal-plate-min, 10rem)), 1fr));
-    gap: 1px;
+    gap: var(--wal-hairline);
     background: var(--wal-plate-bg, var(--wal-card-bg, var(--wal-surface)));
-    border: 1px solid var(--wal-line);
+    border: var(--wal-border);
     border-radius: var(--wal-radius);
     overflow: hidden;
 
     > div {
       background: var(--wal-plate-bg, var(--wal-card-bg, var(--wal-surface)));
       color: var(--wal-card-ink, var(--wal-text));
-      outline: 1px solid var(--wal-line);
+      outline: var(--wal-border);
       padding: var(--wal-space-md);
       display: flex;
       flex-direction: column;
@@ -380,7 +380,7 @@
     padding: var(--wal-space-md);
     background: var(--wal-card-bg);
     color: var(--wal-card-ink);
-    border: 1px solid var(--wal-line);
+    border: var(--wal-border);
     border-radius: var(--wal-radius);
     border-top: var(--wal-metric-border-width, 3px) solid var(--wal-metric-color, var(--wal-accent));
 
@@ -411,7 +411,7 @@
     /* Own token so a consumer with square geometry can flatten chips
        independently of buttons and badges. */
     border-radius: var(--wal-chip-radius, var(--wal-radius-full));
-    border: 1px solid var(--wal-line);
+    border: var(--wal-border);
     background: var(--wal-chip-bg, var(--wal-surface));
     color: var(--wal-chip-color, var(--wal-text-soft));
     white-space: nowrap;
@@ -423,7 +423,7 @@
     flex-direction: column;
     border-radius: var(--wal-radius);
     overflow: hidden;
-    border: 1px solid var(--wal-line);
+    border: var(--wal-border);
     background: var(--wal-card-bg);
     color: var(--wal-card-ink);
 
@@ -464,7 +464,7 @@
       grid-template-columns: 150px 1fr auto;
       gap: var(--wal-space-md);
       padding: var(--wal-space-lg) 0;
-      border-bottom: 1px solid var(--wal-line);
+      border-bottom: var(--wal-border);
       
       &:last-child {
         border-bottom: none;
@@ -543,7 +543,7 @@
       letter-spacing: var(--wal-tracking-label);
       color: var(--wal-text-muted);
       padding: var(--wal-space-md) var(--wal-space-lg);
-      border-bottom: 1px solid var(--wal-line);
+      border-bottom: var(--wal-border);
       font-weight: 400;
     }
 
@@ -552,7 +552,7 @@
       font-size: var(--wal-text-sm);
       color: var(--wal-text);
       padding: var(--wal-space-md) var(--wal-space-lg);
-      border-bottom: 1px solid var(--wal-line-soft);
+      border-bottom: var(--wal-hairline) solid var(--wal-line-soft);
     }
 
     tbody tr:nth-child(even) {
@@ -576,18 +576,18 @@
     &::after {
       content: "";
       flex: 1;
-      border-bottom: 1px solid transparent;
+      border-bottom: var(--wal-hairline) solid transparent;
     }
 
     &::before {
       background: linear-gradient(to left, var(--wal-gold), transparent);
-      height: 1px;
+      height: var(--wal-hairline);
       margin-right: var(--wal-space-md);
     }
 
     &::after {
       background: linear-gradient(to right, var(--wal-gold), transparent);
-      height: 1px;
+      height: var(--wal-hairline);
       margin-left: var(--wal-space-md);
     }
     
@@ -622,7 +622,7 @@
     width: 100%;
     max-width: 320px;
     background: var(--wal-surface);
-    border-left: 1px solid var(--wal-line);
+    border-left: var(--wal-border);
     box-shadow: var(--wal-shadow-lg);
     z-index: 1001;
     transform: translateX(100%);
@@ -667,7 +667,7 @@
         font-family: var(--wal-font-display);
         font-size: var(--wal-text-lg);
         padding: var(--wal-space-sm) 0;
-        border-bottom: 1px solid var(--wal-line-soft);
+        border-bottom: var(--wal-hairline) solid var(--wal-line-soft);
         
         &:hover {
           color: var(--wal-accent-ink);
@@ -682,7 +682,7 @@
   .wal-input {
     width: 100%;
     background: var(--wal-surface);
-    border: 1px solid var(--wal-line-input);
+    border: var(--wal-hairline) solid var(--wal-line-input);
     border-radius: var(--wal-radius-sm);
     padding: 0.65rem 1rem;
     font-family: var(--wal-font-body);
@@ -835,7 +835,7 @@
   /* ═══ 15. Dialog ═══ */
   .wal-dialog {
     padding: var(--wal-space-xl);
-    border: 1px solid var(--wal-line);
+    border: var(--wal-border);
     border-radius: var(--wal-radius-lg);
     background: var(--wal-surface);
     color: var(--wal-text);
@@ -853,7 +853,7 @@
     /* Popover API support */
     &[popover] {
       padding: var(--wal-space-xl);
-      border: 1px solid var(--wal-line);
+      border: var(--wal-border);
       border-radius: var(--wal-radius-lg);
       background: var(--wal-surface);
       color: var(--wal-text);
@@ -903,7 +903,7 @@
     letter-spacing: normal;
     text-transform: none;
     text-align: center;
-    border: 1px solid var(--wal-line);
+    border: var(--wal-border);
     border-radius: var(--wal-radius-sm);
     box-shadow: var(--wal-shadow-sm);
     pointer-events: none;
@@ -985,7 +985,7 @@
   /* ═══ 19. Footer ═══
      End-credits colophon: a top rule and a row of role/value pairs. */
   .wal-footer {
-    border-top: 1px solid var(--wal-line);
+    border-top: var(--wal-border);
     padding-block: var(--wal-space-xl) var(--wal-space-2xl);
   }
 
@@ -1020,7 +1020,7 @@
     width: var(--wal-iconbtn-size, 38px);
     height: var(--wal-iconbtn-size, 38px);
     border-radius: var(--wal-radius-full);
-    border: 1px solid var(--wal-line);
+    border: var(--wal-border);
     background: transparent;
     color: var(--wal-text-soft);
     cursor: pointer;
@@ -1122,7 +1122,7 @@
       overflow: hidden;
       position: relative;
       background: var(--wal-frame-bg, var(--wal-bg-subtle));
-      border: 1px solid var(--wal-line);
+      border: var(--wal-border);
     }
 
     figcaption {
@@ -1177,7 +1177,7 @@
         display: block;
         block-size: var(--wal-script-h, 4.5rem);
         background: var(--wal-cue, var(--wal-surface-2));
-        border: var(--wal-hairline) solid var(--wal-line);
+        border: var(--wal-border);
         border-radius: var(--wal-radius-sm);
       }
 

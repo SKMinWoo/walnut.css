@@ -190,7 +190,7 @@
    ────────────────────────────────────────────── */
 .wal-section {
   padding-block: var(--wal-space-3xl);
-  border-top: 1px solid var(--wal-line);
+  border-top: var(--wal-border);
 
   /* First section on the page needs no border */
   &:first-child,

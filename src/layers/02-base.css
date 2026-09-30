@@ -75,7 +75,7 @@ code, kbd, samp {
   padding: 0.15em 0.4em;
   border-radius: var(--wal-radius-sm);
   background: var(--wal-surface-2);
-  border: 1px solid var(--wal-line-soft);
+  border: var(--wal-hairline) solid var(--wal-line-soft);
 }
 
 pre {
@@ -84,7 +84,7 @@ pre {
   padding: var(--wal-space-lg);
   border-radius: var(--wal-radius);
   background: var(--wal-surface);
-  border: 1px solid var(--wal-line);
+  border: var(--wal-border);
   overflow-x: auto;
   line-height: 1.7;
 
@@ -107,7 +107,7 @@ blockquote {
 /* ─── Horizontal rule ─── */
 hr {
   border: none;
-  border-top: 1px solid var(--wal-line);
+  border-top: var(--wal-border);
   margin: var(--wal-space-xl) 0;
 }
 

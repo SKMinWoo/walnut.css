@@ -239,9 +239,9 @@
 }
 
 /* ── Border & Radius ─────────────────────────────────────────────────── */
-.wal-border { border: 1px solid var(--wal-line); }
-.wal-border-top { border-top: 1px solid var(--wal-line); }
-.wal-border-bottom { border-bottom: 1px solid var(--wal-line); }
+.wal-border { border: var(--wal-border); }
+.wal-border-top { border-top: var(--wal-border); }
+.wal-border-bottom { border-bottom: var(--wal-border); }
 
 .wal-rounded { border-radius: var(--wal-radius); }
 .wal-rounded-sm { border-radius: var(--wal-radius-sm); }

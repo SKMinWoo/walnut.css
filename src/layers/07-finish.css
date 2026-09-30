@@ -131,7 +131,7 @@
   background: var(--wal-bg);
   backdrop-filter: none;
   -webkit-backdrop-filter: none;
-  border-bottom: var(--wal-hairline) solid var(--wal-line);
+  border-bottom: var(--wal-border);
 
   &.is-scrolled {
     box-shadow: none;
@@ -152,13 +152,6 @@
     box-shadow: none;
     border-color: var(--wal-accent);
   }
-}
-
-/* ─── Sections ───
-   Sections are separated by a rule at the top and generous air, and the first
-   one still has none — the same intent as the stock section, drawn flat. */
-[data-finish="catalogue"] .wal-section {
-  border-top-width: var(--wal-hairline);
 }
 
 /* ─── Tables ───
