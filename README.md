@@ -235,9 +235,29 @@ To scope a whole script to a subtree, add `.wal-palette`:
 | Field set | `.wal-field` `.wal-label` `.wal-hint` `.wal-error` | Form furniture |
 | Check / radio | `.wal-check` `.wal-radio` | Native controls themed with `accent-color` |
 | Dialog | `.wal-dialog` | Native dialog + Popover API |
-| Tooltip | `.wal-tooltip` | Inside a `.wal-tooltip-trigger`; shown on hover and keyboard focus |
+| Tooltip | `.wal-tooltip` | Inside a `.wal-tooltip-trigger`; shown on hover and keyboard focus — [markup](#tooltip) |
 | Drawer | `.wal-drawer` | Mobile slide-in panel |
 | Swatch | `.wal-swatch` | Colour swatch display |
+
+### Tooltip
+
+The tip goes inside its trigger, and the trigger points at it:
+
+```html
+<button class="wal-tooltip-trigger" aria-describedby="save-tip">
+  Save
+  <span class="wal-tooltip" id="save-tip" role="tooltip" aria-hidden="true">Saves a draft</span>
+</button>
+```
+
+`aria-hidden` keeps the tip out of the button's accessible *name* ("Save", not "Save Saves a draft"); `aria-describedby` still announces it as the description. The tip shows on hover and on keyboard focus, and stays while the pointer moves onto it. WCAG 1.4.13 also wants it dismissible with Escape, which CSS cannot hear — these two lines do it, once per page:
+
+```js
+addEventListener("keydown", (e) => { if (e.key === "Escape") document.querySelectorAll(".wal-tooltip-trigger:is(:hover, :focus-visible)").forEach((t) => t.classList.add("is-dismissed")); });
+for (const ev of ["pointerover", "focusin"]) addEventListener(ev, () => document.querySelectorAll(".wal-tooltip-trigger.is-dismissed:not(:hover, :focus-within)").forEach((t) => t.classList.remove("is-dismissed")));
+```
+
+It is positioned against the trigger, so an `overflow: hidden` ancestor between them clips it — `.wal-card` is one.
 
 ### The naming trap
 

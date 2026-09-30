@@ -863,20 +863,27 @@
   }
 
   /* ═══ 16. Tooltip ═══
-     The tooltip goes INSIDE its trigger:
+     The tooltip goes INSIDE its trigger, and the trigger points at it:
 
-         <button class="wal-tooltip-trigger">Save
-           <span class="wal-tooltip">Saves a draft</span>
+         <button class="wal-tooltip-trigger" aria-describedby="save-tip">Save
+           <span class="wal-tooltip" id="save-tip" role="tooltip"
+                 aria-hidden="true">Saves a draft</span>
          </button>
 
+     aria-hidden keeps the tip out of the button's NAME, which is computed
+     from its content ("Save Saves a draft" otherwise); aria-describedby
+     still reads it, as the description.
+
      The trigger is its containing block, so plain offsets centre it with no
-     anchor positioning at all. This used to anchor by name, and it had two
-     problems. The only selector that showed it expected the tooltip as the
-     trigger's next sibling, so the markup above never appeared. And every
-     trigger shared one anchor-name, which resolves to the LAST element in the
-     document carrying it, so a second tooltip anywhere on a page pinned the
-     first one to the wrong button. This version needs neither, and works in
-     every browser walnut supports. */
+     anchor positioning — which an earlier version used, sharing one
+     anchor-name that resolved to the LAST trigger on the page. Anything with
+     `overflow: hidden` between the two clips it, .wal-card included.
+
+     WCAG 1.4.13 asks for three things. Hoverable: the tip takes the pointer
+     (no `pointer-events: none`) and ::before bridges the gap, so moving onto
+     it keeps the trigger hovered — it is a descendant. Persistent: it stays
+     until hover and focus leave. Dismissible: Escape, which CSS cannot hear,
+     so it takes two lines of script that add .is-dismissed — see the README. */
   .wal-tooltip-trigger {
     position: relative;
   }
@@ -906,36 +913,49 @@
     border: var(--wal-border);
     border-radius: var(--wal-radius-sm);
     box-shadow: var(--wal-shadow-sm);
-    pointer-events: none;
-    opacity: 0;
-    transition: opacity var(--wal-duration) var(--wal-ease);
     z-index: 1000;
-    
+    /* `visibility`, not just opacity: an invisible tip that still took the
+       pointer would open itself when the cursor crossed where it will be. It
+       flips after the fade, so the fade still plays on the way out. */
+    visibility: hidden;
+    opacity: 0;
+    transition: opacity var(--wal-duration) var(--wal-ease),
+                visibility 0s linear var(--wal-duration);
+
+    /* The hover bridge across the margin. */
     &::before {
       content: "";
       position: absolute;
+      inset-inline: 0;
       bottom: 100%;
-      left: 50%;
-      transform: translateX(-50%);
-      border-width: 5px;
-      border-style: solid;
-      border-color: transparent transparent var(--wal-line) transparent;
+      block-size: var(--wal-space-sm);
     }
-    
+
+    /* The arrow: a square turned 45° with the tip's own fill and two edges. */
     &::after {
       content: "";
       position: absolute;
-      bottom: 100%;
+      top: 0;
       left: 50%;
-      transform: translateX(-50%);
-      border-width: 4px;
-      border-style: solid;
-      border-color: transparent transparent var(--wal-surface-2) transparent;
+      inline-size: 8px;
+      block-size: 8px;
+      translate: -50% -50%;
+      rotate: 45deg;
+      background: var(--wal-surface-2);
+      border-top: var(--wal-border);
+      border-left: var(--wal-border);
     }
   }
-  
+
   .wal-tooltip-trigger:is(:hover, :focus-visible) > .wal-tooltip {
+    visibility: visible;
     opacity: 1;
+    transition-delay: 0s;
+  }
+
+  .wal-tooltip-trigger.is-dismissed > .wal-tooltip {
+    visibility: hidden;
+    opacity: 0;
   }
 
   /* ═══ 17. Eyebrow ═══ */

@@ -735,9 +735,9 @@
                    no JavaScript, and it lands in the top layer for free.</p>
                 <button class="wal-btn wal-btn-secondary" popovertarget="demo-dialog" popovertargetaction="hide">Close</button>
               </div>
-              <button class="wal-btn wal-btn-ghost wal-btn-sm wal-tooltip-trigger">
+              <button class="wal-btn wal-btn-ghost wal-btn-sm wal-tooltip-trigger" type="button" aria-describedby="demo-tip">
                 Hover me
-                <span class="wal-tooltip">A CSS-only tooltip</span>
+                <span class="wal-tooltip" id="demo-tip" role="tooltip" aria-hidden="true">Styled in CSS; Escape dismisses it</span>
               </button>
             </div>
             <div class="wal-timeline">
@@ -1127,6 +1127,12 @@
 
     paint();
     follow();
+
+    /* Tooltips: the two lines WCAG 1.4.13 needs that CSS cannot do. Escape
+       dismisses whatever tip is showing; it re-arms on the next hover or focus. */
+    const TIPS = ".wal-tooltip-trigger";
+    addEventListener("keydown", (e) => { if (e.key === "Escape") document.querySelectorAll(`${TIPS}:is(:hover, :focus-visible)`).forEach((t) => t.classList.add("is-dismissed")); });
+    for (const ev of ["pointerover", "focusin"]) addEventListener(ev, () => document.querySelectorAll(`${TIPS}.is-dismissed:not(:hover, :focus-within)`).forEach((t) => t.classList.remove("is-dismissed")));
 
     /* Masthead hairline appears once the page has moved. */
     const nav = document.querySelector(".wal-nav");
