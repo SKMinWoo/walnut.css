@@ -105,7 +105,7 @@
       calc(var(--wal-cue-in-stagger, 0.14s) * 4),
       calc(var(--wal-cue-in-stagger, 0.14s) * 5),
       calc(var(--wal-cue-in-stagger, 0.14s) * 6);
-    animation-timing-function: var(--wal-ease, cubic-bezier(0.16, 1, 0.3, 1));
+    animation-timing-function: var(--wal-ease);
     animation-fill-mode: backwards;
   }
 
@@ -160,7 +160,7 @@
   .wal-reveal-left,
   .wal-reveal-right,
   .wal-reveal-scale {
-    animation-timing-function: var(--wal-ease, cubic-bezier(0.2, 0.8, 0.2, 1));
+    animation-timing-function: var(--wal-ease);
     animation-fill-mode: both;
     /* Use view timeline for scroll-driven animations */
     animation-timeline: view();
@@ -235,8 +235,8 @@
   /* Cinematic cross-fade for old/new view transitions */
   ::view-transition-old(*),
   ::view-transition-new(*) {
-    animation-duration: var(--wal-duration-slow, 0.8s);
-    animation-timing-function: var(--wal-ease, cubic-bezier(0.4, 0, 0.2, 1));
+    animation-duration: var(--wal-duration-slow);
+    animation-timing-function: var(--wal-ease);
   }
 
   ::view-transition-old(*) {
@@ -298,15 +298,15 @@
   /* ── Utility Animation Classes ─────────────────────────────────────── */
 
   .wal-animate-drift {
-    animation: wal-drift 4s var(--wal-ease, ease-in-out) infinite;
+    animation: wal-drift 4s var(--wal-ease) infinite;
   }
 
   .wal-animate-pulse {
-    animation: wal-pulse 3s var(--wal-ease, ease-in-out) infinite;
+    animation: wal-pulse 3s var(--wal-ease) infinite;
   }
 
   .wal-animate-breathe {
-    animation: wal-breathe 5s var(--wal-ease, ease-in-out) infinite;
+    animation: wal-breathe 5s var(--wal-ease) infinite;
   }
 
   /* Animation delays */

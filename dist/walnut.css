@@ -554,13 +554,12 @@ table {
   --wal-cue-5: var(--wal-cool);
 
   /* ── Functional ──
-     Off-script by design: success/warning/danger must survive any rotation of
+     Off-script by design: success and danger must survive any rotation of
      the cues, so they are anchored to fixed hues and only ride the shared cue
      lightness stops. Chroma is a touch lower than a cue's so they read as
      signal rather than as part of the palette. Danger is set as type (.wal-error)
      far more than as a fill, so it rides the accent's ink stop, not its fill. */
   --wal-success: light-dark(oklch(var(--wal-l-olive-light) 0.14 145), oklch(var(--wal-l-gold-dark) 0.16 145));
-  --wal-warning: light-dark(oklch(var(--wal-l-gold-light)  0.14 85),  oklch(var(--wal-l-gold-dark) 0.15 85));
   --wal-danger:  light-dark(oklch(calc(var(--wal-l-accent-light) + var(--wal-ink-shift-light)) 0.18 25),
                             oklch(calc(var(--wal-l-accent-dark)  + var(--wal-ink-shift-dark))  0.20 25));
 
@@ -1119,7 +1118,7 @@ html::-webkit-scrollbar-thumb:hover { background: var(--wal-accent); }
        the page — which is what a fixed height plus nowrap did. Nothing is
        hidden and no JavaScript is involved; .wal-drawer is still there if you
        want a real mobile menu instead. */
-    min-height: var(--wal-nav-h, 64px);
+    min-height: var(--wal-nav-h);
     display: flex;
     flex-wrap: wrap;
     align-items: center;
@@ -1442,14 +1441,14 @@ html::-webkit-scrollbar-thumb:hover { background: var(--wal-accent); }
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(min(100%, var(--wal-plate-min, 10rem)), 1fr));
     gap: var(--wal-hairline);
-    background: var(--wal-plate-bg, var(--wal-card-bg, var(--wal-surface)));
+    background: var(--wal-plate-bg, var(--wal-card-bg));
     border: var(--wal-border);
     border-radius: var(--wal-radius);
     overflow: hidden;
 
     > div {
-      background: var(--wal-plate-bg, var(--wal-card-bg, var(--wal-surface)));
-      color: var(--wal-card-ink, var(--wal-text));
+      background: var(--wal-plate-bg, var(--wal-card-bg));
+      color: var(--wal-card-ink);
       outline: var(--wal-border);
       padding: var(--wal-space-md);
       display: flex;
@@ -1460,7 +1459,7 @@ html::-webkit-scrollbar-thumb:hover { background: var(--wal-accent); }
     dt {
       font-family: var(--wal-font-label);
       font-size: var(--wal-text-xs);
-      color: var(--wal-card-ink-muted, var(--wal-text-muted));
+      color: var(--wal-card-ink-muted);
       text-transform: uppercase;
       letter-spacing: var(--wal-tracking-label);
       margin: 0;
@@ -1470,7 +1469,7 @@ html::-webkit-scrollbar-thumb:hover { background: var(--wal-accent); }
       font-family: var(--wal-font-display);
       font-size: var(--wal-text-lg);
       font-weight: 700;
-      color: var(--wal-card-ink, var(--wal-text));
+      color: var(--wal-card-ink);
       margin: 0;
     }
   }
@@ -1952,17 +1951,6 @@ html::-webkit-scrollbar-thumb:hover { background: var(--wal-accent); }
       backdrop-filter: blur(8px);
       -webkit-backdrop-filter: blur(8px);
     }
-    
-    /* Popover API support */
-    &[popover] {
-      padding: var(--wal-space-xl);
-      border: var(--wal-border);
-      border-radius: var(--wal-radius-lg);
-      background: var(--wal-surface);
-      color: var(--wal-text);
-      box-shadow: var(--wal-shadow-lg);
-      max-width: 500px;
-    }
   }
 
   /* ═══ 16. Tooltip ═══
@@ -2086,21 +2074,21 @@ html::-webkit-scrollbar-thumb:hover { background: var(--wal-accent); }
       width: 8px;
       height: 8px;
       border-radius: 50%;
-      background-color: var(--wal-success, #10b981);
-      box-shadow: 0 0 0 0 color-mix(in oklch, var(--wal-success, #10b981) 70%, transparent);
+      background-color: var(--wal-success);
+      box-shadow: 0 0 0 0 color-mix(in oklch, var(--wal-success) 70%, transparent);
       animation: wal-ping 2s infinite var(--wal-ease);
     }
   }
 
   @keyframes wal-ping {
     0% {
-      box-shadow: 0 0 0 0 color-mix(in oklch, var(--wal-success, #10b981) 70%, transparent);
+      box-shadow: 0 0 0 0 color-mix(in oklch, var(--wal-success) 70%, transparent);
     }
     70% {
-      box-shadow: 0 0 0 6px color-mix(in oklch, var(--wal-success, #10b981) 0%, transparent);
+      box-shadow: 0 0 0 6px color-mix(in oklch, var(--wal-success) 0%, transparent);
     }
     100% {
-      box-shadow: 0 0 0 0 color-mix(in oklch, var(--wal-success, #10b981) 0%, transparent);
+      box-shadow: 0 0 0 0 color-mix(in oklch, var(--wal-success) 0%, transparent);
     }
   }
 
@@ -2481,7 +2469,7 @@ html::-webkit-scrollbar-thumb:hover { background: var(--wal-accent); }
 
    So orthogonality is kept by ownership, not by order: the two axes compose
    in any combination and at any depth because they never write the same
-   token. It also keeps `soft` honest — it restates the stock values, which
+   token. It also keeps `soft` honest — it resets to the stock values, which
    is only the same thing as "no finish" if no palette has moved them.
 ═══════════════════════════════════════════════════ */
 
@@ -2523,25 +2511,20 @@ html::-webkit-scrollbar-thumb:hover { background: var(--wal-accent); }
      than as words. */
   --wal-tracking-label: 0.12em;
   --wal-font-label: var(--wal-font-typewriter);
-}
 
-/* Hairlines are the catalogue's entire visual language, so they have to read
-   on any palette, including the soft ones. This turns the knob rather than
-   overriding --wal-line: the finish must not own a colour, or it stops being
-   orthogonal to the palette and a light rule ends up hard-coded onto a dark
-   theme. --wal-line-boost is consumed inside the derivation in 01-tokens.css,
-   and reaches it because both land on the same element — custom property
-   substitution uses the winning value on that element, whichever layer
-   declared it. */
-[data-finish="catalogue"] {
+  /* ── Rules ──
+     Hairlines are the catalogue's entire visual language, so they have to
+     read on any palette, including the soft ones. This turns the knob rather
+     than overriding --wal-line: the finish must not own a colour, or it stops
+     being orthogonal to the palette and a light rule ends up hard-coded onto
+     a dark theme. --wal-line-boost is consumed by the rule in 01-tokens.css
+     that lists [data-finish], so it re-derives on this element. */
   --wal-line-boost: 1.7;
-}
 
-/* ─── Headings ───
-   Tighter and quieter. A catalogue's hierarchy comes from rules and numbering,
-   not from typographic shouting, so headings lose a weight step and gain
-   balanced wrapping. */
-[data-finish="catalogue"] {
+  /* ─── Headings ───
+     Tighter and quieter. A catalogue's hierarchy comes from rules and
+     numbering, not from typographic shouting, so headings lose a weight step
+     and gain balanced wrapping. */
   h1, h2, h3, h4 {
     font-weight: 600;
     text-wrap: balance;
@@ -2579,8 +2562,6 @@ html::-webkit-scrollbar-thumb:hover { background: var(--wal-accent); }
    geometry. Keeping a translate on hover is what makes an otherwise correct
    catalogue still feel like a SaaS dashboard. */
 [data-finish="catalogue"] .wal-card {
-  border-color: var(--wal-line);
-
   &:hover {
     transform: none;
     box-shadow: none;
@@ -2604,11 +2585,7 @@ html::-webkit-scrollbar-thumb:hover { background: var(--wal-accent); }
 [data-finish="catalogue"] .wal-btn {
   letter-spacing: 0.04em;
 
-  &.wal-btn-secondary {
-    border-color: var(--wal-line);
-
-    &:hover { background: var(--wal-accent-soft); }
-  }
+  &.wal-btn-secondary:hover { background: var(--wal-accent-soft); }
 
   &.wal-btn-primary:hover {
     transform: none;
@@ -2627,20 +2604,23 @@ html::-webkit-scrollbar-thumb:hover { background: var(--wal-accent); }
 
 /* ═══ SOFT ═══
    The stock finish, named so it can be asked for explicitly — useful when a
-   subtree should opt out of an inherited catalogue finish. Restates the
-   defaults from 01-tokens.css rather than unsetting them, because `unset` on a
-   custom property would fall back to the registered initial value and lose a
-   consumer's own override. */
+   subtree should opt out of an inherited catalogue finish. It cannot simply
+   `unset` them: these tokens inherit, so unset means inherit, which is the
+   catalogue it is opting out of. `initial` is the next best thing. On a
+   registered token it is the registered stock value (01-tokens.css), so the
+   numbers are not restated here; on the unregistered per-component radii it
+   is "no value", and each component falls back to its pill. The two tokens
+   that are neither are stated. */
 [data-finish="soft"] {
-  --wal-radius:       12px;
-  --wal-radius-sm:    6px;
-  --wal-radius-lg:    18px;
-  --wal-btn-radius:   var(--wal-radius-full);
-  --wal-chip-radius:  var(--wal-radius-full);
-  --wal-badge-radius: var(--wal-radius-full);
-  --wal-elevation:    1;
-  --wal-wash:         1;
-  --wal-line-boost:   1;
+  --wal-radius:       initial;
+  --wal-radius-sm:    initial;
+  --wal-radius-lg:    initial;
+  --wal-btn-radius:   initial;
+  --wal-chip-radius:  initial;
+  --wal-badge-radius: initial;
+  --wal-elevation:    initial;
+  --wal-wash:         initial;
+  --wal-line-boost:   initial;
   --wal-tracking-label: 0.1em;
   --wal-font-label:   var(--wal-font-mono);
 }
@@ -3030,7 +3010,7 @@ html::-webkit-scrollbar-thumb:hover { background: var(--wal-accent); }
       calc(var(--wal-cue-in-stagger, 0.14s) * 4),
       calc(var(--wal-cue-in-stagger, 0.14s) * 5),
       calc(var(--wal-cue-in-stagger, 0.14s) * 6);
-    animation-timing-function: var(--wal-ease, cubic-bezier(0.16, 1, 0.3, 1));
+    animation-timing-function: var(--wal-ease);
     animation-fill-mode: backwards;
   }
 
@@ -3085,7 +3065,7 @@ html::-webkit-scrollbar-thumb:hover { background: var(--wal-accent); }
   .wal-reveal-left,
   .wal-reveal-right,
   .wal-reveal-scale {
-    animation-timing-function: var(--wal-ease, cubic-bezier(0.2, 0.8, 0.2, 1));
+    animation-timing-function: var(--wal-ease);
     animation-fill-mode: both;
     /* Use view timeline for scroll-driven animations */
     animation-timeline: view();
@@ -3160,8 +3140,8 @@ html::-webkit-scrollbar-thumb:hover { background: var(--wal-accent); }
   /* Cinematic cross-fade for old/new view transitions */
   ::view-transition-old(*),
   ::view-transition-new(*) {
-    animation-duration: var(--wal-duration-slow, 0.8s);
-    animation-timing-function: var(--wal-ease, cubic-bezier(0.4, 0, 0.2, 1));
+    animation-duration: var(--wal-duration-slow);
+    animation-timing-function: var(--wal-ease);
   }
 
   ::view-transition-old(*) {
@@ -3223,15 +3203,15 @@ html::-webkit-scrollbar-thumb:hover { background: var(--wal-accent); }
   /* ── Utility Animation Classes ─────────────────────────────────────── */
 
   .wal-animate-drift {
-    animation: wal-drift 4s var(--wal-ease, ease-in-out) infinite;
+    animation: wal-drift 4s var(--wal-ease) infinite;
   }
 
   .wal-animate-pulse {
-    animation: wal-pulse 3s var(--wal-ease, ease-in-out) infinite;
+    animation: wal-pulse 3s var(--wal-ease) infinite;
   }
 
   .wal-animate-breathe {
-    animation: wal-breathe 5s var(--wal-ease, ease-in-out) infinite;
+    animation: wal-breathe 5s var(--wal-ease) infinite;
   }
 
   /* Animation delays */

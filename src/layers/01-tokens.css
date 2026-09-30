@@ -439,13 +439,12 @@
   --wal-cue-5: var(--wal-cool);
 
   /* ── Functional ──
-     Off-script by design: success/warning/danger must survive any rotation of
+     Off-script by design: success and danger must survive any rotation of
      the cues, so they are anchored to fixed hues and only ride the shared cue
      lightness stops. Chroma is a touch lower than a cue's so they read as
      signal rather than as part of the palette. Danger is set as type (.wal-error)
      far more than as a fill, so it rides the accent's ink stop, not its fill. */
   --wal-success: light-dark(oklch(var(--wal-l-olive-light) 0.14 145), oklch(var(--wal-l-gold-dark) 0.16 145));
-  --wal-warning: light-dark(oklch(var(--wal-l-gold-light)  0.14 85),  oklch(var(--wal-l-gold-dark) 0.15 85));
   --wal-danger:  light-dark(oklch(calc(var(--wal-l-accent-light) + var(--wal-ink-shift-light)) 0.18 25),
                             oklch(calc(var(--wal-l-accent-dark)  + var(--wal-ink-shift-dark))  0.20 25));
 

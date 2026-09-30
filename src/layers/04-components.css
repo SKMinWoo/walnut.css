@@ -16,7 +16,7 @@
        the page — which is what a fixed height plus nowrap did. Nothing is
        hidden and no JavaScript is involved; .wal-drawer is still there if you
        want a real mobile menu instead. */
-    min-height: var(--wal-nav-h, 64px);
+    min-height: var(--wal-nav-h);
     display: flex;
     flex-wrap: wrap;
     align-items: center;
@@ -339,14 +339,14 @@
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(min(100%, var(--wal-plate-min, 10rem)), 1fr));
     gap: var(--wal-hairline);
-    background: var(--wal-plate-bg, var(--wal-card-bg, var(--wal-surface)));
+    background: var(--wal-plate-bg, var(--wal-card-bg));
     border: var(--wal-border);
     border-radius: var(--wal-radius);
     overflow: hidden;
 
     > div {
-      background: var(--wal-plate-bg, var(--wal-card-bg, var(--wal-surface)));
-      color: var(--wal-card-ink, var(--wal-text));
+      background: var(--wal-plate-bg, var(--wal-card-bg));
+      color: var(--wal-card-ink);
       outline: var(--wal-border);
       padding: var(--wal-space-md);
       display: flex;
@@ -357,7 +357,7 @@
     dt {
       font-family: var(--wal-font-label);
       font-size: var(--wal-text-xs);
-      color: var(--wal-card-ink-muted, var(--wal-text-muted));
+      color: var(--wal-card-ink-muted);
       text-transform: uppercase;
       letter-spacing: var(--wal-tracking-label);
       margin: 0;
@@ -367,7 +367,7 @@
       font-family: var(--wal-font-display);
       font-size: var(--wal-text-lg);
       font-weight: 700;
-      color: var(--wal-card-ink, var(--wal-text));
+      color: var(--wal-card-ink);
       margin: 0;
     }
   }
@@ -849,17 +849,6 @@
       backdrop-filter: blur(8px);
       -webkit-backdrop-filter: blur(8px);
     }
-    
-    /* Popover API support */
-    &[popover] {
-      padding: var(--wal-space-xl);
-      border: var(--wal-border);
-      border-radius: var(--wal-radius-lg);
-      background: var(--wal-surface);
-      color: var(--wal-text);
-      box-shadow: var(--wal-shadow-lg);
-      max-width: 500px;
-    }
   }
 
   /* ═══ 16. Tooltip ═══
@@ -983,21 +972,21 @@
       width: 8px;
       height: 8px;
       border-radius: 50%;
-      background-color: var(--wal-success, #10b981);
-      box-shadow: 0 0 0 0 color-mix(in oklch, var(--wal-success, #10b981) 70%, transparent);
+      background-color: var(--wal-success);
+      box-shadow: 0 0 0 0 color-mix(in oklch, var(--wal-success) 70%, transparent);
       animation: wal-ping 2s infinite var(--wal-ease);
     }
   }
 
   @keyframes wal-ping {
     0% {
-      box-shadow: 0 0 0 0 color-mix(in oklch, var(--wal-success, #10b981) 70%, transparent);
+      box-shadow: 0 0 0 0 color-mix(in oklch, var(--wal-success) 70%, transparent);
     }
     70% {
-      box-shadow: 0 0 0 6px color-mix(in oklch, var(--wal-success, #10b981) 0%, transparent);
+      box-shadow: 0 0 0 6px color-mix(in oklch, var(--wal-success) 0%, transparent);
     }
     100% {
-      box-shadow: 0 0 0 0 color-mix(in oklch, var(--wal-success, #10b981) 0%, transparent);
+      box-shadow: 0 0 0 0 color-mix(in oklch, var(--wal-success) 0%, transparent);
     }
   }
 

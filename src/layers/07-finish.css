@@ -47,7 +47,7 @@
 
    So orthogonality is kept by ownership, not by order: the two axes compose
    in any combination and at any depth because they never write the same
-   token. It also keeps `soft` honest — it restates the stock values, which
+   token. It also keeps `soft` honest — it resets to the stock values, which
    is only the same thing as "no finish" if no palette has moved them.
 ═══════════════════════════════════════════════════ */
 
@@ -89,25 +89,20 @@
      than as words. */
   --wal-tracking-label: 0.12em;
   --wal-font-label: var(--wal-font-typewriter);
-}
 
-/* Hairlines are the catalogue's entire visual language, so they have to read
-   on any palette, including the soft ones. This turns the knob rather than
-   overriding --wal-line: the finish must not own a colour, or it stops being
-   orthogonal to the palette and a light rule ends up hard-coded onto a dark
-   theme. --wal-line-boost is consumed inside the derivation in 01-tokens.css,
-   and reaches it because both land on the same element — custom property
-   substitution uses the winning value on that element, whichever layer
-   declared it. */
-[data-finish="catalogue"] {
+  /* ── Rules ──
+     Hairlines are the catalogue's entire visual language, so they have to
+     read on any palette, including the soft ones. This turns the knob rather
+     than overriding --wal-line: the finish must not own a colour, or it stops
+     being orthogonal to the palette and a light rule ends up hard-coded onto
+     a dark theme. --wal-line-boost is consumed by the rule in 01-tokens.css
+     that lists [data-finish], so it re-derives on this element. */
   --wal-line-boost: 1.7;
-}
 
-/* ─── Headings ───
-   Tighter and quieter. A catalogue's hierarchy comes from rules and numbering,
-   not from typographic shouting, so headings lose a weight step and gain
-   balanced wrapping. */
-[data-finish="catalogue"] {
+  /* ─── Headings ───
+     Tighter and quieter. A catalogue's hierarchy comes from rules and
+     numbering, not from typographic shouting, so headings lose a weight step
+     and gain balanced wrapping. */
   h1, h2, h3, h4 {
     font-weight: 600;
     text-wrap: balance;
@@ -145,8 +140,6 @@
    geometry. Keeping a translate on hover is what makes an otherwise correct
    catalogue still feel like a SaaS dashboard. */
 [data-finish="catalogue"] .wal-card {
-  border-color: var(--wal-line);
-
   &:hover {
     transform: none;
     box-shadow: none;
@@ -170,11 +163,7 @@
 [data-finish="catalogue"] .wal-btn {
   letter-spacing: 0.04em;
 
-  &.wal-btn-secondary {
-    border-color: var(--wal-line);
-
-    &:hover { background: var(--wal-accent-soft); }
-  }
+  &.wal-btn-secondary:hover { background: var(--wal-accent-soft); }
 
   &.wal-btn-primary:hover {
     transform: none;
@@ -193,20 +182,23 @@
 
 /* ═══ SOFT ═══
    The stock finish, named so it can be asked for explicitly — useful when a
-   subtree should opt out of an inherited catalogue finish. Restates the
-   defaults from 01-tokens.css rather than unsetting them, because `unset` on a
-   custom property would fall back to the registered initial value and lose a
-   consumer's own override. */
+   subtree should opt out of an inherited catalogue finish. It cannot simply
+   `unset` them: these tokens inherit, so unset means inherit, which is the
+   catalogue it is opting out of. `initial` is the next best thing. On a
+   registered token it is the registered stock value (01-tokens.css), so the
+   numbers are not restated here; on the unregistered per-component radii it
+   is "no value", and each component falls back to its pill. The two tokens
+   that are neither are stated. */
 [data-finish="soft"] {
-  --wal-radius:       12px;
-  --wal-radius-sm:    6px;
-  --wal-radius-lg:    18px;
-  --wal-btn-radius:   var(--wal-radius-full);
-  --wal-chip-radius:  var(--wal-radius-full);
-  --wal-badge-radius: var(--wal-radius-full);
-  --wal-elevation:    1;
-  --wal-wash:         1;
-  --wal-line-boost:   1;
+  --wal-radius:       initial;
+  --wal-radius-sm:    initial;
+  --wal-radius-lg:    initial;
+  --wal-btn-radius:   initial;
+  --wal-chip-radius:  initial;
+  --wal-badge-radius: initial;
+  --wal-elevation:    initial;
+  --wal-wash:         initial;
+  --wal-line-boost:   initial;
   --wal-tracking-label: 0.1em;
   --wal-font-label:   var(--wal-font-mono);
 }
