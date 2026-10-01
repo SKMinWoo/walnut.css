@@ -1,10 +1,11 @@
 /* ═══════════════════════════════════════════════════
    03 — LAYOUT
-   Composable layout primitives driven by container
-   queries. Every component that needs responsive
-   awareness becomes its own inline-size container.
-   No media queries for component sizing — only
-   @container.  Pure CSS, zero JavaScript.
+   Composable layout primitives that respond to the
+   space they are given, not to the viewport: grids
+   shed columns via auto-fit + minmax, flex rows wrap
+   on their bases. .wal-wrap is an inline-size
+   container for your own @container rules; nothing
+   here queries it. Pure CSS, zero JavaScript.
 ═══════════════════════════════════════════════════ */
 
 
@@ -86,8 +87,6 @@
   }
 }
 
-/* Column collapse is intrinsic (see .wal-grid above) — no container queries. */
-
 
 /* ─── .wal-flex ──────────────────────────────────
    Flexbox row with gap. Composable modifiers for
@@ -148,21 +147,17 @@
 
 /* ─── .wal-sidebar ───────────────────────────────
    Two-panel layout: one fixed-width sidebar, one
-   fluid content area.  Wraps to stacked column at
-   narrow container widths via container query.
-   Uses the "flexbox holy grail" trick with
-   flex-basis + flex-grow for the fluid side.
+   fluid content area. Wraps to a stacked column
+   once the content panel can no longer hold its
+   55% floor — flex-basis + flex-grow, no query.
    ────────────────────────────────────────────── */
 .wal-sidebar {
   display: flex;
   flex-wrap: wrap;
   gap: var(--wal-space-xl);
 
-  /* Not a query container, for the same reason as .wal-grid: the old
-     `@container sidebar` block below queried this element from within itself
-     and never matched. It was also redundant — flex-wrap plus the basis/grow
-     pair below already collapses to a single column once the content panel
-     can no longer hold its 55% floor. */
+  /* Not a query container, for the same reason as .wal-grid: an element
+     cannot query itself. */
 
   /* Sidebar panel (first child by convention) */
   & > :first-child {
@@ -178,8 +173,6 @@
     min-width: 55%;
   }
 }
-
-/* Collapse is intrinsic (flex-wrap + flex-basis) — no container query needed. */
 
 
 /* ─── .wal-section ───────────────────────────────

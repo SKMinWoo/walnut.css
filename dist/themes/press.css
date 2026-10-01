@@ -51,9 +51,10 @@
 
   /* ── Ramp nudges ──
      Paper is warmer and the ink deeper than the stock ramp: this is print, not
-     a screen. The hairline multipliers run high because a catalogue is drawn
-     in rules — a hairline you cannot see is a hairline that is not doing its
-     job of dividing the page. */
+     a screen. The hairline chroma multipliers run high so the rules read as
+     warm printed ink rather than grey dividers. They scale a rule's colour,
+     not its strength — strength is --wal-line-boost, which the catalogue
+     finish owns. */
   --wal-l-bg-light:        93%;
   --wal-l-subtle-light:    90.5%;
   --wal-l-surface-light:   97.6%;

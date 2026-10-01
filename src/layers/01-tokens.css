@@ -10,8 +10,8 @@
        FIVE CUES           accent · bloom · gold · olive · cool. Each is a
                            hue + a chroma. Everything else is derived.
 
-   That is the whole input surface. A theme file is those numbers and nothing
-   else; see src/themes/*.css, which are ~30 lines each.
+   That is the whole input surface. A theme file is those numbers, plus any
+   ramp stops it nudges, and nothing else; see src/themes/*.css.
 
    ───────────────────────────────────────────────────
    HOW THE DERIVATION WORKS, AND WHY THERE IS ONLY ONE OF IT
@@ -19,9 +19,10 @@
    Every colour below is declared exactly once, as `light-dark(light, dark)`.
    Two properties of CSS make that sufficient:
 
-     1. A custom property's value is stored as an unsubstituted token stream.
-        `light-dark()` is therefore NOT resolved where it is declared — it is
-        resolved where the token is finally *used*.
+     1. A custom property's computed value is a token stream. Its var()s
+        are substituted where it is declared, but a `light-dark()` in it is
+        just more tokens, so it is NOT resolved there — it is resolved where
+        the token is finally *used*.
      2. `light-dark()` picks its branch from the used element's `color-scheme`,
         which inherits.
 
@@ -348,13 +349,14 @@
      and friends rebind --wal-text* from these, so every descendant flips with
      the surface and no per-child override is needed.
 
-     These MUST be independent expressions, never `var(--wal-text)`. Custom
-     properties inherit as unsubstituted token streams, so pointing
-     --wal-card-ink at --wal-text here while .wal-card points --wal-text at
-     --wal-card-ink is a substitution cycle: both resolve invalid and every
-     card loses its text colour. It reads as a random rendering bug and is
-     painful to trace. Repeating the expression is the cheap price of not
-     having that bug. */
+     These MUST be independent expressions, never `var(--wal-text)`. On the
+     common path an alias would work, because the var() is substituted here
+     before .wal-card rebinds anything. But an element matching both this
+     rule and .wal-card — a card that is also a .wal-palette — would declare
+     --wal-card-ink: var(--wal-text) and --wal-text: var(--wal-card-ink) on
+     itself: a cycle, both invalid, and the card loses its text colour. It
+     reads as a random rendering bug and is painful to trace. Repeating the
+     expression is the cheap price of not having that bug. */
   --wal-card-bg: light-dark(
     oklch(var(--wal-l-surface-light) calc(var(--wal-chroma) * var(--wal-cx-surface-light)) var(--wal-hue)),
     oklch(var(--wal-l-surface-dark)  calc(var(--wal-chroma) * var(--wal-cx-surface-dark))  var(--wal-hue)));

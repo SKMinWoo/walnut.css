@@ -130,7 +130,7 @@ Three different syntaxes for three different questions, so it is always obvious 
 | 🌅 Dusk | `.wal-dusk` | Mountain sunset, purple twilight, lantern glow. |
 | 📜 Bone | `.wal-bone` | Sunlit linen, watercolour, pressed flowers. Light-first. |
 
-Each palette file is about thirty lines, because a palette file is a colour script and nothing else.
+A palette file is its colour script — a ground rod, some cues, and any ramp stops it nudges — and nothing else.
 
 ### Mode — by attribute
 
@@ -142,7 +142,7 @@ Mode is a real `color-scheme`, not a class convention, so native form controls, 
 <html>                      <!-- follows the system -->
 ```
 
-Every colour is declared once as `light-dark(light, dark)`. Custom properties store an unsubstituted token stream, so that function is not resolved where it is declared — it is resolved where the token is *used*, against the used element's `color-scheme`. One declaration therefore covers dark, light, **and any subtree that asks for the other one**:
+Every colour is declared once as `light-dark(light, dark)`. A custom property's `var()`s are substituted where it is declared, but a `light-dark()` inside it is just more tokens, so it is not resolved there — it is resolved where the token is *used*, against the used element's `color-scheme`. One declaration therefore covers dark, light, **and any subtree that asks for the other one**:
 
 ```html
 <section class="wal-light">
