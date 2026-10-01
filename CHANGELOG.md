@@ -3,14 +3,79 @@
 ## Unreleased
 
 Motion that moves the colour script itself, rather than the elements on top
-of it.
+of it — and a contrast pass that brings every text pair in every palette and
+mode to WCAG AA.
+
+### Changed (breaking)
+
+- **Tooltip markup.** The tip now goes *inside* its trigger, and the trigger
+  points at it:
+
+  ```html
+  <button class="wal-tooltip-trigger" aria-describedby="t1">Save
+    <span class="wal-tooltip" id="t1" role="tooltip" aria-hidden="true">Saves a draft</span>
+  </button>
+  ```
+
+  The sibling form, the undocumented `:popover-open` form and anchor
+  positioning are gone. Escape-to-dismiss needs two lines of script; see the
+  README. An `overflow: hidden` ancestor (`.wal-card` is one) clips it.
+
+- **Removed the per-primitive gap modifiers** (`.wal-stack.wal-gap-lg` and
+  friends in the layout layer). They never applied: the `.wal-gap-*`
+  utilities sit in a later layer, and layer order outranks specificity, so no
+  rendered spacing changes — but a selector that targeted them is gone.
+
+- **The ramp is typed.** Lightness stops must be a `<percentage>`, chroma
+  multipliers a `<number>`, the ink and hover shifts a `<percentage>`, and
+  `--wal-radius-sm` / `-lg` a `<length>`. A wrongly-typed value (`0.93` for a
+  stop, `6` for a radius) used to flow through; it now falls back to the stock
+  value.
+
+- **Press and Bone no longer set `--wal-elevation` or `--wal-wash`.** Without a
+  finish they get the stock shadow and wash. For the old look put
+  `data-finish="catalogue"` on Press, or `--wal-elevation: 0.75` on Bone. See
+  Fixed.
+
+- **Catalogue label tracking 0.16em → 0.12em.** Courier Prime is monospaced, so
+  its advance is already wide, and captions multiply the token by 1.6 — at
+  0.16em they set at 0.26em and read as spaced-out letters.
+
+- **The contrast pass moves colours.** Hues, chromas and palette character are
+  unchanged; these lightness stops moved, by the least that clears AA:
+
+  | Stop | Light | Dark |
+  |------|-------|------|
+  | `--wal-l-text-muted` | 58% → 49% | 52% → 64% |
+  | `--wal-l-text-soft` | — | 68% → 72% |
+  | `--wal-l-bloom` | 58% → 54% | — |
+  | `--wal-l-gold` | 62% → 60% | — |
+  | `--wal-l-olive` | — | 55% → 60% |
+
+  Press: soft 50.2% → 44% and muted 48.5% on paper, soft 80% / muted 72.5% /
+  ink shift 15% on the desk. Bone: muted 56% → 50.5%. Forest: gold 59% on
+  paper. Dusk: olive 58% → 62% at night. `--wal-danger` now uses the accent's
+  *ink* stop, so `.wal-error` is darker on paper and lighter at night. Dark-mode
+  primary buttons (and every `-fg` the threshold change below flips) now carry
+  near-black type.
+
+- **`--wal-warning` is removed.** Nothing in walnut read it. Define it yourself
+  if you used it: `oklch(var(--wal-l-gold-light) 0.14 85)` was its light value.
+
+- **`[hidden]` is now `display: none !important`**, in the reset layer. It
+  beats every walnut display rule, and an unlayered rule of yours as well:
+  remove the attribute to show the element.
+
+- **A `.wal-palette` scope re-derives bloom and cool** from the accent in
+  effect there, including under a palette that stated its own. Set them on the
+  same element to pin them.
 
 ### Added
 
 - **`.wal-retune`.** Tweens the rods — the ground, all five cues, the ramp and
   the geometry scalars — when a palette class, a finish or an inline rod
   changes. Because every colour is derived per frame from the in-flight
-  numbers, a hue travels round the wheel and each intermediate frame is a
+  numbers, a hue travels along the wheel and each intermediate frame is a
   coherent script, not a crossfade of two screenshots. Derived cues stay locked
   to the accent: bloom's transition runs on the accent's timing from a value
   27° away to a value 27° away. Opt-in, and meant to be dropped while a control
@@ -28,6 +93,21 @@ of it.
   nudges while its hues were still travelling. Registration is typed, so these
   must be a `<percentage>`, `<number>` and `<length>` respectively; an invalid
   value now falls back to the stock ramp instead of invalidating the colour.
+  The ink and hover shifts are registered too.
+
+- **`--wal-line-input`**, the border of `.wal-input`, from a new registered
+  stop pair `--wal-l-line-input-light/-dark`. A divider hairline may be faint;
+  the edge of an empty text field is the only thing marking it, so it is held
+  to 3:1 against every ground (WCAG 1.4.11). `--wal-line` measured 1.2–1.6:1.
+
+- **`--wal-border`**, the standard rule as one shorthand
+  (`var(--wal-hairline) solid var(--wal-line)`). Every border in walnut now
+  goes through `--wal-hairline`; 30 of them hard-coded `1px`.
+
+- **Forced-colours support.** Rules, the divider, list markers, the nav
+  underline, the progress bar and the availability dot are redrawn as borders
+  or in system colours under `forced-colors: active`; `select.wal-input` gets
+  the native arrow back; colour-chart swatches keep their colours.
 
 ### Changed
 
@@ -35,23 +115,78 @@ of it.
   scaled the whole-page snapshot to 0.98 / 1.02, which read as the browser
   zooming. Named elements keep the breathe; `root` fades.
 
-- **Catalogue label tracking 0.16em → 0.12em.** Courier Prime is monospaced, so
-  its advance is already wide, and captions multiply the token by 1.6 — at
-  0.16em they set at 0.26em and read as spaced-out letters.
-
-- **The tooltip goes inside its trigger, and no longer uses anchor
-  positioning.** `<button class="wal-tooltip-trigger">… <span
-  class="wal-tooltip">…</span></button>`. The trigger is its containing block,
-  so plain offsets centre it in every supported browser. The sibling form and
-  the undocumented `:popover-open` form are gone. See Fixed for why.
-
-- **Removed the per-primitive gap modifiers** (`.wal-stack.wal-gap-lg` and
-  friends in the layout layer). They never applied: the `.wal-gap-*`
-  utilities sit in a later layer, and layer order outranks specificity. No
-  rendered spacing changes. `.wal-gap-lg` is `--wal-space-lg` everywhere, and
-  it always was.
-
 ### Fixed
+
+- **Muted text failed AA everywhere.** `--wal-text-muted` measured 2.05–4.28:1
+  in all 40 palette × mode × ground cases. It now clears 4.5:1 on `bg`,
+  `bg-subtle`, `surface` and `surface-2` in every palette and mode, and stays
+  visibly quieter than `--wal-text-soft`. Press's soft text on its `surface-2`
+  and `bg-subtle` (3.93–4.49) is fixed with it.
+
+- **`-fg` picked the worse foreground in 19 of 50 cases.** The computed
+  threshold was `0.63`; any value in 0.56–0.58 picks the better of the two
+  candidates for every shipped cue, and it is now `0.57`. Dark-mode primary
+  buttons went from 3.6:1 to 4.9:1; text on gold (the skip link) from 3.3:1
+  to 4.7:1 or better. Bloom on paper and olive at night sat where neither
+  candidate reaches 4.5:1 and moved out of that band. The `@supports`
+  fallbacks, which failed 20 of 50, now make the same per-mode pick.
+
+- **Badges and error text below 4.5:1.** Gold badges on paper (4.17–4.46),
+  Press's olive ink on a dark card (3.86) and its accent, olive and cool badges
+  there (4.0–4.3), and `.wal-error` on Press's desk (4.15). All clear AA now on
+  `bg` and `surface`.
+
+- **Bloom, cool, rules and shadows did not follow a scope.** The bloom and cool
+  offsets were declared only on `:root`, and the hues are registered numbers,
+  so `<section class="wal-forest">` inherited bloom 58 instead of 87, and the
+  README's `.wal-palette` example did not move them. A `data-finish` subtree
+  changed radii and label voice but kept the root's rule strength and shadow
+  depth. Both now re-derive where they are scoped.
+
+- **`--wal-tracking-label`'s `@property` rule was invalid** (`0.1em` is not a
+  computationally independent initial value), so it was dropped by every
+  browser. The rule and its dead `.wal-retune` entry are gone.
+
+- **`[hidden]` lost to `.wal-flex` and the other display utilities.**
+
+- **The tooltip renamed its trigger and failed WCAG 1.4.13.** Its text was
+  part of the button's accessible name; it could not be hovered or dismissed.
+  It now can, and the name is the button's own.
+
+- **`.wal-input` lost its focus indicator in forced-colours mode** (`outline:
+  none`, and the box-shadow ring is dropped there). It uses a transparent
+  outline, which forced colours paint.
+
+- **Press and Bone's light-first rule beat an app's `.dark { color-scheme:
+  dark }`** at (0,4,0). It is wrapped in `:where()`.
+
+- **`walnut.css/themes/press.css` resolved to `press.css.css`** through the
+  package exports.
+
+- **Smaller fixes.** The required-field `*` is no longer read aloud; the
+  disabled select keeps its arrow; `.wal-sr-only` uses `clip-path`; drawer
+  links ease back out; impossible fallbacks (`#10b981` ×5, `64px`, card
+  tokens) and cinema fallbacks that disagreed with the tokens are gone;
+  `.wal-dialog[popover]` no longer repeats its parent; the soft finish resets
+  with `initial` instead of restating each stock number.
+
+- **Docs page.** Install instructions pointed at an npm package that was never
+  published; they now use jsDelivr. "Copy this CSS" omitted the palette's ramp
+  nudges, its own cool and its forced mode, so the pasted script rendered a
+  different page. A double click on the mode button logged an unhandled
+  rejection. The foreground showcase used gold, which no longer flips between
+  modes; it shows the accent. Browser support now states the Firefox 128 floor
+  for `.wal-retune` and the `mod()` the wheel needs.
+
+- **Build.** Guards run before anything is written, so a failing one cannot
+  leave a half-written `dist/`; a theme missing from disk fails the build
+  instead of being skipped; the version comes from `package.json`.
+
+- **Hue travel is numeric, and now says so.** A registered `<number>` hue
+  interpolates the numeric way, not the short way round: Café (55) to Dusk
+  (280) passes through green. The README and the cinema layer said "round the
+  wheel"; they now explain it and the workaround (state a neighbour's hue
+  within 180, e.g. `-80` for `280`).
 
 - **The docs tooltip never appeared, and two tooltips could not coexist.** The
   only rule that showed a `.wal-tooltip` expected it as the trigger's next
