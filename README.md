@@ -189,6 +189,8 @@ You will rarely need these, but the ramp is open. All are optional and all have 
 | `--wal-ink-shift-*` | How far a cue moves when used as type. |
 | `--wal-hover-shift-*` | How far the accent moves on hover. |
 | `--wal-line-boost` | Hairline strength, without owning a colour. |
+| `--wal-hairline` · `--wal-border` | Rule width, and the standard rule as one shorthand (`var(--wal-hairline) solid var(--wal-line)`). |
+| `--wal-line-input` | The edge of a form control: held to 3:1 against every ground (WCAG 1.4.11), unlike a divider. |
 | `--wal-elevation` | Scales every shadow offset. `0` flattens the page. |
 | `--wal-wash` | Scales the tinted light on `<body>`. `0` removes it. |
 | `--wal-radius` · `--wal-btn-radius` · `--wal-chip-radius` · `--wal-badge-radius` | Geometry, per component family. |
@@ -200,6 +202,8 @@ To scope a whole script to a subtree, add `.wal-palette`:
   <!-- re-derives the entire script from the rods in effect here -->
 </section>
 ```
+
+That includes bloom and cool: inside a `.wal-palette` they follow the accent in effect there, even under a palette that stated its own. Set them on the same element to pin them. A `data-finish` on a subtree re-derives only what a finish owns — rules and shadows — never a colour.
 
 ---
 
@@ -254,6 +258,16 @@ for (const ev of ["pointerover", "focusin"]) addEventListener(ev, () => document
 
 It is positioned against the trigger, so an `overflow: hidden` ancestor between them clips it — `.wal-card` is one.
 
+### Drawer
+
+`.wal-drawer` is the panel and its open/closed styling; opening it is yours to script, because three things a modal drawer needs are not CSS's to do. Toggle `.is-open` on the drawer and on its `.wal-drawer-overlay`, and:
+
+- **Focus.** On open, move focus into the drawer (its first link or its close button); on close, return it to the button that opened it.
+- **Escape.** Close on <kbd>Escape</kbd>, and on a click on the overlay.
+- **Inert.** Set `inert` on the rest of the page while it is open, so neither the keyboard nor a screen reader can reach what is behind it.
+
+The closed drawer is already `visibility: hidden`, so its links are out of the tab order without any script. If you would rather not write the above, a `<dialog class="wal-dialog">` opened with `showModal()` does all three natively.
+
 ### The naming trap
 
 `wal-text-*` sets a font **size**. `wal-color-*` sets a **colour**. There is no `.wal-text-muted` class — `--wal-text-muted` is a *token*, and the class you want is `.wal-color-muted`. Using a token name as a class fails silently.
@@ -264,6 +278,34 @@ It is positioned against the trigger, so an `overflow: hidden` ancestor between 
 <!-- does nothing: .wal-text-muted is not a class -->
 <p class="wal-text-muted">still full size, full contrast</p>
 ```
+
+### Everything else that ships
+
+Smaller pieces the tables above do not cover. All are in `dist/walnut.css`.
+
+| Class | What it is |
+|-------|------------|
+| `.wal-eyebrow` | Small uppercase kicker above a heading, in the accent's ink |
+| `.wal-iconbtn` | Round icon-only button; give it an `aria-label` |
+| `.wal-link-arrow` | Text link whose gap opens on hover, stepping the arrow away |
+| `.wal-list-dash` | List with a short rule as its marker |
+| `.wal-avail` · `.wal-avail-dot` | "Available" line with a pulsing dot |
+| `.wal-sidebar` | Fixed sidebar + fluid content that stacks when it runs out of room |
+| `.wal-skip` | Skip link, off-screen until focused |
+| `.wal-footer` · `.wal-footer-grid` | End-credits colophon: a rule and a row of `dt`/`dd` pairs |
+| `.wal-fill-*` | A cue as a fill with its computed `-fg` as the text — `-accent` `-bloom` `-gold` `-olive` `-cool` |
+| `.wal-bg-*` | Backgrounds: `-surface` `-surface-2` and each cue's `-soft` wash |
+| `.wal-glass` | Translucent surface with a backdrop blur |
+| `.wal-gradient-text` | Accent-to-gold gradient clipped to the text |
+| `.wal-sr-only` | Visually hidden, still read by screen readers |
+| `.wal-m-*` `.wal-p-*` (`t` `b` `l` `r` `x` `y`) · `.wal-gap-*` | Spacing on the `xs`…`3xl` scale, plus `-0` |
+| `.wal-reveal` · `-left` · `-right` · `-scale` | Scroll-driven entrances |
+| `.wal-parallax` · `.wal-progress-bar` | Scroll-linked drift; reading-progress bar |
+| `.wal-animate-drift` · `-pulse` · `-breathe` · `.wal-delay-100`…`1000` | Looping ambient motion and its delays |
+
+**State classes are unprefixed.** walnut reads `.is-open` (`.wal-drawer`, `.wal-drawer-overlay`), `.is-scrolled` (`.wal-nav`), `.is-active` (a `.wal-nav-links` link) and `.is-dismissed` (`.wal-tooltip-trigger`). Your script sets them; they only take effect alongside the `wal-` class, so they will not collide with an app's own `is-*` styles — but an app's own `.is-open { … }` rule *will* reach walnut's elements.
+
+`.wal-text-center` / `-left` / `-right` set alignment, not size, despite the `wal-text-*` size family; renaming them would break existing pages, so they stay.
 
 ## Cinematic motion
 
