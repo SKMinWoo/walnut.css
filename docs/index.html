@@ -101,10 +101,13 @@
     .demo-tile-cues { display: grid; grid-template-columns: repeat(5, 1fr); block-size: 30px; border-radius: 2px; overflow: hidden; }
     .demo-tile-ground { block-size: 10px; border-radius: 2px; border: var(--wal-hairline) solid var(--wal-line); }
 
-    /* Swatch buttons in the masthead. 24px is the accessible floor. */
+    /* Swatch buttons in the masthead. 24px is the accessible floor. Each
+       carries its own palette class, so it is painted from that palette's
+       real paper and accent rather than from hex copied off it once. */
     .demo-swatches { display: flex; gap: .3rem; }
     .demo-swatch {
       inline-size: 24px; block-size: 24px; padding: 0; cursor: pointer;
+      background: linear-gradient(135deg, var(--wal-bg) 50%, var(--wal-accent) 50%);
       border: var(--wal-hairline) solid var(--wal-line); border-radius: 2px;
       outline: 2px solid transparent; outline-offset: 0;
     }
@@ -255,11 +258,11 @@
     </div>
     <div class="wal-nav-actions">
       <div class="demo-swatches" id="palette-switch" role="group" aria-label="Palette">
-        <button class="demo-swatch" type="button" data-palette="wal-press"  style="background:#d94a2f" title="Press"  aria-pressed="true"></button>
-        <button class="demo-swatch" type="button" data-palette="wal-cafe"   style="background:#c0562f" title="Café"   aria-pressed="false"></button>
-        <button class="demo-swatch" type="button" data-palette="wal-forest" style="background:#7d7a35" title="Forest" aria-pressed="false"></button>
-        <button class="demo-swatch" type="button" data-palette="wal-dusk"   style="background:#c96a30" title="Dusk"   aria-pressed="false"></button>
-        <button class="demo-swatch" type="button" data-palette="wal-bone"   style="background:#e8e2d6" title="Bone"   aria-pressed="false"></button>
+        <button class="demo-swatch wal-press" type="button" data-palette="wal-press" title="Press"  aria-pressed="true"></button>
+        <button class="demo-swatch wal-cafe" type="button" data-palette="wal-cafe" title="Café"   aria-pressed="false"></button>
+        <button class="demo-swatch wal-forest" type="button" data-palette="wal-forest" title="Forest" aria-pressed="false"></button>
+        <button class="demo-swatch wal-dusk" type="button" data-palette="wal-dusk" title="Dusk"   aria-pressed="false"></button>
+        <button class="demo-swatch wal-bone" type="button" data-palette="wal-bone" title="Bone"   aria-pressed="false"></button>
       </div>
       <button class="wal-btn wal-btn-secondary wal-btn-sm" type="button" id="mode">Dark</button>
     </div>
@@ -300,7 +303,7 @@
               <input type="range" id="rod-accent-c" data-prop="--wal-accent-chroma" min="0" max="0.32" step="0.005">
             </div>
 
-            <pre class="demo-code" id="generated" aria-label="Generated CSS"></pre>
+            <pre class="demo-code" id="generated"></pre>
 
             <div class="wal-cluster">
               <button class="wal-btn wal-btn-primary wal-btn-sm" type="button" id="copy">Copy this CSS</button>
@@ -462,9 +465,9 @@
   oklch(16% …)    /* dark  */
 );</pre>
             <p class="wal-text-sm">
-              Custom properties store an unsubstituted token stream, so
-              <code>light-dark()</code> resolves where the token is <em>used</em>, not
-              where it is declared. Both panels here run the same markup and the same
+              A custom property substitutes its <code>var()</code>s where it is
+              declared, but a <code>light-dark()</code> inside it is just more tokens —
+              so it resolves where the token is <em>used</em>, not where it is declared. Both panels here run the same markup and the same
               tokens — only <code>color-scheme</code> differs.
             </p>
             <p class="wal-text-sm wal-color-muted">
@@ -582,7 +585,7 @@
       <div class="wal-wrap">
         <header class="wal-section-head">
           <p class="wal-index">04</p>
-          <h2>Five palettes, thirty lines each</h2>
+          <h2>Five palettes, nothing but numbers</h2>
           <p class="wal-caption">Ground rod on top, five cues below — click to apply</p>
         </header>
 

@@ -668,11 +668,12 @@
         font-size: var(--wal-text-lg);
         padding: var(--wal-space-sm) 0;
         border-bottom: var(--wal-hairline) solid var(--wal-line-soft);
-        
+        /* On the link, not on :hover, so the indent eases back out as well. */
+        transition: padding var(--wal-duration) var(--wal-ease);
+
         &:hover {
           color: var(--wal-accent-ink);
           padding-left: var(--wal-space-sm);
-          transition: padding var(--wal-duration) var(--wal-ease);
         }
       }
     }
@@ -703,8 +704,10 @@
       box-shadow: 0 0 0 3px color-mix(in oklch, var(--wal-accent) 20%, transparent);
     }
     
+    /* background-color, not the shorthand, which would also reset the
+       select arrow's background-image. */
     &:disabled {
-      background: var(--wal-bg-subtle);
+      background-color: var(--wal-bg-subtle);
       color: var(--wal-text-muted);
       cursor: not-allowed;
     }
@@ -751,9 +754,11 @@
     font-weight: 500;
     color: var(--wal-text);
 
-    /* A required marker, opt-in via [data-required] so it needs no extra span. */
+    /* A required marker, opt-in via [data-required] so it needs no extra span.
+       The empty alt text keeps screen readers from announcing "star": the
+       input's own `required` is what says it. */
     &[data-required]::after {
-      content: "*";
+      content: "*" / "";
       color: var(--wal-accent);
       font-weight: 700;
     }
@@ -1300,10 +1305,10 @@
          </header> */
   .wal-section-head {
     display: grid;
-    /* `max-content minmax(0, 1fr)`, not a fixed margin plus a floor: the index
-       column is exactly as wide as "01" needs and the content column can
-       shrink to zero, so this needs no breakpoint and cannot overflow at any
-       width. A minmax() floor on the second column would have done both. */
+    /* `max-content minmax(0, 1fr)`: the index column is exactly as wide as
+       "01" needs and the content column can shrink to zero, so this needs no
+       breakpoint and cannot overflow at any width. A fixed floor on the
+       content column (minmax(20rem, 1fr), say) would bring back both. */
     grid-template-columns: max-content minmax(0, 1fr);
     gap: var(--wal-space-xs) var(--wal-space-lg);
     align-items: baseline;
