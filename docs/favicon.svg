@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" width="256" height="256">
+  <!-- Rounded background tile for contrast in any tab bar -->
+  <rect width="256" height="256" rx="56" fill="#1C140B" />
+  <rect x="2" y="2" width="252" height="252" rx="54" fill="none" stroke="#382615" stroke-width="4" />
+
+  <!-- Walnut Shell Outline (Nut shape: pointed apex, rounded base) -->
+  <path d="M128 32 C152 32 216 72 216 142 C216 196 176 226 128 226 C80 226 40 196 40 142 C40 72 104 32 128 32 Z" fill="#2E1F12" stroke="#543A22" stroke-width="6" />
+
+  <!-- The Ground Rod (The spine of walnut.css) -->
+  <line x1="128" y1="36" x2="128" y2="222" stroke="#FAF5EE" stroke-width="10" stroke-linecap="round" />
+
+  <!-- Left Bracket { in Goldenrod #E5A62E -->
+  <path d="M106 62 C82 64 74 84 74 102 C74 116 66 124 54 128 C66 132 74 140 74 154 C74 172 82 192 106 194" fill="none" stroke="#E5A62E" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" />
+
+  <!-- Right Bracket } in Goldenrod #E5A62E -->
+  <path d="M150 62 C174 64 182 84 182 102 C182 116 190 124 202 128 C190 132 182 140 182 154 C182 172 174 192 150 194" fill="none" stroke="#E5A62E" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" />
+
+  <!-- Tomato accent dot at crown #D9432F -->
+  <circle cx="128" cy="36" r="10" fill="#D9432F" />
+
+  <!-- Goldenrod accent dot at base #E5A62E -->
+  <circle cx="128" cy="222" r="8" fill="#E5A62E" />
+</svg>

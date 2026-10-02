@@ -228,6 +228,12 @@ for (const [theme, css] of Object.entries(themeCss)) {
   fs.writeFileSync(path.join(PUBLIC, "dist", "themes", `${theme}.css`), css);
 }
 fs.writeFileSync(path.join(PUBLIC, "index.html"), siteHtml);
+if (fs.existsSync(path.join(DOCS, "favicon.svg"))) {
+  fs.copyFileSync(path.join(DOCS, "favicon.svg"), path.join(PUBLIC, "favicon.svg"));
+}
+if (fs.existsSync(path.join(DOCS, "favicon.ico"))) {
+  fs.copyFileSync(path.join(DOCS, "favicon.ico"), path.join(PUBLIC, "favicon.ico"));
+}
 
 // ─── Report sizes ───
 const fullSize = Buffer.byteLength(bundle, "utf8");
