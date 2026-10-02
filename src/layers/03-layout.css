@@ -1,10 +1,11 @@
 /* ═══════════════════════════════════════════════════
    03 — LAYOUT
-   Composable layout primitives driven by container
-   queries. Every component that needs responsive
-   awareness becomes its own inline-size container.
-   No media queries for component sizing — only
-   @container.  Pure CSS, zero JavaScript.
+   Composable layout primitives that respond to the
+   space they are given, not to the viewport: grids
+   shed columns via auto-fit + minmax, flex rows wrap
+   on their bases. .wal-wrap is an inline-size
+   container for your own @container rules; nothing
+   here queries it. Pure CSS, zero JavaScript.
 ═══════════════════════════════════════════════════ */
 
 
@@ -48,14 +49,16 @@
      now collapse intrinsically via auto-fit + minmax, which needs no container
      at all and works at any nesting depth.
      Removing container-type also drops the implied `contain: layout`, which had
-     made every grid a containing block for `position: fixed` descendants. */
+     made every grid a containing block for `position: fixed` descendants.
 
-
-  /* ── Gap modifiers ── */
-
-  &.wal-gap-sm { gap: var(--wal-space-sm); }
-  &.wal-gap-md { gap: var(--wal-space-md); }
-  &.wal-gap-lg { gap: var(--wal-space-xl); }
+     Gaps are the .wal-gap-* utilities, which mean the same step on every
+     primitive: .wal-gap-lg is --wal-space-lg on a grid, a stack, a flex row
+     and a cluster alike. This file used to restate them per primitive with
+     different steps (a stack's -lg was space-xl, a cluster's -sm space-xs).
+     Those never applied: the utilities layer comes later, and layer order
+     outranks specificity, so .wal-gap-lg beat .wal-stack.wal-gap-lg. They
+     were deleted rather than revived, because reviving them would silently
+     change the spacing of every page already built on what actually rendered. */
 
 
   /* Column variants. `auto-fit` + `minmax(min(100%, Xrem), 1fr)` caps the count
@@ -83,8 +86,6 @@
     grid-template-columns: repeat(auto-fit, minmax(min(100%, 9rem), 1fr));
   }
 }
-
-/* Column collapse is intrinsic (see .wal-grid above) — no container queries. */
 
 
 /* ─── .wal-flex ──────────────────────────────────
@@ -116,11 +117,6 @@
     justify-content: flex-end;
     align-items: center;
   }
-
-  /* Gap modifiers (re-use the same class names as grid) */
-  &.wal-gap-sm { gap: var(--wal-space-sm); }
-  &.wal-gap-md { gap: var(--wal-space-md); }
-  &.wal-gap-lg { gap: var(--wal-space-xl); }
 }
 
 
@@ -133,11 +129,6 @@
   display: flex;
   flex-direction: column;
   gap: var(--wal-space-lg);
-
-  /* Size variants */
-  &.wal-gap-sm { gap: var(--wal-space-sm); }
-  &.wal-gap-md { gap: var(--wal-space-md); }
-  &.wal-gap-lg { gap: var(--wal-space-xl); }
 }
 
 
@@ -151,31 +142,22 @@
   flex-wrap: wrap;
   gap: var(--wal-space-sm);
   align-items: center;
-
-  /* Size variants */
-  &.wal-gap-sm { gap: var(--wal-space-xs); }
-  &.wal-gap-md { gap: var(--wal-space-md); }
-  &.wal-gap-lg { gap: var(--wal-space-lg); }
 }
 
 
 /* ─── .wal-sidebar ───────────────────────────────
    Two-panel layout: one fixed-width sidebar, one
-   fluid content area.  Wraps to stacked column at
-   narrow container widths via container query.
-   Uses the "flexbox holy grail" trick with
-   flex-basis + flex-grow for the fluid side.
+   fluid content area. Wraps to a stacked column
+   once the content panel can no longer hold its
+   55% floor — flex-basis + flex-grow, no query.
    ────────────────────────────────────────────── */
 .wal-sidebar {
   display: flex;
   flex-wrap: wrap;
   gap: var(--wal-space-xl);
 
-  /* Not a query container, for the same reason as .wal-grid: the old
-     `@container sidebar` block below queried this element from within itself
-     and never matched. It was also redundant — flex-wrap plus the basis/grow
-     pair below already collapses to a single column once the content panel
-     can no longer hold its 55% floor. */
+  /* Not a query container, for the same reason as .wal-grid: an element
+     cannot query itself. */
 
   /* Sidebar panel (first child by convention) */
   & > :first-child {
@@ -192,8 +174,6 @@
   }
 }
 
-/* Collapse is intrinsic (flex-wrap + flex-basis) — no container query needed. */
-
 
 /* ─── .wal-section ───────────────────────────────
    Top-level page section with generous vertical
@@ -203,7 +183,7 @@
    ────────────────────────────────────────────── */
 .wal-section {
   padding-block: var(--wal-space-3xl);
-  border-top: 1px solid var(--wal-line);
+  border-top: var(--wal-border);
 
   /* First section on the page needs no border */
   &:first-child,

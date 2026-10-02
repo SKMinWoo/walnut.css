@@ -8,6 +8,11 @@
 
        <html class="wal-press" data-finish="catalogue">
 
+   Print does not cast shadows and a page does not glow, but neither fact is
+   stated here. Shadow depth and the body wash are atmosphere, and atmosphere
+   belongs to the finish — see the header of 07-finish.css for why a palette
+   that sets it breaks every finish it is paired with.
+
    ───────────────────────────────────────────────────
    WHY THESE FIVE, AND WHY THEY ARE NOT RANDOM
 
@@ -15,7 +20,8 @@
    months, then measured. Two relationships fell out of the measurement:
 
      tomato 31° → apricot 58°     a 27° warm step
-     tomato 31° → adriatic 240°   209°, within a few degrees of exact complement
+     tomato 31° → adriatic 240°   209°, 29° past the direct opposite: a
+                                  split complement
 
    Those are the two offsets walnut ships as the DEFAULTS for --wal-bloom-hue
    and --wal-cool-hue, which is why this file does not state them: setting the
@@ -45,9 +51,10 @@
 
   /* ── Ramp nudges ──
      Paper is warmer and the ink deeper than the stock ramp: this is print, not
-     a screen. The hairline multipliers run high because a catalogue is drawn
-     in rules — a hairline you cannot see is a hairline that is not doing its
-     job of dividing the page. */
+     a screen. The hairline chroma multipliers run high so the rules read as
+     warm printed ink rather than grey dividers. They scale a rule's colour,
+     not its strength — strength is --wal-line-boost, which the catalogue
+     finish owns. */
   --wal-l-bg-light:        93%;
   --wal-l-subtle-light:    90.5%;
   --wal-l-surface-light:   97.6%;
@@ -55,7 +62,8 @@
   --wal-l-line-light:      84.6%;
   --wal-l-line-soft-light: 88%;
   --wal-l-text-light:      23.3%;
-  --wal-l-text-soft-light: 50.2%;
+  --wal-l-text-soft-light: 44%;
+  --wal-l-text-muted-light: 48.5%;
 
   --wal-cx-line-light: 1.6;
   --wal-cx-ink-light:  1.0;
@@ -67,17 +75,20 @@
   --wal-l-surface-2-dark: 35%;
   --wal-l-line-dark:      36.9%;
   --wal-l-line-soft-dark: 32%;
+  --wal-l-line-input-dark: 63%;
   --wal-l-text-dark:      94.7%;
+  /* The desk sits well above the stock dark ground, so the inks rise with
+     it: soft and muted to hold 4.5:1 on its lightest stock, surface-2, and
+     the cue inks (links, badges, .wal-error) to hold it on a card. */
+  --wal-l-text-soft-dark: 80%;
+  --wal-l-text-muted-dark: 72.5%;
+  --wal-ink-shift-dark:   15%;
   --wal-cx-line-dark:     1.4;
-
-  /* Print does not cast shadows; the wash belongs to a lit room, not a page. */
-  --wal-elevation: 0.5;
-  --wal-wash:      0.5;
 }
 
 /* Paper-first, for the same reason and by the same mechanism as Bone —
    see the note in bone.css about why the :not() chain is required. */
-.wal-press:not(.wal-dark):not([data-theme="dark"]):not([data-theme$="-dark"]),
-[data-theme="press"]:not(.wal-dark) {
+:where(.wal-press:not(.wal-dark):not([data-theme="dark"]):not([data-theme$="-dark"]),
+       [data-theme="press"]:not(.wal-dark)) {
   color-scheme: light;
 }

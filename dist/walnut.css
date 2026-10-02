@@ -85,6 +85,16 @@ table {
   width: 100%;
 }
 
+/* The `hidden` attribute has to beat every walnut rule that sets `display`.
+   Specificity cannot do it: .wal-flex, .wal-badge and a dozen others outrank
+   the UA sheet's [hidden], and utilities come after every other layer, so
+   `<div class="wal-flex" hidden>` rendered. `!important` inverts layer order,
+   which puts the earliest layer on top — so this sits in reset, and even an
+   unlayered `!important` cannot un-hide the element: remove the attribute,
+   which is what it means. `until-found` is excluded: it hides with
+   content-visibility and must stay findable. */
+[hidden]:not([hidden="until-found"]) { display: none !important; }
+
 /* Remove animations and transitions for users who prefer not to see them */
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
@@ -115,8 +125,8 @@ table {
        FIVE CUES           accent · bloom · gold · olive · cool. Each is a
                            hue + a chroma. Everything else is derived.
 
-   That is the whole input surface. A theme file is those numbers and nothing
-   else; see src/themes/*.css, which are ~30 lines each.
+   That is the whole input surface. A theme file is those numbers, plus any
+   ramp stops it nudges, and nothing else; see src/themes/*.css.
 
    ───────────────────────────────────────────────────
    HOW THE DERIVATION WORKS, AND WHY THERE IS ONLY ONE OF IT
@@ -124,9 +134,10 @@ table {
    Every colour below is declared exactly once, as `light-dark(light, dark)`.
    Two properties of CSS make that sufficient:
 
-     1. A custom property's value is stored as an unsubstituted token stream.
-        `light-dark()` is therefore NOT resolved where it is declared — it is
-        resolved where the token is finally *used*.
+     1. A custom property's computed value is a token stream. Its var()s
+        are substituted where it is declared, but a `light-dark()` in it is
+        just more tokens, so it is NOT resolved there — it is resolved where
+        the token is finally *used*.
      2. `light-dark()` picks its branch from the used element's `color-scheme`,
         which inherits.
 
@@ -148,8 +159,11 @@ table {
      --wal-cx-*                      chroma multipliers per surface family
      --wal-radius / --wal-elevation / --wal-wash    geometry and atmosphere
 
-   Only the first two are needed for a coherent theme. The rest exist so a
-   theme can nudge one stop without inheriting the job of restating the ramp.
+   Only the first two are needed for a coherent theme. The ramp exists so a
+   theme can nudge one stop without inheriting the job of restating it.
+   Geometry and atmosphere are not a theme's to set at all: they are the
+   finish's knobs, and a palette that touches them overrides every finish it
+   is paired with (see 07-finish.css).
 ═══════════════════════════════════════════════════ */
 
 
@@ -187,13 +201,64 @@ table {
 @property --wal-cool-hue      { syntax: "<number>"; inherits: true; initial-value: 234; }
 @property --wal-cool-chroma   { syntax: "<number>"; inherits: true; initial-value: 0.11; }
 
+/* ── The ramp ──
+   Registered for the same reasons as the rods, and for one more: .wal-retune
+   (06-cinema.css) can only tween what is registered. A palette nudges these
+   stops, and left unregistered they would snap on the first frame of a
+   palette switch while the hues were still travelling — Press → Café would
+   drop its body text eight points of lightness before anything else moved.
+   Initial values are the stock ramp in :root below. */
+@property --wal-l-bg-light         { syntax: "<percentage>"; inherits: true; initial-value: 93%; }
+@property --wal-l-bg-dark          { syntax: "<percentage>"; inherits: true; initial-value: 16%; }
+@property --wal-l-subtle-light     { syntax: "<percentage>"; inherits: true; initial-value: 90%; }
+@property --wal-l-subtle-dark      { syntax: "<percentage>"; inherits: true; initial-value: 19%; }
+@property --wal-l-surface-light    { syntax: "<percentage>"; inherits: true; initial-value: 97%; }
+@property --wal-l-surface-dark     { syntax: "<percentage>"; inherits: true; initial-value: 22%; }
+@property --wal-l-surface-2-light  { syntax: "<percentage>"; inherits: true; initial-value: 91%; }
+@property --wal-l-surface-2-dark   { syntax: "<percentage>"; inherits: true; initial-value: 26%; }
+@property --wal-l-line-light       { syntax: "<percentage>"; inherits: true; initial-value: 84%; }
+@property --wal-l-line-dark        { syntax: "<percentage>"; inherits: true; initial-value: 32%; }
+@property --wal-l-line-soft-light  { syntax: "<percentage>"; inherits: true; initial-value: 88%; }
+@property --wal-l-line-soft-dark   { syntax: "<percentage>"; inherits: true; initial-value: 28%; }
+@property --wal-l-line-input-light { syntax: "<percentage>"; inherits: true; initial-value: 57%; }
+@property --wal-l-line-input-dark  { syntax: "<percentage>"; inherits: true; initial-value: 56%; }
+@property --wal-l-text-light       { syntax: "<percentage>"; inherits: true; initial-value: 20%; }
+@property --wal-l-text-dark        { syntax: "<percentage>"; inherits: true; initial-value: 92%; }
+@property --wal-l-text-soft-light  { syntax: "<percentage>"; inherits: true; initial-value: 42%; }
+@property --wal-l-text-soft-dark   { syntax: "<percentage>"; inherits: true; initial-value: 72%; }
+@property --wal-l-text-muted-light { syntax: "<percentage>"; inherits: true; initial-value: 49%; }
+@property --wal-l-text-muted-dark  { syntax: "<percentage>"; inherits: true; initial-value: 64%; }
+@property --wal-l-accent-light     { syntax: "<percentage>"; inherits: true; initial-value: 52%; }
+@property --wal-l-accent-dark      { syntax: "<percentage>"; inherits: true; initial-value: 62%; }
+@property --wal-l-bloom-light      { syntax: "<percentage>"; inherits: true; initial-value: 54%; }
+@property --wal-l-bloom-dark       { syntax: "<percentage>"; inherits: true; initial-value: 70%; }
+@property --wal-l-gold-light       { syntax: "<percentage>"; inherits: true; initial-value: 60%; }
+@property --wal-l-gold-dark        { syntax: "<percentage>"; inherits: true; initial-value: 75%; }
+@property --wal-l-olive-light      { syntax: "<percentage>"; inherits: true; initial-value: 48%; }
+@property --wal-l-olive-dark       { syntax: "<percentage>"; inherits: true; initial-value: 60%; }
+@property --wal-l-cool-light       { syntax: "<percentage>"; inherits: true; initial-value: 46%; }
+@property --wal-l-cool-dark        { syntax: "<percentage>"; inherits: true; initial-value: 62%; }
+@property --wal-hover-shift-light  { syntax: "<percentage>"; inherits: true; initial-value: -6%; }
+@property --wal-hover-shift-dark   { syntax: "<percentage>"; inherits: true; initial-value: 6%; }
+@property --wal-ink-shift-light    { syntax: "<percentage>"; inherits: true; initial-value: -12%; }
+@property --wal-ink-shift-dark     { syntax: "<percentage>"; inherits: true; initial-value: 8%; }
+@property --wal-cx-ground-light    { syntax: "<number>";     inherits: true; initial-value: 0.65; }
+@property --wal-cx-ground-dark     { syntax: "<number>";     inherits: true; initial-value: 1; }
+@property --wal-cx-surface-light   { syntax: "<number>";     inherits: true; initial-value: 0.40; }
+@property --wal-cx-surface-dark    { syntax: "<number>";     inherits: true; initial-value: 1.15; }
+@property --wal-cx-line-light      { syntax: "<number>";     inherits: true; initial-value: 0.75; }
+@property --wal-cx-line-dark       { syntax: "<number>";     inherits: true; initial-value: 0.60; }
+@property --wal-cx-ink-light       { syntax: "<number>";     inherits: true; initial-value: 0.85; }
+@property --wal-cx-ink-dark        { syntax: "<number>";     inherits: true; initial-value: 0.45; }
+
 /* ── Geometry and atmosphere ── */
 @property --wal-radius     { syntax: "<length>";     inherits: true; initial-value: 12px; }
+@property --wal-radius-sm  { syntax: "<length>";     inherits: true; initial-value: 6px; }
+@property --wal-radius-lg  { syntax: "<length>";     inherits: true; initial-value: 18px; }
 @property --wal-elevation  { syntax: "<number>";     inherits: true; initial-value: 1; }
 @property --wal-wash       { syntax: "<number>";     inherits: true; initial-value: 1; }
 @property --wal-hairline   { syntax: "<length>";     inherits: true; initial-value: 1px; }
 @property --wal-line-boost { syntax: "<number>";     inherits: true; initial-value: 1; }
-@property --wal-tracking-label { syntax: "<length-percentage>"; inherits: true; initial-value: 0.1em; }
 
 
 /* ═══ THE DEFAULT SCRIPT — CAFÉ ═══
@@ -205,40 +270,37 @@ table {
   --wal-chroma: 0.04;
 
   /* ── The five cues ──
-     bloom and cool default to *offsets from the accent* rather than to fixed
-     numbers, so rotating one rod keeps the script in tune instead of pulling
-     the lead colour away from the rest of the cast. The offsets are not
-     arbitrary: +27° is the warm step from a tomato red to a soft apricot, and
-     +209° lands within a few degrees of the accent's exact complement — the
-     structure a hand-mixed mid-century palette tends to converge on anyway.
-     Override either with a plain number to break the relationship. */
+     The bloom and cool hues are not stated here: they default to offsets from
+     the accent, declared with the derivation below. */
   --wal-accent-hue:    25;    --wal-accent-chroma: 0.17;  /* terracotta   */
-  --wal-bloom-hue:     calc(var(--wal-accent-hue) + 27);
-  --wal-bloom-chroma:  0.12;                              /* apricot      */
+                              --wal-bloom-chroma:  0.12;  /* apricot      */
   --wal-gold-hue:      85;    --wal-gold-chroma:   0.15;  /* goldenrod    */
   --wal-olive-hue:     130;   --wal-olive-chroma:  0.10;  /* botanical    */
-  --wal-cool-hue:      calc(var(--wal-accent-hue) + 209);
-  --wal-cool-chroma:   0.11;                              /* adriatic     */
+                              --wal-cool-chroma:   0.11;  /* adriatic     */
 
   /* ── The ramp: lightness stops ──
      `-light` is the value used when the page is light; `-dark` when it is
-     dark. Neutrals invert across the pair, which is the whole of mode support. */
+     dark. Neutrals invert across the pair, which is the whole of mode support.
+     text-muted is set as far from text as it can go and still clear 4.5:1 on
+     all four grounds, surface-2 included; a palette that moves a ground has
+     to move it too (see press.css). */
   --wal-l-bg-light:          93%;   --wal-l-bg-dark:          16%;
   --wal-l-subtle-light:      90%;   --wal-l-subtle-dark:      19%;
   --wal-l-surface-light:     97%;   --wal-l-surface-dark:     22%;
   --wal-l-surface-2-light:   91%;   --wal-l-surface-2-dark:   26%;
   --wal-l-line-light:        84%;   --wal-l-line-dark:        32%;
   --wal-l-line-soft-light:   88%;   --wal-l-line-soft-dark:   28%;
+  --wal-l-line-input-light:  57%;   --wal-l-line-input-dark:  56%;
   --wal-l-text-light:        20%;   --wal-l-text-dark:        92%;
-  --wal-l-text-soft-light:   42%;   --wal-l-text-soft-dark:   68%;
-  --wal-l-text-muted-light:  58%;   --wal-l-text-muted-dark:  52%;
+  --wal-l-text-soft-light:   42%;   --wal-l-text-soft-dark:   72%;
+  --wal-l-text-muted-light:  49%;   --wal-l-text-muted-dark:  64%;
 
   /* Cue lightness. Cues do NOT invert — a terracotta stays terracotta — they
      only shift enough to hold their weight against the ground. */
   --wal-l-accent-light: 52%;   --wal-l-accent-dark: 62%;
-  --wal-l-bloom-light:  58%;   --wal-l-bloom-dark:  70%;
-  --wal-l-gold-light:   62%;   --wal-l-gold-dark:   75%;
-  --wal-l-olive-light:  48%;   --wal-l-olive-dark:  55%;
+  --wal-l-bloom-light:  54%;   --wal-l-bloom-dark:  70%;
+  --wal-l-gold-light:   60%;   --wal-l-gold-dark:   75%;
+  --wal-l-olive-light:  48%;   --wal-l-olive-dark:  60%;
   --wal-l-cool-light:   46%;   --wal-l-cool-dark:   62%;
 
   /* Two shifts applied on top of the cue stops:
@@ -335,15 +397,30 @@ table {
    Why the theme class names are listed here rather than in the theme files:
    the derivation must not live in the theme files, or we are back to four
    copies that drift. Listing the names centrally costs one line each and is
-   harmless when a theme file is not loaded. */
+   harmless when a theme file is not loaded. `[data-theme|="cafe"]` matches
+   both "cafe" and the fused "cafe-light" / "cafe-dark". */
 :root,
 :where(.wal-palette,
        .wal-cafe, .wal-forest, .wal-dusk, .wal-bone, .wal-press,
-       [data-theme="cafe"],  [data-theme^="cafe-"],
-       [data-theme="forest"],[data-theme^="forest-"],
-       [data-theme="dusk"],  [data-theme^="dusk-"],
-       [data-theme="bone"],  [data-theme^="bone-"],
-       [data-theme="press"], [data-theme^="press-"]) {
+       [data-theme|="cafe"], [data-theme|="forest"], [data-theme|="dusk"],
+       [data-theme|="bone"], [data-theme|="press"]) {
+
+  /* ── Derived cues ──
+     bloom and cool default to *offsets from the accent* rather than to fixed
+     numbers, so rotating one rod keeps the script in tune instead of pulling
+     the lead colour away from the rest of the cast. The offsets are not
+     arbitrary: +27° is the warm step from a tomato red to a soft apricot, and
+     +209° lands 29° past the accent's direct opposite — a split complement,
+     across the wheel without being dead against it. That is the structure a
+     hand-mixed mid-century palette tends to converge on anyway.
+     Override either with a plain number to break the relationship.
+
+     They live here, not in :root, because the hues are registered <number>s:
+     a registered value computes where it is declared and descendants inherit
+     the number, not the calc(). Stated only on :root, a scoped
+     <section class="wal-forest"> inherited bloom at 52° instead of 87°. */
+  --wal-bloom-hue: calc(var(--wal-accent-hue) + 27);
+  --wal-cool-hue:  calc(var(--wal-accent-hue) + 209);
 
   /* ── Ground: surfaces ── */
   --wal-bg: light-dark(
@@ -360,20 +437,15 @@ table {
     oklch(var(--wal-l-surface-2-dark)  calc(var(--wal-chroma) * var(--wal-cx-ground-dark))  var(--wal-hue)));
 
   /* ── Ground: hairlines ──
-     --wal-line-boost pushes the rule AWAY from the page ground: darker on
-     light, lighter on dark. It is one knob rather than two overrides so a
-     finish can ask for stronger rules on any palette without owning a colour
-     — see 07-finish.css, where the catalogue finish turns it to 1.7. */
-  --wal-line: light-dark(
-    oklch(calc(var(--wal-l-line-light) - (var(--wal-line-boost) - 1) * 9%)
-          calc(var(--wal-chroma) * var(--wal-cx-line-light)) var(--wal-hue)),
-    oklch(calc(var(--wal-l-line-dark)  + (var(--wal-line-boost) - 1) * 9%)
-          calc(var(--wal-chroma) * var(--wal-cx-line-dark))  var(--wal-hue)));
-  --wal-line-soft: light-dark(
-    oklch(calc(var(--wal-l-line-soft-light) - (var(--wal-line-boost) - 1) * 6%)
-          calc(var(--wal-chroma) * var(--wal-cx-line-light)) var(--wal-hue)),
-    oklch(calc(var(--wal-l-line-soft-dark)  + (var(--wal-line-boost) - 1) * 6%)
-          calc(var(--wal-chroma) * var(--wal-cx-line-dark))  var(--wal-hue)));
+     --wal-line and --wal-line-soft are derived in the next rule, with the
+     shadows, because a finish scales them. */
+
+  /* The edge of a form control. A hairline is a divider and may be faint; the
+     only thing marking an empty text field is its border, which WCAG 1.4.11
+     holds to 3:1 against everything around it. --wal-line measured 1.2–1.6. */
+  --wal-line-input: light-dark(
+    oklch(var(--wal-l-line-input-light) calc(var(--wal-chroma) * var(--wal-cx-line-light)) var(--wal-hue)),
+    oklch(var(--wal-l-line-input-dark)  calc(var(--wal-chroma) * var(--wal-cx-line-dark))  var(--wal-hue)));
 
   /* ── Ground: ink ── */
   --wal-text: light-dark(
@@ -392,13 +464,14 @@ table {
      and friends rebind --wal-text* from these, so every descendant flips with
      the surface and no per-child override is needed.
 
-     These MUST be independent expressions, never `var(--wal-text)`. Custom
-     properties inherit as unsubstituted token streams, so pointing
-     --wal-card-ink at --wal-text here while .wal-card points --wal-text at
-     --wal-card-ink is a substitution cycle: both resolve invalid and every
-     card loses its text colour. It reads as a random rendering bug and is
-     painful to trace. Repeating the expression is the cheap price of not
-     having that bug. */
+     These MUST be independent expressions, never `var(--wal-text)`. On the
+     common path an alias would work, because the var() is substituted here
+     before .wal-card rebinds anything. But an element matching both this
+     rule and .wal-card — a card that is also a .wal-palette — would declare
+     --wal-card-ink: var(--wal-text) and --wal-text: var(--wal-card-ink) on
+     itself: a cycle, both invalid, and the card loses its text colour. It
+     reads as a random rendering bug and is painful to trace. Repeating the
+     expression is the cheap price of not having that bug. */
   --wal-card-bg: light-dark(
     oklch(var(--wal-l-surface-light) calc(var(--wal-chroma) * var(--wal-cx-surface-light)) var(--wal-hue)),
     oklch(var(--wal-l-surface-dark)  calc(var(--wal-chroma) * var(--wal-cx-surface-dark))  var(--wal-hue)));
@@ -418,7 +491,8 @@ table {
 
        --wal-<cue>        the colour. A fill, a rule, a swatch.
        --wal-<cue>-ink    the same cue, shifted to be legible AS TEXT.
-       --wal-<cue>-soft   a 12% wash, for chip and badge backgrounds.
+       --wal-<cue>-soft   a 12% wash (15% for gold), for chip and badge
+                          backgrounds.
        --wal-<cue>-fg     a foreground that is legible ON the cue. Computed,
                           not chosen — see the @supports block below.
      Plus --wal-accent-hover, since the accent is the one interactive cue. */
@@ -462,7 +536,7 @@ table {
     oklch(calc(var(--wal-l-olive-dark)  + var(--wal-ink-shift-dark))  var(--wal-olive-chroma) var(--wal-olive-hue)));
   --wal-olive-soft: color-mix(in oklch, var(--wal-olive) 12%, transparent);
 
-  /* Cue 5 — cool. The complement: the only cue that argues with the others,
+  /* Cue 5 — cool. The split complement: the only cue that argues with the others,
      which is exactly why a catalogue needs one. */
   --wal-cool: light-dark(
     oklch(var(--wal-l-cool-light) var(--wal-cool-chroma) var(--wal-cool-hue)),
@@ -482,76 +556,116 @@ table {
   --wal-cue-5: var(--wal-cool);
 
   /* ── Functional ──
-     Off-script by design: success/warning/danger must survive any rotation of
+     Off-script by design: success and danger must survive any rotation of
      the cues, so they are anchored to fixed hues and only ride the shared cue
      lightness stops. Chroma is a touch lower than a cue's so they read as
-     signal rather than as part of the palette. */
+     signal rather than as part of the palette. Danger is set as type (.wal-error)
+     far more than as a fill, so it rides the accent's ink stop, not its fill. */
   --wal-success: light-dark(oklch(var(--wal-l-olive-light) 0.14 145), oklch(var(--wal-l-gold-dark) 0.16 145));
-  --wal-warning: light-dark(oklch(var(--wal-l-gold-light)  0.14 85),  oklch(var(--wal-l-gold-dark) 0.15 85));
-  --wal-danger:  light-dark(oklch(var(--wal-l-accent-light) 0.18 25), oklch(var(--wal-l-accent-dark) 0.20 25));
+  --wal-danger:  light-dark(oklch(calc(var(--wal-l-accent-light) + var(--wal-ink-shift-light)) 0.18 25),
+                            oklch(calc(var(--wal-l-accent-dark)  + var(--wal-ink-shift-dark))  0.20 25));
 
-  /* ── Shadows ──
+  /* ── Shadow colour ──
      light-dark() takes colours, not whole shadow values, so the mode split
-     lives in the colour and the geometry is shared. --wal-elevation scales the
-     offsets, which is how a flat finish stays flat without overriding three
-     separate shadows. */
+     lives in the colour; the geometry is in the next rule. */
   --wal-shadow-ink:    light-dark(oklch(50% 0.03 var(--wal-hue) / 0.18), oklch(10% 0.02 var(--wal-hue) / 0.45));
   --wal-shadow-ink-sm: light-dark(oklch(50% 0.03 var(--wal-hue) / 0.12), oklch(10% 0.02 var(--wal-hue) / 0.30));
   --wal-shadow-ink-lg: light-dark(oklch(50% 0.03 var(--wal-hue) / 0.22), oklch(8%  0.02 var(--wal-hue) / 0.55));
 
-  --wal-shadow:    0 calc(20px * var(--wal-elevation)) calc(44px * var(--wal-elevation)) -18px var(--wal-shadow-ink);
-  --wal-shadow-sm: 0 calc(4px  * var(--wal-elevation)) calc(12px * var(--wal-elevation)) -4px  var(--wal-shadow-ink-sm);
-  --wal-shadow-lg: 0 calc(32px * var(--wal-elevation)) calc(64px * var(--wal-elevation)) -24px var(--wal-shadow-ink-lg);
-
   /* ── Foregrounds ON a cue ──
-     Plain fallback; the @supports block below replaces these with a computed
+     Plain fallback; the nested @supports below replaces these with a computed
      contrast pick. Kept as a real value so a browser without relative colour
-     syntax still gets a legible button rather than an invalid one. */
-  --wal-accent-fg: light-dark(oklch(97% 0.01 var(--wal-accent-hue)), oklch(96% 0.01 var(--wal-accent-hue)));
-  --wal-bloom-fg:  oklch(18% 0.02 var(--wal-bloom-hue));
-  --wal-gold-fg:   oklch(18% 0.02 var(--wal-gold-hue));
-  --wal-olive-fg:  oklch(97% 0.01 var(--wal-olive-hue));
-  --wal-cool-fg:   oklch(97% 0.01 var(--wal-cool-hue));
+     syntax (Firefox before 128) still gets a legible button rather than an
+     invalid one. Each is the pick the computed form makes for the stock stops
+     in each mode — so accent, olive and cool flip from light to dark ink with
+     the mode, as the computed form does. */
+  --wal-accent-fg: light-dark(oklch(97% 0.01 var(--wal-accent-hue)), oklch(16% 0.02 var(--wal-accent-hue)));
+  --wal-bloom-fg:  light-dark(oklch(97% 0.01 var(--wal-bloom-hue)),  oklch(16% 0.02 var(--wal-bloom-hue)));
+  --wal-gold-fg:   oklch(16% 0.02 var(--wal-gold-hue));
+  --wal-olive-fg:  light-dark(oklch(97% 0.01 var(--wal-olive-hue)),  oklch(16% 0.02 var(--wal-olive-hue)));
+  --wal-cool-fg:   light-dark(oklch(97% 0.01 var(--wal-cool-hue)),   oklch(16% 0.02 var(--wal-cool-hue)));
+
+  /* ── Automatic foreground contrast ──
+     The single most tedious part of hand-theming: every time you rotate a cue
+     you have to re-decide whether text on it should be black or white, and
+     getting it wrong is an accessibility bug rather than a taste one.
+
+     Relative colour syntax can decide it arithmetically. `l` is the cue's own
+     lightness as a 0–1 number, so
+
+         clamp(0.16, (0.57 - l) * 1000, 0.97)
+
+     is a step function: below the 0.57 threshold the middle term is a large
+     positive number and clamps to 0.97 (near-white ink); above it the term goes
+     negative and clamps to 0.16 (near-black ink). The ×1000 makes the crossover
+     effectively instant rather than a mushy grey band.
+
+     Not pure white and black: `calc(c * 0.08)` keeps a trace of the cue's own
+     chroma in its foreground, which is why a terracotta button reads as warm
+     cream on terracotta rather than as a sticker.
+
+     0.57 is where the two candidates swap places under WCAG 2 contrast: for
+     every cue in the shipped palettes, in both modes, any threshold from 0.56
+     to 0.58 picks whichever of the two reads better. (It used to be 0.63, which
+     picked the worse one in 19 of those 50 cases — dark-mode primary buttons
+     at 3.6:1.) Near the threshold neither candidate may reach 4.5:1, so the
+     shipped cue stops keep clear of roughly 0.55–0.59; a cue you move into
+     that band is the case to check.
+
+     Nested rather than a separate rule, so the selector list above is the
+     only copy: a second copy that drifted would leave a scoped palette with
+     the root's foregrounds. */
+  @supports (color: oklch(from white l c h)) {
+    --wal-accent-fg: oklch(from var(--wal-accent) clamp(0.16, (0.57 - l) * 1000, 0.97) calc(c * 0.08) h);
+    --wal-bloom-fg:  oklch(from var(--wal-bloom)  clamp(0.16, (0.57 - l) * 1000, 0.97) calc(c * 0.08) h);
+    --wal-gold-fg:   oklch(from var(--wal-gold)   clamp(0.16, (0.57 - l) * 1000, 0.97) calc(c * 0.08) h);
+    --wal-olive-fg:  oklch(from var(--wal-olive)  clamp(0.16, (0.57 - l) * 1000, 0.97) calc(c * 0.08) h);
+    --wal-cool-fg:   oklch(from var(--wal-cool)   clamp(0.16, (0.57 - l) * 1000, 0.97) calc(c * 0.08) h);
+  }
 }
 
 
-/* ═══ AUTOMATIC FOREGROUND CONTRAST ═══
-   The single most tedious part of hand-theming: every time you rotate a cue
-   you have to re-decide whether text on it should be black or white, and
-   getting it wrong is an accessibility bug rather than a taste one.
+/* ═══ WHAT A FINISH SCALES ═══
+   Hairlines and shadows read --wal-line-boost and --wal-elevation, which a
+   finish sets. A custom property substitutes its var()s where it is declared,
+   so derived only where a palette is, these froze at that element's finish:
+   `data-finish` on a subtree changed its radii and label voice but not its
+   rules or its shadows. Hence [data-finish] in this list and not in the one
+   above — a finish re-derives the geometry it owns and nothing else, so it
+   can never move a colour that a palette set. */
+:root,
+:where(.wal-palette,
+       .wal-cafe, .wal-forest, .wal-dusk, .wal-bone, .wal-press,
+       [data-theme|="cafe"], [data-theme|="forest"], [data-theme|="dusk"],
+       [data-theme|="bone"], [data-theme|="press"],
+       [data-finish]) {
+  /* ── Hairlines ──
+     --wal-line-boost pushes the rule AWAY from the page ground: darker on
+     light, lighter on dark. It is one knob rather than two overrides so a
+     finish can ask for stronger rules on any palette without owning a colour
+     — see 07-finish.css, where the catalogue finish turns it to 1.7. */
+  --wal-line: light-dark(
+    oklch(calc(var(--wal-l-line-light) - (var(--wal-line-boost) - 1) * 9%)
+          calc(var(--wal-chroma) * var(--wal-cx-line-light)) var(--wal-hue)),
+    oklch(calc(var(--wal-l-line-dark)  + (var(--wal-line-boost) - 1) * 9%)
+          calc(var(--wal-chroma) * var(--wal-cx-line-dark))  var(--wal-hue)));
+  --wal-line-soft: light-dark(
+    oklch(calc(var(--wal-l-line-soft-light) - (var(--wal-line-boost) - 1) * 6%)
+          calc(var(--wal-chroma) * var(--wal-cx-line-light)) var(--wal-hue)),
+    oklch(calc(var(--wal-l-line-soft-dark)  + (var(--wal-line-boost) - 1) * 6%)
+          calc(var(--wal-chroma) * var(--wal-cx-line-dark))  var(--wal-hue)));
 
-   Relative colour syntax can decide it arithmetically. `l` is the cue's own
-   lightness as a 0–1 number, so
+  /* The standard rule, as one shorthand, so a component never states a
+     width of its own and --wal-hairline reaches every border. Declared here
+     rather than in :root because it has to pick up this scope's --wal-line. */
+  --wal-border: var(--wal-hairline) solid var(--wal-line);
 
-       clamp(0.16, (0.63 - l) * 1000, 0.97)
-
-   is a step function: below the 0.63 threshold the middle term is a large
-   positive number and clamps to 0.97 (near-white ink); above it the term goes
-   negative and clamps to 0.16 (near-black ink). The ×1000 makes the crossover
-   effectively instant rather than a mushy grey band.
-
-   Not pure white and black: `calc(c * 0.08)` keeps a trace of the cue's own
-   chroma in its foreground, which is why a terracotta button reads as warm
-   cream on terracotta rather than as a sticker.
-
-   0.63 is a perceptual crossover for oklch lightness, not a WCAG computation.
-   It lands correctly for every cue in the shipped themes; a cue sitting right
-   at the threshold with low chroma is the case to check by eye. */
-@supports (color: oklch(from white l c h)) {
-  :root,
-  :where(.wal-palette,
-         .wal-cafe, .wal-forest, .wal-dusk, .wal-bone, .wal-press,
-         [data-theme="cafe"],  [data-theme^="cafe-"],
-         [data-theme="forest"],[data-theme^="forest-"],
-         [data-theme="dusk"],  [data-theme^="dusk-"],
-         [data-theme="bone"],  [data-theme^="bone-"],
-         [data-theme="press"], [data-theme^="press-"]) {
-    --wal-accent-fg: oklch(from var(--wal-accent) clamp(0.16, (0.63 - l) * 1000, 0.97) calc(c * 0.08) h);
-    --wal-bloom-fg:  oklch(from var(--wal-bloom)  clamp(0.16, (0.63 - l) * 1000, 0.97) calc(c * 0.08) h);
-    --wal-gold-fg:   oklch(from var(--wal-gold)   clamp(0.16, (0.63 - l) * 1000, 0.97) calc(c * 0.08) h);
-    --wal-olive-fg:  oklch(from var(--wal-olive)  clamp(0.16, (0.63 - l) * 1000, 0.97) calc(c * 0.08) h);
-    --wal-cool-fg:   oklch(from var(--wal-cool)   clamp(0.16, (0.63 - l) * 1000, 0.97) calc(c * 0.08) h);
-  }
+  /* ── Shadows ──
+     --wal-elevation scales the offsets, which is how a flat finish stays flat
+     without overriding three separate shadows. */
+  --wal-shadow:    0 calc(20px * var(--wal-elevation)) calc(44px * var(--wal-elevation)) -18px var(--wal-shadow-ink);
+  --wal-shadow-sm: 0 calc(4px  * var(--wal-elevation)) calc(12px * var(--wal-elevation)) -4px  var(--wal-shadow-ink-sm);
+  --wal-shadow-lg: 0 calc(32px * var(--wal-elevation)) calc(64px * var(--wal-elevation)) -24px var(--wal-shadow-ink-lg);
 }
 
 
@@ -668,7 +782,7 @@ code, kbd, samp {
   padding: 0.15em 0.4em;
   border-radius: var(--wal-radius-sm);
   background: var(--wal-surface-2);
-  border: 1px solid var(--wal-line-soft);
+  border: var(--wal-hairline) solid var(--wal-line-soft);
 }
 
 pre {
@@ -677,7 +791,7 @@ pre {
   padding: var(--wal-space-lg);
   border-radius: var(--wal-radius);
   background: var(--wal-surface);
-  border: 1px solid var(--wal-line);
+  border: var(--wal-border);
   overflow-x: auto;
   line-height: 1.7;
 
@@ -700,7 +814,7 @@ blockquote {
 /* ─── Horizontal rule ─── */
 hr {
   border: none;
-  border-top: 1px solid var(--wal-line);
+  border-top: var(--wal-border);
   margin: var(--wal-space-xl) 0;
 }
 
@@ -728,21 +842,28 @@ mark {
    Scoped to `html`, which is where the document scrollbar takes its styling
    from. It used to be `*`, which meant walnut silently restyled every scroll
    container in a consuming app — and because Chromium ignores the
-   ::-webkit-scrollbar-* pseudos entirely whenever `scrollbar-width` is any
-   non-auto value, a consumer had to reset BOTH properties to get its own bar
-   back. One selector change removes that whole class of surprise. */
+   ::-webkit-scrollbar-* pseudos entirely whenever `scrollbar-width` or
+   `scrollbar-color` is non-auto, a consumer had to reset BOTH properties to
+   get its own bar back.
+
+   Two things this scoping does NOT do. A bare `::-webkit-scrollbar` means
+   `*::-webkit-scrollbar`, so the pseudos below carry an explicit `html`, or
+   Safari would still style every container. And `scrollbar-color` inherits,
+   so inner scroll containers do take the warm colours (not the thin width)
+   in browsers with the standard property. To opt one out, give it
+   `scrollbar-color: auto`. */
 :root {
   --wal-scrollbar-thumb: color-mix(in oklch, var(--wal-olive) 45%, var(--wal-line));
 }
 
-::-webkit-scrollbar { width: 10px; }
-::-webkit-scrollbar-track { background: var(--wal-bg); }
-::-webkit-scrollbar-thumb {
+html::-webkit-scrollbar { width: 10px; }
+html::-webkit-scrollbar-track { background: var(--wal-bg); }
+html::-webkit-scrollbar-thumb {
   background: var(--wal-scrollbar-thumb);
   border-radius: 6px;
   border: 2px solid var(--wal-bg);
 }
-::-webkit-scrollbar-thumb:hover { background: var(--wal-accent); }
+html::-webkit-scrollbar-thumb:hover { background: var(--wal-accent); }
 
 /* Firefox scrollbar */
 @supports (scrollbar-color: auto) {
@@ -758,7 +879,9 @@ mark {
   left: -9999px;
   top: 0;
   background: var(--wal-gold);
-  color: var(--wal-bg);
+  /* The computed foreground, not the page ground: --wal-bg on light gold
+     measured 3.0:1, on the one control whose whole job is to be read. */
+  color: var(--wal-gold-fg);
   padding: 0.75rem 1.25rem;
   z-index: 200;
   font-weight: 700;
@@ -776,11 +899,12 @@ mark {
 @layer layout {
 /* ═══════════════════════════════════════════════════
    03 — LAYOUT
-   Composable layout primitives driven by container
-   queries. Every component that needs responsive
-   awareness becomes its own inline-size container.
-   No media queries for component sizing — only
-   @container.  Pure CSS, zero JavaScript.
+   Composable layout primitives that respond to the
+   space they are given, not to the viewport: grids
+   shed columns via auto-fit + minmax, flex rows wrap
+   on their bases. .wal-wrap is an inline-size
+   container for your own @container rules; nothing
+   here queries it. Pure CSS, zero JavaScript.
 ═══════════════════════════════════════════════════ */
 
 
@@ -824,14 +948,16 @@ mark {
      now collapse intrinsically via auto-fit + minmax, which needs no container
      at all and works at any nesting depth.
      Removing container-type also drops the implied `contain: layout`, which had
-     made every grid a containing block for `position: fixed` descendants. */
+     made every grid a containing block for `position: fixed` descendants.
 
-
-  /* ── Gap modifiers ── */
-
-  &.wal-gap-sm { gap: var(--wal-space-sm); }
-  &.wal-gap-md { gap: var(--wal-space-md); }
-  &.wal-gap-lg { gap: var(--wal-space-xl); }
+     Gaps are the .wal-gap-* utilities, which mean the same step on every
+     primitive: .wal-gap-lg is --wal-space-lg on a grid, a stack, a flex row
+     and a cluster alike. This file used to restate them per primitive with
+     different steps (a stack's -lg was space-xl, a cluster's -sm space-xs).
+     Those never applied: the utilities layer comes later, and layer order
+     outranks specificity, so .wal-gap-lg beat .wal-stack.wal-gap-lg. They
+     were deleted rather than revived, because reviving them would silently
+     change the spacing of every page already built on what actually rendered. */
 
 
   /* Column variants. `auto-fit` + `minmax(min(100%, Xrem), 1fr)` caps the count
@@ -859,8 +985,6 @@ mark {
     grid-template-columns: repeat(auto-fit, minmax(min(100%, 9rem), 1fr));
   }
 }
-
-/* Column collapse is intrinsic (see .wal-grid above) — no container queries. */
 
 
 /* ─── .wal-flex ──────────────────────────────────
@@ -892,11 +1016,6 @@ mark {
     justify-content: flex-end;
     align-items: center;
   }
-
-  /* Gap modifiers (re-use the same class names as grid) */
-  &.wal-gap-sm { gap: var(--wal-space-sm); }
-  &.wal-gap-md { gap: var(--wal-space-md); }
-  &.wal-gap-lg { gap: var(--wal-space-xl); }
 }
 
 
@@ -909,11 +1028,6 @@ mark {
   display: flex;
   flex-direction: column;
   gap: var(--wal-space-lg);
-
-  /* Size variants */
-  &.wal-gap-sm { gap: var(--wal-space-sm); }
-  &.wal-gap-md { gap: var(--wal-space-md); }
-  &.wal-gap-lg { gap: var(--wal-space-xl); }
 }
 
 
@@ -927,31 +1041,22 @@ mark {
   flex-wrap: wrap;
   gap: var(--wal-space-sm);
   align-items: center;
-
-  /* Size variants */
-  &.wal-gap-sm { gap: var(--wal-space-xs); }
-  &.wal-gap-md { gap: var(--wal-space-md); }
-  &.wal-gap-lg { gap: var(--wal-space-lg); }
 }
 
 
 /* ─── .wal-sidebar ───────────────────────────────
    Two-panel layout: one fixed-width sidebar, one
-   fluid content area.  Wraps to stacked column at
-   narrow container widths via container query.
-   Uses the "flexbox holy grail" trick with
-   flex-basis + flex-grow for the fluid side.
+   fluid content area. Wraps to a stacked column
+   once the content panel can no longer hold its
+   55% floor — flex-basis + flex-grow, no query.
    ────────────────────────────────────────────── */
 .wal-sidebar {
   display: flex;
   flex-wrap: wrap;
   gap: var(--wal-space-xl);
 
-  /* Not a query container, for the same reason as .wal-grid: the old
-     `@container sidebar` block below queried this element from within itself
-     and never matched. It was also redundant — flex-wrap plus the basis/grow
-     pair below already collapses to a single column once the content panel
-     can no longer hold its 55% floor. */
+  /* Not a query container, for the same reason as .wal-grid: an element
+     cannot query itself. */
 
   /* Sidebar panel (first child by convention) */
   & > :first-child {
@@ -968,8 +1073,6 @@ mark {
   }
 }
 
-/* Collapse is intrinsic (flex-wrap + flex-basis) — no container query needed. */
-
 
 /* ─── .wal-section ───────────────────────────────
    Top-level page section with generous vertical
@@ -979,7 +1082,7 @@ mark {
    ────────────────────────────────────────────── */
 .wal-section {
   padding-block: var(--wal-space-3xl);
-  border-top: 1px solid var(--wal-line);
+  border-top: var(--wal-border);
 
   /* First section on the page needs no border */
   &:first-child,
@@ -1010,7 +1113,7 @@ mark {
        the page — which is what a fixed height plus nowrap did. Nothing is
        hidden and no JavaScript is involved; .wal-drawer is still there if you
        want a real mobile menu instead. */
-    min-height: var(--wal-nav-h, 64px);
+    min-height: var(--wal-nav-h);
     display: flex;
     flex-wrap: wrap;
     align-items: center;
@@ -1019,10 +1122,10 @@ mark {
     padding-block: var(--wal-space-sm);
     padding-inline: var(--wal-space-md);
     transition: box-shadow var(--wal-duration) var(--wal-ease), border-bottom var(--wal-duration) var(--wal-ease);
-    border-bottom: 1px solid transparent;
+    border-bottom: var(--wal-hairline) solid transparent;
 
     &.is-scrolled {
-      border-bottom: 1px solid var(--wal-line);
+      border-bottom: var(--wal-border);
       box-shadow: var(--wal-shadow-sm);
     }
 
@@ -1173,7 +1276,7 @@ mark {
     padding: 0.65rem 1.3rem;
     cursor: pointer;
     text-decoration: none;
-    border: 1px solid transparent;
+    border: var(--wal-hairline) solid transparent;
     transition: all var(--wal-duration) var(--wal-ease);
     line-height: 1.2;
 
@@ -1211,9 +1314,11 @@ mark {
       border-color: var(--wal-line);
       color: var(--wal-text);
 
+      /* The label is the accent used as type, so it takes the -ink form, as
+         links do. The plain accent measured 3.8:1 on a dark ground. */
       &:hover {
         border-color: var(--wal-accent);
-        color: var(--wal-accent);
+        color: var(--wal-accent-ink);
         background: var(--wal-bg-subtle);
       }
     }
@@ -1239,7 +1344,7 @@ mark {
   .wal-card {
     background: var(--wal-card-bg);
     color: var(--wal-card-ink);
-    border: 1px solid var(--wal-line);
+    border: var(--wal-border);
     border-radius: var(--wal-radius);
     padding: var(--wal-space-lg);
     position: relative;
@@ -1276,7 +1381,7 @@ mark {
         height: auto;
         aspect-ratio: 16 / 9;
         object-fit: cover;
-        border-bottom: 1px solid var(--wal-line);
+        border-bottom: var(--wal-border);
       }
       
       > *:not(img:first-child) {
@@ -1315,7 +1420,7 @@ mark {
      `@container` from inside it — an element cannot query itself, so those
      rules never matched and the plate never collapsed.
 
-     The dividers are 1px `gap`s filled by each cell's own outline, so the
+     The dividers are hairline `gap`s filled by each cell's own outline, so the
      hairlines land correctly at *any* wrap configuration. That removes the
      whole nth-child border dance the container queries used to need.
 
@@ -1326,20 +1431,20 @@ mark {
      spec. Now the container carries the cell colour and the cells draw their
      own dividers, so unfilled areas are simply blank. `outline` rather than
      `border` because it is drawn outside the box and does not affect layout,
-     so adjacent cells' outlines meet inside the 1px gap. */
+     so adjacent cells' outlines meet inside the gap. */
   .wal-plate {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(min(100%, var(--wal-plate-min, 10rem)), 1fr));
-    gap: 1px;
-    background: var(--wal-plate-bg, var(--wal-card-bg, var(--wal-surface)));
-    border: 1px solid var(--wal-line);
+    gap: var(--wal-hairline);
+    background: var(--wal-plate-bg, var(--wal-card-bg));
+    border: var(--wal-border);
     border-radius: var(--wal-radius);
     overflow: hidden;
 
     > div {
-      background: var(--wal-plate-bg, var(--wal-card-bg, var(--wal-surface)));
-      color: var(--wal-card-ink, var(--wal-text));
-      outline: 1px solid var(--wal-line);
+      background: var(--wal-plate-bg, var(--wal-card-bg));
+      color: var(--wal-card-ink);
+      outline: var(--wal-border);
       padding: var(--wal-space-md);
       display: flex;
       flex-direction: column;
@@ -1349,7 +1454,7 @@ mark {
     dt {
       font-family: var(--wal-font-label);
       font-size: var(--wal-text-xs);
-      color: var(--wal-card-ink-muted, var(--wal-text-muted));
+      color: var(--wal-card-ink-muted);
       text-transform: uppercase;
       letter-spacing: var(--wal-tracking-label);
       margin: 0;
@@ -1359,7 +1464,7 @@ mark {
       font-family: var(--wal-font-display);
       font-size: var(--wal-text-lg);
       font-weight: 700;
-      color: var(--wal-card-ink, var(--wal-text));
+      color: var(--wal-card-ink);
       margin: 0;
     }
   }
@@ -1372,7 +1477,7 @@ mark {
     padding: var(--wal-space-md);
     background: var(--wal-card-bg);
     color: var(--wal-card-ink);
-    border: 1px solid var(--wal-line);
+    border: var(--wal-border);
     border-radius: var(--wal-radius);
     border-top: var(--wal-metric-border-width, 3px) solid var(--wal-metric-color, var(--wal-accent));
 
@@ -1403,7 +1508,7 @@ mark {
     /* Own token so a consumer with square geometry can flatten chips
        independently of buttons and badges. */
     border-radius: var(--wal-chip-radius, var(--wal-radius-full));
-    border: 1px solid var(--wal-line);
+    border: var(--wal-border);
     background: var(--wal-chip-bg, var(--wal-surface));
     color: var(--wal-chip-color, var(--wal-text-soft));
     white-space: nowrap;
@@ -1415,7 +1520,7 @@ mark {
     flex-direction: column;
     border-radius: var(--wal-radius);
     overflow: hidden;
-    border: 1px solid var(--wal-line);
+    border: var(--wal-border);
     background: var(--wal-card-bg);
     color: var(--wal-card-ink);
 
@@ -1456,7 +1561,7 @@ mark {
       grid-template-columns: 150px 1fr auto;
       gap: var(--wal-space-md);
       padding: var(--wal-space-lg) 0;
-      border-bottom: 1px solid var(--wal-line);
+      border-bottom: var(--wal-border);
       
       &:last-child {
         border-bottom: none;
@@ -1535,7 +1640,7 @@ mark {
       letter-spacing: var(--wal-tracking-label);
       color: var(--wal-text-muted);
       padding: var(--wal-space-md) var(--wal-space-lg);
-      border-bottom: 1px solid var(--wal-line);
+      border-bottom: var(--wal-border);
       font-weight: 400;
     }
 
@@ -1544,7 +1649,7 @@ mark {
       font-size: var(--wal-text-sm);
       color: var(--wal-text);
       padding: var(--wal-space-md) var(--wal-space-lg);
-      border-bottom: 1px solid var(--wal-line-soft);
+      border-bottom: var(--wal-hairline) solid var(--wal-line-soft);
     }
 
     tbody tr:nth-child(even) {
@@ -1568,18 +1673,18 @@ mark {
     &::after {
       content: "";
       flex: 1;
-      border-bottom: 1px solid transparent;
+      border-bottom: var(--wal-hairline) solid transparent;
     }
 
     &::before {
       background: linear-gradient(to left, var(--wal-gold), transparent);
-      height: 1px;
+      height: var(--wal-hairline);
       margin-right: var(--wal-space-md);
     }
 
     &::after {
       background: linear-gradient(to right, var(--wal-gold), transparent);
-      height: 1px;
+      height: var(--wal-hairline);
       margin-left: var(--wal-space-md);
     }
     
@@ -1614,17 +1719,25 @@ mark {
     width: 100%;
     max-width: 320px;
     background: var(--wal-surface);
-    border-left: 1px solid var(--wal-line);
+    border-left: var(--wal-border);
     box-shadow: var(--wal-shadow-lg);
     z-index: 1001;
     transform: translateX(100%);
-    transition: transform var(--wal-duration) var(--wal-ease);
+    /* Off-canvas is not closed: a drawer that is only translated away keeps
+       every link in the tab order, so a keyboard user tabbed into a panel
+       they could not see. `visibility` takes it out of both the tab order and
+       the accessibility tree, and flips only after the slide has finished. */
+    visibility: hidden;
+    transition: transform var(--wal-duration) var(--wal-ease),
+                visibility 0s linear var(--wal-duration);
     display: flex;
     flex-direction: column;
     padding: var(--wal-space-lg);
-    
+
     &.is-open {
       transform: translateX(0);
+      visibility: visible;
+      transition-delay: 0s;
     }
 
     .wal-drawer-header {
@@ -1651,12 +1764,13 @@ mark {
         font-family: var(--wal-font-display);
         font-size: var(--wal-text-lg);
         padding: var(--wal-space-sm) 0;
-        border-bottom: 1px solid var(--wal-line-soft);
-        
+        border-bottom: var(--wal-hairline) solid var(--wal-line-soft);
+        /* On the link, not on :hover, so the indent eases back out as well. */
+        transition: padding var(--wal-duration) var(--wal-ease);
+
         &:hover {
-          color: var(--wal-accent);
+          color: var(--wal-accent-ink);
           padding-left: var(--wal-space-sm);
-          transition: padding var(--wal-duration) var(--wal-ease);
         }
       }
     }
@@ -1666,7 +1780,7 @@ mark {
   .wal-input {
     width: 100%;
     background: var(--wal-surface);
-    border: 1px solid var(--wal-line);
+    border: var(--wal-hairline) solid var(--wal-line-input);
     border-radius: var(--wal-radius-sm);
     padding: 0.65rem 1rem;
     font-family: var(--wal-font-body);
@@ -1678,14 +1792,19 @@ mark {
       color: var(--wal-text-muted);
     }
     
+    /* A transparent outline, not `none`: forced-colors mode discards the
+       box-shadow ring and paints outlines in a system colour, so this is the
+       one focus indicator that survives there. */
     &:focus {
-      outline: none;
+      outline: 2px solid transparent;
       border-color: var(--wal-accent);
       box-shadow: 0 0 0 3px color-mix(in oklch, var(--wal-accent) 20%, transparent);
     }
     
+    /* background-color, not the shorthand, which would also reset the
+       select arrow's background-image. */
     &:disabled {
-      background: var(--wal-bg-subtle);
+      background-color: var(--wal-bg-subtle);
       color: var(--wal-text-muted);
       cursor: not-allowed;
     }
@@ -1696,11 +1815,18 @@ mark {
     resize: vertical;
   }
 
+  /* The arrow is two gradients meeting in a point, because a gradient can
+     read currentColor and an SVG background cannot. The data-URI SVG this
+     replaces was its own document, so its `currentColor` was always black,
+     and the arrow disappeared on every dark ground. */
   select.wal-input {
     appearance: none;
-    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>');
+    background-image:
+      linear-gradient(45deg,  transparent 50%, currentColor 50%),
+      linear-gradient(135deg, currentColor 50%, transparent 50%);
+    background-size: 5px 5px;
     background-repeat: no-repeat;
-    background-position: right 1rem center;
+    background-position: right calc(1rem + 5px) center, right 1rem center;
     padding-right: 2.5rem;
   }
 
@@ -1725,9 +1851,11 @@ mark {
     font-weight: 500;
     color: var(--wal-text);
 
-    /* A required marker, opt-in via [data-required] so it needs no extra span. */
+    /* A required marker, opt-in via [data-required] so it needs no extra span.
+       The empty alt text keeps screen readers from announcing "star": the
+       input's own `required` is what says it. */
     &[data-required]::after {
-      content: "*";
+      content: "*" / "";
       color: var(--wal-accent);
       font-weight: 700;
     }
@@ -1809,7 +1937,7 @@ mark {
   /* ═══ 15. Dialog ═══ */
   .wal-dialog {
     padding: var(--wal-space-xl);
-    border: 1px solid var(--wal-line);
+    border: var(--wal-border);
     border-radius: var(--wal-radius-lg);
     background: var(--wal-surface);
     color: var(--wal-text);
@@ -1823,72 +1951,102 @@ mark {
       backdrop-filter: blur(8px);
       -webkit-backdrop-filter: blur(8px);
     }
-    
-    /* Popover API support */
-    &[popover] {
-      padding: var(--wal-space-xl);
-      border: 1px solid var(--wal-line);
-      border-radius: var(--wal-radius-lg);
-      background: var(--wal-surface);
-      color: var(--wal-text);
-      box-shadow: var(--wal-shadow-lg);
-      max-width: 500px;
-    }
   }
 
-  /* ═══ 16. Tooltip ═══ */
+  /* ═══ 16. Tooltip ═══
+     The tooltip goes INSIDE its trigger, and the trigger points at it:
+
+         <button class="wal-tooltip-trigger" aria-describedby="save-tip">Save
+           <span class="wal-tooltip" id="save-tip" role="tooltip"
+                 aria-hidden="true">Saves a draft</span>
+         </button>
+
+     aria-hidden keeps the tip out of the button's NAME, which is computed
+     from its content ("Save Saves a draft" otherwise); aria-describedby
+     still reads it, as the description.
+
+     The trigger is its containing block, so plain offsets centre it with no
+     anchor positioning — which an earlier version used, sharing one
+     anchor-name that resolved to the LAST trigger on the page. Anything with
+     `overflow: hidden` between the two clips it, .wal-card included.
+
+     WCAG 1.4.13 asks for three things. Hoverable: the tip takes the pointer
+     (no `pointer-events: none`) and ::before bridges the gap, so moving onto
+     it keeps the trigger hovered — it is a descendant. Persistent: it stays
+     until hover and focus leave. Dismissible: Escape, which CSS cannot hear,
+     so it takes two lines of script that add .is-dismissed — see the README. */
   .wal-tooltip-trigger {
-    anchor-name: --wal-tooltip;
+    position: relative;
   }
 
   .wal-tooltip {
     position: absolute;
-    position-anchor: --wal-tooltip;
-    top: anchor(bottom);
-    left: anchor(center);
-    justify-self: anchor-center;
+    top: 100%;
+    left: 50%;
+    translate: -50% 0;
     margin-top: var(--wal-space-sm);
-    
+    /* Sized to its text, not to the space left after `left: 50%`, which would
+       wrap a short tip inside half the width of a small button. */
+    inline-size: max-content;
+    max-inline-size: 16rem;
+
     padding: var(--wal-space-xs) var(--wal-space-sm);
     background: var(--wal-surface-2);
     color: var(--wal-text);
     font-family: var(--wal-font-body);
     font-size: var(--wal-text-xs);
-    border: 1px solid var(--wal-line);
+    /* Inside a .wal-btn it would otherwise inherit the button's weight,
+       tracking and (under a finish) its case. */
+    font-weight: 400;
+    letter-spacing: normal;
+    text-transform: none;
+    text-align: center;
+    border: var(--wal-border);
     border-radius: var(--wal-radius-sm);
     box-shadow: var(--wal-shadow-sm);
-    pointer-events: none;
-    opacity: 0;
-    transition: opacity var(--wal-duration) var(--wal-ease);
     z-index: 1000;
-    
+    /* `visibility`, not just opacity: an invisible tip that still took the
+       pointer would open itself when the cursor crossed where it will be. It
+       flips after the fade, so the fade still plays on the way out. */
+    visibility: hidden;
+    opacity: 0;
+    transition: opacity var(--wal-duration) var(--wal-ease),
+                visibility 0s linear var(--wal-duration);
+
+    /* The hover bridge across the margin. */
     &::before {
       content: "";
       position: absolute;
+      inset-inline: 0;
       bottom: 100%;
-      left: 50%;
-      transform: translateX(-50%);
-      border-width: 5px;
-      border-style: solid;
-      border-color: transparent transparent var(--wal-line) transparent;
+      block-size: var(--wal-space-sm);
     }
-    
+
+    /* The arrow: a square turned 45° with the tip's own fill and two edges. */
     &::after {
       content: "";
       position: absolute;
-      bottom: 100%;
+      top: 0;
       left: 50%;
-      transform: translateX(-50%);
-      border-width: 4px;
-      border-style: solid;
-      border-color: transparent transparent var(--wal-surface-2) transparent;
+      inline-size: 8px;
+      block-size: 8px;
+      translate: -50% -50%;
+      rotate: 45deg;
+      background: var(--wal-surface-2);
+      border-top: var(--wal-border);
+      border-left: var(--wal-border);
     }
   }
-  
-  .wal-tooltip-trigger:hover + .wal-tooltip,
-  .wal-tooltip-trigger:focus + .wal-tooltip,
-  .wal-tooltip:popover-open {
+
+  .wal-tooltip-trigger:is(:hover, :focus-visible) > .wal-tooltip {
+    visibility: visible;
     opacity: 1;
+    transition-delay: 0s;
+  }
+
+  .wal-tooltip-trigger.is-dismissed > .wal-tooltip {
+    visibility: hidden;
+    opacity: 0;
   }
 
   /* ═══ 17. Eyebrow ═══ */
@@ -1916,21 +2074,21 @@ mark {
       width: 8px;
       height: 8px;
       border-radius: 50%;
-      background-color: var(--wal-success, #10b981);
-      box-shadow: 0 0 0 0 color-mix(in oklch, var(--wal-success, #10b981) 70%, transparent);
+      background-color: var(--wal-success);
+      box-shadow: 0 0 0 0 color-mix(in oklch, var(--wal-success) 70%, transparent);
       animation: wal-ping 2s infinite var(--wal-ease);
     }
   }
 
   @keyframes wal-ping {
     0% {
-      box-shadow: 0 0 0 0 color-mix(in oklch, var(--wal-success, #10b981) 70%, transparent);
+      box-shadow: 0 0 0 0 color-mix(in oklch, var(--wal-success) 70%, transparent);
     }
     70% {
-      box-shadow: 0 0 0 6px color-mix(in oklch, var(--wal-success, #10b981) 0%, transparent);
+      box-shadow: 0 0 0 6px color-mix(in oklch, var(--wal-success) 0%, transparent);
     }
     100% {
-      box-shadow: 0 0 0 0 color-mix(in oklch, var(--wal-success, #10b981) 0%, transparent);
+      box-shadow: 0 0 0 0 color-mix(in oklch, var(--wal-success) 0%, transparent);
     }
   }
 
@@ -1938,7 +2096,7 @@ mark {
   /* ═══ 19. Footer ═══
      End-credits colophon: a top rule and a row of role/value pairs. */
   .wal-footer {
-    border-top: 1px solid var(--wal-line);
+    border-top: var(--wal-border);
     padding-block: var(--wal-space-xl) var(--wal-space-2xl);
   }
 
@@ -1973,7 +2131,7 @@ mark {
     width: var(--wal-iconbtn-size, 38px);
     height: var(--wal-iconbtn-size, 38px);
     border-radius: var(--wal-radius-full);
-    border: 1px solid var(--wal-line);
+    border: var(--wal-border);
     background: transparent;
     color: var(--wal-text-soft);
     cursor: pointer;
@@ -2075,7 +2233,7 @@ mark {
       overflow: hidden;
       position: relative;
       background: var(--wal-frame-bg, var(--wal-bg-subtle));
-      border: 1px solid var(--wal-line);
+      border: var(--wal-border);
     }
 
     figcaption {
@@ -2130,7 +2288,7 @@ mark {
         display: block;
         block-size: var(--wal-script-h, 4.5rem);
         background: var(--wal-cue, var(--wal-surface-2));
-        border: var(--wal-hairline) solid var(--wal-line);
+        border: var(--wal-border);
         border-radius: var(--wal-radius-sm);
       }
 
@@ -2213,6 +2371,11 @@ mark {
     letter-spacing: calc(var(--wal-tracking-label) * 1.6);
     color: var(--wal-caption-color, var(--wal-text-muted));
     margin: 0;
+    /* A caption is usually a <p>, and base caps <p> at 65ch — measured in
+       the caption's own tiny, widely tracked face, which is under 30rem. A
+       one-line standfirst broke after its fourth word and left the last two
+       on a line of their own. A caption takes its container's measure. */
+    max-width: none;
   }
 
   /* ═══ 29. Index ═══
@@ -2230,8 +2393,7 @@ mark {
 
   /* ═══ 30. Section head ═══
      Index, title and standfirst as one block, with the index in a left margin
-     wide enough to hold it. Collapses to a stack when the margin no longer
-     fits, which is the only breakpoint the component needs.
+     exactly as wide as it needs. No breakpoint: see the column note below.
 
          <header class="wal-section-head">
            <p class="wal-index">01</p>
@@ -2240,10 +2402,10 @@ mark {
          </header> */
   .wal-section-head {
     display: grid;
-    /* `max-content minmax(0, 1fr)`, not a fixed margin plus a floor: the index
-       column is exactly as wide as "01" needs and the content column can
-       shrink to zero, so this needs no breakpoint and cannot overflow at any
-       width. A minmax() floor on the second column would have done both. */
+    /* `max-content minmax(0, 1fr)`: the index column is exactly as wide as
+       "01" needs and the content column can shrink to zero, so this needs no
+       breakpoint and cannot overflow at any width. A fixed floor on the
+       content column (minmax(20rem, 1fr), say) would bring back both. */
     grid-template-columns: max-content minmax(0, 1fr);
     gap: var(--wal-space-xs) var(--wal-space-lg);
     align-items: baseline;
@@ -2286,6 +2448,29 @@ mark {
    a different *structure*, not a different value: a card that is a printed
    plate rather than a floating panel, a nav that is a ruled masthead rather
    than a frosted bar.
+
+   ───────────────────────────────────────────────────
+   A PALETTE NEVER SETS WHAT A FINISH SETS
+
+   Every token declared in this file belongs to the finish axis alone. No
+   palette file sets elevation, wash, radius, rule strength or the label
+   voice, however much its mood seems to ask for it — "print does not cast
+   shadows" is the catalogue finish's sentence, not Press's.
+
+   The `finish` layer cannot protect these tokens on its own, for two reasons:
+
+     1. dist/themes/*.css ship unlayered, and unlayered beats every layer. A
+        palette that set --wal-elevation won on <html class="wal-press"
+        data-finish="soft">, so switching finishes changed nothing.
+     2. Even inside @layer tokens, a layer only arbitrates between
+        declarations on the SAME element. <section class="wal-bone"> on a
+        catalogue page declares its own value there, and an element's own
+        declaration beats an inherited one from any layer.
+
+   So orthogonality is kept by ownership, not by order: the two axes compose
+   in any combination and at any depth because they never write the same
+   token. It also keeps `soft` honest — it resets to the stock values, which
+   is only the same thing as "no finish" if no palette has moved them.
 ═══════════════════════════════════════════════════ */
 
 
@@ -2320,28 +2505,26 @@ mark {
   /* ── Voice ──
      Wider tracking on labels; the typewriter face carries the catalogue's
      furniture, which is what separates it from a modern dashboard using the
-     same mono for code. */
-  --wal-tracking-label: 0.16em;
+     same mono for code. Only a little wider: Courier Prime is monospaced, so
+     its advance is already generous, and captions multiply this by 1.6.
+     At 0.16em a caption set at 0.26em and read as spaced-out letters rather
+     than as words. */
+  --wal-tracking-label: 0.12em;
   --wal-font-label: var(--wal-font-typewriter);
-}
 
-/* Hairlines are the catalogue's entire visual language, so they have to read
-   on any palette, including the soft ones. This turns the knob rather than
-   overriding --wal-line: the finish must not own a colour, or it stops being
-   orthogonal to the palette and a light rule ends up hard-coded onto a dark
-   theme. --wal-line-boost is consumed inside the derivation in 01-tokens.css,
-   and reaches it because both land on the same element — custom property
-   substitution uses the winning value on that element, whichever layer
-   declared it. */
-[data-finish="catalogue"] {
+  /* ── Rules ──
+     Hairlines are the catalogue's entire visual language, so they have to
+     read on any palette, including the soft ones. This turns the knob rather
+     than overriding --wal-line: the finish must not own a colour, or it stops
+     being orthogonal to the palette and a light rule ends up hard-coded onto
+     a dark theme. --wal-line-boost is consumed by the rule in 01-tokens.css
+     that lists [data-finish], so it re-derives on this element. */
   --wal-line-boost: 1.7;
-}
 
-/* ─── Headings ───
-   Tighter and quieter. A catalogue's hierarchy comes from rules and numbering,
-   not from typographic shouting, so headings lose a weight step and gain
-   balanced wrapping. */
-[data-finish="catalogue"] {
+  /* ─── Headings ───
+     Tighter and quieter. A catalogue's hierarchy comes from rules and
+     numbering, not from typographic shouting, so headings lose a weight step
+     and gain balanced wrapping. */
   h1, h2, h3, h4 {
     font-weight: 600;
     text-wrap: balance;
@@ -2365,7 +2548,7 @@ mark {
   background: var(--wal-bg);
   backdrop-filter: none;
   -webkit-backdrop-filter: none;
-  border-bottom: var(--wal-hairline) solid var(--wal-line);
+  border-bottom: var(--wal-border);
 
   &.is-scrolled {
     box-shadow: none;
@@ -2379,20 +2562,11 @@ mark {
    geometry. Keeping a translate on hover is what makes an otherwise correct
    catalogue still feel like a SaaS dashboard. */
 [data-finish="catalogue"] .wal-card {
-  border-color: var(--wal-line);
-
   &:hover {
     transform: none;
     box-shadow: none;
     border-color: var(--wal-accent);
   }
-}
-
-/* ─── Sections ───
-   Sections are separated by a rule at the top and generous air, and the first
-   one still has none — the same intent as the stock section, drawn flat. */
-[data-finish="catalogue"] .wal-section {
-  border-top-width: var(--wal-hairline);
 }
 
 /* ─── Tables ───
@@ -2411,11 +2585,7 @@ mark {
 [data-finish="catalogue"] .wal-btn {
   letter-spacing: 0.04em;
 
-  &.wal-btn-secondary {
-    border-color: var(--wal-line);
-
-    &:hover { background: var(--wal-accent-soft); }
-  }
+  &.wal-btn-secondary:hover { background: var(--wal-accent-soft); }
 
   &.wal-btn-primary:hover {
     transform: none;
@@ -2434,20 +2604,23 @@ mark {
 
 /* ═══ SOFT ═══
    The stock finish, named so it can be asked for explicitly — useful when a
-   subtree should opt out of an inherited catalogue finish. Restates the
-   defaults from 01-tokens.css rather than unsetting them, because `unset` on a
-   custom property would fall back to the registered initial value and lose a
-   consumer's own override. */
+   subtree should opt out of an inherited catalogue finish. It cannot simply
+   `unset` them: these tokens inherit, so unset means inherit, which is the
+   catalogue it is opting out of. `initial` is the next best thing. On a
+   registered token it is the registered stock value (01-tokens.css), so the
+   numbers are not restated here; on the unregistered per-component radii it
+   is "no value", and each component falls back to its pill. The two tokens
+   that are neither are stated. */
 [data-finish="soft"] {
-  --wal-radius:       12px;
-  --wal-radius-sm:    6px;
-  --wal-radius-lg:    18px;
-  --wal-btn-radius:   var(--wal-radius-full);
-  --wal-chip-radius:  var(--wal-radius-full);
-  --wal-badge-radius: var(--wal-radius-full);
-  --wal-elevation:    1;
-  --wal-wash:         1;
-  --wal-line-boost:   1;
+  --wal-radius:       initial;
+  --wal-radius-sm:    initial;
+  --wal-radius-lg:    initial;
+  --wal-btn-radius:   initial;
+  --wal-chip-radius:  initial;
+  --wal-badge-radius: initial;
+  --wal-elevation:    initial;
+  --wal-wash:         initial;
+  --wal-line-boost:   initial;
   --wal-tracking-label: 0.1em;
   --wal-font-label:   var(--wal-font-mono);
 }
@@ -2677,19 +2850,6 @@ mark {
 
 /* ── Display & Visibility ────────────────────────────────────────────── */
 
-/* The HTML `hidden` attribute has to keep working on a walnut component.
-   Every component that sets `display` — .wal-badge, .wal-chip, .wal-btn,
-   .wal-cluster and a dozen others — outranks the UA sheet's
-   `[hidden] { display: none }`, so `<span class="wal-badge" hidden>` rendered
-   anyway. It is a genuinely confusing bug: the attribute is right there in the
-   markup and the element is on screen.
-
-   This belongs conceptually in the reset layer, but reset LOSES to components,
-   so restating it there would do nothing. It lives here because utilities sit
-   after components in the layer order — and this is the one rule in the file
-   that is not a utility class. Consumer CSS is unlayered and still wins. */
-[hidden] { display: none; }
-
 .wal-hidden { display: none; }
 .wal-block { display: block; }
 .wal-inline { display: inline; }
@@ -2704,15 +2864,15 @@ mark {
   padding: 0;
   margin: -1px;
   overflow: hidden;
-  clip: rect(0, 0, 0, 0);
+  clip-path: inset(50%);
   white-space: nowrap;
   border-width: 0;
 }
 
 /* ── Border & Radius ─────────────────────────────────────────────────── */
-.wal-border { border: 1px solid var(--wal-line); }
-.wal-border-top { border-top: 1px solid var(--wal-line); }
-.wal-border-bottom { border-bottom: 1px solid var(--wal-line); }
+.wal-border { border: var(--wal-border); }
+.wal-border-top { border-top: var(--wal-border); }
+.wal-border-bottom { border-bottom: var(--wal-border); }
 
 .wal-rounded { border-radius: var(--wal-radius); }
 .wal-rounded-sm { border-radius: var(--wal-radius-sm); }
@@ -2745,11 +2905,120 @@ mark {
 @layer cinema {
 /* ═══════════════════════════════════════════════════════════════════════
    06-cinema.css
-   Scroll-driven animations and cinematic motion effects.
+   Motion. The first two blocks move the colour script itself; the rest are
+   general-purpose scroll and view-transition helpers.
    ═══════════════════════════════════════════════════════════════════════ */
 
 @media (prefers-reduced-motion: no-preference) {
-  
+
+  /* ── Retune ────────────────────────────────────────────────────────────
+     When the rods move, the page travels with them instead of cutting.
+
+         <html class="wal-press wal-retune">
+
+     Every colour in walnut is derived from registered numbers, and a
+     registered number interpolates. So a palette class, a finish, or a rod
+     written from script tweens the *inputs*, and every surface, hairline,
+     ink and shadow re-derives on each frame from wherever the inputs have
+     got to. That is not a crossfade between two pictures of the page: a hue
+     travels along the wheel, so every intermediate frame is still a coherent
+     script rather than a muddy mix of two.
+
+     Along, not round: a registered <number> interpolates numerically, with
+     no notion of the short way round. Café's ground (55) to Dusk's (280)
+     passes through green and blue. A palette that wants the short path to
+     a neighbour writes its hue within 180 of it (-80 is the same hue as 280).
+
+     Derived hues stay locked to their source. With the default
+     `--wal-bloom-hue: calc(var(--wal-accent-hue) + 27)`, bloom's own
+     transition runs on the same timing as the accent's, from a value 27°
+     away to a value 27° away, so the offset holds on every frame.
+
+     Opt-in, because a tween is wrong for direct manipulation: a slider bound
+     to a rod should move the page under the thumb, not 800ms behind it.
+     Take the class off while a control is being dragged.
+
+     Mode is not included and cannot be. color-scheme is discrete, and
+     light-dark() picks a branch rather than blending two. A root view
+     transition is the tool for that; see the crossfade further down. */
+  .wal-retune {
+    transition-property:
+      --wal-hue, --wal-chroma,
+      --wal-accent-hue, --wal-accent-chroma,
+      --wal-bloom-hue,  --wal-bloom-chroma,
+      --wal-gold-hue,   --wal-gold-chroma,
+      --wal-olive-hue,  --wal-olive-chroma,
+      --wal-cool-hue,   --wal-cool-chroma,
+      --wal-l-bg-light, --wal-l-bg-dark,
+      --wal-l-subtle-light, --wal-l-subtle-dark,
+      --wal-l-surface-light, --wal-l-surface-dark,
+      --wal-l-surface-2-light, --wal-l-surface-2-dark,
+      --wal-l-line-light, --wal-l-line-dark,
+      --wal-l-line-soft-light, --wal-l-line-soft-dark,
+      --wal-l-line-input-light, --wal-l-line-input-dark,
+      --wal-l-text-light, --wal-l-text-dark,
+      --wal-l-text-soft-light, --wal-l-text-soft-dark,
+      --wal-l-text-muted-light, --wal-l-text-muted-dark,
+      --wal-l-accent-light, --wal-l-accent-dark,
+      --wal-l-bloom-light, --wal-l-bloom-dark,
+      --wal-l-gold-light, --wal-l-gold-dark,
+      --wal-l-olive-light, --wal-l-olive-dark,
+      --wal-l-cool-light, --wal-l-cool-dark,
+      --wal-hover-shift-light, --wal-hover-shift-dark,
+      --wal-ink-shift-light, --wal-ink-shift-dark,
+      --wal-cx-ground-light, --wal-cx-ground-dark,
+      --wal-cx-surface-light, --wal-cx-surface-dark,
+      --wal-cx-line-light, --wal-cx-line-dark,
+      --wal-cx-ink-light, --wal-cx-ink-dark,
+      --wal-radius, --wal-radius-sm, --wal-radius-lg,
+      --wal-elevation, --wal-wash, --wal-line-boost;
+    transition-duration: var(--wal-retune-duration, 0.8s);
+    /* Symmetric, unlike --wal-ease. Expo-out suits a thing arriving; a rod
+       being turned from one setting to another should start and stop like a
+       dial under a hand. */
+    transition-timing-function: var(--wal-ease-travel, cubic-bezier(0.65, 0, 0.35, 1));
+  }
+
+  /* ── Cue in ────────────────────────────────────────────────────────────
+     The page prints itself on load: the paper first, then the five cues in
+     script order, each rising from zero chroma — a grey proof taking its
+     colour one plate at a time.
+
+         <html class="wal-press wal-cue-in">
+
+     Only the chroma rods move. Lightness never does, so contrast is final
+     from the first frame and nothing is unreadable while it runs. Each
+     keyframe states only `from`, which makes the end of every pass the
+     element's own value — the same six keyframes print any palette,
+     including one written inline.
+
+     Runs once, on first style resolution. A pass is --wal-cue-in-pass long
+     and each cue starts --wal-cue-in-stagger after the one before it; the
+     ground leads the first cue by twice that. `backwards` holds every cue
+     at zero until its turn. It uses animation-name as a list, so put it on
+     an element that has no other animation — <html> is the intended one. */
+  @keyframes wal-cue-in-ground { from { --wal-chroma: 0; } }
+  @keyframes wal-cue-in-accent { from { --wal-accent-chroma: 0; } }
+  @keyframes wal-cue-in-bloom  { from { --wal-bloom-chroma: 0; } }
+  @keyframes wal-cue-in-gold   { from { --wal-gold-chroma: 0; } }
+  @keyframes wal-cue-in-olive  { from { --wal-olive-chroma: 0; } }
+  @keyframes wal-cue-in-cool   { from { --wal-cool-chroma: 0; } }
+
+  .wal-cue-in {
+    animation-name: wal-cue-in-ground, wal-cue-in-accent, wal-cue-in-bloom,
+                    wal-cue-in-gold, wal-cue-in-olive, wal-cue-in-cool;
+    animation-duration: var(--wal-cue-in-pass, 0.7s);
+    animation-delay:
+      0s,
+      calc(var(--wal-cue-in-stagger, 0.14s) * 2),
+      calc(var(--wal-cue-in-stagger, 0.14s) * 3),
+      calc(var(--wal-cue-in-stagger, 0.14s) * 4),
+      calc(var(--wal-cue-in-stagger, 0.14s) * 5),
+      calc(var(--wal-cue-in-stagger, 0.14s) * 6);
+    animation-timing-function: var(--wal-ease);
+    animation-fill-mode: backwards;
+  }
+
   /* ── Scroll-driven Reveals ─────────────────────────────────────────── */
   
   /* Shared keyframes for reveals */
@@ -2801,7 +3070,7 @@ mark {
   .wal-reveal-left,
   .wal-reveal-right,
   .wal-reveal-scale {
-    animation-timing-function: var(--wal-ease, cubic-bezier(0.2, 0.8, 0.2, 1));
+    animation-timing-function: var(--wal-ease);
     animation-fill-mode: both;
     /* Use view timeline for scroll-driven animations */
     animation-timeline: view();
@@ -2845,6 +3114,14 @@ mark {
     z-index: 1000;
   }
 
+  /* Without scroll timelines the declaration above is dropped, the animation
+     runs on the clock at its default 0s and leaves no fill — so the bar sat
+     at full width across the top of every page. Better absent than wrong.
+     The reveals need no guard: `fill-mode: both` leaves them visible. */
+  @supports not (animation-timeline: scroll()) {
+    .wal-progress-bar { display: none; }
+  }
+
   /* ── Parallax ──────────────────────────────────────────────────────── */
 
   @keyframes wal-parallax-move {
@@ -2868,8 +3145,8 @@ mark {
   /* Cinematic cross-fade for old/new view transitions */
   ::view-transition-old(*),
   ::view-transition-new(*) {
-    animation-duration: var(--wal-duration-slow, 0.8s);
-    animation-timing-function: var(--wal-ease, cubic-bezier(0.4, 0, 0.2, 1));
+    animation-duration: var(--wal-duration-slow);
+    animation-timing-function: var(--wal-ease);
   }
 
   ::view-transition-old(*) {
@@ -2887,6 +3164,16 @@ mark {
   @keyframes wal-breathe-in {
     from { opacity: 0; transform: scale(1.02); }
   }
+
+  /* The root snapshot is the whole page, and scaling the whole page reads as
+     the browser zooming rather than as a cut. Named elements keep the breathe
+     above; the root only crossfades — which is what a mode switch needs,
+     since color-scheme cannot tween (see Retune). */
+  ::view-transition-old(root) { animation-name: wal-fade-out; }
+  ::view-transition-new(root) { animation-name: wal-fade-in; }
+
+  @keyframes wal-fade-out { to   { opacity: 0; } }
+  @keyframes wal-fade-in  { from { opacity: 0; } }
 
   /* ── Cinematic Keyframes ───────────────────────────────────────────── */
 
@@ -2921,15 +3208,15 @@ mark {
   /* ── Utility Animation Classes ─────────────────────────────────────── */
 
   .wal-animate-drift {
-    animation: wal-drift 4s var(--wal-ease, ease-in-out) infinite;
+    animation: wal-drift 4s var(--wal-ease) infinite;
   }
 
   .wal-animate-pulse {
-    animation: wal-pulse 3s var(--wal-ease, ease-in-out) infinite;
+    animation: wal-pulse 3s var(--wal-ease) infinite;
   }
 
   .wal-animate-breathe {
-    animation: wal-breathe 5s var(--wal-ease, ease-in-out) infinite;
+    animation: wal-breathe 5s var(--wal-ease) infinite;
   }
 
   /* Animation delays */
@@ -2944,6 +3231,52 @@ mark {
   .wal-delay-900 { animation-delay: 900ms; }
   .wal-delay-1000 { animation-delay: 1000ms; }
 
+}
+
+/* ── Forced colours ────────────────────────────────────────────────────
+   Windows High Contrast and friends replace every colour with a handful of
+   system ones and drop gradient backgrounds. Anything walnut draws as a
+   filled box or a gradient rather than a border — rules, markers, the nav
+   underline, the progress bar — would vanish, so those are redrawn as
+   borders or in system colours. It lives in this, the last layer, so it
+   wins over whichever layer drew the original. */
+@media (forced-colors: active) {
+  .wal-rule::before,
+  .wal-rule::after,
+  .wal-divider::before,
+  .wal-divider::after {
+    background: none;
+    block-size: 0;
+    border-block-start: var(--wal-hairline) solid CanvasText;
+  }
+
+  .wal-nav .wal-nav-links a::after {
+    background: none;
+    border-block-end: 2px solid LinkText;
+  }
+
+  .wal-list-dash li::before,
+  .wal-avail .wal-avail-dot {
+    forced-color-adjust: none;
+    background: CanvasText;
+  }
+
+  .wal-progress-bar {
+    forced-color-adjust: none;
+    background: Highlight;
+  }
+
+  /* The gradient arrow is gone here; let the platform draw its own. */
+  select.wal-input {
+    appearance: auto;
+    background-image: none;
+  }
+
+  /* A colour chart's colours are its content. */
+  .wal-script > *::before,
+  .wal-swatch .wal-swatch-color {
+    forced-color-adjust: none;
+  }
 }
 
 }

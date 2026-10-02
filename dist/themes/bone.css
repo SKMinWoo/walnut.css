@@ -33,17 +33,16 @@
   --wal-l-line-soft-light: 90%;
   --wal-l-text-light:      18%;
   --wal-l-text-soft-light: 38%;
-  --wal-l-text-muted-light: 56%;
-
-  /* Pencil-edge softness rather than a cast shadow. */
-  --wal-elevation: 0.75;
+  --wal-l-text-muted-light: 50.5%;
 }
 
 /* Light-first, stated so it still LOSES to an explicit mode request.
-   The :not() chain matters: the generic mode rules in 01-tokens.css sit inside
-   :where() and therefore carry zero specificity, so a plain `.wal-bone` rule
-   would outrank `.wal-dark` and make the dark variant unreachable. */
-.wal-bone:not(.wal-dark):not([data-theme="dark"]):not([data-theme$="-dark"]),
-[data-theme="bone"]:not(.wal-dark) {
+   The :not() chain matters: this file ships unlayered, which beats the mode
+   rules in 01-tokens.css whatever their specificity, so a plain `.wal-bone`
+   rule would make `.wal-dark` on the same element unreachable. The :where()
+   matters too: without it the chain weighs (0,4,0) and beats an app's own
+   one-class dark mode, `.dark { color-scheme: dark }`. */
+:where(.wal-bone:not(.wal-dark):not([data-theme="dark"]):not([data-theme$="-dark"]),
+       [data-theme="bone"]:not(.wal-dark)) {
   color-scheme: light;
 }

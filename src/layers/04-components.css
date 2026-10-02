@@ -16,7 +16,7 @@
        the page — which is what a fixed height plus nowrap did. Nothing is
        hidden and no JavaScript is involved; .wal-drawer is still there if you
        want a real mobile menu instead. */
-    min-height: var(--wal-nav-h, 64px);
+    min-height: var(--wal-nav-h);
     display: flex;
     flex-wrap: wrap;
     align-items: center;
@@ -25,10 +25,10 @@
     padding-block: var(--wal-space-sm);
     padding-inline: var(--wal-space-md);
     transition: box-shadow var(--wal-duration) var(--wal-ease), border-bottom var(--wal-duration) var(--wal-ease);
-    border-bottom: 1px solid transparent;
+    border-bottom: var(--wal-hairline) solid transparent;
 
     &.is-scrolled {
-      border-bottom: 1px solid var(--wal-line);
+      border-bottom: var(--wal-border);
       box-shadow: var(--wal-shadow-sm);
     }
 
@@ -179,7 +179,7 @@
     padding: 0.65rem 1.3rem;
     cursor: pointer;
     text-decoration: none;
-    border: 1px solid transparent;
+    border: var(--wal-hairline) solid transparent;
     transition: all var(--wal-duration) var(--wal-ease);
     line-height: 1.2;
 
@@ -217,9 +217,11 @@
       border-color: var(--wal-line);
       color: var(--wal-text);
 
+      /* The label is the accent used as type, so it takes the -ink form, as
+         links do. The plain accent measured 3.8:1 on a dark ground. */
       &:hover {
         border-color: var(--wal-accent);
-        color: var(--wal-accent);
+        color: var(--wal-accent-ink);
         background: var(--wal-bg-subtle);
       }
     }
@@ -245,7 +247,7 @@
   .wal-card {
     background: var(--wal-card-bg);
     color: var(--wal-card-ink);
-    border: 1px solid var(--wal-line);
+    border: var(--wal-border);
     border-radius: var(--wal-radius);
     padding: var(--wal-space-lg);
     position: relative;
@@ -282,7 +284,7 @@
         height: auto;
         aspect-ratio: 16 / 9;
         object-fit: cover;
-        border-bottom: 1px solid var(--wal-line);
+        border-bottom: var(--wal-border);
       }
       
       > *:not(img:first-child) {
@@ -321,7 +323,7 @@
      `@container` from inside it — an element cannot query itself, so those
      rules never matched and the plate never collapsed.
 
-     The dividers are 1px `gap`s filled by each cell's own outline, so the
+     The dividers are hairline `gap`s filled by each cell's own outline, so the
      hairlines land correctly at *any* wrap configuration. That removes the
      whole nth-child border dance the container queries used to need.
 
@@ -332,20 +334,20 @@
      spec. Now the container carries the cell colour and the cells draw their
      own dividers, so unfilled areas are simply blank. `outline` rather than
      `border` because it is drawn outside the box and does not affect layout,
-     so adjacent cells' outlines meet inside the 1px gap. */
+     so adjacent cells' outlines meet inside the gap. */
   .wal-plate {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(min(100%, var(--wal-plate-min, 10rem)), 1fr));
-    gap: 1px;
-    background: var(--wal-plate-bg, var(--wal-card-bg, var(--wal-surface)));
-    border: 1px solid var(--wal-line);
+    gap: var(--wal-hairline);
+    background: var(--wal-plate-bg, var(--wal-card-bg));
+    border: var(--wal-border);
     border-radius: var(--wal-radius);
     overflow: hidden;
 
     > div {
-      background: var(--wal-plate-bg, var(--wal-card-bg, var(--wal-surface)));
-      color: var(--wal-card-ink, var(--wal-text));
-      outline: 1px solid var(--wal-line);
+      background: var(--wal-plate-bg, var(--wal-card-bg));
+      color: var(--wal-card-ink);
+      outline: var(--wal-border);
       padding: var(--wal-space-md);
       display: flex;
       flex-direction: column;
@@ -355,7 +357,7 @@
     dt {
       font-family: var(--wal-font-label);
       font-size: var(--wal-text-xs);
-      color: var(--wal-card-ink-muted, var(--wal-text-muted));
+      color: var(--wal-card-ink-muted);
       text-transform: uppercase;
       letter-spacing: var(--wal-tracking-label);
       margin: 0;
@@ -365,7 +367,7 @@
       font-family: var(--wal-font-display);
       font-size: var(--wal-text-lg);
       font-weight: 700;
-      color: var(--wal-card-ink, var(--wal-text));
+      color: var(--wal-card-ink);
       margin: 0;
     }
   }
@@ -378,7 +380,7 @@
     padding: var(--wal-space-md);
     background: var(--wal-card-bg);
     color: var(--wal-card-ink);
-    border: 1px solid var(--wal-line);
+    border: var(--wal-border);
     border-radius: var(--wal-radius);
     border-top: var(--wal-metric-border-width, 3px) solid var(--wal-metric-color, var(--wal-accent));
 
@@ -409,7 +411,7 @@
     /* Own token so a consumer with square geometry can flatten chips
        independently of buttons and badges. */
     border-radius: var(--wal-chip-radius, var(--wal-radius-full));
-    border: 1px solid var(--wal-line);
+    border: var(--wal-border);
     background: var(--wal-chip-bg, var(--wal-surface));
     color: var(--wal-chip-color, var(--wal-text-soft));
     white-space: nowrap;
@@ -421,7 +423,7 @@
     flex-direction: column;
     border-radius: var(--wal-radius);
     overflow: hidden;
-    border: 1px solid var(--wal-line);
+    border: var(--wal-border);
     background: var(--wal-card-bg);
     color: var(--wal-card-ink);
 
@@ -462,7 +464,7 @@
       grid-template-columns: 150px 1fr auto;
       gap: var(--wal-space-md);
       padding: var(--wal-space-lg) 0;
-      border-bottom: 1px solid var(--wal-line);
+      border-bottom: var(--wal-border);
       
       &:last-child {
         border-bottom: none;
@@ -541,7 +543,7 @@
       letter-spacing: var(--wal-tracking-label);
       color: var(--wal-text-muted);
       padding: var(--wal-space-md) var(--wal-space-lg);
-      border-bottom: 1px solid var(--wal-line);
+      border-bottom: var(--wal-border);
       font-weight: 400;
     }
 
@@ -550,7 +552,7 @@
       font-size: var(--wal-text-sm);
       color: var(--wal-text);
       padding: var(--wal-space-md) var(--wal-space-lg);
-      border-bottom: 1px solid var(--wal-line-soft);
+      border-bottom: var(--wal-hairline) solid var(--wal-line-soft);
     }
 
     tbody tr:nth-child(even) {
@@ -574,18 +576,18 @@
     &::after {
       content: "";
       flex: 1;
-      border-bottom: 1px solid transparent;
+      border-bottom: var(--wal-hairline) solid transparent;
     }
 
     &::before {
       background: linear-gradient(to left, var(--wal-gold), transparent);
-      height: 1px;
+      height: var(--wal-hairline);
       margin-right: var(--wal-space-md);
     }
 
     &::after {
       background: linear-gradient(to right, var(--wal-gold), transparent);
-      height: 1px;
+      height: var(--wal-hairline);
       margin-left: var(--wal-space-md);
     }
     
@@ -620,17 +622,25 @@
     width: 100%;
     max-width: 320px;
     background: var(--wal-surface);
-    border-left: 1px solid var(--wal-line);
+    border-left: var(--wal-border);
     box-shadow: var(--wal-shadow-lg);
     z-index: 1001;
     transform: translateX(100%);
-    transition: transform var(--wal-duration) var(--wal-ease);
+    /* Off-canvas is not closed: a drawer that is only translated away keeps
+       every link in the tab order, so a keyboard user tabbed into a panel
+       they could not see. `visibility` takes it out of both the tab order and
+       the accessibility tree, and flips only after the slide has finished. */
+    visibility: hidden;
+    transition: transform var(--wal-duration) var(--wal-ease),
+                visibility 0s linear var(--wal-duration);
     display: flex;
     flex-direction: column;
     padding: var(--wal-space-lg);
-    
+
     &.is-open {
       transform: translateX(0);
+      visibility: visible;
+      transition-delay: 0s;
     }
 
     .wal-drawer-header {
@@ -657,12 +667,13 @@
         font-family: var(--wal-font-display);
         font-size: var(--wal-text-lg);
         padding: var(--wal-space-sm) 0;
-        border-bottom: 1px solid var(--wal-line-soft);
-        
+        border-bottom: var(--wal-hairline) solid var(--wal-line-soft);
+        /* On the link, not on :hover, so the indent eases back out as well. */
+        transition: padding var(--wal-duration) var(--wal-ease);
+
         &:hover {
-          color: var(--wal-accent);
+          color: var(--wal-accent-ink);
           padding-left: var(--wal-space-sm);
-          transition: padding var(--wal-duration) var(--wal-ease);
         }
       }
     }
@@ -672,7 +683,7 @@
   .wal-input {
     width: 100%;
     background: var(--wal-surface);
-    border: 1px solid var(--wal-line);
+    border: var(--wal-hairline) solid var(--wal-line-input);
     border-radius: var(--wal-radius-sm);
     padding: 0.65rem 1rem;
     font-family: var(--wal-font-body);
@@ -684,14 +695,19 @@
       color: var(--wal-text-muted);
     }
     
+    /* A transparent outline, not `none`: forced-colors mode discards the
+       box-shadow ring and paints outlines in a system colour, so this is the
+       one focus indicator that survives there. */
     &:focus {
-      outline: none;
+      outline: 2px solid transparent;
       border-color: var(--wal-accent);
       box-shadow: 0 0 0 3px color-mix(in oklch, var(--wal-accent) 20%, transparent);
     }
     
+    /* background-color, not the shorthand, which would also reset the
+       select arrow's background-image. */
     &:disabled {
-      background: var(--wal-bg-subtle);
+      background-color: var(--wal-bg-subtle);
       color: var(--wal-text-muted);
       cursor: not-allowed;
     }
@@ -702,11 +718,18 @@
     resize: vertical;
   }
 
+  /* The arrow is two gradients meeting in a point, because a gradient can
+     read currentColor and an SVG background cannot. The data-URI SVG this
+     replaces was its own document, so its `currentColor` was always black,
+     and the arrow disappeared on every dark ground. */
   select.wal-input {
     appearance: none;
-    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>');
+    background-image:
+      linear-gradient(45deg,  transparent 50%, currentColor 50%),
+      linear-gradient(135deg, currentColor 50%, transparent 50%);
+    background-size: 5px 5px;
     background-repeat: no-repeat;
-    background-position: right 1rem center;
+    background-position: right calc(1rem + 5px) center, right 1rem center;
     padding-right: 2.5rem;
   }
 
@@ -731,9 +754,11 @@
     font-weight: 500;
     color: var(--wal-text);
 
-    /* A required marker, opt-in via [data-required] so it needs no extra span. */
+    /* A required marker, opt-in via [data-required] so it needs no extra span.
+       The empty alt text keeps screen readers from announcing "star": the
+       input's own `required` is what says it. */
     &[data-required]::after {
-      content: "*";
+      content: "*" / "";
       color: var(--wal-accent);
       font-weight: 700;
     }
@@ -815,7 +840,7 @@
   /* ═══ 15. Dialog ═══ */
   .wal-dialog {
     padding: var(--wal-space-xl);
-    border: 1px solid var(--wal-line);
+    border: var(--wal-border);
     border-radius: var(--wal-radius-lg);
     background: var(--wal-surface);
     color: var(--wal-text);
@@ -829,72 +854,102 @@
       backdrop-filter: blur(8px);
       -webkit-backdrop-filter: blur(8px);
     }
-    
-    /* Popover API support */
-    &[popover] {
-      padding: var(--wal-space-xl);
-      border: 1px solid var(--wal-line);
-      border-radius: var(--wal-radius-lg);
-      background: var(--wal-surface);
-      color: var(--wal-text);
-      box-shadow: var(--wal-shadow-lg);
-      max-width: 500px;
-    }
   }
 
-  /* ═══ 16. Tooltip ═══ */
+  /* ═══ 16. Tooltip ═══
+     The tooltip goes INSIDE its trigger, and the trigger points at it:
+
+         <button class="wal-tooltip-trigger" aria-describedby="save-tip">Save
+           <span class="wal-tooltip" id="save-tip" role="tooltip"
+                 aria-hidden="true">Saves a draft</span>
+         </button>
+
+     aria-hidden keeps the tip out of the button's NAME, which is computed
+     from its content ("Save Saves a draft" otherwise); aria-describedby
+     still reads it, as the description.
+
+     The trigger is its containing block, so plain offsets centre it with no
+     anchor positioning — which an earlier version used, sharing one
+     anchor-name that resolved to the LAST trigger on the page. Anything with
+     `overflow: hidden` between the two clips it, .wal-card included.
+
+     WCAG 1.4.13 asks for three things. Hoverable: the tip takes the pointer
+     (no `pointer-events: none`) and ::before bridges the gap, so moving onto
+     it keeps the trigger hovered — it is a descendant. Persistent: it stays
+     until hover and focus leave. Dismissible: Escape, which CSS cannot hear,
+     so it takes two lines of script that add .is-dismissed — see the README. */
   .wal-tooltip-trigger {
-    anchor-name: --wal-tooltip;
+    position: relative;
   }
 
   .wal-tooltip {
     position: absolute;
-    position-anchor: --wal-tooltip;
-    top: anchor(bottom);
-    left: anchor(center);
-    justify-self: anchor-center;
+    top: 100%;
+    left: 50%;
+    translate: -50% 0;
     margin-top: var(--wal-space-sm);
-    
+    /* Sized to its text, not to the space left after `left: 50%`, which would
+       wrap a short tip inside half the width of a small button. */
+    inline-size: max-content;
+    max-inline-size: 16rem;
+
     padding: var(--wal-space-xs) var(--wal-space-sm);
     background: var(--wal-surface-2);
     color: var(--wal-text);
     font-family: var(--wal-font-body);
     font-size: var(--wal-text-xs);
-    border: 1px solid var(--wal-line);
+    /* Inside a .wal-btn it would otherwise inherit the button's weight,
+       tracking and (under a finish) its case. */
+    font-weight: 400;
+    letter-spacing: normal;
+    text-transform: none;
+    text-align: center;
+    border: var(--wal-border);
     border-radius: var(--wal-radius-sm);
     box-shadow: var(--wal-shadow-sm);
-    pointer-events: none;
-    opacity: 0;
-    transition: opacity var(--wal-duration) var(--wal-ease);
     z-index: 1000;
-    
+    /* `visibility`, not just opacity: an invisible tip that still took the
+       pointer would open itself when the cursor crossed where it will be. It
+       flips after the fade, so the fade still plays on the way out. */
+    visibility: hidden;
+    opacity: 0;
+    transition: opacity var(--wal-duration) var(--wal-ease),
+                visibility 0s linear var(--wal-duration);
+
+    /* The hover bridge across the margin. */
     &::before {
       content: "";
       position: absolute;
+      inset-inline: 0;
       bottom: 100%;
-      left: 50%;
-      transform: translateX(-50%);
-      border-width: 5px;
-      border-style: solid;
-      border-color: transparent transparent var(--wal-line) transparent;
+      block-size: var(--wal-space-sm);
     }
-    
+
+    /* The arrow: a square turned 45° with the tip's own fill and two edges. */
     &::after {
       content: "";
       position: absolute;
-      bottom: 100%;
+      top: 0;
       left: 50%;
-      transform: translateX(-50%);
-      border-width: 4px;
-      border-style: solid;
-      border-color: transparent transparent var(--wal-surface-2) transparent;
+      inline-size: 8px;
+      block-size: 8px;
+      translate: -50% -50%;
+      rotate: 45deg;
+      background: var(--wal-surface-2);
+      border-top: var(--wal-border);
+      border-left: var(--wal-border);
     }
   }
-  
-  .wal-tooltip-trigger:hover + .wal-tooltip,
-  .wal-tooltip-trigger:focus + .wal-tooltip,
-  .wal-tooltip:popover-open {
+
+  .wal-tooltip-trigger:is(:hover, :focus-visible) > .wal-tooltip {
+    visibility: visible;
     opacity: 1;
+    transition-delay: 0s;
+  }
+
+  .wal-tooltip-trigger.is-dismissed > .wal-tooltip {
+    visibility: hidden;
+    opacity: 0;
   }
 
   /* ═══ 17. Eyebrow ═══ */
@@ -922,21 +977,21 @@
       width: 8px;
       height: 8px;
       border-radius: 50%;
-      background-color: var(--wal-success, #10b981);
-      box-shadow: 0 0 0 0 color-mix(in oklch, var(--wal-success, #10b981) 70%, transparent);
+      background-color: var(--wal-success);
+      box-shadow: 0 0 0 0 color-mix(in oklch, var(--wal-success) 70%, transparent);
       animation: wal-ping 2s infinite var(--wal-ease);
     }
   }
 
   @keyframes wal-ping {
     0% {
-      box-shadow: 0 0 0 0 color-mix(in oklch, var(--wal-success, #10b981) 70%, transparent);
+      box-shadow: 0 0 0 0 color-mix(in oklch, var(--wal-success) 70%, transparent);
     }
     70% {
-      box-shadow: 0 0 0 6px color-mix(in oklch, var(--wal-success, #10b981) 0%, transparent);
+      box-shadow: 0 0 0 6px color-mix(in oklch, var(--wal-success) 0%, transparent);
     }
     100% {
-      box-shadow: 0 0 0 0 color-mix(in oklch, var(--wal-success, #10b981) 0%, transparent);
+      box-shadow: 0 0 0 0 color-mix(in oklch, var(--wal-success) 0%, transparent);
     }
   }
 
@@ -944,7 +999,7 @@
   /* ═══ 19. Footer ═══
      End-credits colophon: a top rule and a row of role/value pairs. */
   .wal-footer {
-    border-top: 1px solid var(--wal-line);
+    border-top: var(--wal-border);
     padding-block: var(--wal-space-xl) var(--wal-space-2xl);
   }
 
@@ -979,7 +1034,7 @@
     width: var(--wal-iconbtn-size, 38px);
     height: var(--wal-iconbtn-size, 38px);
     border-radius: var(--wal-radius-full);
-    border: 1px solid var(--wal-line);
+    border: var(--wal-border);
     background: transparent;
     color: var(--wal-text-soft);
     cursor: pointer;
@@ -1081,7 +1136,7 @@
       overflow: hidden;
       position: relative;
       background: var(--wal-frame-bg, var(--wal-bg-subtle));
-      border: 1px solid var(--wal-line);
+      border: var(--wal-border);
     }
 
     figcaption {
@@ -1136,7 +1191,7 @@
         display: block;
         block-size: var(--wal-script-h, 4.5rem);
         background: var(--wal-cue, var(--wal-surface-2));
-        border: var(--wal-hairline) solid var(--wal-line);
+        border: var(--wal-border);
         border-radius: var(--wal-radius-sm);
       }
 
@@ -1219,6 +1274,11 @@
     letter-spacing: calc(var(--wal-tracking-label) * 1.6);
     color: var(--wal-caption-color, var(--wal-text-muted));
     margin: 0;
+    /* A caption is usually a <p>, and base caps <p> at 65ch — measured in
+       the caption's own tiny, widely tracked face, which is under 30rem. A
+       one-line standfirst broke after its fourth word and left the last two
+       on a line of their own. A caption takes its container's measure. */
+    max-width: none;
   }
 
   /* ═══ 29. Index ═══
@@ -1236,8 +1296,7 @@
 
   /* ═══ 30. Section head ═══
      Index, title and standfirst as one block, with the index in a left margin
-     wide enough to hold it. Collapses to a stack when the margin no longer
-     fits, which is the only breakpoint the component needs.
+     exactly as wide as it needs. No breakpoint: see the column note below.
 
          <header class="wal-section-head">
            <p class="wal-index">01</p>
@@ -1246,10 +1305,10 @@
          </header> */
   .wal-section-head {
     display: grid;
-    /* `max-content minmax(0, 1fr)`, not a fixed margin plus a floor: the index
-       column is exactly as wide as "01" needs and the content column can
-       shrink to zero, so this needs no breakpoint and cannot overflow at any
-       width. A minmax() floor on the second column would have done both. */
+    /* `max-content minmax(0, 1fr)`: the index column is exactly as wide as
+       "01" needs and the content column can shrink to zero, so this needs no
+       breakpoint and cannot overflow at any width. A fixed floor on the
+       content column (minmax(20rem, 1fr), say) would bring back both. */
     grid-template-columns: max-content minmax(0, 1fr);
     gap: var(--wal-space-xs) var(--wal-space-lg);
     align-items: baseline;

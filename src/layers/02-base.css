@@ -75,7 +75,7 @@ code, kbd, samp {
   padding: 0.15em 0.4em;
   border-radius: var(--wal-radius-sm);
   background: var(--wal-surface-2);
-  border: 1px solid var(--wal-line-soft);
+  border: var(--wal-hairline) solid var(--wal-line-soft);
 }
 
 pre {
@@ -84,7 +84,7 @@ pre {
   padding: var(--wal-space-lg);
   border-radius: var(--wal-radius);
   background: var(--wal-surface);
-  border: 1px solid var(--wal-line);
+  border: var(--wal-border);
   overflow-x: auto;
   line-height: 1.7;
 
@@ -107,7 +107,7 @@ blockquote {
 /* ─── Horizontal rule ─── */
 hr {
   border: none;
-  border-top: 1px solid var(--wal-line);
+  border-top: var(--wal-border);
   margin: var(--wal-space-xl) 0;
 }
 
@@ -135,21 +135,28 @@ mark {
    Scoped to `html`, which is where the document scrollbar takes its styling
    from. It used to be `*`, which meant walnut silently restyled every scroll
    container in a consuming app — and because Chromium ignores the
-   ::-webkit-scrollbar-* pseudos entirely whenever `scrollbar-width` is any
-   non-auto value, a consumer had to reset BOTH properties to get its own bar
-   back. One selector change removes that whole class of surprise. */
+   ::-webkit-scrollbar-* pseudos entirely whenever `scrollbar-width` or
+   `scrollbar-color` is non-auto, a consumer had to reset BOTH properties to
+   get its own bar back.
+
+   Two things this scoping does NOT do. A bare `::-webkit-scrollbar` means
+   `*::-webkit-scrollbar`, so the pseudos below carry an explicit `html`, or
+   Safari would still style every container. And `scrollbar-color` inherits,
+   so inner scroll containers do take the warm colours (not the thin width)
+   in browsers with the standard property. To opt one out, give it
+   `scrollbar-color: auto`. */
 :root {
   --wal-scrollbar-thumb: color-mix(in oklch, var(--wal-olive) 45%, var(--wal-line));
 }
 
-::-webkit-scrollbar { width: 10px; }
-::-webkit-scrollbar-track { background: var(--wal-bg); }
-::-webkit-scrollbar-thumb {
+html::-webkit-scrollbar { width: 10px; }
+html::-webkit-scrollbar-track { background: var(--wal-bg); }
+html::-webkit-scrollbar-thumb {
   background: var(--wal-scrollbar-thumb);
   border-radius: 6px;
   border: 2px solid var(--wal-bg);
 }
-::-webkit-scrollbar-thumb:hover { background: var(--wal-accent); }
+html::-webkit-scrollbar-thumb:hover { background: var(--wal-accent); }
 
 /* Firefox scrollbar */
 @supports (scrollbar-color: auto) {
@@ -165,7 +172,9 @@ mark {
   left: -9999px;
   top: 0;
   background: var(--wal-gold);
-  color: var(--wal-bg);
+  /* The computed foreground, not the page ground: --wal-bg on light gold
+     measured 3.0:1, on the one control whose whole job is to be read. */
+  color: var(--wal-gold-fg);
   padding: 0.75rem 1.25rem;
   z-index: 200;
   font-weight: 700;

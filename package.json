@@ -28,6 +28,7 @@
   "exports": {
     ".": "./dist/walnut.css",
     "./min": "./dist/walnut.min.css",
+    "./themes/*.css": "./dist/themes/*.css",
     "./themes/*": "./dist/themes/*.css",
     "./src/*": "./src/*",
     "./package.json": "./package.json"

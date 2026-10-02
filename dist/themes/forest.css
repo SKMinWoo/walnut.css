@@ -30,7 +30,9 @@
   --wal-l-surface-dark: 20%;
 
   /* Copper needs to sit a little higher than a terracotta to survive against
-     foliage; sage sits lower than a brass goldenrod. */
+     foliage; sage sits lower than a brass goldenrod, in both modes — on paper
+     that is also what keeps its badge type at 4.5:1 on its own wash. */
   --wal-l-accent-dark: 65%;
+  --wal-l-gold-light:  59%;
   --wal-l-gold-dark:   68%;
 }
