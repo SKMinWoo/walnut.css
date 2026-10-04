@@ -1803,10 +1803,12 @@ html::-webkit-scrollbar-thumb:hover { background: var(--wal-accent); }
     font-family: var(--wal-font-body);
     font-size: var(--wal-text-sm);
     color: var(--wal-text);
-    /* Listed, not `all`; see .wal-btn. */
+    /* Listed, not `all`; see .wal-btn. The outline is left out on purpose:
+       the :focus one below is transparent, so easing it only faded a dark
+       ring out of the text colour each time the input took focus. */
     transition-property:
       background-color, border-color, color, box-shadow,
-      outline-color, outline-offset, outline-width, border-radius;
+      border-radius;
     transition-duration: var(--wal-duration);
     transition-timing-function: var(--wal-ease);
 
