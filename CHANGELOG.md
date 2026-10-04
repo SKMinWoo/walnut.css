@@ -256,6 +256,14 @@ mode to WCAG AA.
   under 30rem. Section-head standfirsts wrapped with their last two words on a
   line of their own. Captions now take their container's measure.
 
+- **Any restyle of `<html>` started a transition on every button, card and
+  input.** Their `transition: all` caught `scrollbar-color`, which inherits,
+  so in Chrome a rod from a slider, a palette, even a custom property nothing
+  reads set off 21 on the docs page, each restyling its element every frame
+  for 0.2s. Each component now lists what it animates; every transition you
+  could see before still runs. A rule of your own that moves another property
+  on them needs its own `transition`.
+
 ## 0.4.0
 
 The theming release. A theme used to be a 130-line file that restated every

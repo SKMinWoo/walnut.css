@@ -180,7 +180,18 @@
     cursor: pointer;
     text-decoration: none;
     border: var(--wal-hairline) solid transparent;
-    transition: all var(--wal-duration) var(--wal-ease);
+    /* Listed, not `all`. In Chrome, any restyle of <html> — a rod, a
+       palette, even a custom property nothing reads — started a
+       scrollbar-color transition on every button, card and input: the
+       property inherits, and `all` caught it. The first line is what the
+       states below animate; the second is the rest of what `all` visibly
+       animated, the base layer's :focus-visible ring and a finish switch's
+       radius and tracking. */
+    transition-property:
+      background-color, border-color, color, box-shadow, transform, opacity,
+      outline-color, outline-offset, outline-width, border-radius, letter-spacing;
+    transition-duration: var(--wal-duration);
+    transition-timing-function: var(--wal-ease);
     line-height: 1.2;
 
     @media (prefers-reduced-motion: reduce) {
@@ -252,7 +263,13 @@
     padding: var(--wal-space-lg);
     position: relative;
     overflow: hidden;
-    transition: all var(--wal-duration) var(--wal-ease);
+    /* Listed, not `all`; see .wal-btn. Background and ink are here because a
+       palette switch moves them; the ring is for a card that is a link. */
+    transition-property:
+      background-color, border-color, color, box-shadow, transform,
+      outline-color, outline-offset, outline-width, border-radius;
+    transition-duration: var(--wal-duration);
+    transition-timing-function: var(--wal-ease);
     display: flex;
     flex-direction: column;
     gap: var(--wal-space-md);
@@ -689,8 +706,13 @@
     font-family: var(--wal-font-body);
     font-size: var(--wal-text-sm);
     color: var(--wal-text);
-    transition: all var(--wal-duration) var(--wal-ease);
-    
+    /* Listed, not `all`; see .wal-btn. */
+    transition-property:
+      background-color, border-color, color, box-shadow,
+      outline-color, outline-offset, outline-width, border-radius;
+    transition-duration: var(--wal-duration);
+    transition-timing-function: var(--wal-ease);
+
     &::placeholder {
       color: var(--wal-text-muted);
     }
