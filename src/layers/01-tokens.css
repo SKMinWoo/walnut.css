@@ -497,15 +497,47 @@
      shipped cue stops keep clear of roughly 0.55–0.59; a cue you move into
      that band is the case to check.
 
+     light-dark() goes on the OUTSIDE. The natural spelling,
+     `oklch(from var(--wal-accent) …)`, hands relative colour a light-dark()
+     origin, and Chrome from the 123 floor through at least 127 cannot resolve
+     one. It parses, so the @supports test below passes; it fails only at
+     computed-value time, where `color` silently inherits the page text —
+     near-black type on a terracotta button. So light-dark() chooses between
+     two finished relative colours, and each origin is the cue rebuilt from
+     the same stops as --wal-<cue> above, never var(--wal-<cue>): the alias
+     would carry the light-dark() back in. The cost is that -fg follows the
+     rods and the ramp, as -ink and -hover already do, rather than a colour
+     written straight into --wal-<cue>.
+
      Nested rather than a separate rule, so the selector list above is the
      only copy: a second copy that drifted would leave a scoped palette with
      the root's foregrounds. */
   @supports (color: oklch(from white l c h)) {
-    --wal-accent-fg: oklch(from var(--wal-accent) clamp(0.16, (0.57 - l) * 1000, 0.97) calc(c * 0.08) h);
-    --wal-bloom-fg:  oklch(from var(--wal-bloom)  clamp(0.16, (0.57 - l) * 1000, 0.97) calc(c * 0.08) h);
-    --wal-gold-fg:   oklch(from var(--wal-gold)   clamp(0.16, (0.57 - l) * 1000, 0.97) calc(c * 0.08) h);
-    --wal-olive-fg:  oklch(from var(--wal-olive)  clamp(0.16, (0.57 - l) * 1000, 0.97) calc(c * 0.08) h);
-    --wal-cool-fg:   oklch(from var(--wal-cool)   clamp(0.16, (0.57 - l) * 1000, 0.97) calc(c * 0.08) h);
+    --wal-accent-fg: light-dark(
+      oklch(from oklch(var(--wal-l-accent-light) var(--wal-accent-chroma) var(--wal-accent-hue))
+            clamp(0.16, (0.57 - l) * 1000, 0.97) calc(c * 0.08) h),
+      oklch(from oklch(var(--wal-l-accent-dark)  var(--wal-accent-chroma) var(--wal-accent-hue))
+            clamp(0.16, (0.57 - l) * 1000, 0.97) calc(c * 0.08) h));
+    --wal-bloom-fg: light-dark(
+      oklch(from oklch(var(--wal-l-bloom-light) var(--wal-bloom-chroma) var(--wal-bloom-hue))
+            clamp(0.16, (0.57 - l) * 1000, 0.97) calc(c * 0.08) h),
+      oklch(from oklch(var(--wal-l-bloom-dark)  var(--wal-bloom-chroma) var(--wal-bloom-hue))
+            clamp(0.16, (0.57 - l) * 1000, 0.97) calc(c * 0.08) h));
+    --wal-gold-fg: light-dark(
+      oklch(from oklch(var(--wal-l-gold-light) var(--wal-gold-chroma) var(--wal-gold-hue))
+            clamp(0.16, (0.57 - l) * 1000, 0.97) calc(c * 0.08) h),
+      oklch(from oklch(var(--wal-l-gold-dark)  var(--wal-gold-chroma) var(--wal-gold-hue))
+            clamp(0.16, (0.57 - l) * 1000, 0.97) calc(c * 0.08) h));
+    --wal-olive-fg: light-dark(
+      oklch(from oklch(var(--wal-l-olive-light) var(--wal-olive-chroma) var(--wal-olive-hue))
+            clamp(0.16, (0.57 - l) * 1000, 0.97) calc(c * 0.08) h),
+      oklch(from oklch(var(--wal-l-olive-dark)  var(--wal-olive-chroma) var(--wal-olive-hue))
+            clamp(0.16, (0.57 - l) * 1000, 0.97) calc(c * 0.08) h));
+    --wal-cool-fg: light-dark(
+      oklch(from oklch(var(--wal-l-cool-light) var(--wal-cool-chroma) var(--wal-cool-hue))
+            clamp(0.16, (0.57 - l) * 1000, 0.97) calc(c * 0.08) h),
+      oklch(from oklch(var(--wal-l-cool-dark)  var(--wal-cool-chroma) var(--wal-cool-hue))
+            clamp(0.16, (0.57 - l) * 1000, 0.97) calc(c * 0.08) h));
   }
 }
 

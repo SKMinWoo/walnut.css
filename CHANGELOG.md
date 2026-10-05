@@ -270,6 +270,16 @@ mode to WCAG AA.
   transitions; the border and the shadow ring still ease in, and in
   forced-colors mode the outline now appears at once.
 
+- **Computed `-fg` fell back to the page text in Chrome 127 and earlier.**
+  Each was a relative colour whose origin was its cue, and a cue is a
+  `light-dark()` value. Those versions parse that, so `@supports` passed, but
+  cannot resolve it, so the primary button, every `.wal-fill-*` and the skip
+  link took the inherited text colour: dark type on terracotta on paper,
+  light type on gold at night. `light-dark()` now chooses between two relative
+  colours whose origins are the cue rebuilt from its stops. `-fg` therefore
+  follows the rods and the ramp, as `-ink` and `-hover` do, not a colour set
+  directly on `--wal-<cue>`.
+
 ## 0.4.0
 
 The theming release. A theme used to be a 130-line file that restated every
