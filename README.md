@@ -94,16 +94,19 @@ Picking the right form is most of what good theming is, and the second one is wh
 
 Goldenrod is a fine button and an illegible paragraph. `--wal-gold` and `--wal-gold-ink` are that difference, and every component that puts a cue on type reads the `-ink` form.
 
-`-fg` is computed with relative colour syntax, so you never re-decide black-or-white when you rotate a cue:
+`-fg` is computed with relative colour syntax, so you never re-decide black-or-white when you rotate a cue. Each mode's branch starts from that mode's gold, rebuilt from its stops:
 
 ```css
---wal-gold-fg: oklch(from var(--wal-gold)
-                 clamp(0.16, (0.57 - l) * 1000, 0.97)  /* near-black or near-white */
-                 calc(c * 0.08)                         /* keep a trace of the hue  */
-                 h);
+--wal-gold-fg: light-dark(
+  oklch(from oklch(var(--wal-l-gold-light) var(--wal-gold-chroma) var(--wal-gold-hue))
+        clamp(0.16, (0.57 - l) * 1000, 0.97)  /* near-black or near-white */
+        calc(c * 0.08)                         /* keep a trace of the hue  */
+        h),
+  oklch(from oklch(var(--wal-l-gold-dark)  var(--wal-gold-chroma) var(--wal-gold-hue))
+        clamp(0.16, (0.57 - l) * 1000, 0.97) calc(c * 0.08) h));
 ```
 
-It sits behind `@supports` and degrades to a stated value.
+`light-dark()` goes outside rather than in the origin. Written as `oklch(from var(--wal-gold) …)`, the origin is itself a `light-dark()`, which Chrome 127 and earlier cannot resolve, and the text silently takes the page colour. It sits behind `@supports` and degrades to a stated value.
 
 ### The gamut caveat
 
