@@ -256,6 +256,20 @@ mode to WCAG AA.
   under 30rem. Section-head standfirsts wrapped with their last two words on a
   line of their own. Captions now take their container's measure.
 
+- **Any restyle of `<html>` started a transition on every button, card and
+  input.** Their `transition: all` caught `scrollbar-color`, which inherits,
+  so in Chrome a rod from a slider, a palette, even a custom property nothing
+  reads set off 21 on the docs page, each restyling its element every frame
+  for 0.2s. Each component now lists what it animates. Apart from the input's
+  focus flash below, every transition you could see before still runs. A rule
+  of your own that moves another property on them needs its own `transition`.
+
+- **Focusing an input flashed a dark ring.** Its outline is transparent, there
+  only for forced-colors mode, but `all` faded it from the text colour to
+  transparent, so a dark ring showed for about 50ms. The outline no longer
+  transitions; the border and the shadow ring still ease in, and in
+  forced-colors mode the outline now appears at once.
+
 ## 0.4.0
 
 The theming release. A theme used to be a 130-line file that restated every
