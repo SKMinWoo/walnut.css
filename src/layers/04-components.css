@@ -1980,11 +1980,13 @@
          </dialog>
 
      The movement is walnut-motion.js; without it, or under reduced motion,
-     the spread opens as any .wal-window does. The cover and the card's
-     picture ([data-wal-art]) should share an aspect ratio, so the cover can
-     travel from the card at one scale: --wal-cover-ratio, 10 / 11 unless
-     you set it. The notes are the cover's size and scroll inside it. On a
-     phone the spread stacks and the notes fold down. */
+     the spread opens as any .wal-window does. The cover's shape is
+     --wal-cover-ratio, 10 / 11 unless you set it, and needn't be the card
+     picture's ([data-wal-art]): the cover never stretches, but leaves at
+     one scale cropped to the picture, and the crop opens as it lands.
+     --wal-cover-focus (50% 50%, read as object-position is) says which part
+     of the cover the picture is. The notes are the cover's size and scroll
+     inside it. On a phone the spread stacks and the notes fold down. */
   /* --wal-cover-ratio is read with its default rather than declared here,
      so it can be set on the dialog, or anywhere above it. */
   .wal-gatefold-spread {

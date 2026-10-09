@@ -67,14 +67,30 @@
   const settled = (anims) => Promise.all(anims.map((a) => a.finished.catch(() => {})));
 
   /* ── Gatefold ──
-     The cover travels from the card's picture; with the same shape it is
-     one scale. The notes turn on the spine from lying over the cover to
+     The cover travels from the card's picture at one scale, cropped to the
+     picture's shape until it lands (over, below). The notes turn on the spine from lying over the cover to
      lying flat beside it. Past the halfway turn their back faces you and is
      not drawn, so they appear as they come round. The notes land on the
      material's curve, since they come down on the table; the cover glides
      out and settles home whatever it is made of, being in flight both ways. */
   const stacked = (spread) => getComputedStyle(spread).gridTemplateColumns.trim().split(/\s+/).length === 1;
-  const flip = (a, b) => `translate(${a.left - b.left}px, ${a.top - b.top}px) scale(${a.width / b.width}, ${a.height / b.height})`;
+  /* The cover as it sits over the card's picture, a: never stretched, so
+     at one scale, just large enough to cover the picture, and cropped to
+     it. --wal-cover-focus says which part of the cover the picture is, as
+     object-position would. A cover the picture's own shape needs no crop,
+     and travels exactly as one would expect. */
+  function over(cover, a, b, art) {
+    const s = Math.max(a.width / b.width, a.height / b.height);
+    const w = a.width / s, h = a.height / s;
+    const [fx = 50, fy = 50] = token(cover, "--wal-cover-focus", "50% 50%").split(/\s+/).map(parseFloat);
+    const x = (b.width - w) * fx / 100, y = (b.height - h) * fy / 100;
+    const r = parseFloat(getComputedStyle(art).borderTopLeftRadius) || 0;
+    return {
+      transform: `translate(${a.left - b.left - x * s}px, ${a.top - b.top - y * s}px) scale(${s})`,
+      clipPath: `inset(${y}px ${b.width - w - x}px ${b.height - h - y}px ${x}px round ${r / s}px)`,
+    };
+  }
+  const home = { transform: "none", clipPath: "inset(0px 0px 0px 0px round 0px)" };
   const artOf = (from) => from.querySelector("[data-wal-art]") ?? from;
   const parts = (dialog, from) => ({
     art: artOf(from),
@@ -94,7 +110,7 @@
       art.style.visibility = "hidden";
       const anims = [
         spread.animate([{ filter: "drop-shadow(0 0 0 transparent)" }, { filter: getComputedStyle(spread).filter }], { duration: T, easing: glide }),
-        cover.animate([{ transform: flip(a, b) }, { transform: "none" }], { duration: T * 0.9, easing: glide }),
+        cover.animate([over(cover, a, b, art), home], { duration: T * 0.9, easing: glide }),
         notes.animate([{ transform: turn }, { transform: "none" }],
           { duration: T * 1.05, delay: T * 0.42, easing: ease, fill: "backwards" }),
         notes.animate([{ opacity: 1 }, { opacity: 0 }],
@@ -117,9 +133,9 @@
       await new Promise((r) => setTimeout(r, T * 0.38));
       // Measured now, not before: the page may have scrolled under the window.
       const a = art.getBoundingClientRect(), b = cover.getBoundingClientRect();
-      const home = cover.animate([{ transform: "none" }, { transform: flip(a, b) }],
+      const back = cover.animate([home, over(cover, a, b, art)],
         { duration: T * 0.78, easing: settle, fill: "forwards" });
-      await settled([...fold, home]);
+      await settled([...fold, back]);
       return () => {
         art.style.visibility = "";
         [cover, notes].forEach((el) => el.getAnimations().forEach((x) => x.cancel()));

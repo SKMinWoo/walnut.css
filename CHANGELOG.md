@@ -105,7 +105,9 @@ the platform can now draw with no script.
   (`data-wal-open="gatefold"`, `walnut.open`). A window that a link or Back
   opens can open in place and still go home to its card
   (`{ instant: true }`), and a close asked for while it opens waits for it
-  to land.
+  to land. The cover needn't be the card picture's shape: it travels at one
+  scale, cropped to the picture, and the crop opens as it lands
+  (`--wal-cover-focus` places the picture on the cover).
 - **Materials.** `data-motion="materials"` on `<html>`, or
   `data-wal-material` on any element, gives openings weight: walnut
   (1050ms out, 800ms home) hits its stop and knocks back, brass (480ms,
