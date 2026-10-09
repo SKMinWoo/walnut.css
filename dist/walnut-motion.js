@@ -156,6 +156,11 @@
     next?.();
   };
 
+  // A card whose picture is not drawn (display: none, say, or taken off
+  // the page) is no place to leave from or go home to: the window opens
+  // and closes in place.
+  const drawn = (from) => !!from?.isConnected && artOf(from).getClientRects().length > 0;
+
   // Called on a window already open, it changes the card the window goes
   // home to: a page showing another card's contents in the same window.
   // The card it leaves is whole again.
@@ -166,7 +171,7 @@
     if (busy.has(dialog)) return void queued.set(dialog, () => open(dialog, sources.get(dialog), { instant }));
     if (dialog.open) return;
     const style = STYLES[dialog.dataset.walOpen];
-    if (!style || instant || reduce.matches || !from) return dialog.showModal();
+    if (!style || instant || reduce.matches || !drawn(from)) return dialog.showModal();
     busy.add(dialog);
     dialog.dataset.walMoving = "";
     Promise.resolve(style.open(dialog, from)).finally(() => landed(dialog));
@@ -177,7 +182,7 @@
     if (!dialog.open) return;
     const style = STYLES[dialog.dataset.walOpen];
     const from = sources.get(dialog);
-    if (!style || reduce.matches || !from?.isConnected) return dialog.close();
+    if (!style || reduce.matches || !drawn(from)) return dialog.close();
     busy.add(dialog);
     dialog.dataset.walMoving = "";
     dialog.classList.add("is-closing");

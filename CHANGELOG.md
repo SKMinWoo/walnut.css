@@ -107,7 +107,8 @@ the platform can now draw with no script.
   (`{ instant: true }`), and a close asked for while it opens waits for it
   to land. The cover needn't be the card picture's shape: it travels at one
   scale, cropped to the picture, and the crop opens as it lands
-  (`--wal-cover-focus` places the picture on the cover).
+  (`--wal-cover-focus` places the picture on the cover). A card whose
+  picture is not drawn opens and closes its window in place.
 - **Materials.** `data-motion="materials"` on `<html>`, or
   `data-wal-material` on any element, gives openings weight: walnut
   (1050ms out, 800ms home) hits its stop and knocks back, brass (480ms,
