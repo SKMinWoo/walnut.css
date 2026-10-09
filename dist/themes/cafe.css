@@ -1,5 +1,5 @@
 /* ═══════════════════════════════════════════════════
-   THEME — CAFÉ  (walnut's default script)
+   THEME — CAFÉ
    Coffee shop in golden hour light.
    Walnut wood, bone china, brass fixtures.
    ───────────────────────────────────────────────────
@@ -14,8 +14,10 @@
    theme re-declares --wal-accent with a number inlined, setting
    --wal-accent-chroma stops doing anything. There is nothing here to drift.
 
-   Café is already the default in 01-tokens.css. This file exists so a page can
-   name it explicitly and switch between palettes at runtime by class.
+   Café used to restate walnut's default script, the terracotta one on :root in
+   01-tokens.css. It now leads with the blue on the bone china instead, so that
+   no two shipped palettes open on the same colour. A page that wants the old
+   default needs no class at all.
 ═══════════════════════════════════════════════════ */
 
 .wal-cafe,
@@ -25,10 +27,17 @@
   --wal-hue:    55;
   --wal-chroma: 0.04;
 
-  /* ── The five cues ──
-     bloom and cool are left to their defaults, which are offsets from the
-     accent (+27° and +209°), so the script stays in tune if the accent moves. */
-  --wal-accent-hue: 25;   --wal-accent-chroma: 0.17;  /* terracotta */
-  --wal-gold-hue:   85;   --wal-gold-chroma:   0.15;  /* goldenrod  */
-  --wal-olive-hue:  130;  --wal-olive-chroma:  0.10;  /* botanical  */
+  /* ── The five cues ── the china leads and the room answers it.
+     Bloom and cool are pinned. Their defaults step from the accent (+27° and
+     +209°), which from a china blue lands on a violet and a lime: neither is in
+     a coffee shop. */
+  --wal-accent-hue: 258;  --wal-accent-chroma: 0.16;  /* china blue    */
+  --wal-bloom-hue:  250;  --wal-bloom-chroma:  0.10;  /* glaze         */
+  --wal-gold-hue:   85;   --wal-gold-chroma:   0.12;  /* brass         */
+  --wal-olive-hue:  62;   --wal-olive-chroma:  0.11;  /* golden hour   */
+  --wal-cool-hue:   50;   --wal-cool-chroma:   0.07;  /* walnut counter */
+
+  /* Brass sits a stop under the shared 60% on paper: at 60 its badge type
+     measures 4.57:1 on its own wash, at 59 it clears 4.6. */
+  --wal-l-gold-light: 59%;
 }

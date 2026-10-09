@@ -3,36 +3,45 @@
    Mossy forest floor at dawn. Deep greens, earthy
    browns, filtered morning light.
    ───────────────────────────────────────────────────
-   The accent is deliberately warm — copper against dense foliage, firelight in
-   a clearing. A green accent on a green ground would give you one colour and
-   no script.
+   The fern leads. This file used to keep the accent warm on the grounds that
+   a green accent on a green ground gives you one colour and no script. The
+   answer is to give the green room rather than avoid it: the ground turns 25°
+   toward the leaf litter and stays at a whisper of chroma, and the fern sits
+   30° away at four times the chroma. The campfire copper that used to lead is
+   still lit, as the bloom.
 ═══════════════════════════════════════════════════ */
 
 .wal-forest,
 [data-theme="forest"],
 [data-theme^="forest-"] {
-  /* ── The ground rod ── deep green, muted enough to read as bark and shadow */
-  --wal-hue:    145;
-  --wal-chroma: 0.03;
+  /* ── The ground rod ── leaf litter more than leaf, muted enough to read as
+     bark and shadow */
+  --wal-hue:    120;
+  --wal-chroma: 0.028;
 
-  /* ── The five cues ── */
-  --wal-accent-hue: 60;   --wal-accent-chroma: 0.16;  /* copper / campfire */
-  --wal-gold-hue:   120;  --wal-gold-chroma:   0.10;  /* soft sage         */
-  --wal-olive-hue:  140;  --wal-olive-chroma:  0.08;  /* moss              */
+  /* ── The five cues ── bloom and cool are pinned: from a fern the default
+     steps (+27° and +209°) are another green and a rose. */
+  --wal-accent-hue: 150;  --wal-accent-chroma: 0.128; /* fern              */
+  --wal-bloom-hue:  55;   --wal-bloom-chroma:  0.13;  /* campfire copper   */
+  --wal-gold-hue:   98;   --wal-gold-chroma:   0.11;  /* morning light     */
+  --wal-olive-hue:  125;  --wal-olive-chroma:  0.07;  /* lichen            */
   --wal-cool-hue:   230;  --wal-cool-chroma:   0.09;  /* dawn sky through canopy */
 
   /* ── Ramp nudges ──
      Forest sits two stops deeper than café in the dark: undergrowth, not a lit
      room. Nudging two stops is the whole difference — the other seven, plus
-     every light-mode value, stay on the shared ramp. */
+     every light-mode ground, stay on the shared ramp. */
   --wal-l-bg-dark:      14%;
   --wal-l-subtle-dark:  17%;
   --wal-l-surface-dark: 20%;
 
-  /* Copper needs to sit a little higher than a terracotta to survive against
-     foliage; sage sits lower than a brass goldenrod, in both modes — on paper
-     that is also what keeps its badge type at 4.5:1 on its own wash. */
-  --wal-l-accent-dark: 65%;
-  --wal-l-gold-light:  59%;
-  --wal-l-gold-dark:   68%;
+  /* The fern sits five stops deep on paper (deep green, not mint) and three
+     high at night, to stand out of the undergrowth; 0.128 is as much chroma
+     as a green holds inside sRGB at both. The morning light sits lower than a
+     brass goldenrod in both modes; on paper that is also what keeps its badge
+     type at 4.5:1 on its own wash. */
+  --wal-l-accent-light: 47%;
+  --wal-l-accent-dark:  65%;
+  --wal-l-gold-light:   59%;
+  --wal-l-gold-dark:    68%;
 }
