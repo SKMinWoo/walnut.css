@@ -1,0 +1,109 @@
+/* walnut.css · scroll
+   ─────────────────────────────────────────────────────────────────────────
+   The parts of walnut the browser draws from scrolling, in selectors only
+   Chrome and Edge have today: a carousel's dots and arrows, and the nav
+   link for the section in view. Add it beside walnut.css:
+
+       <link rel="stylesheet" href="walnut.css">
+       <link rel="stylesheet" href="walnut-scroll.css">
+
+   It is its own file because CSS bundlers cannot read it yet. Next.js
+   (Turbopack), Vite, Parcel and Bun parse CSS with Lightning CSS, which
+   refuses a whole stylesheet over one selector it does not know, and these
+   are the selectors it does not know. In a bundled app, import walnut.css
+   and link this one from your public folder, or leave it out: the
+   carousel is then a list you swipe, and the nav lights a link when a
+   script sets .is-active.
+
+   The layer list comes first so this file keeps walnut's layer order even
+   if it loads before walnut.css. Its rules join the components layer.
+   ───────────────────────────────────────────────────────────────────────── */
+@layer reset, tokens, base, layout, components, finish, utilities, cinema;
+
+@layer components {
+  /* ═══ Nav: scroll-spy ═══
+     The links are a group of scroll targets, and the one whose section is
+     in view matches :target-current. Its own rule, not one more selector
+     beside .is-active: a browser that does not know a pseudo-class drops
+     the whole list it appears in. */
+  .wal-nav .wal-nav-links {
+    scroll-target-group: auto;
+  }
+
+  .wal-nav .wal-nav-links a:target-current {
+    color: var(--wal-accent-ink);
+
+    &::after {
+      transform: scaleX(1);
+      transform-origin: left;
+    }
+  }
+
+  /* ═══ Carousel: dots and arrows ═══
+     A dot per slide after the list, and Previous and Next astride it. */
+  .wal-carousel {
+    scroll-marker-group: after;
+  }
+
+  .wal-carousel::scroll-marker-group {
+    display: flex;
+    justify-content: center;
+    gap: 0.55rem;
+    padding-block: var(--wal-space-sm) 0;
+  }
+
+  .wal-carousel > li::scroll-marker {
+    content: "";
+    inline-size: 0.6rem;
+    block-size: 0.6rem;
+    border-radius: 50%;
+    background: var(--wal-line);
+    transition:
+      background-color var(--wal-duration) var(--wal-ease),
+      scale            var(--wal-duration) var(--wal-ease);
+  }
+
+  .wal-carousel > li::scroll-marker:target-current {
+    background: var(--wal-accent);
+    scale: 1.35;
+  }
+
+  .wal-carousel > li::scroll-marker:focus-visible {
+    outline: 2px solid var(--wal-accent);
+    outline-offset: 2px;
+  }
+
+  .wal-carousel::scroll-button(*) {
+    position: absolute;
+    position-anchor: --wal-carousel;
+    inline-size: 2.4rem;
+    block-size: 2.4rem;
+    border-radius: 50%;
+    border: var(--wal-border);
+    background: color-mix(in oklch, var(--wal-surface) 88%, transparent);
+    color: var(--wal-text);
+    font: 600 1.05rem/1 var(--wal-font-body);
+    cursor: pointer;
+    box-shadow: var(--wal-shadow-sm);
+    transition: opacity var(--wal-duration) var(--wal-ease);
+  }
+
+  .wal-carousel::scroll-button(*):disabled {
+    opacity: 0;
+    cursor: default;
+  }
+
+  /* Astride the carousel's edges. The text after the slash is the name a
+     screen reader gives the arrow. */
+  .wal-carousel::scroll-button(inline-start) {
+    content: "\2190" / "Previous";
+    position-area: left center;
+    translate: 50% 0;
+  }
+
+  .wal-carousel::scroll-button(inline-end) {
+    content: "\2192" / "Next";
+    position-area: right center;
+    translate: -50% 0;
+  }
+}

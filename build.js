@@ -97,6 +97,15 @@ const scripts = Object.fromEntries(SCRIPTS.map((file) => [file,
   `/*! walnut.css v${VERSION} · ${file.replace(/^walnut-|\.js$/g, "")} | MIT License | github.com/SKMinWoo/walnut.css */\n` +
   fs.readFileSync(path.join(SRC, file), "utf8")]));
 
+// ─── Companion stylesheets ───
+// Optional too: walnut-scroll.css holds the selectors CSS bundlers cannot
+// parse yet (see its header, and assertBundlerSafe below), so walnut.css can
+// be imported into a bundled app and this linked beside it.
+const SHEETS = ["walnut-scroll.css"];
+const sheets = Object.fromEntries(SHEETS.map((file) => [file,
+  `/*! walnut.css v${VERSION} · ${file.replace(/^walnut-|\.css$/g, "")} | MIT License | github.com/SKMinWoo/walnut.css */\n` +
+  fs.readFileSync(path.join(SRC, file), "utf8")]));
+
 // ─── Read the palettes ───
 // A theme listed in THEMES that is missing on disk is an error, not a skip:
 // assertDocsRewritten expects a <link> for every one of them, and a skipped
@@ -147,11 +156,12 @@ function assertPalettesLeaveFinishTokens(finishCss, palettes) {
  * @throws to fail the build when the deployed page would be missing styles
  */
 function assertDocsRewritten(page, original, rewritten) {
-  // One stylesheet <link> per theme, plus the bundle itself. Derived from
-  // THEMES rather than hardcoded so adding a theme cannot quietly lower the
-  // bar. Scripts are not counted: a page may load any number of them, and
-  // the "../" check below catches one the rewrite missed.
-  const expected = THEMES.length + 1;
+  // One stylesheet <link> per theme, plus the bundle itself and each
+  // companion sheet, since the docs show walnut whole. Derived from THEMES
+  // and SHEETS rather than hardcoded so adding either cannot quietly lower
+  // the bar. Scripts are not counted: a page may load any number of them,
+  // and the "../" check below catches one the rewrite missed.
+  const expected = THEMES.length + 1 + SHEETS.length;
   const found = (original.match(STYLESHEET_LINKS) || []).length;
 
   if (found !== expected) {
@@ -205,8 +215,14 @@ function assertVersionStamped(found) {
  *   @function --x(--c <color>)       --x(--c), untyped: it is reprinted as
  *                                    `--c< color>` and the browser drops it
  *
+ * Some have no twin. A pseudo-class or pseudo-element Lightning CSS does not
+ * know fails the stylesheet however it is wrapped (:where(), :is(), nesting),
+ * so those live in walnut-scroll.css, which a bundled app links instead:
+ *
+ *   :target-current  ::scroll-marker  ::scroll-marker-group  ::scroll-button()
+ *
  * A pattern check, not a parse, since walnut does not depend on Lightning
- * CSS: it stops these three coming back, not the next one.
+ * CSS: it stops these coming back, not the next one.
  *
  * @param {string} css  the assembled bundle
  * @throws naming each line that uses one of them
@@ -216,6 +232,7 @@ function assertBundlerSafe(css) {
     [/@container[^{]*scroll-state\(/, "a scroll-state container query"],
     [/::picker\([^)]*\):(?!hover|active|focus)/, "a state pseudo-class after ::picker()"],
     [/@function\s+--[\w-]+\([^)]*</, "a typed @function parameter"],
+    [/:target-current|::scroll-marker|::scroll-button/, "a scroll selector, which belongs in walnut-scroll.css"],
   ];
   const hits = css.split("\n").flatMap((line, i) =>
     rules.filter(([re]) => re.test(line)).map(([, what]) => `  line ${i + 1}: ${what}\n      ${line.trim()}`));
@@ -270,6 +287,7 @@ fs.mkdirSync(path.join(DIST, "themes"), { recursive: true });
 fs.writeFileSync(path.join(DIST, "walnut.css"), bundle);
 fs.writeFileSync(path.join(DIST, "walnut.min.css"), minified);
 for (const [file, js] of Object.entries(scripts)) fs.writeFileSync(path.join(DIST, file), js);
+for (const [file, css] of Object.entries(sheets)) fs.writeFileSync(path.join(DIST, file), css);
 for (const [theme, css] of Object.entries(themeCss)) {
   fs.writeFileSync(path.join(DIST, "themes", `${theme}.css`), css);
 }
@@ -279,6 +297,7 @@ fs.mkdirSync(path.join(PUBLIC, "dist", "themes"), { recursive: true });
 fs.writeFileSync(path.join(PUBLIC, "dist", "walnut.css"), bundle);
 fs.writeFileSync(path.join(PUBLIC, "dist", "walnut.min.css"), minified);
 for (const [file, js] of Object.entries(scripts)) fs.writeFileSync(path.join(PUBLIC, "dist", file), js);
+for (const [file, css] of Object.entries(sheets)) fs.writeFileSync(path.join(PUBLIC, "dist", file), css);
 for (const [theme, css] of Object.entries(themeCss)) {
   fs.writeFileSync(path.join(PUBLIC, "dist", "themes", `${theme}.css`), css);
 }
@@ -297,6 +316,6 @@ const minSize = Buffer.byteLength(minified, "utf8");
 console.log(`\n  walnut.css v${VERSION} built successfully\n`);
 console.log(`  dist/walnut.css         ${(fullSize / 1024).toFixed(1)} KB`);
 console.log(`  dist/walnut.min.css     ${(minSize / 1024).toFixed(1)} KB`);
-for (const [file, js] of Object.entries(scripts)) console.log(`  dist/${file.padEnd(18)} ${(Buffer.byteLength(js, "utf8") / 1024).toFixed(1)} KB`);
+for (const [file, txt] of Object.entries({ ...sheets, ...scripts })) console.log(`  dist/${file.padEnd(18)} ${(Buffer.byteLength(txt, "utf8") / 1024).toFixed(1)} KB`);
 console.log(`  themes:                 ${THEMES.join(", ")}`);
 console.log();

@@ -46,6 +46,8 @@ From jsDelivr, pinned to a release tag:
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/SKMinWoo/walnut.css@v0.4.0/dist/walnut.min.css">
 <!-- optional: a named palette -->
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/SKMinWoo/walnut.css@v0.4.0/dist/themes/press.css">
+<!-- optional: the carousel's dots and arrows, and the nav's scroll-spy -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/SKMinWoo/walnut.css@v0.4.0/dist/walnut-scroll.css">
 
 <html class="wal-press" data-finish="catalogue">
 ```
@@ -422,7 +424,7 @@ A chip or badge with `.wal-tint` wears the ink on the wash; add `.wal-fill-tint`
 </ul>
 ```
 
-Three parts the browser now draws itself, dressed in walnut. The **menu** is a popover anchored to its button: it opens below, or above, or to the other side, whichever has room, closes on <kbd>Escape</kbd> and on a click outside, and keeps the button's `aria-expanded` in step. The **select** uses `appearance: base-select`, so an option can hold any markup and `<selectedcontent>` copies the chosen one into the button; a browser without it shows the ordinary select with the same border. The **carousel** is a snapping list with a dot per slide (`::scroll-marker`) and Previous and Next buttons that grey out at either end (`::scroll-button`); without them it is a row you swipe. Under [Materials](#materials) the menu and the select are brass.
+Three parts the browser now draws itself, dressed in walnut. The **menu** is a popover anchored to its button: it opens below, or above, or to the other side, whichever has room, closes on <kbd>Escape</kbd> and on a click outside, and keeps the button's `aria-expanded` in step. The **select** uses `appearance: base-select`, so an option can hold any markup and `<selectedcontent>` copies the chosen one into the button; a browser without it shows the ordinary select with the same border. The **carousel** is a snapping list; with `walnut-scroll.css` it has a dot per slide (`::scroll-marker`) and Previous and Next buttons that grey out at either end (`::scroll-button`), and without them it is a row you swipe. Under [Materials](#materials) the menu and the select are brass.
 
 ### Chart
 
@@ -494,7 +496,7 @@ Smaller pieces the tables above do not cover. All are in `dist/walnut.css`.
 
 **State classes are unprefixed.** walnut reads `.is-open` (`.wal-drawer`, `.wal-drawer-overlay`), `.is-scrolled` (`.wal-nav`), `.is-active` (a `.wal-nav-links` link) and `.is-dismissed` (`.wal-tooltip-trigger`). Your script sets them; they only take effect alongside the `wal-` class, so they will not collide with an app's own `is-*` styles — but an app's own `.is-open { … }` rule *will* reach walnut's elements.
 
-You can leave two of them to the browser. A `.wal-nav` gains its rule and shadow over the first 1.5rem the page scrolls (a scroll-driven animation, so no scroll listener), and its links light the one whose section is in view (`scroll-target-group` and `:target-current`, so no scroll-spy). Where the browser has neither, set `.is-scrolled` and `.is-active` as before. A script's `.is-scrolled` stands the browser's rule down, so the rule is never drawn twice; a scroll-spy script of your own can light a different link from the browser's, so keep it for browsers without `:target-current`.
+You can leave two of them to the browser. A `.wal-nav` gains its rule and shadow over the first 1.5rem the page scrolls (a scroll-driven animation, so no scroll listener), and, with `walnut-scroll.css`, its links light the one whose section is in view (`scroll-target-group` and `:target-current`, so no scroll-spy). Where the browser has neither, set `.is-scrolled` and `.is-active` as before. A script's `.is-scrolled` stands the browser's rule down, so the rule is never drawn twice; a scroll-spy script of your own can light a different link from the browser's, so keep it for browsers without `:target-current`.
 
 `.wal-text-center` / `-left` / `-right` set alignment, not size, despite the `wal-text-*` size family; renaming them would break existing pages, so they stay.
 
@@ -703,7 +705,12 @@ Newer features enhance where they exist and are simply absent where they don't. 
 
 The newest parts are built on the platform's newest features, and Chrome and Edge have every one of them today. Each falls back to something that still works: a chest's drawer opens at once (`::details-content`), a door or window is opened by your own `showModal()` (`commandfor`), a tip stays hidden (`interestfor`), a select is the system's own (`base-select`), a carousel is a row you swipe (`::scroll-marker`), corners are round (`corner-shape`), `--wal-ink()` needs its fallback declaration (`@function`), and the nav needs its state classes (scroll-driven animations, `:target-current`).
 
-walnut.css parses in Lightning CSS, which Next.js (Turbopack), Vite, Parcel and Bun use, so importing it into a bundled app works. Lightning CSS refuses a whole stylesheet over one rule it cannot read, so a few of these features are spelled the way it accepts: `.wal-select:open::picker(select)` rather than `:popover-open` on the picker, and `@function` parameters without a type. The build refuses the spellings that break it.
+walnut.css parses in Lightning CSS, which Next.js (Turbopack), Vite, Parcel and Bun use, so importing it into a bundled app works. Lightning CSS refuses a whole stylesheet over one rule it cannot read, so a few of these features are spelled the way it accepts: `.wal-select:open::picker(select)` rather than `:popover-open` on the picker, and `@function` parameters without a type. The selectors it cannot read in any spelling (`:target-current`, `::scroll-marker`, `::scroll-button()`) are in `walnut-scroll.css`, a separate file: in a bundled app, import `walnut.css` and link `walnut-scroll.css` from your public folder, or leave it out. The build refuses anything Lightning CSS rejects from finding its way back into `walnut.css`.
+
+```js
+import "walnut.css";                       // in the bundle
+// <link rel="stylesheet" href="/walnut-scroll.css">, copied from walnut.css/scroll
+```
 
 ## License
 

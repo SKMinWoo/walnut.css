@@ -28,6 +28,7 @@
   "exports": {
     ".": "./dist/walnut.css",
     "./min": "./dist/walnut.min.css",
+    "./scroll": "./dist/walnut-scroll.css",
     "./acts": "./dist/walnut-acts.js",
     "./recolour": "./dist/walnut-recolour.js",
     "./motion": "./dist/walnut-motion.js",

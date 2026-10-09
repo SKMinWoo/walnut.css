@@ -84,10 +84,8 @@
       scrollbar-width: none;
       &::-webkit-scrollbar { display: none; }
 
-      /* Scroll-spy, from the browser: the links are a group of scroll
-         targets, and the one whose section is in view matches
-         :target-current (below). */
-      scroll-target-group: auto;
+      /* Scroll-spy from the browser, with no script, is in
+         walnut-scroll.css; .is-active is the script's way. */
 
       a { white-space: nowrap; }
 
@@ -144,19 +142,6 @@
   @keyframes wal-nav-rule {
     from { opacity: 0; }
     to   { opacity: 1; }
-  }
-
-  /* Its own rule, not one more selector in the lists above: a browser
-     that does not know a pseudo-class drops the whole list it appears in,
-     and would take .is-active and :hover with it. */
-
-  .wal-nav .wal-nav-links a:target-current {
-    color: var(--wal-accent-ink);
-
-    &::after {
-      transform: scaleX(1);
-      transform-origin: left;
-    }
   }
 
   /* ═══ 2. Hero ═══ */
@@ -2314,11 +2299,11 @@
            <li>…</li>
          </ul>
 
-     It is a scroll-snapping list. scroll-marker-group gives it a dot per
+     It is a scroll-snapping list. walnut-scroll.css gives it a dot per
      slide, which scrolls to that slide and lights while it is the one in
-     view; ::scroll-button gives it Previous and Next, which grey out at
-     either end. A browser without them has a list you swipe or scroll,
-     which is still a carousel. */
+     view, and Previous and Next, which grey out at either end. Without
+     that sheet, or in a browser without scroll markers, it is a list you
+     swipe or scroll, which is still a carousel. */
   .wal-carousel {
     list-style: none;
     margin: 0;
@@ -2334,74 +2319,11 @@
     scrollbar-width: none;
     anchor-name: --wal-carousel;
     anchor-scope: --wal-carousel;
-    scroll-marker-group: after;
 
     > li {
       scroll-snap-align: center;
       min-inline-size: 0;
     }
-  }
-
-  .wal-carousel::scroll-marker-group {
-    display: flex;
-    justify-content: center;
-    gap: 0.55rem;
-    padding-block: var(--wal-space-sm) 0;
-  }
-
-  .wal-carousel > li::scroll-marker {
-    content: "";
-    inline-size: 0.6rem;
-    block-size: 0.6rem;
-    border-radius: 50%;
-    background: var(--wal-line);
-    transition:
-      background-color var(--wal-duration) var(--wal-ease),
-      scale            var(--wal-duration) var(--wal-ease);
-  }
-
-  .wal-carousel > li::scroll-marker:target-current {
-    background: var(--wal-accent);
-    scale: 1.35;
-  }
-
-  .wal-carousel > li::scroll-marker:focus-visible {
-    outline: 2px solid var(--wal-accent);
-    outline-offset: 2px;
-  }
-
-  .wal-carousel::scroll-button(*) {
-    position: absolute;
-    position-anchor: --wal-carousel;
-    inline-size: 2.4rem;
-    block-size: 2.4rem;
-    border-radius: 50%;
-    border: var(--wal-border);
-    background: color-mix(in oklch, var(--wal-surface) 88%, transparent);
-    color: var(--wal-text);
-    font: 600 1.05rem/1 var(--wal-font-body);
-    cursor: pointer;
-    box-shadow: var(--wal-shadow-sm);
-    transition: opacity var(--wal-duration) var(--wal-ease);
-  }
-
-  .wal-carousel::scroll-button(*):disabled {
-    opacity: 0;
-    cursor: default;
-  }
-
-  /* Astride the carousel's edges. The text after the slash is the name a
-     screen reader gives the arrow. */
-  .wal-carousel::scroll-button(inline-start) {
-    content: "\2190" / "Previous";
-    position-area: left center;
-    translate: 50% 0;
-  }
-
-  .wal-carousel::scroll-button(inline-end) {
-    content: "\2192" / "Next";
-    position-area: right center;
-    translate: -50% 0;
   }
 
   /* ═══ 42. Chart ═══

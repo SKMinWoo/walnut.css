@@ -13,6 +13,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Archivo:ital,wdth,wght@0,62..125,100..900;1,62..125,100..900&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 
   <link rel="stylesheet" href="../dist/walnut.css">
+  <link rel="stylesheet" href="../dist/walnut-scroll.css">
   <link rel="stylesheet" href="../dist/themes/press.css">
   <link rel="stylesheet" href="../dist/themes/cafe.css">
   <link rel="stylesheet" href="../dist/themes/forest.css">
@@ -730,7 +731,8 @@ walnut.recolour(page, () =&gt; showDetail("forest"), { from: card });</code></pr
         <p class="pitch-what">A carousel, a select that shows real swatches, and a menu that knows where it fits. All three are the browser's own elements, styled by walnut, with no script and no library.</p>
         <dl class="pitch-facts">
           <div><dt>Why you would use it</dt><dd>These are the three parts a site most often installs a library for. The browser's versions work with a keyboard and a screen reader from the start.</dd></div>
-          <div><dt>On your site</dt><dd><pre><code>&lt;ul class="wal-carousel"&gt;&lt;li&gt;…&lt;/li&gt;&lt;/ul&gt;
+          <div><dt>On your site</dt><dd><pre><code>&lt;link rel="stylesheet" href="walnut-scroll.css"&gt;
+&lt;ul class="wal-carousel"&gt;&lt;li&gt;…&lt;/li&gt;&lt;/ul&gt;
 
 &lt;select class="wal-select"&gt;
   &lt;button&gt;&lt;selectedcontent&gt;&lt;/selectedcontent&gt;&lt;/button&gt;
@@ -739,7 +741,7 @@ walnut.recolour(page, () =&gt; showDetail("forest"), { from: card });</code></pr
 
 &lt;button popovertarget="more"&gt;More&lt;/button&gt;
 &lt;div id="more" popover class="wal-menu"&gt;…&lt;/div&gt;</code></pre></dd></div>
-          <div><dt>Status</dt><dd class="pitch-status"><b data-status="ships">Ships.</b> <span>Chrome and Edge draw all three today. Elsewhere the carousel is a plain swipeable row and the select is the system's own. Under Materials the menu and the picker are brass.</span></dd></div>
+          <div><dt>Status</dt><dd class="pitch-status"><b data-status="ships">Ships.</b> <span>Chrome and Edge draw all three today. Elsewhere the carousel is a plain swipeable row and the select is the system's own. The carousel's dots and arrows are in their own sheet, since Next.js and Vite cannot read them yet. Under Materials the menu and the picker are brass.</span></dd></div>
         </dl>
       </div>
       <div class="demo">
