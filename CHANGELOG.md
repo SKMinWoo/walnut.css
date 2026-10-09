@@ -4,9 +4,34 @@
 
 Motion that moves the colour script itself, rather than the elements on top
 of it — and a contrast pass that brings every text pair in every palette and
-mode to WCAG AA.
+mode to WCAG AA. Then openings taken from furniture (a plan chest, a sliding
+door, a gatefold), materials that give them weight, charts, and the parts
+the platform can now draw with no script.
 
 ### Changed (breaking)
+
+- **Café, Bone, Dusk and Forest lead with new accents.** All five shipped
+  palettes used to open on a warm red or orange (accents between 25° and
+  60°), so side by side they read as one palette in five rooms. Each now
+  leads with its own hue and keeps its old lead as a supporting cue:
+
+  | Palette | Accent was | Accent now | The old lead moved to |
+  |---------|------------|------------|-----------------------|
+  | Café    | terracotta 25° | china blue 258° | (the default script, below) |
+  | Bone    | terracotta stamp 25° | asagi teal 208° | cool, as a hanko vermilion 30° |
+  | Dusk    | sunset orange 40° | twilight violet 302° | gold, as the lantern 62° |
+  | Forest  | copper 60° | fern 150° | bloom, as campfire copper 55° |
+
+  Press keeps its tomato. Café now pins `--wal-bloom-hue` and
+  `--wal-cool-hue`, and Bone and Forest pin `--wal-bloom-hue`, because the
+  default steps from these accents land on hues outside their stories.
+  Forest's ground turns from 145° to 120°. Every fill in the four sits inside
+  sRGB, and every text pair still clears 4.5:1 in both modes.
+
+  **Café is no longer the default script.** `:root` keeps the terracotta
+  script it always had; a page that named no palette looks exactly as
+  before. A page that put `.wal-cafe` on to get that look should drop the
+  class.
 
 - **Tooltip markup.** The tip now goes *inside* its trigger, and the trigger
   points at it:
@@ -72,6 +97,47 @@ mode to WCAG AA.
 
 ### Added
 
+- **Openings.** `.wal-chest`, a plan chest of `<details>` drawers that
+  slide out of their slots in the flow of the page. `.wal-door`, a sliding
+  side panel on a `<dialog>` opened with `commandfor`, so it needs none of
+  `.wal-drawer`'s script. `.wal-window`, a page inside the page, which
+  `walnut-motion.js` opens as a gatefold from the card that opened it
+  (`data-wal-open="gatefold"`, `walnut.open`). A window that a link or Back
+  opens can open in place and still go home to its card
+  (`{ instant: true }`), and a close asked for while it opens waits for it
+  to land.
+- **Materials.** `data-motion="materials"` on `<html>`, or
+  `data-wal-material` on any element, gives openings weight: walnut
+  (1050ms out, 800ms home) hits its stop and knocks back, brass (480ms,
+  380ms) rings, stone (1200ms, 1000ms) grinds to a dead stop. A material is
+  the four new opening tokens, `--wal-open-duration`, `--wal-open-ease`,
+  `--wal-close-duration` and `--wal-close-ease`, so a part of your own takes
+  one by transitioning on them.
+- **Charts.** `.wal-chart` (columns on a brass rail, stringing for
+  gridlines), `.wal-ring` (shares inlaid in a brass bezel) and `.wal-key`,
+  drawn from the markup with no script. Under Materials they are brass, and
+  a new value strikes and rings.
+- **`.wal-tint`** and `.wal-fill-tint`: any colour, as ink, wash, fill and
+  text on the fill, legible in both modes. The same as CSS functions,
+  `--wal-ink()` and `--wal-soft()`.
+- **`--wal-corner-shape`**: `round`, `squircle` or `bevel`, read by every
+  rule that draws a radius. The Catalogue finish bevels.
+- **Native parts.** `.wal-select` (`base-select`, options with swatches),
+  `.wal-menu` (an anchored popover that flips to fit), `.wal-carousel`
+  (scroll markers and buttons), and `.wal-tip` (a tooltip on
+  `interestfor`, with no script and no nesting).
+- **Less script.** `.wal-nav` draws its scrolled rule from a scroll-state
+  query and lights the link in view with `:target-current`; `.is-scrolled`
+  and `.is-active` remain for browsers without them.
+- **`walnut.shuffle`** and `.wal-shuffle`: a filter or sort where every
+  item travels to its new place, as a view transition scoped to the list.
+- **`walnut-motion.js`**, the third optional script, for the gatefold and
+  the shuffle.
+- **Print.** A walnut page prints as a catalogue sheet: A4, light, flat,
+  numbered at the foot, with link addresses printed, screen furniture left
+  off (or anything marked `data-wal-print="skip"`) and every chest drawer
+  out. Charts, keys, scripts and swatches print in colour.
+
 - **`.wal-retune`.** Tweens the rods — the ground, all five cues, the ramp and
   the geometry scalars — when a palette class, a finish or an inline rod
   changes. Because every colour is derived per frame from the in-flight
@@ -109,7 +175,96 @@ mode to WCAG AA.
   or in system colours under `forced-colors: active`; `select.wal-input` gets
   the native arrow back; colour-chart swatches keep their colours.
 
+- **`.wal-desk`.** Papers on a walnut desk, literally: a grain under the page,
+  drawn by the browser from SVG noise and tinted from the ground rod
+  (`--wal-desk-ink`), so it re-themes with the script; and a resting shadow
+  under every top-level card, plate and metric. On a light page the grain goes
+  no darker than `--wal-bg-subtle`, so every ink keeps the contrast it was
+  tuned to — 240 more pairs checked, none below AA. On `<html>` or `<body>`.
+  The desk holds still: a pointer-parallax version was built and taken out,
+  because a window's worth of grain moving even a few pixels read as
+  dizzying rather than as depth.
+
+- **Acts: `dist/walnut-acts.js`, an optional script.**
+  Mark sections `data-act="wal-dusk"` (or give them rods of their own) and,
+  as each reaches the middle of the window, the whole page retunes to its
+  script under `.wal-retune`. An act lasts until the next begins; above the
+  first, the page keeps its opening script. A page opened or reloaded
+  mid-scroll starts in the right act without a tween, reduced motion cuts,
+  and acts never change the mode. An IntersectionObserver wakes it only at
+  an act's edge, so scrolling within an act does no work.
+
+- **Page-to-page transitions.** `@view-transition { navigation: auto; }`:
+  a same-origin navigation between walnut pages crossfades, so what the pages
+  share — masthead, desk, ground — holds still while the papers change.
+  Elements named alike on both pages travel between them on walnut's easing
+  (`::view-transition-group(*)` now takes `--wal-duration-slow` and
+  `--wal-ease`). Opt out with your own `@view-transition { navigation: none; }`.
+  Chrome 126, Safari 18.2; elsewhere, and under reduced motion, links just
+  navigate.
+
+- **Recolour from the swatch: `dist/walnut-recolour.js`, an optional
+  script.** Put `data-wal-recolour="swatch"` on `<html>` and every palette
+  change made through it opens out of the control that asked for it, in a
+  circle with a 96px soft edge, until it covers the page. A view transition
+  masks the "after" picture, so every frame is either the old palette or the
+  finished new one, and contrast holds throughout. Buttons with
+  `data-wal-palette="wal-dusk"` need no script of their own; `aria-controls`
+  aims one at a `.wal-palette` section, and `aria-pressed` is kept in step.
+  From script, `walnut.recolour(target, { palette } | { rods } | fn, { from })`,
+  and each change fires a bubbling `wal-recolour` event from inside it.
+  Without the attribute, or without view-transition types, it tweens with
+  `.wal-retune`; reduced motion cuts; acts keep retuning. Tune with
+  `--wal-recolour-duration` (760ms). Exported as `walnut.css/recolour`.
+
+- **`.wal-duotone`: any photograph printed in two inks**, a deep shade of
+  one cue and paper, as a gradient map from two blend modes. `data-ink`
+  picks the cue (`accent` by default). A new palette or mode regrades it with
+  nothing for the page to do; by night the paper greys so a print is not a
+  white rectangle; in forced colours the photograph is shown plainly.
+  `overflow: clip`, so a scroll-driven animation inside it still reads the
+  page's scroll.
+
+- **`.wal-reveal-develop`.** A print comes up out of blank paper as it
+  scrolls into view, shadows first and highlights last, by easing a
+  brightness filter back down to the duotone's own. On the image, so the
+  ink and the paper hold still around it.
+
+- **Docs: `next.html` shows all three.** Its catalogue recolours from the
+  swatch; each colourway's "Open page" opens a gatefold window whose cover
+  is the plate, in walnut, with every colour's oklch, hex and contrast in
+  both modes, and an `#open=` address so Back closes it; its prints are duotones with an
+  ink row; and a new tool reads a photo into a palette whose every text pair
+  passes AA. The README has the in-page morph under "Between pages".
+
+- **Dialog and popover entrances.** A `.wal-dialog` that is a `<dialog>` or a
+  `[popover]` rises the last 0.75rem into place as it fades in, and sinks back
+  as it closes, backdrop with it — `@starting-style`, with `display` and
+  `overlay` transitioning discretely so the exit plays in the top layer. A
+  `.wal-dialog` used as a plain box is never hidden by it.
+
+- **`--wal-tooth`, a finish token: the stock's paper tooth.** Catalogue sets
+  a fibre-and-mottle texture that cards, plates and metrics multiply into
+  their own colour; Soft resets it. It darkens light stock by about four
+  percent at most, and muted text on the darkest speck still clears 4.8:1.
+  A paper repainted by a `.wal-fill-*` or `.wal-bg-*` utility stays flat:
+  gold's dark foreground on a toothed gold fill measured 4.3:1.
+
+- **Docs: `openings.html`**, a deck of the openings, the materials and the
+  seven new parts, each demo running on the built framework.
+
+- **Docs: plate 14 has a page of its own** (`docs/specimen.html`), which the
+  workbench's specimen card grows into and which is in three acts. The
+  workbench now remembers the reader's palette, mode and finish for the tab.
+
 ### Changed
+
+- **Same-origin navigations between walnut pages now crossfade** instead of
+  cutting (see Page-to-page transitions). Visible on any site of more than
+  one walnut page; opt out as above.
+
+- **Tooltips drop the last quarter-rem into place** from their trigger as
+  they fade in, rather than fading in where they stand.
 
 - **Root view transitions crossfade instead of zooming.** The breathe keyframes
   scaled the whole-page snapshot to 0.98 / 1.02, which read as the browser
