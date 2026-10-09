@@ -87,6 +87,16 @@ const minified = bundle
   .replace(/[^{}]+\{\s*\}/g, "")
   .trim();
 
+// ─── Companion scripts ───
+// Optional, each one doing a single thing CSS cannot (see the header of each
+// file). Copied with a banner rather than minified: each is a few hundred
+// bytes of code under its own explanation, and a minifier is one more thing
+// that can quietly ship different code.
+const SCRIPTS = ["walnut-acts.js", "walnut-recolour.js", "walnut-motion.js"];
+const scripts = Object.fromEntries(SCRIPTS.map((file) => [file,
+  `/*! walnut.css v${VERSION} · ${file.replace(/^walnut-|\.js$/g, "")} | MIT License | github.com/SKMinWoo/walnut.css */\n` +
+  fs.readFileSync(path.join(SRC, file), "utf8")]));
+
 // ─── Read the palettes ───
 // A theme listed in THEMES that is missing on disk is an error, not a skip:
 // assertDocsRewritten expects a <link> for every one of them, and a skipped
@@ -121,32 +131,35 @@ function assertPalettesLeaveFinishTokens(finishCss, palettes) {
 }
 
 /**
- * Guard the ../dist/ → dist/ rewrite that assembles public/index.html.
+ * Guard the ../dist/ → dist/ rewrite that assembles each page in public/.
  *
  * The rewrite is a regex over hand-written HTML, which means it fails open:
- * if someone edits the docs page and the paths stop matching the pattern,
+ * if someone edits a docs page and the paths stop matching the pattern,
  * `.replace()` returns the input unchanged, this build prints "built
  * successfully", and the deployed site quietly serves an unstyled page. That
  * is the same shape of failure as the two minifier bugs documented above — a
  * build that reported success while shipping a stylesheet that wasn't the one
  * anybody wrote. The build should refuse to produce a site it cannot vouch for.
  *
- * @param {string} original  docs/index.html exactly as read from disk
+ * @param {string} page      the page's file name in docs/, for the message
+ * @param {string} original  the page exactly as read from disk
  * @param {string} rewritten the same HTML after ../dist/ became dist/
  * @throws to fail the build when the deployed page would be missing styles
  */
-function assertDocsRewritten(original, rewritten) {
-  // One <link> per theme, plus the bundle itself. Derived from THEMES rather
-  // than hardcoded so adding a theme cannot quietly lower the bar.
+function assertDocsRewritten(page, original, rewritten) {
+  // One stylesheet <link> per theme, plus the bundle itself. Derived from
+  // THEMES rather than hardcoded so adding a theme cannot quietly lower the
+  // bar. Scripts are not counted: a page may load any number of them, and
+  // the "../" check below catches one the rewrite missed.
   const expected = THEMES.length + 1;
   const found = (original.match(STYLESHEET_LINKS) || []).length;
 
   if (found !== expected) {
     throw new Error(
-      `docs/index.html: expected ${expected} "../dist/" stylesheet links, found ${found}.\n` +
+      `docs/${page}: expected ${expected} "../dist/" stylesheet links, found ${found}.\n` +
         `  The public/ rewrite is keyed to that exact pattern, so the deployed page\n` +
         `  would have shipped with ${expected - found} stylesheet(s) pointing above the\n` +
-        `  site root. Update STYLESHEET_LINKS to match how the docs page links its CSS.`
+        `  site root. Update STYLESHEET_LINKS to match how the docs pages link their CSS.`
     );
   }
 
@@ -154,7 +167,7 @@ function assertDocsRewritten(original, rewritten) {
   // pattern but survived the replace, or a new one written in some other shape.
   if (rewritten.includes("../")) {
     throw new Error(
-      `public/index.html still contains a "../" path after rewriting.\n` +
+      `public/${page} still contains a "../" path after rewriting.\n` +
         `  Nothing above the site root exists once deployed — it would 404.`
     );
   }
@@ -192,30 +205,39 @@ function assertVersionStamped(found) {
 // scratch on every run, so a file deleted from docs/ or dist/ cannot linger
 // there and keep working in production after it stopped existing.
 
-/* docs/index.html links its stylesheets as `../dist/walnut.css` so that the
-   page renders when opened straight off disk, with no server at all. In
-   public/ the page sits at the root *beside* dist/, so that `../` has to go.
+/* The docs pages link their stylesheets as `../dist/walnut.css` so that they
+   render when opened straight off disk, with no server at all. In public/
+   the pages sit at the root *beside* dist/, so that `../` has to go.
 
-   Rewriting on copy — rather than changing docs/index.html to `dist/` and
-   nesting the deployed copy to match — keeps the one-file, no-build-step
-   promise the docs page makes about itself in the Install section. The cost is
-   that the rewrite is a blind regex, which is what assertDocsRewritten guards. */
-const STYLESHEET_LINKS = /\.\.\/dist\//g;
-const docsHtml = fs.readFileSync(path.join(DOCS, "index.html"), "utf8");
-const siteHtml = docsHtml.replace(STYLESHEET_LINKS, "dist/");
+   Rewriting on copy — rather than changing the pages to `dist/` and nesting
+   the deployed copies to match — keeps the one-file, no-build-step promise
+   the docs make about themselves in the Install section. The cost is that the
+   rewrite is a blind regex, which is what assertDocsRewritten guards.
+
+   Listed rather than globbed, so a scratch page left in docs/ is never
+   deployed by accident. */
+const DOCS_PAGES = ["index.html", "specimen.html", "next.html"];
+const STYLESHEET_LINKS = /<link rel="stylesheet" href="\.\.\/dist\//g;
+const DIST_REFS = /\.\.\/dist\//g;
+const docsPages = DOCS_PAGES.map((page) => {
+  const html = fs.readFileSync(path.join(DOCS, page), "utf8");
+  return { page, html, site: html.replace(DIST_REFS, "dist/") };
+});
 
 // ─── Guards — all of them, before anything is written ───
 assertPalettesLeaveFinishTokens(fs.readFileSync(path.join(SRC, "layers", "07-finish.css"), "utf8"), themeCss);
-assertDocsRewritten(docsHtml, siteHtml);
+for (const { page, html, site } of docsPages) assertDocsRewritten(page, html, site);
 assertVersionStamped({
   "src/walnut.css": [...fs.readFileSync(path.join(SRC, "walnut.css"), "utf8").matchAll(/walnut\.css v(\d+\.\d+\.\d+\S*)/g)].map((m) => m[1]),
-  "docs/index.html": [...docsHtml.matchAll(/<span data-version>([^<]*)<\/span>/g)].map((m) => m[1]),
+  ...Object.fromEntries(docsPages.map(({ page, html }) =>
+    [`docs/${page}`, [...html.matchAll(/<span data-version>([^<]*)<\/span>/g)].map((m) => m[1])])),
 });
 
 // ─── Write ───
 fs.mkdirSync(path.join(DIST, "themes"), { recursive: true });
 fs.writeFileSync(path.join(DIST, "walnut.css"), bundle);
 fs.writeFileSync(path.join(DIST, "walnut.min.css"), minified);
+for (const [file, js] of Object.entries(scripts)) fs.writeFileSync(path.join(DIST, file), js);
 for (const [theme, css] of Object.entries(themeCss)) {
   fs.writeFileSync(path.join(DIST, "themes", `${theme}.css`), css);
 }
@@ -224,10 +246,11 @@ fs.rmSync(PUBLIC, { recursive: true, force: true });
 fs.mkdirSync(path.join(PUBLIC, "dist", "themes"), { recursive: true });
 fs.writeFileSync(path.join(PUBLIC, "dist", "walnut.css"), bundle);
 fs.writeFileSync(path.join(PUBLIC, "dist", "walnut.min.css"), minified);
+for (const [file, js] of Object.entries(scripts)) fs.writeFileSync(path.join(PUBLIC, "dist", file), js);
 for (const [theme, css] of Object.entries(themeCss)) {
   fs.writeFileSync(path.join(PUBLIC, "dist", "themes", `${theme}.css`), css);
 }
-fs.writeFileSync(path.join(PUBLIC, "index.html"), siteHtml);
+for (const { page, site } of docsPages) fs.writeFileSync(path.join(PUBLIC, page), site);
 if (fs.existsSync(path.join(DOCS, "favicon.svg"))) {
   fs.copyFileSync(path.join(DOCS, "favicon.svg"), path.join(PUBLIC, "favicon.svg"));
 }
@@ -240,7 +263,8 @@ const fullSize = Buffer.byteLength(bundle, "utf8");
 const minSize = Buffer.byteLength(minified, "utf8");
 
 console.log(`\n  walnut.css v${VERSION} built successfully\n`);
-console.log(`  dist/walnut.css     ${(fullSize / 1024).toFixed(1)} KB`);
-console.log(`  dist/walnut.min.css ${(minSize / 1024).toFixed(1)} KB`);
-console.log(`  themes:             ${THEMES.join(", ")}`);
+console.log(`  dist/walnut.css         ${(fullSize / 1024).toFixed(1)} KB`);
+console.log(`  dist/walnut.min.css     ${(minSize / 1024).toFixed(1)} KB`);
+for (const [file, js] of Object.entries(scripts)) console.log(`  dist/${file.padEnd(18)} ${(Buffer.byteLength(js, "utf8") / 1024).toFixed(1)} KB`);
+console.log(`  themes:                 ${THEMES.join(", ")}`);
 console.log();

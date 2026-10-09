@@ -32,6 +32,28 @@
       box-shadow: var(--wal-shadow-sm);
     }
 
+    /* The same rule and shadow, from the browser. A scroll-state container
+       knows when it is stuck, so a masthead gains its rule once the page
+       has scrolled under it, with no scroll listener. It is drawn on
+       ::after, which a scroll-state query can reach and a stuck element's
+       own box cannot, and stands down when a script sets .is-scrolled, so
+       the two never draw two rules. */
+    container-type: scroll-state;
+
+    &::after {
+      content: "";
+      position: absolute;
+      inset: auto 0 0;
+      block-size: var(--wal-hairline);
+      pointer-events: none;
+      background: var(--wal-line);
+      box-shadow: 0 0.4rem 0.8rem -0.3rem var(--wal-shadow-ink);
+      opacity: 0;
+      transition: opacity var(--wal-duration) var(--wal-ease);
+    }
+
+    &.is-scrolled::after { opacity: 0; }
+
     .wal-nav-brand {
       display: flex;
       flex-direction: column;
@@ -64,6 +86,11 @@
       overflow-x: auto;
       scrollbar-width: none;
       &::-webkit-scrollbar { display: none; }
+
+      /* Scroll-spy, from the browser: the links are a group of scroll
+         targets, and the one whose section is in view matches
+         :target-current (below). */
+      scroll-target-group: auto;
 
       a { white-space: nowrap; }
 
@@ -101,6 +128,22 @@
       display: flex;
       gap: var(--wal-space-sm);
       align-items: center;
+    }
+  }
+
+  /* Each of these is its own rule, not one more selector in the lists
+     above: a browser that does not know a pseudo-class drops the whole
+     list it appears in, and would take .is-active and :hover with it. */
+  @container scroll-state(stuck: top) {
+    .wal-nav::after { opacity: 1; }
+  }
+
+  .wal-nav .wal-nav-links a:target-current {
+    color: var(--wal-accent-ink);
+
+    &::after {
+      transform: scaleX(1);
+      transform-origin: left;
     }
   }
 
@@ -837,7 +880,18 @@
     }
   }
 
-  /* ═══ 15. Dialog ═══ */
+  /* ═══ 15. Dialog ═══
+     Opens like a sheet drawn from a drawer: it rises the last few pixels into
+     place as it fades in, and sinks back the same way as it closes.
+
+     A <dialog> and a [popover] both start from display: none, which a
+     transition has no "before" for. @starting-style supplies one. `display`
+     and `overlay` transition discretely, so a closing sheet stays rendered,
+     and in the top layer, until its exit has played. A browser without
+     @starting-style shows it at once, as before.
+
+     The closed state is scoped to <dialog> and [popover], so a .wal-dialog
+     used as a plain styled box is never hidden by it. */
   .wal-dialog {
     padding: var(--wal-space-xl);
     border: var(--wal-border);
@@ -848,11 +902,42 @@
     max-width: 500px;
     width: 90vw;
     margin: auto;
-    
+    transition:
+      opacity   var(--wal-duration-slow) var(--wal-ease),
+      translate var(--wal-duration-slow) var(--wal-ease),
+      display   var(--wal-duration-slow) allow-discrete,
+      overlay   var(--wal-duration-slow) allow-discrete;
+
+    &:is(dialog, [popover]):not([open], :popover-open) {
+      opacity: 0;
+      translate: 0 0.75rem;
+    }
+
+    @starting-style {
+      &:is([open], :popover-open) {
+        opacity: 0;
+        translate: 0 0.75rem;
+      }
+    }
+
     &::backdrop {
       background: color-mix(in oklch, var(--wal-bg) 60%, transparent);
       backdrop-filter: blur(8px);
       -webkit-backdrop-filter: blur(8px);
+      transition:
+        opacity var(--wal-duration-slow) var(--wal-ease),
+        display var(--wal-duration-slow) allow-discrete,
+        overlay var(--wal-duration-slow) allow-discrete;
+    }
+
+    &:is(dialog, [popover]):not([open], :popover-open)::backdrop {
+      opacity: 0;
+    }
+
+    @starting-style {
+      &:is([open], :popover-open)::backdrop {
+        opacity: 0;
+      }
     }
   }
 
@@ -886,7 +971,10 @@
     position: absolute;
     top: 100%;
     left: 50%;
-    translate: -50% 0;
+    /* Hidden a quarter-rem up, tucked toward its trigger; it drops the rest
+       of the way as it fades in, so it reads as coming from the trigger
+       rather than appearing beside it. */
+    translate: -50% -0.25rem;
     margin-top: var(--wal-space-sm);
     /* Sized to its text, not to the space left after `left: 50%`, which would
        wrap a short tip inside half the width of a small button. */
@@ -914,6 +1002,7 @@
     visibility: hidden;
     opacity: 0;
     transition: opacity var(--wal-duration) var(--wal-ease),
+                translate var(--wal-duration) var(--wal-ease),
                 visibility 0s linear var(--wal-duration);
 
     /* The hover bridge across the margin. */
@@ -944,6 +1033,7 @@
   .wal-tooltip-trigger:is(:hover, :focus-visible) > .wal-tooltip {
     visibility: visible;
     opacity: 1;
+    translate: -50% 0;
     transition-delay: 0s;
   }
 
@@ -951,6 +1041,61 @@
     visibility: hidden;
     opacity: 0;
   }
+
+  /* ═══ 16b. Tip ═══
+     The tooltip with no script and no nesting: a hint popover the browser
+     opens on hover and focus, and closes on Escape.
+
+         <button interestfor="save-tip">Save</button>
+         <span class="wal-tip" id="save-tip" popover="hint">Saves a draft</span>
+
+     interestfor gives all three of WCAG 1.4.13's asks (hoverable,
+     persistent, dismissible) and the description, so .is-dismissed and its
+     two lines of script are not needed. The tip lives in the top layer, so
+     no `overflow: hidden` between it and its button can clip it, and it is
+     anchored to the button that showed it: above, or below when there is no
+     room above.
+
+     A browser without interestfor never opens it, so keep anything the
+     reader needs in the button's own name. .wal-tooltip still works
+     everywhere. */
+  .wal-tip {
+    position-area: top;
+    position-try-fallbacks: flip-block;
+    inset: auto;
+    margin: 0 0 0.45rem;
+    padding: 0.35rem 0.6rem;
+    border: 0;
+    border-radius: var(--wal-radius-sm);
+    background: var(--wal-text);
+    color: var(--wal-bg);
+    font: 500 var(--wal-text-xs)/1.3 var(--wal-font-body);
+    white-space: nowrap;
+    opacity: 0;
+    translate: 0 0.25rem;
+    transition:
+      opacity   var(--wal-duration) var(--wal-ease),
+      translate var(--wal-duration) var(--wal-ease),
+      display   var(--wal-duration) allow-discrete,
+      overlay   var(--wal-duration) allow-discrete;
+  }
+
+  .wal-tip:popover-open {
+    opacity: 1;
+    translate: 0 0;
+  }
+
+  @starting-style {
+    .wal-tip:popover-open {
+      opacity: 0;
+      translate: 0 0.25rem;
+    }
+  }
+
+  /* A beat before it opens, so a pointer crossing the button does not
+     flicker a tip; a shorter one before it closes, so the pointer can
+     travel onto it. */
+  [interestfor] { interest-delay: 0.3s 0.15s; }
 
   /* ═══ 17. Eyebrow ═══ */
   .wal-eyebrow {
@@ -1318,3 +1463,1151 @@
     > h2, > h3 { grid-column: 2; margin: 0; }
     .wal-caption { grid-column: 2; }
   }
+
+  /* ═══ 31. Desk ═══
+     The surface the page's papers lie on.
+
+         <html class="wal-press wal-desk">
+
+     .wal-desk lays a walnut grain under the page and lifts the papers on it —
+     cards, plates, metrics — a resting shadow off it. The grain is the
+     ground rod a few points darker (--wal-desk-ink), so it re-stains with
+     the script.
+
+     It holds still. A version that shifted the grain a few pixels with the
+     pointer was built, measured and taken out: even at 3–10px, a whole
+     window's worth of texture moving read as dizzying rather than as depth.
+     The resting shadows carry the depth instead, and they never move.
+
+     On <html> or <body> only. The grain is fixed to the window, so papers
+     scroll across the desk rather than with it. */
+  .wal-desk::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    background: var(--wal-desk-ink);
+    mask: var(--wal-desk-grain) 0 0 / 640px repeat;
+  }
+
+  /* Papers rest a shadow above the desk. :where() holds this to one class's
+     specificity, so .wal-card:hover still lifts to --wal-shadow and a
+     .wal-shadow-none utility still wins; a paper inside another paper rests
+     on that one, and casts nothing. Any other element joins the desk with
+     the .wal-shadow-sm utility.
+
+     `*:is`, not ` :is`: the minifier strips the space before a colon, which
+     would turn this descendant selector into "a .wal-desk that is a card"
+     (see build.js). */
+  :where(.wal-desk) *:is(.wal-card, .wal-plate, .wal-metric):where(:not(:is(.wal-card, .wal-plate, .wal-metric) *)) {
+    box-shadow: var(--wal-shadow-sm);
+  }
+
+  @media print {
+    .wal-desk::before { display: none; }
+  }
+
+  /* ═══ 32. Stock ═══
+     What the papers are printed on. A finish may give their stock a tooth —
+     --wal-tooth, a grey texture multiplied into each paper's own colour, so
+     it carries no colour of its own — and Catalogue does (07-finish.css).
+     Unset, this is `none` and the papers are flat fills, as before.
+
+     Only on a paper showing its own stock. The .wal-fill-* and .wal-bg-*
+     utilities repaint a paper's colour, not its image, so they would keep a
+     tooth multiplied into ink it was never measured against: gold's dark
+     foreground on a toothed gold fill fell to 4.3:1. A repainted paper is
+     a solid surface, and stays flat.
+
+     The specificity (0,2,1) is above the papers' own `background`
+     shorthands, so it outranks them for this one longhand. */
+  :is(.wal-card, .wal-metric, .wal-plate > div):not([class*="wal-fill-"], [class*="wal-bg-"]) {
+    background-image: var(--wal-tooth, none);
+    background-blend-mode: multiply;
+  }
+
+  /* ═══ 33. Duotone ═══
+     Any photograph, printed in two inks: a deep shade of one of the
+     palette's cues, and paper.
+
+         <figure class="wal-duotone" data-ink="cool">
+           <img src="…" alt="…">
+         </figure>
+
+     data-ink is accent (the default), bloom, gold, olive or cool. A new
+     palette or mode regrades every print with no work from the page, so a
+     stock photograph is always on palette, and the same picture can sit in
+     two sections graded two ways.
+
+     A true gradient map, in every browser, from two blend modes. The image
+     goes grey and is screened over the ink's deep shade, so its shadows take
+     the ink and its highlights stay light; then the paper is multiplied over
+     the lot, which tints the highlights and leaves the shadows alone. The
+     paper is warm white by day and greyed by night, so a dark page is not
+     lit by a white rectangle.
+
+     The figure sizes to its image. Give it a block size or an aspect-ratio
+     and the image covers it. `overflow: clip`, not hidden: hidden makes a
+     scroll container, and a scroll-driven animation inside, such as
+     .wal-reveal-develop, would read its timeline off the figure instead of
+     the page. */
+  .wal-duotone {
+    --wal-duotone-ink: var(--wal-accent);
+    position: relative;
+    isolation: isolate;
+    overflow: clip;
+    margin: 0;
+    background-color: color-mix(in oklch, var(--wal-duotone-ink) 58%, oklch(0.18 0.02 50));
+
+    &[data-ink="bloom"] { --wal-duotone-ink: var(--wal-bloom); }
+    &[data-ink="gold"]  { --wal-duotone-ink: var(--wal-gold); }
+    &[data-ink="olive"] { --wal-duotone-ink: var(--wal-olive); }
+    &[data-ink="cool"]  { --wal-duotone-ink: var(--wal-cool); }
+
+    img {
+      display: block;
+      inline-size: 100%;
+      block-size: 100%;
+      object-fit: cover;
+      filter: grayscale(1) contrast(1.08);
+      mix-blend-mode: screen;
+    }
+
+    &::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      background-color: color-mix(in oklch, var(--wal-duotone-ink) 16%,
+                                  light-dark(oklch(0.97 0.01 85), oklch(0.86 0.02 85)));
+      mix-blend-mode: multiply;
+    }
+    /* No transition of its own: under .wal-retune the rods already carry
+       the ink across, and a transition on top would restart every frame
+       and trail behind the rest of the page. */
+  }
+
+  /* ═══ 34. Chest ═══
+     A plan chest: drawers in the flow of the page. Each drawer is a
+     <details>; its front is the summary, and the drawer slides out of the
+     slot beneath it while the rows below make room. Its contents ride with
+     it, so they come out of the slot rather than unrolling.
+
+         <div class="wal-chest">
+           <details name="colourways">
+             <summary>Forest</summary>
+             <div>Everything in the drawer.</div>
+           </details>
+           …
+         </div>
+
+     A shared `name` makes them one chest, where pulling out a drawer pushes
+     the open one home; leave it off and any number can be out. The browser
+     owns the rest: the keyboard, the open state, find-in-page reaching into
+     a shut drawer.
+
+     The drawer moves on the four opening tokens (01-tokens.css), so a
+     material changes how it lands: data-wal-material="walnut" on the chest
+     and a drawer hits its stop and knocks back before it settles. A browser
+     without ::details-content opens the drawer at once, as a plain
+     <details> does. */
+  .wal-chest {
+    display: grid;
+    border-block-start: var(--wal-border);
+
+    > details {
+      interpolate-size: allow-keywords;
+      border-block-end: var(--wal-border);
+      background: var(--wal-surface);
+      color: var(--wal-text);
+    }
+
+    summary {
+      list-style: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: var(--wal-space-md);
+      padding: var(--wal-space-md) var(--wal-space-lg);
+      transition: background-color var(--wal-duration) var(--wal-ease);
+
+      &::-webkit-details-marker { display: none; }
+      &:hover { background: var(--wal-surface-2); }
+
+      &:focus-visible {
+        outline: 2px solid var(--wal-accent);
+        outline-offset: -2px;
+      }
+
+      /* The pull: a finger slot routed into the front. It fills with the
+         accent while its drawer is out. */
+      &::after {
+        content: "";
+        flex: none;
+        margin-inline-start: auto;
+        inline-size: 2.75rem;
+        block-size: 0.5rem;
+        border-radius: var(--wal-radius-full);
+        background: var(--wal-bg-subtle);
+        box-shadow: inset 0 1px 2px var(--wal-shadow-ink),
+                    0 1px 0 color-mix(in oklch, var(--wal-surface), white 40%);
+        transition: background-color var(--wal-duration) var(--wal-ease);
+      }
+    }
+
+    details[open] > summary::after { background: var(--wal-accent); }
+
+    /* The drawer is the gap that opens under the front: the details'
+       content box, from no height to its own. interpolate-size lets a
+       transition reach `auto`, and content-visibility, the property that
+       hides a shut drawer, flips at the end of the close instead of the
+       start, so the contents stay drawn until the drawer is home. */
+    details::details-content {
+      block-size: 0;
+      overflow-y: clip;
+      transition:
+        block-size         var(--wal-close-duration) var(--wal-close-ease),
+        content-visibility var(--wal-close-duration) allow-discrete;
+    }
+
+    details[open]::details-content {
+      block-size: auto;
+      transition-duration: var(--wal-open-duration);
+      transition-timing-function: var(--wal-open-ease);
+    }
+
+    /* Only where the drawer clips: without that, contents sliding down
+       from 2.5rem up would pass over the front. */
+    @supports selector(::details-content) {
+      details > :not(summary) {
+        background: var(--wal-bg-subtle);
+        /* The cabinet's edge shades the top of the drawer; its back is a
+           lip. */
+        box-shadow: inset 0 1.1rem 1rem -1rem var(--wal-shadow-ink),
+                    inset 0 -3px 0 color-mix(in oklch, var(--wal-surface), var(--wal-text) 12%);
+        translate: 0 -2.5rem;
+        transition: translate var(--wal-close-duration) var(--wal-close-ease);
+      }
+
+      details[open] > :not(summary) {
+        translate: 0 0;
+        transition-duration: var(--wal-open-duration);
+        transition-timing-function: var(--wal-open-ease);
+      }
+
+      /* A shut drawer's contents are not styled at all, so there is no
+         "before" for the slide. This is it. */
+      @starting-style {
+        details[open] > :not(summary) { translate: 0 -2.5rem; }
+      }
+    }
+  }
+
+  /* ═══ 35. Door ═══
+     A sliding door: a side panel that is a <dialog>, so it needs no script.
+
+         <button commandfor="cart" command="show-modal">Cart</button>
+         <dialog class="wal-door" id="cart" closedby="any" aria-label="Cart">
+           <button class="wal-door-pull" commandfor="cart" command="close"
+                   aria-label="Close"></button>
+           <div class="wal-door-body">…</div>
+         </dialog>
+
+     commandfor opens and closes it, and closedby="any" lets a click outside
+     or Escape close it, so focus, the inert page behind and the Escape key
+     are all the browser's. It runs in on a track from the right and throws
+     its shadow across the page; on a phone it rises from below. The
+     leading edge is its pull, which closes it.
+
+     This is .wal-drawer without the script that drawer needs for its
+     classes and its focus. Like the chest, it moves on the four opening
+     tokens, so it takes a material. */
+  .wal-door {
+    position: fixed;
+    inset: 0 0 0 auto;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    inline-size: min(30rem, 92vw);
+    max-inline-size: none;
+    block-size: 100dvh;
+    max-block-size: none;
+    background: var(--wal-surface);
+    color: var(--wal-text);
+    box-shadow: -1px 0 0 var(--wal-line), -2.5rem 0 3rem -2rem var(--wal-shadow-ink-lg);
+    /* The grid is set shut as well as open, so the door keeps its shape
+       while it slides away. */
+    display: none;
+    grid-template-columns: 1.5rem minmax(0, 1fr);
+    translate: 100% 0;
+    transition:
+      translate var(--wal-close-duration) var(--wal-close-ease),
+      display   var(--wal-close-duration) allow-discrete,
+      overlay   var(--wal-close-duration) allow-discrete;
+
+    &[open] {
+      display: grid;
+      translate: 0 0;
+      transition-duration: var(--wal-open-duration);
+      transition-timing-function: var(--wal-open-ease);
+    }
+
+    /* The shadow the door throws, darkest at the door. A dim in the
+       ground's hue rather than a wash of the page colour: the door is
+       solid, and what it shades is the room. */
+    &::backdrop {
+      background: linear-gradient(to left,
+        oklch(0.18 0.02 var(--wal-hue) / 0.38),
+        oklch(0.18 0.02 var(--wal-hue) / 0.12) 55%,
+        oklch(0.18 0.02 var(--wal-hue) / 0.05));
+      opacity: 0;
+      transition:
+        opacity var(--wal-close-duration) var(--wal-ease),
+        display var(--wal-close-duration) allow-discrete,
+        overlay var(--wal-close-duration) allow-discrete;
+    }
+
+    &[open]::backdrop {
+      opacity: 1;
+      transition-duration: var(--wal-open-duration);
+    }
+  }
+
+  @starting-style {
+    .wal-door[open] { translate: 100% 0; }
+    .wal-door[open]::backdrop { opacity: 0; }
+  }
+
+  .wal-door-pull {
+    grid-row: 1 / -1;
+    display: grid;
+    place-items: center;
+    padding: 0;
+    border: 0;
+    cursor: pointer;
+    background: color-mix(in oklch, var(--wal-surface), var(--wal-text) 9%);
+    box-shadow: inset -1px 0 0 var(--wal-line);
+
+    /* The handle: a long slot, the height of a hand. */
+    &::before {
+      content: "";
+      inline-size: 0.45rem;
+      block-size: 4.5rem;
+      border-radius: var(--wal-radius-full);
+      background: color-mix(in oklch, var(--wal-surface), var(--wal-text) 24%);
+      box-shadow: inset 1px 1px 3px var(--wal-shadow-ink);
+      transition: background-color var(--wal-duration) var(--wal-ease);
+    }
+
+    &:hover::before { background: var(--wal-accent); }
+
+    &:focus-visible {
+      outline: 2px solid var(--wal-accent);
+      outline-offset: -4px;
+    }
+  }
+
+  .wal-door-body {
+    overflow: auto;
+    overscroll-behavior: contain;
+    padding: var(--wal-space-xl) var(--wal-space-lg);
+  }
+
+  @media (max-width: 40rem) {
+    .wal-door {
+      inset: auto 0 0;
+      inline-size: 100%;
+      block-size: min(88dvh, 44rem);
+      border-radius: var(--wal-radius-lg) var(--wal-radius-lg) 0 0;
+      box-shadow: 0 -1px 0 var(--wal-line), 0 -2.5rem 3rem -2rem var(--wal-shadow-ink-lg);
+      translate: 0 100%;
+      grid-template-columns: none;
+      grid-template-rows: 1.5rem minmax(0, 1fr);
+
+      &::backdrop {
+        background: linear-gradient(to top,
+          oklch(0.18 0.02 var(--wal-hue) / 0.38),
+          oklch(0.18 0.02 var(--wal-hue) / 0.08));
+      }
+    }
+
+    @starting-style {
+      .wal-door[open] { translate: 0 100%; }
+    }
+
+    .wal-door-pull {
+      grid-row: auto;
+      border-radius: inherit;
+      box-shadow: inset 0 -1px 0 var(--wal-line);
+
+      &::before {
+        inline-size: 4.5rem;
+        block-size: 0.45rem;
+      }
+    }
+  }
+
+  /* ═══ 36. Window ═══
+     A page inside the page. The <dialog> is the room the window opens in:
+     the whole viewport, transparent, so a movement can start from anywhere
+     on screen. The window itself is the panel inside it.
+
+         <dialog class="wal-window" id="dusk" closedby="any" aria-labelledby="dusk-title">
+           <div class="wal-window-panel">…</div>
+         </dialog>
+
+     On its own it opens like .wal-dialog: the panel rises the last few
+     pixels into place. walnut-motion.js gives it a movement from the
+     button that opened it, the gatefold (37). */
+  .wal-window {
+    position: fixed;
+    inset: 0;
+    margin: 0;
+    padding: var(--wal-space-lg);
+    border: 0;
+    box-sizing: border-box;
+    inline-size: 100%;
+    block-size: 100%;
+    max-inline-size: none;
+    max-block-size: none;
+    background: none;
+    color: var(--wal-text);
+    overflow: auto;
+    overscroll-behavior: contain;
+    display: none;
+    place-items: center;
+    transition:
+      display var(--wal-duration-slow) allow-discrete,
+      overlay var(--wal-duration-slow) allow-discrete;
+
+    &[open] { display: grid; }
+
+    /* A movement has already played the exit, so the window goes at once. */
+    &.is-closing { transition: none; }
+
+    /* A dim, not a wash: the window may wear another palette from the page
+       behind it, so the backdrop takes none of the window's colours. */
+    &::backdrop {
+      background: oklch(0.16 0.015 var(--wal-hue) / 0.36);
+      backdrop-filter: blur(5px) saturate(0.8);
+      -webkit-backdrop-filter: blur(5px) saturate(0.8);
+      opacity: 0;
+      transition:
+        opacity var(--wal-close-duration) var(--wal-ease),
+        display var(--wal-close-duration) allow-discrete,
+        overlay var(--wal-close-duration) allow-discrete;
+    }
+
+    &[open]::backdrop {
+      opacity: 1;
+      transition-duration: var(--wal-open-duration);
+    }
+
+    &.is-closing::backdrop {
+      opacity: 0;
+      transition-duration: calc(var(--wal-close-duration) * 0.8);
+    }
+  }
+
+  @starting-style {
+    .wal-window[open]::backdrop { opacity: 0; }
+  }
+
+  .wal-window-panel {
+    position: relative;
+    inline-size: min(40rem, 100%);
+    box-sizing: border-box;
+    background: var(--wal-surface);
+    color: var(--wal-text);
+    border-radius: var(--wal-radius-lg);
+    box-shadow: var(--wal-shadow-lg);
+  }
+
+  /* The panel's own rise, when no movement is playing. */
+  .wal-window:not([data-wal-moving]) .wal-window-panel {
+    transition:
+      opacity   var(--wal-duration-slow) var(--wal-ease),
+      translate var(--wal-duration-slow) var(--wal-ease);
+  }
+
+  .wal-window:not([data-wal-moving]):not([open]) .wal-window-panel {
+    opacity: 0;
+    translate: 0 0.75rem;
+  }
+
+  @starting-style {
+    .wal-window:not([data-wal-moving])[open] .wal-window-panel {
+      opacity: 0;
+      translate: 0 0.75rem;
+    }
+  }
+
+  /* ═══ 37. Gatefold ═══
+     A window that opens like a gatefold sleeve: its cover travels from the
+     card that opened it, and the notes unfold from behind the cover on the
+     spine.
+
+         <button commandfor="dusk" command="show-modal">
+           <span data-wal-art>…the card's picture…</span> Dusk
+         </button>
+         <dialog class="wal-window" data-wal-open="gatefold" id="dusk" closedby="any">
+           <div class="wal-gatefold-spread">
+             <figure class="wal-gatefold-cover">…the same picture, larger…</figure>
+             <div class="wal-gatefold-notes">…</div>
+           </div>
+         </dialog>
+
+     The movement is walnut-motion.js; without it, or under reduced motion,
+     the spread opens as any .wal-window does. The cover and the card's
+     picture ([data-wal-art]) should share an aspect ratio, so the cover can
+     travel from the card at one scale: --wal-cover-ratio, 10 / 11 unless
+     you set it. The notes are the cover's size and scroll inside it. On a
+     phone the spread stacks and the notes fold down. */
+  .wal-gatefold-spread {
+    --wal-cover-ratio: 10 / 11;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    /* Two covers wide, and never taller than the screen. */
+    inline-size: min(60rem, 100%, calc((100dvh - 3rem) * 2 / 1.1));
+    perspective: 1800px;
+    filter: drop-shadow(0 1.6rem 1.8rem var(--wal-shadow-ink-lg));
+  }
+
+  .wal-gatefold-cover {
+    margin: 0;
+    aspect-ratio: var(--wal-cover-ratio);
+    transform-origin: 0 0;
+    overflow: hidden;
+    border-radius: var(--wal-radius-lg) 0 0 var(--wal-radius-lg);
+    background: var(--wal-surface-2);
+  }
+
+  .wal-gatefold-notes {
+    position: relative;
+    transform-origin: 0 50%;
+    backface-visibility: hidden;
+    contain: size;
+    background: var(--wal-surface);
+    border-radius: 0 var(--wal-radius-lg) var(--wal-radius-lg) 0;
+    box-shadow: inset 1px 0 0 var(--wal-line-soft);
+    overflow: auto;
+    overscroll-behavior: contain;
+
+    /* The light across the page as it turns. The script fades it out as the
+       notes come down flat. */
+    &::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      opacity: 0;
+      border-radius: inherit;
+      background: linear-gradient(90deg, oklch(0.15 0.02 60 / 0.55), oklch(0.15 0.02 60 / 0.12) 45%, oklch(1 0 0 / 0.1));
+    }
+  }
+
+  @media (max-width: 44rem) {
+    .wal-gatefold-spread {
+      grid-template-columns: minmax(0, 1fr);
+      inline-size: 100%;
+    }
+
+    .wal-gatefold-cover {
+      aspect-ratio: auto;
+      block-size: min(30dvh, 14rem);
+      border-radius: var(--wal-radius-lg) var(--wal-radius-lg) 0 0;
+    }
+
+    .wal-gatefold-notes {
+      contain: none;
+      transform-origin: 50% 0;
+      border-radius: 0 0 var(--wal-radius-lg) var(--wal-radius-lg);
+      box-shadow: inset 0 1px 0 var(--wal-line-soft);
+    }
+  }
+
+  /* ═══ 38. Tint ═══
+     Any colour at all, given the four forms every cue has, legible in both
+     modes. For the colours a site owns that no palette does: a tag colour
+     a user picked, a category, a brand's own.
+
+         <span class="wal-chip wal-tint" style="--wal-tint: #2f7d6d">Garden</span>
+         <span class="wal-badge wal-tint wal-fill-tint" style="--wal-tint: gold">New</span>
+
+     --wal-tint-ink   the colour as text on the page
+     --wal-tint-soft  a wash of it under text
+     --wal-tint-fill  the colour as a solid fill
+     --wal-tint-fg    text on that fill
+
+     .wal-fill-tint (05-utilities.css, with the other fills) paints an
+     element in the last two.
+
+     The fill is the colour itself, nudged out of the middle band of
+     lightness where neither near-black nor near-white text reaches 4.5:1.
+     A light colour is lifted to at least 0.74 and takes dark text; a dark
+     one is held to at most 0.5 and takes light. The step at 0.62 is
+     `clamp(0, (l - 0.62) * 1000, 1)`: 0 or 1, never between, the same
+     switch the cues' -fg tokens use. Every pair was measured at 4.5:1 or
+     better for sixteen colours across the wheel, in both modes. */
+  .wal-tint {
+    --wal-tint: var(--wal-accent);
+    --wal-tint-ink: light-dark(oklch(from var(--wal-tint) 0.44 min(c, 0.16) h),
+                               oklch(from var(--wal-tint) 0.8 min(c, 0.13) h));
+    --wal-tint-soft: color-mix(in oklch, var(--wal-tint) 18%, var(--wal-surface));
+    --wal-tint-fill: oklch(from var(--wal-tint)
+      calc(clamp(0, (l - 0.62) * 1000, 1) * max(l, 0.74) + (1 - clamp(0, (l - 0.62) * 1000, 1)) * min(l, 0.5)) c h);
+    --wal-tint-fg: oklch(from var(--wal-tint) calc(0.98 - clamp(0, (l - 0.62) * 1000, 1) * 0.8) calc(c * 0.08) h);
+  }
+
+  :is(.wal-chip, .wal-badge).wal-tint {
+    background: var(--wal-tint-soft);
+    color: var(--wal-tint-ink);
+    border-color: color-mix(in oklch, var(--wal-tint) 45%, transparent);
+  }
+
+  /* The same engine, for your own CSS: `color: --wal-ink(#2f7d6d)`. A
+     browser without @function skips these, and a declaration that calls
+     one is invalid there, so give it a fallback declaration first. */
+  @function --wal-ink(--c <color>) returns <color> {
+    result: light-dark(oklch(from var(--c) 0.44 min(c, 0.16) h), oklch(from var(--c) 0.8 min(c, 0.13) h));
+  }
+
+  @function --wal-soft(--c <color>) returns <color> {
+    result: color-mix(in oklch, var(--c) 18%, var(--wal-surface));
+  }
+
+  /* ═══ 39. Select ═══
+     A <select> that can show what it chooses: a swatch, an icon, two lines.
+
+         <select class="wal-select">
+           <button><selectedcontent></selectedcontent></button>
+           <option value="forest"><i class="…"></i> Forest</option>
+         </select>
+
+     appearance: base-select lets the options hold any markup, and
+     <selectedcontent> copies the chosen one into the button. A browser
+     without it shows the ordinary select, with the text of each option and
+     the same border, so the form still works. */
+  .wal-select,
+  .wal-select::picker(select) {
+    appearance: base-select;
+  }
+
+  .wal-select {
+    /* A picker is small and close to hand: it keeps the quick pace whether
+       or not a material is in play, unless one is named on it. */
+    --wal-open-duration:  var(--wal-duration-slow);
+    --wal-open-ease:      var(--wal-ease-glide);
+    --wal-close-duration: var(--wal-duration);
+    --wal-close-ease:     var(--wal-ease);
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    min-inline-size: 11rem;
+    padding: 0.5rem 0.75rem;
+    border: var(--wal-border);
+    border-color: var(--wal-line-input);
+    border-radius: var(--wal-radius);
+    background: var(--wal-surface);
+    color: var(--wal-text);
+    font: 500 var(--wal-text-sm)/1.2 var(--wal-font-body);
+    cursor: pointer;
+
+    &:focus-visible {
+      outline: 2px solid var(--wal-accent);
+      outline-offset: 2px;
+    }
+
+    option {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      padding: 0.5rem 0.6rem;
+      border-radius: calc(var(--wal-radius) - 0.2rem);
+      font: 500 var(--wal-text-sm)/1.2 var(--wal-font-body);
+      color: var(--wal-text);
+      cursor: pointer;
+    }
+
+    option:is(:hover, :focus-visible) {
+      background: var(--wal-surface-2);
+      outline: none;
+    }
+
+    option:checked { background: var(--wal-accent-soft); }
+  }
+
+  .wal-select::picker-icon {
+    margin-inline-start: auto;
+    transition: rotate var(--wal-duration) var(--wal-ease);
+  }
+
+  .wal-select:open::picker-icon { rotate: 180deg; }
+
+  .wal-select::picker(select) {
+    margin-block: 0.35rem;
+    padding: 0.3rem;
+    border: var(--wal-border);
+    border-radius: var(--wal-radius);
+    background: var(--wal-surface);
+    color: var(--wal-text);
+    box-shadow: var(--wal-shadow-lg);
+    opacity: 0;
+    translate: 0 -0.35rem;
+    transition:
+      opacity   var(--wal-close-duration) var(--wal-ease),
+      translate var(--wal-close-duration) var(--wal-close-ease),
+      display   var(--wal-close-duration) allow-discrete,
+      overlay   var(--wal-close-duration) allow-discrete;
+  }
+
+  .wal-select::picker(select):popover-open {
+    opacity: 1;
+    translate: 0 0;
+    transition-duration: var(--wal-open-duration);
+    transition-timing-function: var(--wal-ease), var(--wal-open-ease);
+  }
+
+  @starting-style {
+    .wal-select::picker(select):popover-open {
+      opacity: 0;
+      translate: 0 -0.35rem;
+    }
+  }
+
+  .wal-select option::checkmark {
+    order: 1;
+    margin-inline-start: auto;
+    color: var(--wal-accent-ink);
+  }
+
+  /* ═══ 40. Menu ═══
+     A menu that opens under its button, or above it, or to its other side,
+     whichever has room. No script and no positioning library: the menu is
+     a popover anchored to the button that opened it.
+
+         <button popovertarget="file-menu">File</button>
+         <div class="wal-menu" id="file-menu" popover>
+           <button>New</button>
+           <a href="…">Open…</a>
+         </div>
+
+     A popover closes on Escape and on a click outside, and the button keeps
+     aria-expanded in step. */
+  .wal-menu {
+    --wal-open-duration:  var(--wal-duration-slow);
+    --wal-open-ease:      var(--wal-ease-glide);
+    --wal-close-duration: var(--wal-duration);
+    --wal-close-ease:     var(--wal-ease);
+    position-area: block-end span-inline-end;
+    position-try-fallbacks: flip-block, flip-inline;
+    inset: auto;
+    margin: 0.35rem 0;
+    padding: 0.3rem;
+    min-inline-size: 12rem;
+    border: var(--wal-border);
+    border-radius: var(--wal-radius);
+    background: var(--wal-surface);
+    color: var(--wal-text);
+    box-shadow: var(--wal-shadow-lg);
+    opacity: 0;
+    translate: 0 -0.35rem;
+    transition:
+      opacity   var(--wal-close-duration) var(--wal-ease),
+      translate var(--wal-close-duration) var(--wal-close-ease),
+      display   var(--wal-close-duration) allow-discrete,
+      overlay   var(--wal-close-duration) allow-discrete;
+
+    > :is(button, a) {
+      display: flex;
+      gap: 0.6rem;
+      align-items: center;
+      inline-size: 100%;
+      padding: 0.5rem 0.65rem;
+      border: 0;
+      border-radius: calc(var(--wal-radius) - 0.2rem);
+      background: none;
+      color: inherit;
+      text-align: start;
+      text-decoration: none;
+      font: 500 var(--wal-text-sm)/1.2 var(--wal-font-body);
+      cursor: pointer;
+
+      &:is(:hover, :focus-visible) {
+        background: var(--wal-surface-2);
+        outline: none;
+      }
+    }
+  }
+
+  .wal-menu:popover-open {
+    display: grid;
+    opacity: 1;
+    translate: 0 0;
+    transition-duration: var(--wal-open-duration);
+    transition-timing-function: var(--wal-ease), var(--wal-open-ease);
+  }
+
+  @starting-style {
+    .wal-menu:popover-open {
+      opacity: 0;
+      translate: 0 -0.35rem;
+    }
+  }
+
+  /* ═══ 41. Carousel ═══
+     A row of slides with the browser's own buttons and dots: no script,
+     and every part is focusable and announced.
+
+         <ul class="wal-carousel" aria-label="Colourways">
+           <li>…</li>
+           <li>…</li>
+         </ul>
+
+     It is a scroll-snapping list. scroll-marker-group gives it a dot per
+     slide, which scrolls to that slide and lights while it is the one in
+     view; ::scroll-button gives it Previous and Next, which grey out at
+     either end. A browser without them has a list you swipe or scroll,
+     which is still a carousel. */
+  .wal-carousel {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-auto-flow: column;
+    grid-auto-columns: 100%;
+    gap: var(--wal-space-md);
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    scroll-snap-type: x mandatory;
+    scroll-behavior: smooth;
+    scrollbar-width: none;
+    anchor-name: --wal-carousel;
+    anchor-scope: --wal-carousel;
+    scroll-marker-group: after;
+
+    > li {
+      scroll-snap-align: center;
+      min-inline-size: 0;
+    }
+  }
+
+  .wal-carousel::scroll-marker-group {
+    display: flex;
+    justify-content: center;
+    gap: 0.55rem;
+    padding-block: var(--wal-space-sm) 0;
+  }
+
+  .wal-carousel > li::scroll-marker {
+    content: "";
+    inline-size: 0.6rem;
+    block-size: 0.6rem;
+    border-radius: 50%;
+    background: var(--wal-line);
+    transition:
+      background-color var(--wal-duration) var(--wal-ease),
+      scale            var(--wal-duration) var(--wal-ease);
+  }
+
+  .wal-carousel > li::scroll-marker:target-current {
+    background: var(--wal-accent);
+    scale: 1.35;
+  }
+
+  .wal-carousel > li::scroll-marker:focus-visible {
+    outline: 2px solid var(--wal-accent);
+    outline-offset: 2px;
+  }
+
+  .wal-carousel::scroll-button(*) {
+    position: absolute;
+    position-anchor: --wal-carousel;
+    inline-size: 2.4rem;
+    block-size: 2.4rem;
+    border-radius: 50%;
+    border: var(--wal-border);
+    background: color-mix(in oklch, var(--wal-surface) 88%, transparent);
+    color: var(--wal-text);
+    font: 600 1.05rem/1 var(--wal-font-body);
+    cursor: pointer;
+    box-shadow: var(--wal-shadow-sm);
+    transition: opacity var(--wal-duration) var(--wal-ease);
+  }
+
+  .wal-carousel::scroll-button(*):disabled {
+    opacity: 0;
+    cursor: default;
+  }
+
+  /* Astride the carousel's edges. The text after the slash is the name a
+     screen reader gives the arrow. */
+  .wal-carousel::scroll-button(inline-start) {
+    content: "\2190" / "Previous";
+    position-area: left center;
+    translate: 50% 0;
+  }
+
+  .wal-carousel::scroll-button(inline-end) {
+    content: "\2192" / "Next";
+    position-area: right center;
+    translate: -50% 0;
+  }
+
+  /* ═══ 42. Chart ═══
+     Columns, a ring and a key, in the five cues, and made like furniture.
+     The columns stand on a brass rail, each on a brass shoe like the feet of
+     a sideboard's legs; the gridlines are stringing, the fine inlaid line
+     of a paler wood, a groove with its lit edge; the ring sits in a brass
+     bezel with a tick at each quarter. The data is the markup: no script,
+     no canvas, nothing to load.
+
+         <ol class="wal-chart" style="--max: 80" aria-label="Rooms painted, by season">
+           <li><b>Spring</b><span style="--v: 42">42</span><span style="--v: 30">30</span></li>
+           <li><b>Summer</b><span style="--v: 64">64</span><span style="--v: 51">51</span></li>
+         </ol>
+         <ul class="wal-key"><li>Walls</li><li>Trim</li></ul>
+
+     Each <li> is a group on the axis, and each <span> a column in it: its
+     value in --v and, as text, printed above it. --max is the top of the
+     scale and --ticks how many gridlines divide it, 4 unless you say. The
+     nth column of every group is cue n, as is the nth entry in .wal-key.
+
+     A new --v moves the column on the opening tokens, so a material shows
+     here as well: under data-motion="materials" a chart is brass, and a
+     column strikes its new height and rings. So does the ring below. */
+  .wal-chart {
+    --max: 100;
+    --ticks: 4;
+    --wal-rail: 5px;
+    --wal-shoe: 6px;
+    position: relative;
+    list-style: none;
+    margin: 0 0 calc(var(--wal-rail) + 1.6rem);
+    padding: 0;
+    display: grid;
+    grid-auto-flow: column;
+    grid-auto-columns: minmax(0, 1fr);
+    align-items: end;
+    gap: var(--wal-space-md);
+    block-size: var(--wal-chart-h, 12rem);
+    /* Stringing: a groove in the line colour, and under it a hairline of
+       light where its far edge catches. One per tick, down from the top of
+       the scale; the rail is the last. */
+    background:
+      linear-gradient(var(--wal-line) 1px,
+                      light-dark(oklch(1 0 0 / 0.75), oklch(1 0 0 / 0.07)) 1px 2px,
+                      transparent 2px)
+      0 0 / 100% calc(100% / var(--ticks));
+
+    /* The rail the columns stand on. */
+    &::after {
+      content: "";
+      position: absolute;
+      inset: 100% 0 auto;
+      block-size: var(--wal-rail);
+      border-radius: 1px;
+      background: linear-gradient(var(--wal-brass-hi), var(--wal-brass) 45%, var(--wal-brass-lo));
+      box-shadow: 0 1px 2px var(--wal-shadow-ink);
+    }
+
+    > li {
+      position: relative;
+      display: flex;
+      align-items: stretch;
+      justify-content: center;
+      gap: 3px;
+      block-size: 100%;
+    }
+
+    /* The group's name, under the rail. */
+    > li > b {
+      position: absolute;
+      inset: 100% 0 auto;
+      padding-block-start: calc(var(--wal-rail) + 0.45rem);
+      text-align: center;
+      font: 500 var(--wal-text-xs)/1 var(--wal-font-body);
+      color: var(--wal-text-muted);
+    }
+
+    /* A column: its value printed at its top, the leg below. The leg does
+       not shrink for the label; a tall column's label stands above the
+       scale instead. */
+    > li > span {
+      --wal-chart-cue: var(--wal-cue-1);
+      flex: 1 1 0;
+      max-inline-size: 2.75rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      align-items: center;
+      font: 500 var(--wal-text-xs)/1 var(--wal-font-body);
+      font-variant-numeric: tabular-nums;
+      color: var(--wal-text-soft);
+
+      &::after {
+        content: "";
+        flex: none;
+        align-self: stretch;
+        margin-block-start: 0.3rem;
+        block-size: calc(var(--v, 0) / var(--max) * 100%);
+        border-radius: var(--wal-radius-sm) var(--wal-radius-sm) 0 0;
+        corner-shape: var(--wal-corner-shape, round);
+        /* Top to bottom: the light across a turned leg, the shoe and the
+           seam above it, and the cue. */
+        background:
+          var(--wal-chart-sheen, linear-gradient(90deg, oklch(1 0 0 / 0.16), oklch(1 0 0 / 0) 38% 66%, oklch(0 0 0 / 0.1))),
+          linear-gradient(to top,
+            var(--wal-brass-lo) 0 1px,
+            var(--wal-brass) 1px var(--wal-shoe),
+            oklch(0 0 0 / 0.22) var(--wal-shoe) calc(var(--wal-shoe) + 1px),
+            transparent 0),
+          var(--wal-chart-cue);
+        transition: block-size var(--wal-open-duration) var(--wal-open-ease);
+      }
+    }
+
+    > li > span:nth-of-type(2) { --wal-chart-cue: var(--wal-cue-2); }
+    > li > span:nth-of-type(3) { --wal-chart-cue: var(--wal-cue-3); }
+    > li > span:nth-of-type(4) { --wal-chart-cue: var(--wal-cue-4); }
+    > li > span:nth-of-type(5) { --wal-chart-cue: var(--wal-cue-5); }
+  }
+
+  /* The ring: shares out of a whole, cue by cue, as percentages. Four
+     shares are named; the fifth is whatever is left. Its own text is the
+     figure in the middle, set in the display face, with a <small> caption
+     under it.
+
+         <div class="wal-ring" style="--a: 38; --b: 24; --c: 18; --d: 12">
+           92<small>rooms</small>
+         </div>
+
+     The shares are inlay: a hairline of the ground between each. New
+     shares turn the ring on the opening tokens, as a new --v moves a
+     column, so under brass the ring strikes and rings too. */
+  /* The shares again, as numbers the browser can tween. They have names of
+     their own because a registration is global, and --a is short enough
+     that a site may already use it for something else. */
+  @property --wal-ring-a { syntax: "<number>"; inherits: true; initial-value: 0; }
+  @property --wal-ring-b { syntax: "<number>"; inherits: true; initial-value: 0; }
+  @property --wal-ring-c { syntax: "<number>"; inherits: true; initial-value: 0; }
+  @property --wal-ring-d { syntax: "<number>"; inherits: true; initial-value: 0; }
+
+  .wal-ring {
+    --a: 0;
+    --b: 0;
+    --c: 0;
+    --d: 0;
+    --wal-ring-a: var(--a);
+    --wal-ring-b: var(--b);
+    --wal-ring-c: var(--c);
+    --wal-ring-d: var(--d);
+    --wal-ring-gap: 0.5%;
+    transition:
+      --wal-ring-a var(--wal-open-duration) var(--wal-open-ease),
+      --wal-ring-b var(--wal-open-duration) var(--wal-open-ease),
+      --wal-ring-c var(--wal-open-duration) var(--wal-open-ease),
+      --wal-ring-d var(--wal-open-duration) var(--wal-open-ease);
+    position: relative;
+    display: grid;
+    place-content: center;
+    isolation: isolate;
+    inline-size: var(--wal-ring-size, 8rem);
+    aspect-ratio: 1;
+    border-radius: 50%;
+    font: 700 1.6rem/1 var(--wal-font-display);
+    font-variant-numeric: tabular-nums;
+    text-align: center;
+    color: var(--wal-text);
+
+    small {
+      display: block;
+      margin-block-start: 0.2rem;
+      font: 500 var(--wal-text-xs)/1.2 var(--wal-font-body);
+      color: var(--wal-text-muted);
+    }
+
+    &::before {
+      content: "";
+      position: absolute;
+      inset: 6px;
+      z-index: -1;
+      border-radius: 50%;
+      background: conic-gradient(
+        var(--wal-cue-1) 0 calc(var(--wal-ring-a) * 1% - var(--wal-ring-gap)),
+        transparent 0 calc(var(--wal-ring-a) * 1%),
+        var(--wal-cue-2) 0 calc((var(--wal-ring-a) + var(--wal-ring-b)) * 1% - var(--wal-ring-gap)),
+        transparent 0 calc((var(--wal-ring-a) + var(--wal-ring-b)) * 1%),
+        var(--wal-cue-3) 0 calc((var(--wal-ring-a) + var(--wal-ring-b) + var(--wal-ring-c)) * 1% - var(--wal-ring-gap)),
+        transparent 0 calc((var(--wal-ring-a) + var(--wal-ring-b) + var(--wal-ring-c)) * 1%),
+        var(--wal-cue-4) 0 calc((var(--wal-ring-a) + var(--wal-ring-b) + var(--wal-ring-c) + var(--wal-ring-d)) * 1% - var(--wal-ring-gap)),
+        transparent 0 calc((var(--wal-ring-a) + var(--wal-ring-b) + var(--wal-ring-c) + var(--wal-ring-d)) * 1%),
+        var(--wal-cue-5) 0 calc(100% - var(--wal-ring-gap)),
+        transparent 0);
+      mask: radial-gradient(closest-side, transparent 64%, #000 calc(64% + 1px));
+    }
+
+    /* The bezel: a brass ring round the shares, 6px out, and a tick on its
+       inside edge at each quarter. --wal-ring-size includes it. */
+    &::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      z-index: -1;
+      border-radius: 50%;
+      border: 2px solid var(--wal-brass);
+      background: repeating-conic-gradient(from -0.75deg, var(--wal-brass-lo) 0 1.5deg, transparent 0 90deg);
+      mask: radial-gradient(closest-side, transparent calc(100% - 7px), #000 calc(100% - 6px));
+    }
+  }
+
+  .wal-key {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem 1rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    font-size: var(--wal-text-xs);
+    color: var(--wal-text-soft);
+
+    > li {
+      --wal-chart-cue: var(--wal-cue-1);
+      display: inline-flex;
+      align-items: center;
+      gap: 0.45rem;
+    }
+
+    > li::before {
+      content: "";
+      inline-size: 0.75rem;
+      block-size: 0.75rem;
+      border-radius: 2px;
+      corner-shape: var(--wal-corner-shape, round);
+      background: var(--wal-chart-cue);
+      box-shadow: inset 0 0 0 1px oklch(0 0 0 / 0.12), inset 0 -2px 0 var(--wal-brass);
+    }
+
+    > li:nth-child(2) { --wal-chart-cue: var(--wal-cue-2); }
+    > li:nth-child(3) { --wal-chart-cue: var(--wal-cue-3); }
+    > li:nth-child(4) { --wal-chart-cue: var(--wal-cue-4); }
+    > li:nth-child(5) { --wal-chart-cue: var(--wal-cue-5); }
+  }
+
+  /* ═══ 43. Corners ═══
+     Every rule here that draws a radius also reads its shape:
+     --wal-corner-shape, round unless a finish or you say otherwise
+     (01-tokens.css). Catalogue cuts them. squircle is Piet Hein's
+     superellipse, the edge of the Superellipse table, between the circle's
+     arc and the square. */
+  :is(.wal-btn, .wal-card, .wal-plate, .wal-metric, .wal-chip, .wal-swatch,
+      .wal-input, .wal-badge, .wal-dialog, .wal-tooltip, .wal-iconbtn, .wal-tip,
+      .wal-select, .wal-menu, .wal-door, .wal-window-panel,
+      .wal-gatefold-cover, .wal-gatefold-notes,
+      .wal-rounded, .wal-rounded-sm, .wal-rounded-lg, .wal-rounded-full) {
+    corner-shape: var(--wal-corner-shape, round);
+  }
+
+  .wal-script > *::before { corner-shape: var(--wal-corner-shape, round); }
+  .wal-select::picker(select) { corner-shape: var(--wal-corner-shape, round); }

@@ -31,9 +31,10 @@
    A PALETTE NEVER SETS WHAT A FINISH SETS
 
    Every token declared in this file belongs to the finish axis alone. No
-   palette file sets elevation, wash, radius, rule strength or the label
-   voice, however much its mood seems to ask for it — "print does not cast
-   shadows" is the catalogue finish's sentence, not Press's.
+   palette file sets elevation, wash, radius, rule strength, the stock's
+   tooth or the label voice, however much its mood seems to ask for it —
+   "print does not cast shadows" is the catalogue finish's sentence, not
+   Press's.
 
    The `finish` layer cannot protect these tokens on its own, for two reasons:
 
@@ -73,6 +74,9 @@
   --wal-badge-radius: 2px;
   /* --wal-radius-full is deliberately untouched: it still has to make the
      availability dot a circle. */
+  /* The corners are cut, not rounded: a card trimmed on the guillotine
+     with its corners clipped, as a parts sheet's are. */
+  --wal-corner-shape: bevel;
 
   /* ── Atmosphere ──
      Print does not glow and barely casts. Both are scalars rather than
@@ -98,6 +102,14 @@
      a dark theme. --wal-line-boost is consumed by the rule in 01-tokens.css
      that lists [data-finish], so it re-derives on this element. */
   --wal-line-boost: 1.7;
+
+  /* ── Stock ──
+     Printed matter has a tooth. Fine fibres over a soft mottle, as grey that
+     every paper multiplies into its own colour (04-components.css, 32. Stock),
+     so it owns no colour either: it darkens light stock by four percent at
+     its darkest speck and all but vanishes on dark. Muted text on the darkest
+     speck still clears 4.8:1 in every shipped palette. */
+  --wal-tooth: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='300' height='300'><filter id='t' x='0' y='0' width='100%' height='100%' color-interpolation-filters='sRGB'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' seed='3' stitchTiles='stitch' result='f'/><feTurbulence type='fractalNoise' baseFrequency='0.018' numOctaves='2' seed='8' stitchTiles='stitch' result='m'/><feComposite in='f' in2='m' operator='arithmetic' k1='0' k2='0.7' k3='0.3' k4='0'/><feColorMatrix values='-0.14 0 0 0 1.07 -0.14 0 0 0 1.07 -0.14 0 0 0 1.07 0 0 0 0 1'/></filter><rect width='100%' height='100%' filter='url(%23t)'/></svg>");
 
   /* ─── Headings ───
      Tighter and quieter. A catalogue's hierarchy comes from rules and
@@ -131,6 +143,12 @@
   &.is-scrolled {
     box-shadow: none;
     border-bottom-color: var(--wal-text);
+  }
+
+  /* The rule a stuck masthead draws for itself (04-components.css, 1). */
+  &::after {
+    background: var(--wal-text);
+    box-shadow: none;
   }
 }
 
@@ -196,9 +214,11 @@
   --wal-btn-radius:   initial;
   --wal-chip-radius:  initial;
   --wal-badge-radius: initial;
+  --wal-corner-shape: initial;
   --wal-elevation:    initial;
   --wal-wash:         initial;
   --wal-line-boost:   initial;
+  --wal-tooth:        initial;
   --wal-tracking-label: 0.1em;
   --wal-font-label:   var(--wal-font-mono);
 }
