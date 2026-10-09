@@ -127,9 +127,14 @@ the platform can now draw with no script.
   `.wal-menu` (an anchored popover that flips to fit), `.wal-carousel`
   (scroll markers and buttons), and `.wal-tip` (a tooltip on
   `interestfor`, with no script and no nesting).
-- **Less script.** `.wal-nav` draws its scrolled rule from a scroll-state
-  query and lights the link in view with `:target-current`; `.is-scrolled`
-  and `.is-active` remain for browsers without them.
+- **Less script.** `.wal-nav` draws its scrolled rule with a scroll-driven
+  animation and lights the link in view with `:target-current`;
+  `.is-scrolled` and `.is-active` remain for browsers without them.
+- **Parses in Lightning CSS**, so Next.js (Turbopack), Vite, Parcel and Bun
+  can import it: the nav's rule is a scroll-driven animation rather than a
+  scroll-state query, the open picker is `.wal-select:open::picker(select)`,
+  and `@function` parameters are untyped. The build refuses the spellings
+  Lightning CSS rejects.
 - **`walnut.shuffle`** and `.wal-shuffle`: a filter or sort where every
   item travels to its new place, as a view transition scoped to the list.
 - **`walnut-motion.js`**, the third optional script, for the gatefold and

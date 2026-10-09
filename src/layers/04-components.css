@@ -32,14 +32,11 @@
       box-shadow: var(--wal-shadow-sm);
     }
 
-    /* The same rule and shadow, from the browser. A scroll-state container
-       knows when it is stuck, so a masthead gains its rule once the page
-       has scrolled under it, with no scroll listener. It is drawn on
-       ::after, which a scroll-state query can reach and a stuck element's
-       own box cannot, and stands down when a script sets .is-scrolled, so
-       the two never draw two rules. */
-    container-type: scroll-state;
-
+    /* The same rule and shadow, from the browser: a scroll-driven
+       animation (below) brings it in over the first 1.5rem the page
+       scrolls, so a masthead gains its rule once the page passes under it,
+       with no scroll listener. It is drawn on ::after and stands down when
+       a script sets .is-scrolled, so the two never draw two rules. */
     &::after {
       content: "";
       position: absolute;
@@ -52,7 +49,7 @@
       transition: opacity var(--wal-duration) var(--wal-ease);
     }
 
-    &.is-scrolled::after { opacity: 0; }
+    &.is-scrolled::after { opacity: 0; animation: none; }
 
     .wal-nav-brand {
       display: flex;
@@ -131,12 +128,27 @@
     }
   }
 
-  /* Each of these is its own rule, not one more selector in the lists
-     above: a browser that does not know a pseudo-class drops the whole
-     list it appears in, and would take .is-active and :hover with it. */
-  @container scroll-state(stuck: top) {
-    .wal-nav::after { opacity: 1; }
+  /* Not a scroll-state container query, which says "stuck" exactly:
+     Lightning CSS (Turbopack, Vite, Parcel, Bun) cannot parse one and
+     rejects the whole stylesheet. Guarded, because without scroll
+     timelines the animation would run once, at once, and leave the rule
+     on from the top of the page. */
+  @supports (animation-timeline: scroll()) {
+    .wal-nav:not(.is-scrolled)::after {
+      animation: wal-nav-rule linear both;
+      animation-timeline: scroll();
+      animation-range: 0 1.5rem;
+    }
   }
+
+  @keyframes wal-nav-rule {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+  }
+
+  /* Its own rule, not one more selector in the lists above: a browser
+     that does not know a pseudo-class drops the whole list it appears in,
+     and would take .is-active and :hover with it. */
 
   .wal-nav .wal-nav-links a:target-current {
     color: var(--wal-accent-ink);
@@ -2099,12 +2111,15 @@
 
   /* The same engine, for your own CSS: `color: --wal-ink(#2f7d6d)`. A
      browser without @function skips these, and a declaration that calls
-     one is invalid there, so give it a fallback declaration first. */
-  @function --wal-ink(--c <color>) returns <color> {
+     one is invalid there, so give it a fallback declaration first.
+     The parameter is untyped: Lightning CSS reprints an at-rule it does
+     not know, and turns `--c <color>` into `--c< color>`, which no
+     browser will read. */
+  @function --wal-ink(--c) {
     result: light-dark(oklch(from var(--c) 0.44 min(c, 0.16) h), oklch(from var(--c) 0.8 min(c, 0.13) h));
   }
 
-  @function --wal-soft(--c <color>) returns <color> {
+  @function --wal-soft(--c) {
     result: color-mix(in oklch, var(--c) 18%, var(--wal-surface));
   }
 
@@ -2193,7 +2208,10 @@
       overlay   var(--wal-close-duration) allow-discrete;
   }
 
-  .wal-select::picker(select):popover-open {
+  /* :open on the select, not :popover-open on its picker: Lightning CSS
+     allows only :hover-like states after a pseudo-element, and rejects the
+     whole stylesheet over one. */
+  .wal-select:open::picker(select) {
     opacity: 1;
     translate: 0 0;
     transition-duration: var(--wal-open-duration);
@@ -2201,7 +2219,7 @@
   }
 
   @starting-style {
-    .wal-select::picker(select):popover-open {
+    .wal-select:open::picker(select) {
       opacity: 0;
       translate: 0 -0.35rem;
     }

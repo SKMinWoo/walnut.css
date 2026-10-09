@@ -193,6 +193,37 @@ function assertVersionStamped(found) {
   }
 }
 
+/**
+ * Guard the stylesheet against the bundlers that will parse it. Next.js
+ * (Turbopack), Vite's lightningcss mode, Parcel and Bun all read CSS with
+ * Lightning CSS, which rejects a whole stylesheet over one rule it cannot
+ * parse: the page 500s in development, before anyone sees a style. Three
+ * spellings have done that to walnut, and each has a twin that parses:
+ *
+ *   @container scroll-state(…)       a scroll-driven animation (see .wal-nav)
+ *   ::picker(select):popover-open    .wal-select:open::picker(select)
+ *   @function --x(--c <color>)       --x(--c), untyped: it is reprinted as
+ *                                    `--c< color>` and the browser drops it
+ *
+ * A pattern check, not a parse, since walnut does not depend on Lightning
+ * CSS: it stops these three coming back, not the next one.
+ *
+ * @param {string} css  the assembled bundle
+ * @throws naming each line that uses one of them
+ */
+function assertBundlerSafe(css) {
+  const rules = [
+    [/@container[^{]*scroll-state\(/, "a scroll-state container query"],
+    [/::picker\([^)]*\):(?!hover|active|focus)/, "a state pseudo-class after ::picker()"],
+    [/@function\s+--[\w-]+\([^)]*</, "a typed @function parameter"],
+  ];
+  const hits = css.split("\n").flatMap((line, i) =>
+    rules.filter(([re]) => re.test(line)).map(([, what]) => `  line ${i + 1}: ${what}\n      ${line.trim()}`));
+  if (hits.length) {
+    throw new Error(`dist/walnut.css would be rejected by Lightning CSS (Next.js, Vite, Parcel, Bun):\n${hits.join("\n")}`);
+  }
+}
+
 // ─── Assemble the deployable site (in memory) ───
 //
 // A static host serves exactly one directory. The docs page and the
@@ -226,6 +257,7 @@ const docsPages = DOCS_PAGES.map((page) => {
 
 // ─── Guards — all of them, before anything is written ───
 assertPalettesLeaveFinishTokens(fs.readFileSync(path.join(SRC, "layers", "07-finish.css"), "utf8"), themeCss);
+assertBundlerSafe(bundle);
 for (const { page, html, site } of docsPages) assertDocsRewritten(page, html, site);
 assertVersionStamped({
   "src/walnut.css": [...fs.readFileSync(path.join(SRC, "walnut.css"), "utf8").matchAll(/walnut\.css v(\d+\.\d+\.\d+\S*)/g)].map((m) => m[1]),
