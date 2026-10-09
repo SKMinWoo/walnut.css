@@ -1964,19 +1964,20 @@
      travel from the card at one scale: --wal-cover-ratio, 10 / 11 unless
      you set it. The notes are the cover's size and scroll inside it. On a
      phone the spread stacks and the notes fold down. */
+  /* --wal-cover-ratio is read with its default rather than declared here,
+     so it can be set on the dialog, or anywhere above it. */
   .wal-gatefold-spread {
-    --wal-cover-ratio: 10 / 11;
     display: grid;
     grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
     /* Two covers wide, and never taller than the screen. */
-    inline-size: min(60rem, 100%, calc((100dvh - 3rem) * 2 / 1.1));
+    inline-size: min(60rem, 100%, calc((100dvh - 3rem) * 2 * var(--wal-cover-ratio, 10 / 11)));
     perspective: 1800px;
     filter: drop-shadow(0 1.6rem 1.8rem var(--wal-shadow-ink-lg));
   }
 
   .wal-gatefold-cover {
     margin: 0;
-    aspect-ratio: var(--wal-cover-ratio);
+    aspect-ratio: var(--wal-cover-ratio, 10 / 11);
     transform-origin: 0 0;
     overflow: hidden;
     border-radius: var(--wal-radius-lg) 0 0 var(--wal-radius-lg);

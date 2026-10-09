@@ -21,6 +21,9 @@
 
    The picture that travels is the button's [data-wal-art], or the button.
    From script, walnut.open(dialog, button) and walnut.open.close(dialog).
+   A window that a link or Back opens has no press to travel from:
+   walnut.open(dialog, card, { instant: true }) opens it in place, and it
+   still goes home to that card when it closes.
 
    The shuffle. walnut.shuffle(list, change) runs a change to a list, a
    filter or a sort, so that every item travels to its new place. The
@@ -71,8 +74,9 @@
      out and settles home whatever it is made of, being in flight both ways. */
   const stacked = (spread) => getComputedStyle(spread).gridTemplateColumns.trim().split(/\s+/).length === 1;
   const flip = (a, b) => `translate(${a.left - b.left}px, ${a.top - b.top}px) scale(${a.width / b.width}, ${a.height / b.height})`;
+  const artOf = (from) => from.querySelector("[data-wal-art]") ?? from;
   const parts = (dialog, from) => ({
-    art: from.querySelector("[data-wal-art]") ?? from,
+    art: artOf(from),
     cover: dialog.querySelector(".wal-gatefold-cover"),
     notes: dialog.querySelector(".wal-gatefold-notes"),
     spread: dialog.querySelector(".wal-gatefold-spread"),
@@ -99,6 +103,8 @@
     },
     async close(dialog, from) {
       const { art, cover, notes, spread } = parts(dialog, from);
+      // Hidden already, unless the window opened in place.
+      art.style.visibility = "hidden";
       const turn = stacked(spread) ? "rotateX(180deg)" : "rotateY(-180deg)";
       const { duration, settle } = timing(dialog, "close");
       const T = pace(cover.getBoundingClientRect(), art.getBoundingClientRect(), duration);
@@ -122,18 +128,36 @@
 
   const STYLES = { gatefold };
 
-  function open(dialog, from) {
-    if (dialog.open || busy.has(dialog)) return;
-    const style = STYLES[dialog.dataset.walOpen];
+  // Asked for while the window moves (Back pressed as it opens, say): the
+  // last request is kept, and made once the movement ends.
+  const queued = new WeakMap();
+  const landed = (dialog) => {
+    busy.delete(dialog);
+    delete dialog.dataset.walMoving;
+    const next = queued.get(dialog);
+    queued.delete(dialog);
+    next?.();
+  };
+
+  // Called on a window already open, it changes the card the window goes
+  // home to: a page showing another card's contents in the same window.
+  // The card it leaves is whole again.
+  function open(dialog, from, { instant = false } = {}) {
+    const was = sources.get(dialog);
     if (from) sources.set(dialog, from);
-    if (!style || reduce.matches || !from) return dialog.showModal();
+    if (dialog.open && from && was && was !== from) artOf(was).style.removeProperty("visibility");
+    if (busy.has(dialog)) return void queued.set(dialog, () => open(dialog, sources.get(dialog), { instant }));
+    if (dialog.open) return;
+    const style = STYLES[dialog.dataset.walOpen];
+    if (!style || instant || reduce.matches || !from) return dialog.showModal();
     busy.add(dialog);
     dialog.dataset.walMoving = "";
-    Promise.resolve(style.open(dialog, from)).finally(() => { busy.delete(dialog); delete dialog.dataset.walMoving; });
+    Promise.resolve(style.open(dialog, from)).finally(() => landed(dialog));
   }
 
   function close(dialog) {
-    if (!dialog.open || busy.has(dialog)) return;
+    if (busy.has(dialog)) return void queued.set(dialog, () => close(dialog));
+    if (!dialog.open) return;
     const style = STYLES[dialog.dataset.walOpen];
     const from = sources.get(dialog);
     if (!style || reduce.matches || !from?.isConnected) return dialog.close();
@@ -147,7 +171,7 @@
       // transition would otherwise keep it painted for its whole length.
       getComputedStyle(dialog).display;
       if (typeof after === "function") after();
-    }).finally(() => { dialog.classList.remove("is-closing"); busy.delete(dialog); delete dialog.dataset.walMoving; });
+    }).finally(() => { dialog.classList.remove("is-closing"); landed(dialog); });
   }
 
   const ours = (d) => d instanceof HTMLDialogElement && d.dataset.walOpen in STYLES;
@@ -173,7 +197,8 @@
   // However a window closed, its card is whole again and nothing is held.
   addEventListener("close", (e) => {
     if (!ours(e.target) || busy.has(e.target)) return;
-    sources.get(e.target)?.querySelector("[data-wal-art]")?.style.removeProperty("visibility");
+    const from = sources.get(e.target);
+    if (from) artOf(from).style.removeProperty("visibility");
     e.target.querySelectorAll(".wal-window-panel, .wal-gatefold-cover, .wal-gatefold-notes")
       .forEach((el) => el.getAnimations().forEach((x) => x.cancel()));
   }, true);
