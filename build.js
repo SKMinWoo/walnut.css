@@ -216,7 +216,7 @@ function assertVersionStamped(found) {
 
    Listed rather than globbed, so a scratch page left in docs/ is never
    deployed by accident. */
-const DOCS_PAGES = ["index.html", "specimen.html", "next.html"];
+const DOCS_PAGES = ["index.html", "specimen.html", "next.html", "openings.html"];
 const STYLESHEET_LINKS = /<link rel="stylesheet" href="\.\.\/dist\//g;
 const DIST_REFS = /\.\.\/dist\//g;
 const docsPages = DOCS_PAGES.map((page) => {

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" class="wal-press wal-cue-in" data-finish="catalogue">
+<html lang="en" class="wal-press wal-cue-in wal-desk" data-finish="catalogue">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -18,6 +18,61 @@
   <link rel="stylesheet" href="../dist/themes/forest.css">
   <link rel="stylesheet" href="../dist/themes/dusk.css">
   <link rel="stylesheet" href="../dist/themes/bone.css">
+
+  <script>
+    /* The reader's palette, mode and finish, carried across the docs pages
+       in this tab and back (specimen.html takes the mode and finish). Applied
+       before first paint, so a return trip does not flash the default. Each
+       value is checked against what the page knows how to show. */
+    try {
+      const saved = JSON.parse(sessionStorage.getItem("walnut-docs") || "{}");
+      const root = document.documentElement;
+      if (["wal-press", "wal-cafe", "wal-forest", "wal-dusk", "wal-bone"].includes(saved.palette)) {
+        root.classList.remove("wal-press");
+        root.classList.add(saved.palette);
+      }
+      if (saved.theme === "light" || saved.theme === "dark") root.dataset.theme = saved.theme;
+      if (saved.finish === "catalogue" || saved.finish === "soft") root.dataset.finish = saved.finish;
+    } catch {}
+
+    /* Page to page. The specimen's index, title, plate and cue strip travel
+       into plate 14's own page (specimen.html) instead of fading with the
+       rest, and back again on the return. They are named only for the
+       navigation itself — a name left on them would also be caught by the
+       mode switch's view transition, and drawn over the masthead — so the
+       names go on in the old page's pageswap and the new page's pagereveal,
+       and come off when the transition is done. Registered here in <head>
+       because pagereveal can fire before a script at the end of <body> has
+       run; the <link rel="expect"> below holds first paint until the
+       travellers exist. */
+    {
+      const TRAVELLERS = {
+        "specimen-index": "plate-14-index", "specimen-title": "plate-14-title",
+        "specimen-specs": "plate-14-specs", "specimen-script": "plate-14-script",
+      };
+      const travel = (on) => {
+        for (const [id, name] of Object.entries(TRAVELLERS)) {
+          const el = document.getElementById(id);
+          if (el) el.style.viewTransitionName = on ? name : "";
+        }
+      };
+      addEventListener("pageswap", (e) => {
+        const to = e.activation && e.activation.entry && new URL(e.activation.entry.url).pathname;
+        if (e.viewTransition && to && /\/specimen(\.html)?$/.test(to)) {
+          travel(true);
+          e.viewTransition.finished.finally(() => travel(false));
+        }
+      });
+      addEventListener("pagereveal", (e) => {
+        if (!e.viewTransition) return;
+        // Arriving from another page, not loading: skip the print-in.
+        document.documentElement.classList.remove("wal-cue-in");
+        travel(true);
+        e.viewTransition.finished.finally(() => travel(false));
+      });
+    }
+  </script>
+  <link rel="expect" href="#specimen-script" blocking="render">
 
   <style>
     /* Demo-only styles. Every component on this page is walnut itself; what
@@ -90,6 +145,9 @@
       background: var(--wal-bg-subtle);
     }
     .demo-specimen-body { padding: var(--wal-space-md); display: grid; gap: var(--wal-space-md); }
+    /* The specimen's title opens its own page; it stays a title until hovered. */
+    .demo-plate-link { color: inherit; text-decoration: none; }
+    .demo-plate-link:hover { text-decoration: underline; text-underline-offset: 0.15em; }
 
     /* Palette tiles — each shows its own real cues. */
     .demo-tile {
@@ -256,6 +314,7 @@
       <a href="#modes">Light &amp; dark</a>
       <a href="#finish">Finish</a>
       <a href="#components">Components</a>
+      <a href="#desk">Desk</a>
       <a href="#install">Install</a>
     </div>
     <div class="wal-nav-actions">
@@ -325,8 +384,8 @@
               </div>
               <div class="demo-specimen-body">
                 <div>
-                  <p class="wal-index">Plate 14</p>
-                  <h2 class="wal-text-xl" style="margin:0">Walnut sideboard</h2>
+                  <p class="wal-index" id="specimen-index">Plate 14</p>
+                  <h2 class="wal-text-xl" style="margin:0" id="specimen-title"><a class="demo-plate-link" href="specimen.html">Walnut sideboard</a></h2>
                   <p class="wal-text-sm" style="margin:0">
                     Tambour doors, brass pulls, tapered legs. <a href="#specimen-specs">Dimensions</a>.
                   </p>
@@ -345,13 +404,14 @@
                   <div><dt>Height</dt><dd>72&#8239;<small>cm</small></dd></div>
                 </dl>
 
-                <ol class="wal-script" style="--wal-script-h: 2rem; --wal-script-min: 3rem">
+                <ol class="wal-script" id="specimen-script" style="--wal-script-h: 2rem; --wal-script-min: 3rem">
                   <li></li><li></li><li></li><li></li><li></li>
                 </ol>
               </div>
             </div>
 
             <p class="wal-caption">Every component above is stock walnut. None of them knows the palette changed.</p>
+            <p><a class="wal-link-arrow" href="specimen.html">Open plate 14 in its own page <span aria-hidden="true">→</span></a></p>
           </div>
         </div>
       </div>
@@ -563,6 +623,7 @@
   --wal-elevation: 0.35;
   --wal-wash: 0;
   --wal-line-boost: 1.7;
+  --wal-tooth: url(…);
   --wal-tracking-label: 0.12em;
   --wal-font-label: var(--wal-font-typewriter);
 }</pre>
@@ -572,7 +633,8 @@
             updating a finish. Palette answers <em>what colour</em>; finish answers
             <em>what kind of object</em>. They compose freely. And because the tokens
             are registered numbers, switching a finish tweens them — press the button
-            and watch the corners round off and the rules soften.
+            and watch the corners round off and the rules soften. Catalogue's papers
+            also take a tooth, a faint grain multiplied into their own stock.
           </p>
         </div>
 
@@ -622,7 +684,7 @@
               <span style="background: var(--wal-cue-5)"></span>
             </span>
             <span><b style="font-family: var(--wal-font-display)">Forest</b>
-              <small class="wal-caption" style="display:block">Mossy floor, copper firelight</small></span>
+              <small class="wal-caption" style="display:block">Fern, mossy floor, campfire copper</small></span>
           </button>
 
           <button class="demo-tile wal-dusk" type="button" data-palette="wal-dusk" aria-pressed="false">
@@ -633,7 +695,7 @@
               <span style="background: var(--wal-cue-5)"></span>
             </span>
             <span><b style="font-family: var(--wal-font-display)">Dusk</b>
-              <small class="wal-caption" style="display:block">Sunset, lantern, twilight</small></span>
+              <small class="wal-caption" style="display:block">Twilight, afterglow, lantern</small></span>
           </button>
 
           <button class="demo-tile wal-bone" type="button" data-palette="wal-bone" aria-pressed="false">
@@ -644,7 +706,7 @@
               <span style="background: var(--wal-cue-5)"></span>
             </span>
             <span><b style="font-family: var(--wal-font-display)">Bone</b>
-              <small class="wal-caption" style="display:block">Linen, watercolour, light-first</small></span>
+              <small class="wal-caption" style="display:block">Washi tape, pressed flowers, light-first</small></span>
           </button>
 
           <div class="demo-tile" style="cursor:default">
@@ -757,14 +819,44 @@
             </div>
           </div>
         </div>
+
+        <p style="margin-block-start: var(--wal-space-xl)"><a class="wal-link-arrow" href="openings.html">The openings, their materials and the newest parts, each working <span aria-hidden="true">→</span></a></p>
       </div>
     </section>
 
-    <!-- ══════════ 06 · Install ══════════ -->
-    <section class="wal-section" id="install">
+    <!-- ══════════ 06 · Desk ══════════ -->
+    <section class="wal-section" id="desk">
       <div class="wal-wrap">
         <header class="wal-section-head">
           <p class="wal-index">06</p>
+          <h2>Papers on a walnut desk</h2>
+          <p class="wal-caption">One class, its grain drawn by the browser from the ground rod</p>
+        </header>
+
+        <div class="wal-grid wal-cols-2">
+          <pre class="demo-code" style="align-self: start">&lt;html class="wal-press wal-desk"&gt;</pre>
+          <div class="wal-stack wal-gap-sm">
+            <p class="wal-text-sm">
+              The grain under this page is the ground rod a few points darker, drawn
+              by the browser from noise rather than shipped as a photograph. Rotate
+              the ground hue above and the wood follows. On a light page it never goes
+              darker than the subtle ground, so every ink keeps its contrast on it.
+            </p>
+            <p class="wal-text-sm">
+              Every card, plate and metric rests a shadow above the desk, and the
+              finish decides how high: Catalogue's printed plates lie almost flat on
+              the wood; apply Soft above and they lift off it.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ══════════ 07 · Install ══════════ -->
+    <section class="wal-section" id="install">
+      <div class="wal-wrap">
+        <header class="wal-section-head">
+          <p class="wal-index">07</p>
           <h2>Install</h2>
           <p class="wal-caption">One link tag · no build step · no runtime</p>
         </header>
@@ -1097,7 +1189,7 @@
     modeBtn.addEventListener("click", () => {
       readerChoseMode = true;
       const next = currentMode() === "dark" ? "light" : "dark";
-      const flip = () => { root.setAttribute("data-theme", next); syncModeBtn(); paint(); };
+      const flip = () => { root.setAttribute("data-theme", next); syncModeBtn(); paint(); remember(); };
       // .ready rejects when a transition is skipped — a second click before
       // the first finishes — and nothing else awaits it, so it would surface
       // as an unhandled rejection. The flip itself has happened either way.
@@ -1129,16 +1221,23 @@
       root.classList.add("wal-retune");
       root.classList.remove(...PALETTES);
       root.classList.add(name);
-      for (const b of document.querySelectorAll("[data-palette]")) {
-        b.setAttribute("aria-pressed", String(b.dataset.palette === name));
-      }
+      syncPaletteButtons();
       // A palette IS a script, so hand-turned rods are stale once one is
       // picked. Dropping them in the same frame as the class change means
       // the tween starts from where the reader left the rods.
       for (const el of rods) root.style.removeProperty(el.dataset.prop);
       syncModeBtn();
       paint();
+      remember();
     }
+
+    function syncPaletteButtons() {
+      const name = PALETTES.find((p) => root.classList.contains(p));
+      for (const b of document.querySelectorAll("[data-palette]")) {
+        b.setAttribute("aria-pressed", String(b.dataset.palette === name));
+      }
+    }
+    syncPaletteButtons();
 
     for (const group of ["palette-switch", "palette-tiles"]) {
       document.getElementById(group).addEventListener("click", (e) => {
@@ -1151,14 +1250,34 @@
        Radius, elevation, wash and rule strength are registered, so under
        .wal-retune a finish switch tweens them; the label voice cuts. */
     const finishBtn = document.getElementById("finish-toggle");
+    const syncFinishBtn = () => {
+      finishBtn.textContent = root.getAttribute("data-finish") === "catalogue"
+        ? "Apply the soft finish to this page"
+        : "Apply the catalogue finish to this page";
+    };
     finishBtn.addEventListener("click", () => {
       const next = root.getAttribute("data-finish") === "catalogue" ? "soft" : "catalogue";
       root.classList.add("wal-retune");
       root.setAttribute("data-finish", next);
-      finishBtn.textContent = next === "catalogue"
-        ? "Apply the soft finish to this page"
-        : "Apply the catalogue finish to this page";
+      syncFinishBtn();
+      remember();
     });
+    syncFinishBtn();
+
+    /* ── Remembered across the docs pages ──
+       What the reader picked, for the script in <head> here and on
+       specimen.html to put back before first paint. A tab-long memory, and
+       a convenience only: without storage the pages simply open as they
+       are written. */
+    function remember() {
+      try {
+        sessionStorage.setItem("walnut-docs", JSON.stringify({
+          palette: PALETTES.find((p) => root.classList.contains(p)),
+          theme: root.getAttribute("data-theme") || undefined,
+          finish: root.getAttribute("data-finish"),
+        }));
+      } catch {}
+    }
 
     /* ── Copy ── */
     const copied = document.getElementById("copied");
