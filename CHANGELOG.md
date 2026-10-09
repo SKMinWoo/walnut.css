@@ -118,8 +118,9 @@ the platform can now draw with no script.
   drawn from the markup with no script. Under Materials they are brass, and
   a new value strikes and rings.
 - **`.wal-tint`** and `.wal-fill-tint`: any colour, as ink, wash, fill and
-  text on the fill, legible in both modes. The same as CSS functions,
-  `--wal-ink()` and `--wal-soft()`.
+  text on the fill, legible in both modes. Unset, it is the accent, rebuilt
+  from its stops so it resolves in the Chrome versions the `-fg` fix below
+  covers. The same as CSS functions, `--wal-ink()` and `--wal-soft()`.
 - **`--wal-corner-shape`**: `round`, `squircle` or `bevel`, read by every
   rule that draws a radius. The Catalogue finish bevels.
 - **Native parts.** `.wal-select` (`base-select`, options with swatches),
@@ -410,6 +411,30 @@ the platform can now draw with no script.
   base caps `<p>` at 65ch — measured in the caption's own tiny face, which is
   under 30rem. Section-head standfirsts wrapped with their last two words on a
   line of their own. Captions now take their container's measure.
+
+- **Any restyle of `<html>` started a transition on every button, card and
+  input.** Their `transition: all` caught `scrollbar-color`, which inherits,
+  so in Chrome a rod from a slider, a palette, even a custom property nothing
+  reads set off 21 on the docs page, each restyling its element every frame
+  for 0.2s. Each component now lists what it animates. Apart from the input's
+  focus flash below, every transition you could see before still runs. A rule
+  of your own that moves another property on them needs its own `transition`.
+
+- **Focusing an input flashed a dark ring.** Its outline is transparent, there
+  only for forced-colors mode, but `all` faded it from the text colour to
+  transparent, so a dark ring showed for about 50ms. The outline no longer
+  transitions; the border and the shadow ring still ease in, and in
+  forced-colors mode the outline now appears at once.
+
+- **Computed `-fg` fell back to the page text in Chrome 127 and earlier.**
+  Each was a relative colour whose origin was its cue, and a cue is a
+  `light-dark()` value. Those versions parse that, so `@supports` passed, but
+  cannot resolve it, so the primary button, every `.wal-fill-*` and the skip
+  link took the inherited text colour: dark type on terracotta on paper,
+  light type on gold at night. `light-dark()` now chooses between two relative
+  colours whose origins are the cue rebuilt from its stops. `-fg` therefore
+  follows the rods and the ramp, as `-ink` and `-hover` do, not a colour set
+  directly on `--wal-<cue>`.
 
 ## 0.4.0
 

@@ -223,7 +223,18 @@
     cursor: pointer;
     text-decoration: none;
     border: var(--wal-hairline) solid transparent;
-    transition: all var(--wal-duration) var(--wal-ease);
+    /* Listed, not `all`. In Chrome, any restyle of <html> — a rod, a
+       palette, even a custom property nothing reads — started a
+       scrollbar-color transition on every button, card and input: the
+       property inherits, and `all` caught it. The first line is what the
+       states below animate; the second is the rest of what `all` visibly
+       animated, the base layer's :focus-visible ring and a finish switch's
+       radius and tracking. */
+    transition-property:
+      background-color, border-color, color, box-shadow, transform, opacity,
+      outline-color, outline-offset, outline-width, border-radius, letter-spacing;
+    transition-duration: var(--wal-duration);
+    transition-timing-function: var(--wal-ease);
     line-height: 1.2;
 
     @media (prefers-reduced-motion: reduce) {
@@ -295,7 +306,13 @@
     padding: var(--wal-space-lg);
     position: relative;
     overflow: hidden;
-    transition: all var(--wal-duration) var(--wal-ease);
+    /* Listed, not `all`; see .wal-btn. Background and ink are here because a
+       palette switch moves them; the ring is for a card that is a link. */
+    transition-property:
+      background-color, border-color, color, box-shadow, transform,
+      outline-color, outline-offset, outline-width, border-radius;
+    transition-duration: var(--wal-duration);
+    transition-timing-function: var(--wal-ease);
     display: flex;
     flex-direction: column;
     gap: var(--wal-space-md);
@@ -732,8 +749,15 @@
     font-family: var(--wal-font-body);
     font-size: var(--wal-text-sm);
     color: var(--wal-text);
-    transition: all var(--wal-duration) var(--wal-ease);
-    
+    /* Listed, not `all`; see .wal-btn. The outline is left out on purpose:
+       the :focus one below is transparent, so easing it only faded a dark
+       ring out of the text colour each time the input took focus. */
+    transition-property:
+      background-color, border-color, color, box-shadow,
+      border-radius;
+    transition-duration: var(--wal-duration);
+    transition-timing-function: var(--wal-ease);
+
     &::placeholder {
       color: var(--wal-text-muted);
     }
@@ -2050,9 +2074,15 @@
      one is held to at most 0.5 and takes light. The step at 0.62 is
      `clamp(0, (l - 0.62) * 1000, 1)`: 0 or 1, never between, the same
      switch the cues' -fg tokens use. Every pair was measured at 4.5:1 or
-     better for sixteen colours across the wheel, in both modes. */
+     better for sixteen colours across the wheel, in both modes.
+
+     Unset, the tint is the accent, rebuilt from its light stop rather than
+     var(--wal-accent): that alias is a light-dark(), and a light-dark()
+     origin is the one relative colour Chrome 123 to 127 cannot resolve
+     (see the cues' -fg tokens in 01-tokens.css). The tint makes its own
+     dark-mode ink from it. */
   .wal-tint {
-    --wal-tint: var(--wal-accent);
+    --wal-tint: oklch(var(--wal-l-accent-light) var(--wal-accent-chroma) var(--wal-accent-hue));
     --wal-tint-ink: light-dark(oklch(from var(--wal-tint) 0.44 min(c, 0.16) h),
                                oklch(from var(--wal-tint) 0.8 min(c, 0.13) h));
     --wal-tint-soft: color-mix(in oklch, var(--wal-tint) 18%, var(--wal-surface));
