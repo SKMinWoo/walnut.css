@@ -1,0 +1,1313 @@
+<!DOCTYPE html>
+<html lang="en" class="wal-press wal-cue-in wal-desk" data-finish="catalogue">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>walnut.css reference</title>
+  <meta name="description" content="A zero-JavaScript CSS framework. Eight numbers generate every surface, hairline, ink, shadow and foreground — in light and dark, from one declaration each.">
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
+  <link rel="alternate icon" href="favicon.ico">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Courier+Prime:ital,wght@0,400;0,700;1,400&family=DM+Mono:ital,wght@0,300;0,400;0,500&family=Inter:wght@100..900&family=Jost:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="../dist/walnut.css">
+  <link rel="stylesheet" href="../dist/walnut-scroll.css">
+  <link rel="stylesheet" href="../dist/themes/press.css">
+  <link rel="stylesheet" href="../dist/themes/cafe.css">
+  <link rel="stylesheet" href="../dist/themes/forest.css">
+  <link rel="stylesheet" href="../dist/themes/dusk.css">
+  <link rel="stylesheet" href="../dist/themes/bone.css">
+
+  <script>
+    /* The reader's palette, mode and finish, carried across the docs pages
+       in this tab and back (specimen.html takes the mode and finish). Applied
+       before first paint, so a return trip does not flash the default. Each
+       value is checked against what the page knows how to show. */
+    try {
+      const saved = JSON.parse(sessionStorage.getItem("walnut-docs") || "{}");
+      const root = document.documentElement;
+      if (["wal-press", "wal-cafe", "wal-forest", "wal-dusk", "wal-bone"].includes(saved.palette)) {
+        root.classList.remove("wal-press");
+        root.classList.add(saved.palette);
+      }
+      if (saved.theme === "light" || saved.theme === "dark") root.dataset.theme = saved.theme;
+      if (saved.finish === "catalogue" || saved.finish === "soft") root.dataset.finish = saved.finish;
+    } catch {}
+
+    /* Page to page. The specimen's index, title, plate and cue strip travel
+       into plate 14's own page (specimen.html) instead of fading with the
+       rest, and back again on the return. They are named only for the
+       navigation itself — a name left on them would also be caught by the
+       mode switch's view transition, and drawn over the masthead — so the
+       names go on in the old page's pageswap and the new page's pagereveal,
+       and come off when the transition is done. Registered here in <head>
+       because pagereveal can fire before a script at the end of <body> has
+       run; the <link rel="expect"> below holds first paint until the
+       travellers exist. */
+    {
+      const TRAVELLERS = {
+        "specimen-index": "plate-14-index", "specimen-title": "plate-14-title",
+        "specimen-specs": "plate-14-specs", "specimen-script": "plate-14-script",
+      };
+      const travel = (on) => {
+        for (const [id, name] of Object.entries(TRAVELLERS)) {
+          const el = document.getElementById(id);
+          if (el) el.style.viewTransitionName = on ? name : "";
+        }
+      };
+      addEventListener("pageswap", (e) => {
+        const to = e.activation && e.activation.entry && new URL(e.activation.entry.url).pathname;
+        if (e.viewTransition && to && /\/specimen(\.html)?$/.test(to)) {
+          travel(true);
+          e.viewTransition.finished.finally(() => travel(false));
+        }
+      });
+      addEventListener("pagereveal", (e) => {
+        if (!e.viewTransition) return;
+        // Arriving from another page, not loading: skip the print-in.
+        document.documentElement.classList.remove("wal-cue-in");
+        travel(true);
+        e.viewTransition.finished.finally(() => travel(false));
+      });
+    }
+  </script>
+  <link rel="expect" href="#specimen-script" blocking="render">
+
+  <style>
+    /* Demo-only styles. Every component on this page is walnut itself; what
+       follows is page furniture — the workbench split, the slider tracks, and
+       the specimen frame. */
+
+    .demo-code { white-space: pre; overflow-x: auto; margin: 0; }
+
+    /* The generated script. Property names recede; the numbers are set in
+       the accent's type form, because they are the only part of the block a
+       reader changes — and on load they count up from zero as the page
+       prints, which is the whole claim of the page made visible. */
+    #generated .demo-k { color: var(--wal-text-muted); }
+    #generated b { font-weight: 500; color: var(--wal-accent-ink); }
+
+    /* ── Hero workbench ──
+       The hero is not a poster. Controls and the CSS they generate on the
+       left, a page rendering from that CSS on the right. */
+    .wal-hero.demo-top {
+      min-height: auto;
+      padding-block: var(--wal-space-2xl) var(--wal-space-xl);
+    }
+    .demo-bench {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(min(100%, 21rem), 1fr));
+      gap: var(--wal-space-xl);
+      align-items: start;
+      text-align: start;
+      inline-size: 100%;
+    }
+
+    /* Rods */
+    .demo-rod { display: grid; grid-template-columns: 1fr auto; gap: .1rem .5rem; align-items: center; }
+    .demo-rod > label { grid-column: 1; font-family: var(--wal-font-label); font-size: var(--wal-text-xs); text-transform: uppercase; letter-spacing: var(--wal-tracking-label); color: var(--wal-text-soft); }
+    .demo-rod > output { grid-column: 2; font-family: var(--wal-font-mono); font-size: var(--wal-text-xs); font-variant-numeric: tabular-nums; color: var(--wal-text); }
+    .demo-rod > input { grid-column: 1 / -1; inline-size: 100%; accent-color: var(--wal-accent); min-block-size: 24px; }
+
+    /* A hue track drawn in oklch at the rod's own chroma: the slider IS the
+       palette. --c is bound to the live chroma rod, not a constant, so the
+       track greys out when chroma is zero — which is true: at zero chroma
+       the hue stops mattering — and colours in with the page on load. */
+    .demo-rod > input[data-track="hue"] {
+      appearance: none; block-size: 12px; border-radius: 2px; cursor: ew-resize;
+      border: var(--wal-hairline) solid var(--wal-line);
+      background: linear-gradient(to right,
+        oklch(var(--l) var(--c) 0), oklch(var(--l) var(--c) 60), oklch(var(--l) var(--c) 120),
+        oklch(var(--l) var(--c) 180), oklch(var(--l) var(--c) 240), oklch(var(--l) var(--c) 300),
+        oklch(var(--l) var(--c) 360));
+    }
+    .demo-rod > input[data-track="hue"]::-webkit-slider-thumb {
+      appearance: none; inline-size: 14px; block-size: 20px; border-radius: 2px;
+      background: var(--wal-text); border: 2px solid var(--wal-bg); cursor: ew-resize;
+    }
+    .demo-rod > input[data-track="hue"]::-moz-range-thumb {
+      inline-size: 12px; block-size: 20px; border-radius: 2px;
+      background: var(--wal-text); border: 2px solid var(--wal-bg); cursor: ew-resize;
+    }
+
+    /* The specimen — a miniature page, built only from walnut classes. */
+    .demo-specimen {
+      border: var(--wal-hairline) solid var(--wal-line);
+      border-radius: var(--wal-radius);
+      background: var(--wal-bg);
+      overflow: hidden;
+    }
+    .demo-specimen-bar {
+      display: flex; align-items: center; justify-content: space-between; gap: var(--wal-space-sm);
+      padding: .5rem .75rem;
+      border-bottom: var(--wal-hairline) solid var(--wal-line);
+      background: var(--wal-bg-subtle);
+    }
+    .demo-specimen-body { padding: var(--wal-space-md); display: grid; gap: var(--wal-space-md); }
+    /* The specimen's title opens its own page; it stays a title until hovered. */
+    .demo-plate-link { color: inherit; text-decoration: none; }
+    .demo-plate-link:hover { text-decoration: underline; text-underline-offset: 0.15em; }
+
+    /* Palette tiles — each shows its own real cues. */
+    .demo-tile {
+      display: grid; gap: .5rem; inline-size: 100%; text-align: start; cursor: pointer;
+      padding: var(--wal-space-sm);
+      background: var(--wal-surface); color: var(--wal-text);
+      border: var(--wal-hairline) solid var(--wal-line); border-radius: var(--wal-radius);
+    }
+    .demo-tile:hover { border-color: var(--wal-accent); }
+    .demo-tile[aria-pressed="true"] { border-color: var(--wal-accent); box-shadow: inset 0 0 0 1px var(--wal-accent); }
+    .demo-tile-cues { display: grid; grid-template-columns: repeat(5, 1fr); block-size: 30px; border-radius: 2px; overflow: hidden; }
+    .demo-tile-ground { block-size: 10px; border-radius: 2px; border: var(--wal-hairline) solid var(--wal-line); }
+
+    /* Swatch buttons in the masthead. 24px is the accessible floor. Each
+       carries its own palette class, so it is painted from that palette's
+       real paper and accent rather than from hex copied off it once. */
+    .demo-swatches { display: flex; gap: .3rem; }
+    .demo-swatch {
+      inline-size: 24px; block-size: 24px; padding: 0; cursor: pointer;
+      background: linear-gradient(135deg, var(--wal-bg) 50%, var(--wal-accent) 50%);
+      border: var(--wal-hairline) solid var(--wal-line); border-radius: 2px;
+      outline: 2px solid transparent; outline-offset: 0;
+    }
+    .demo-swatch[aria-pressed="true"] { outline-color: var(--wal-accent); outline-offset: 2px; }
+
+    /* Side-by-side evidence panels. */
+    .demo-pair { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 15rem), 1fr)); gap: var(--wal-space-md); }
+    .demo-panel {
+      padding: var(--wal-space-md);
+      background: var(--wal-bg); color: var(--wal-text);
+      border: var(--wal-hairline) solid var(--wal-line); border-radius: var(--wal-radius);
+      display: grid; gap: var(--wal-space-sm); align-content: start;
+    }
+
+    /* A block big enough to actually judge a foreground against. The chip-sized
+       version of this demo was technically correct and visually unreadable. */
+    .demo-onCue {
+      margin: 0;
+      padding: var(--wal-space-lg) var(--wal-space-md);
+      text-align: center;
+      border-radius: var(--wal-radius-sm);
+      font-family: var(--wal-font-display);
+      font-size: var(--wal-text-lg);
+      font-weight: 600;
+      background: var(--wal-accent);
+      color: var(--wal-accent-fg);
+    }
+
+    /* Reference disclosures — the long-form material, out of the pitch's way. */
+    .demo-ref {
+      border-top: var(--wal-hairline) solid var(--wal-line);
+      padding-block: var(--wal-space-md);
+    }
+    .demo-ref > summary {
+      cursor: pointer; list-style: none;
+      font-family: var(--wal-font-display); font-weight: 600; font-size: var(--wal-text-md);
+      display: flex; align-items: center; justify-content: space-between; gap: var(--wal-space-md);
+    }
+    .demo-ref > summary::-webkit-details-marker { display: none; }
+    .demo-ref > summary::after { content: "+"; font-family: var(--wal-font-mono); color: var(--wal-accent-ink); }
+    .demo-ref[open] > summary::after { content: "–"; }
+    .demo-ref > summary:focus-visible { outline: 2px solid var(--wal-accent); outline-offset: 3px; }
+    .demo-ref-body { padding-block-start: var(--wal-space-md); display: grid; gap: var(--wal-space-md); }
+
+    /* ── The wheel ──
+       The script as geometry, drawn like a plate in a parts catalogue. Every
+       position is a rod read straight from CSS: the dots, arcs and the
+       opposite marker all rotate by var(--wal-*-hue), so they travel when a
+       palette retunes and nothing here is told that anything changed. The
+       dial is a size container so 50cqi is its radius at any width. */
+    .demo-wheel { margin: 0; display: grid; gap: var(--wal-space-md); justify-items: center; align-content: start; }
+    .demo-dial {
+      position: relative;
+      inline-size: min(100% - 3rem, 21rem);
+      aspect-ratio: 1;
+      margin: 1.5rem;
+      container-type: inline-size;
+      border: var(--wal-hairline) solid var(--wal-line);
+      border-radius: 50%;
+    }
+    /* Rim ticks every 30°, as one masked conic rather than twelve elements. */
+    .demo-dial::before {
+      content: ""; position: absolute; inset: 0; border-radius: 50%;
+      background: repeating-conic-gradient(from -0.3deg, var(--wal-line) 0 0.6deg, transparent 0.6deg 30deg);
+      mask: radial-gradient(closest-side, transparent calc(100% - 7px), #000 calc(100% - 7px));
+    }
+    .demo-dial > * { position: absolute; left: 50%; top: 50%; }
+
+    /* A zero-size pivot at the centre, turned to the cue's hue. Children sit
+       out along the radius and counter-rotate so their type stays upright. */
+    .demo-pivot { inline-size: 0; block-size: 0; rotate: calc(var(--at) * 1deg); }
+    .demo-pivot > * { position: absolute; left: 0; top: 0; }
+    .demo-dot {
+      inline-size: 1.2rem; aspect-ratio: 1; border-radius: 50%;
+      background: var(--fill);
+      box-shadow: 0 0 0 3px var(--wal-bg);
+      transform: translate(-50%, -50%) translateY(-50cqi);
+    }
+    /* Derived cues carry a ring: the reader wrote the others. */
+    .demo-pivot.is-derived .demo-dot { box-shadow: 0 0 0 3px var(--wal-bg), 0 0 0 4px var(--wal-text-muted); }
+    .demo-pivot b {
+      font-family: var(--wal-font-mono); font-size: var(--wal-text-xs); font-weight: 400;
+      color: var(--wal-text-muted);
+      transform: translate(-50%, -50%) translateY(calc(-50cqi + 1.9rem)) rotate(calc(var(--at) * -1deg));
+    }
+    .demo-opposite {
+      inline-size: .7rem; aspect-ratio: 1; border-radius: 50%;
+      border: var(--wal-hairline) solid var(--wal-text-muted); background: var(--wal-bg);
+      transform: translate(-50%, -50%) translateY(-50cqi);
+    }
+    .demo-deg {
+      font-family: var(--wal-font-mono); font-size: var(--wal-text-xs); color: var(--wal-text-muted);
+      transform: translate(-50%, -50%) rotate(calc(var(--at) * 1deg)) translateY(calc(-50cqi + 1.6rem)) rotate(calc(var(--at) * -1deg));
+    }
+
+    /* Dimension arcs from the accent to each derived cue. mod() keeps the
+       span positive when a palette states a hue below the accent's. */
+    .demo-arc {
+      --span: mod(calc(var(--to) - var(--wal-accent-hue)), 360);
+      inline-size: calc(100cqi - var(--inset) * 2); aspect-ratio: 1; border-radius: 50%;
+      translate: -50% -50%;
+      background: conic-gradient(from calc(var(--wal-accent-hue) * 1deg),
+        var(--ink) 0deg calc(var(--span) * 1deg), transparent 0);
+      mask: radial-gradient(closest-side, transparent calc(100% - 1.5px), #000 calc(100% - 1.5px));
+    }
+    .demo-arc-label {
+      font-family: var(--wal-font-mono); font-size: var(--wal-text-xs); color: var(--ink);
+      --mid: calc(var(--wal-accent-hue) + mod(calc(var(--to) - var(--wal-accent-hue)), 360) / 2);
+      transform: translate(-50%, -50%) rotate(calc(var(--mid) * 1deg))
+                 translateY(calc(-50cqi + var(--inset) + 1.5rem)) rotate(calc(var(--mid) * -1deg));
+    }
+    .demo-arc-bloom { --to: var(--wal-bloom-hue); --ink: var(--wal-bloom-ink); --inset: 2.9rem; }
+    .demo-arc-cool  { --to: var(--wal-cool-hue);  --ink: var(--wal-cool-ink);  --inset: 4.1rem; }
+
+    .demo-hub { translate: -50% -50%; display: grid; justify-items: center; gap: .1rem; }
+    .demo-hub output {
+      font-family: var(--wal-font-mono); font-size: var(--wal-text-3xl); font-weight: 300;
+      line-height: 1; color: var(--wal-accent-ink); font-variant-numeric: tabular-nums;
+    }
+    /* A monospace degree sign gets a full cell, which at this size reads as
+       "31 °". Pulled in to sit against the figure the way it would in print. */
+    .demo-hub output small { font-size: .6em; vertical-align: .55em; margin-inline-start: -.3em; }
+
+    .demo-legend { display: flex; flex-wrap: wrap; justify-content: center; gap: .4rem 1.2rem; }
+    .demo-legend span { display: inline-flex; align-items: center; gap: .45rem; }
+    .demo-legend i { inline-size: .6rem; aspect-ratio: 1; border-radius: 50%; background: var(--wal-text-soft); }
+    .demo-legend i.is-derived { box-shadow: 0 0 0 2px var(--wal-bg), 0 0 0 3px var(--wal-text-muted); }
+    .demo-legend i.is-opposite { background: none; border: var(--wal-hairline) solid var(--wal-text-muted); }
+    .demo-wheel .demo-rod { inline-size: min(100%, 21rem); }
+  </style>
+</head>
+<body>
+
+  <a href="#main" class="wal-skip">Skip to content</a>
+  <div class="wal-progress-bar"></div>
+
+  <nav class="wal-nav">
+    <a class="wal-nav-brand" href="index.html">
+      walnut.css
+      <small>form no. <span data-version>0.4.0</span></small>
+    </a>
+    <div class="wal-nav-links">
+      <a href="#script">Colour script</a>
+      <a href="#modes">Light &amp; dark</a>
+      <a href="#finish">Finish</a>
+      <a href="#components">Components</a>
+      <a href="#desk">Desk</a>
+      <a href="#install">Install</a>
+    </div>
+    <div class="wal-nav-actions">
+      <div class="demo-swatches" id="palette-switch" role="group" aria-label="Palette">
+        <button class="demo-swatch wal-press" type="button" data-palette="wal-press" title="Press"  aria-pressed="true"></button>
+        <button class="demo-swatch wal-cafe" type="button" data-palette="wal-cafe" title="Café"   aria-pressed="false"></button>
+        <button class="demo-swatch wal-forest" type="button" data-palette="wal-forest" title="Forest" aria-pressed="false"></button>
+        <button class="demo-swatch wal-dusk" type="button" data-palette="wal-dusk" title="Dusk"   aria-pressed="false"></button>
+        <button class="demo-swatch wal-bone" type="button" data-palette="wal-bone" title="Bone"   aria-pressed="false"></button>
+      </div>
+      <button class="wal-btn wal-btn-secondary wal-btn-sm" type="button" id="mode">Dark</button>
+    </div>
+  </nav>
+
+  <main id="main">
+
+    <!-- ══════════ Hero: the workbench ══════════ -->
+    <header class="wal-hero demo-top">
+      <div class="wal-wrap">
+        <p class="wal-eyebrow">CSS framework · zero JavaScript · MIT</p>
+        <h1 style="max-inline-size: 20ch">Theme a whole site from eight numbers.</h1>
+        <p class="wal-text-md wal-mt-md" style="max-width: 58ch">
+          Drag a rod. Every surface, hairline, ink, hover state, shadow and foreground
+          re-derives — in light and dark, from one declaration each.
+        </p>
+
+        <div class="demo-bench wal-mt-xl">
+
+          <!-- Left: the inputs, and the CSS they produce -->
+          <div class="wal-stack wal-gap-md">
+            <p class="wal-caption">The whole input surface</p>
+
+            <div class="demo-rod">
+              <label for="rod-hue">Ground hue</label><output id="out-hue"></output>
+              <input type="range" id="rod-hue" data-track="hue" data-prop="--wal-hue" min="0" max="360" step="0.5" style="--l:.62;--c:calc(var(--wal-chroma) * 2.5)">
+            </div>
+            <div class="demo-rod">
+              <label for="rod-chroma">Ground chroma</label><output id="out-chroma"></output>
+              <input type="range" id="rod-chroma" data-prop="--wal-chroma" min="0" max="0.09" step="0.002">
+            </div>
+            <div class="demo-rod">
+              <label for="rod-accent">Accent hue</label><output id="out-accent"></output>
+              <input type="range" id="rod-accent" data-track="hue" data-prop="--wal-accent-hue" min="0" max="360" step="1" style="--l:.6;--c:var(--wal-accent-chroma)">
+            </div>
+            <div class="demo-rod">
+              <label for="rod-accent-c">Accent chroma</label><output id="out-accent-c"></output>
+              <input type="range" id="rod-accent-c" data-prop="--wal-accent-chroma" min="0" max="0.32" step="0.005">
+            </div>
+
+            <pre class="demo-code" id="generated"></pre>
+
+            <div class="wal-cluster">
+              <button class="wal-btn wal-btn-primary wal-btn-sm" type="button" id="copy">Copy this CSS</button>
+              <button class="wal-btn wal-btn-secondary wal-btn-sm" type="button" id="reset">Reset</button>
+              <span class="wal-badge" id="copied" hidden>Copied</span>
+            </div>
+          </div>
+
+          <!-- Right: a page rendered from exactly that CSS -->
+          <div class="wal-stack wal-gap-sm">
+            <p class="wal-caption">What it renders</p>
+
+            <div class="demo-specimen">
+              <div class="demo-specimen-bar">
+                <strong style="font-family: var(--wal-font-display); font-size: var(--wal-text-sm)">Holm &amp; Varde</strong>
+                <span class="wal-caption" style="font-size: var(--wal-text-xs)">Catalogue</span>
+              </div>
+              <div class="demo-specimen-body">
+                <div>
+                  <p class="wal-index" id="specimen-index">Plate 14</p>
+                  <h2 class="wal-text-xl" style="margin:0" id="specimen-title"><a class="demo-plate-link" href="specimen.html">Walnut sideboard</a></h2>
+                  <p class="wal-text-sm" style="margin:0">
+                    Tambour doors, brass pulls, tapered legs. <a href="#specimen-specs">Dimensions</a>.
+                  </p>
+                </div>
+
+                <div class="wal-cluster">
+                  <button class="wal-btn wal-btn-primary wal-btn-sm" type="button">Order</button>
+                  <button class="wal-btn wal-btn-secondary wal-btn-sm" type="button">Compare</button>
+                  <span class="wal-badge wal-badge-gold">In stock</span>
+                  <span class="wal-badge wal-badge-cool">Model 211</span>
+                </div>
+
+                <dl class="wal-plate" id="specimen-specs" style="--wal-plate-min: 6rem">
+                  <div><dt>Width</dt><dd>180&#8239;<small>cm</small></dd></div>
+                  <div><dt>Depth</dt><dd>45&#8239;<small>cm</small></dd></div>
+                  <div><dt>Height</dt><dd>72&#8239;<small>cm</small></dd></div>
+                </dl>
+
+                <ol class="wal-script" id="specimen-script" style="--wal-script-h: 2rem; --wal-script-min: 3rem">
+                  <li></li><li></li><li></li><li></li><li></li>
+                </ol>
+              </div>
+            </div>
+
+            <p class="wal-caption">Every component above is stock walnut. None of them knows the palette changed.</p>
+            <p><a class="wal-link-arrow" href="specimen.html">Open plate 14 in its own page <span aria-hidden="true">→</span></a></p>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- ══════════ 01 · Colour script ══════════ -->
+    <section class="wal-section" id="script">
+      <div class="wal-wrap">
+        <header class="wal-section-head">
+          <p class="wal-index">01</p>
+          <h2>Write three cues, get five</h2>
+          <p class="wal-caption">The script stays in tune when you rotate it</p>
+        </header>
+
+        <div class="wal-grid wal-cols-2">
+          <figure class="demo-wheel">
+            <div class="demo-dial" role="img" aria-labelledby="wheel-legend">
+              <span class="demo-deg" style="--at: 0">0°</span>
+              <span class="demo-deg" style="--at: 90">90°</span>
+              <span class="demo-deg" style="--at: 180">180°</span>
+              <span class="demo-deg" style="--at: 270">270°</span>
+
+              <span class="demo-arc demo-arc-bloom"></span>
+              <span class="demo-arc demo-arc-cool"></span>
+              <span class="demo-arc-label demo-arc-bloom" id="arc-bloom">+27°</span>
+              <span class="demo-arc-label demo-arc-cool" id="arc-cool">+209°</span>
+
+              <span class="demo-pivot" style="--at: calc(var(--wal-accent-hue) + 180)"><i class="demo-opposite"></i></span>
+              <span class="demo-pivot" style="--at: var(--wal-olive-hue); --fill: var(--wal-olive)"><i class="demo-dot"></i><b>04</b></span>
+              <span class="demo-pivot" style="--at: var(--wal-gold-hue); --fill: var(--wal-gold)"><i class="demo-dot"></i><b>03</b></span>
+              <span class="demo-pivot is-derived" style="--at: var(--wal-cool-hue); --fill: var(--wal-cool)"><i class="demo-dot"></i><b>05</b></span>
+              <span class="demo-pivot is-derived" style="--at: var(--wal-bloom-hue); --fill: var(--wal-bloom)"><i class="demo-dot"></i><b>02</b></span>
+              <span class="demo-pivot" style="--at: var(--wal-accent-hue); --fill: var(--wal-accent)"><i class="demo-dot"></i><b>01</b></span>
+
+              <span class="demo-hub"><output id="hub-hue">31<small>°</small></output><span class="wal-caption">Accent</span></span>
+            </div>
+
+            <div class="demo-rod">
+              <label for="rod-accent-wheel">Turn the accent</label><output></output>
+              <input type="range" id="rod-accent-wheel" data-track="hue" data-prop="--wal-accent-hue" min="0" max="360" step="1" style="--l:.6;--c:var(--wal-accent-chroma)">
+            </div>
+
+            <figcaption class="demo-legend wal-caption" id="wheel-legend">
+              <span><i></i>You write it</span>
+              <span><i class="is-derived"></i>Derived from the accent</span>
+              <span><i class="is-opposite"></i>Direct opposite</span>
+            </figcaption>
+          </figure>
+
+          <div class="wal-stack wal-gap-md">
+            <ol class="wal-script" id="strip" style="--wal-script-min: 5rem; --wal-script-h: 3.25rem">
+              <li><b>Accent</b><small data-hue>—</small></li>
+              <li><b>Bloom</b><small data-hue>—</small></li>
+              <li><b>Gold</b><small data-hue>—</small></li>
+              <li><b>Olive</b><small data-hue>—</small></li>
+              <li><b>Cool</b><small data-hue>—</small></li>
+            </ol>
+            <pre class="demo-code">--wal-accent-hue: 31;   /* you write this  */
+--wal-gold-hue:   78;   /* and this        */
+--wal-olive-hue:  140;  /* and this        */
+
+/* bloom  = accent + 27°   ← derived */
+/* cool   = accent + 209°  ← derived */</pre>
+            <div>
+              <p class="wal-text-sm">
+                Bloom is a warm step after the lead. Cool lands 29° past the lead's
+                direct opposite — a split complement, across the wheel from it but not
+                dead against it. Both are defaults, so they turn with the accent and
+                hold their distance. Gold and olive stay where you put them.
+              </p>
+              <p class="wal-text-sm wal-color-muted">
+                A palette can still set either one outright. Forest, Dusk and Bone each
+                choose their own cool — switch to one and the arc shows the offset it
+                picked instead.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div class="wal-rule wal-mt-xl"><span>One hue, nine stops</span></div>
+        <p class="wal-text-sm wal-color-muted">
+          Every neutral — page, card stock, hairlines, ink — is the ground rod at a
+          different lightness. That is what makes a palette a system rather than a
+          collection.
+        </p>
+        <ol class="wal-script wal-mt-sm" style="--wal-script-h: 2.75rem; --wal-script-min: 6rem">
+          <li style="--wal-cue: var(--wal-bg)"><small>bg</small></li>
+          <li style="--wal-cue: var(--wal-bg-subtle)"><small>bg-subtle</small></li>
+          <li style="--wal-cue: var(--wal-surface)"><small>surface</small></li>
+          <li style="--wal-cue: var(--wal-surface-2)"><small>surface-2</small></li>
+          <li style="--wal-cue: var(--wal-line-soft)"><small>line-soft</small></li>
+          <li style="--wal-cue: var(--wal-line)"><small>line</small></li>
+          <li style="--wal-cue: var(--wal-text-muted)"><small>text-muted</small></li>
+          <li style="--wal-cue: var(--wal-text-soft)"><small>text-soft</small></li>
+          <li style="--wal-cue: var(--wal-text)"><small>text</small></li>
+        </ol>
+      </div>
+    </section>
+
+    <!-- ══════════ 02 · Light & dark ══════════ -->
+    <section class="wal-section" id="modes">
+      <div class="wal-wrap">
+        <header class="wal-section-head">
+          <p class="wal-index">02</p>
+          <h2>One declaration covers both modes</h2>
+          <p class="wal-caption">And any subtree that wants the other one</p>
+        </header>
+
+        <div class="wal-grid wal-cols-2">
+          <div class="wal-stack wal-gap-md">
+            <pre class="demo-code">--wal-bg: light-dark(
+  oklch(93% …),   /* light */
+  oklch(16% …)    /* dark  */
+);</pre>
+            <p class="wal-text-sm">
+              A custom property substitutes its <code>var()</code>s where it is
+              declared, but a <code>light-dark()</code> inside it is just more tokens —
+              so it resolves where the token is <em>used</em>, not where it is declared. Both panels here run the same markup and the same
+              tokens — only <code>color-scheme</code> differs.
+            </p>
+            <p class="wal-text-sm wal-color-muted">
+              Because it is a real <code>color-scheme</code>, native form controls and
+              scrollbars follow it too.
+            </p>
+          </div>
+
+          <div class="demo-pair">
+            <div class="demo-panel wal-light">
+              <p class="wal-caption">.wal-light</p>
+              <p class="wal-text-sm" style="margin:0">Same markup. No second palette.</p>
+              <div class="wal-cluster">
+                <span class="wal-badge wal-badge-accent">accent</span>
+                <span class="wal-badge wal-badge-gold">gold</span>
+              </div>
+              <input class="wal-input" placeholder="native control" aria-label="Sample text field">
+            </div>
+            <div class="demo-panel wal-dark">
+              <p class="wal-caption">.wal-dark</p>
+              <p class="wal-text-sm" style="margin:0">Same markup. No second palette.</p>
+              <div class="wal-cluster">
+                <span class="wal-badge wal-badge-accent">accent</span>
+                <span class="wal-badge wal-badge-gold">gold</span>
+              </div>
+              <input class="wal-input" placeholder="native control" aria-label="Sample text field">
+            </div>
+          </div>
+        </div>
+
+        <div class="wal-rule wal-mt-xl"><span>Foregrounds are computed, not chosen</span></div>
+        <div class="wal-grid wal-cols-2">
+          <div class="demo-pair">
+            <div class="demo-panel wal-light">
+              <p class="wal-caption">light · accent sits at L <span data-l="--wal-l-accent-light">0.52</span></p>
+              <p class="demo-onCue">Text on the accent</p>
+            </div>
+            <div class="demo-panel wal-dark">
+              <p class="wal-caption">dark · accent sits at L <span data-l="--wal-l-accent-dark">0.62</span></p>
+              <p class="demo-onCue">Text on the accent</p>
+            </div>
+          </div>
+          <p class="wal-text-sm">
+            Those two blocks carry <strong>opposite</strong> foregrounds, and no rule names
+            either one. The accent crosses the legibility threshold between modes, so
+            <code>--wal-accent-fg</code> derives near-white on paper and near-black on a
+            dark ground — from the cue's own lightness, every time you rotate it.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ══════════ 03 · Finish ══════════ -->
+    <section class="wal-section" id="finish">
+      <div class="wal-wrap">
+        <header class="wal-section-head">
+          <p class="wal-index">03</p>
+          <h2>One attribute changes the whole object</h2>
+          <p class="wal-caption">Same palette, same markup, different kind of thing</p>
+        </header>
+
+        <div class="demo-pair">
+          <div class="demo-panel" data-finish="catalogue">
+            <p class="wal-caption">data-finish="catalogue"</p>
+            <div class="wal-card">
+              <h3 class="wal-text-lg" style="margin:0">Walnut sideboard</h3>
+              <p class="wal-text-sm" style="margin:0">Tambour doors, brass pulls.</p>
+              <div class="wal-cluster">
+                <button class="wal-btn wal-btn-primary wal-btn-sm" type="button">Order</button>
+                <span class="wal-badge wal-badge-gold">In stock</span>
+              </div>
+            </div>
+          </div>
+          <div class="demo-panel" data-finish="soft">
+            <p class="wal-caption">data-finish="soft"</p>
+            <div class="wal-card">
+              <h3 class="wal-text-lg" style="margin:0">Walnut sideboard</h3>
+              <p class="wal-text-sm" style="margin:0">Tambour doors, brass pulls.</p>
+              <div class="wal-cluster">
+                <button class="wal-btn wal-btn-primary wal-btn-sm" type="button">Order</button>
+                <span class="wal-badge wal-badge-gold">In stock</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="wal-grid wal-cols-2 wal-mt-lg">
+          <pre class="demo-code">[data-finish="catalogue"] {
+  --wal-radius: 3px;
+  --wal-btn-radius: 2px;
+  --wal-elevation: 0.35;
+  --wal-wash: 0;
+  --wal-line-boost: 1.7;
+  --wal-tooth: url(…);
+  --wal-tracking-label: 0.12em;
+  --wal-font-label: var(--wal-font-typewriter);
+}</pre>
+          <p class="wal-text-sm">
+            A finish is a retune of the geometry and atmosphere tokens every component
+            already reads — no component selectors, so adding a component never means
+            updating a finish. Palette answers <em>what colour</em>; finish answers
+            <em>what kind of object</em>. They compose freely. And because the tokens
+            are registered numbers, switching a finish tweens them — press the button
+            and watch the corners round off and the rules soften. Catalogue's papers
+            also take a tooth, a faint grain multiplied into their own stock.
+          </p>
+        </div>
+
+        <div class="wal-cluster wal-mt-md">
+          <button class="wal-btn wal-btn-secondary wal-btn-sm" type="button" id="finish-toggle">Apply the soft finish to this page</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ══════════ 04 · Palettes ══════════ -->
+    <section class="wal-section" id="palettes">
+      <div class="wal-wrap">
+        <header class="wal-section-head">
+          <p class="wal-index">04</p>
+          <h2>Five palettes, nothing but numbers</h2>
+          <p class="wal-caption">Ground rod on top, five cues below — click to apply</p>
+        </header>
+
+        <div class="wal-grid wal-cols-3" id="palette-tiles">
+          <button class="demo-tile wal-press" type="button" data-palette="wal-press" aria-pressed="true">
+            <span class="demo-tile-ground" style="background: var(--wal-bg)"></span>
+            <span class="demo-tile-cues">
+              <span style="background: var(--wal-cue-1)"></span><span style="background: var(--wal-cue-2)"></span>
+              <span style="background: var(--wal-cue-3)"></span><span style="background: var(--wal-cue-4)"></span>
+              <span style="background: var(--wal-cue-5)"></span>
+            </span>
+            <span><b style="font-family: var(--wal-font-display)">Press</b>
+              <small class="wal-caption" style="display:block">1960s parts catalogue</small></span>
+          </button>
+
+          <button class="demo-tile wal-cafe" type="button" data-palette="wal-cafe" aria-pressed="false">
+            <span class="demo-tile-ground" style="background: var(--wal-bg)"></span>
+            <span class="demo-tile-cues">
+              <span style="background: var(--wal-cue-1)"></span><span style="background: var(--wal-cue-2)"></span>
+              <span style="background: var(--wal-cue-3)"></span><span style="background: var(--wal-cue-4)"></span>
+              <span style="background: var(--wal-cue-5)"></span>
+            </span>
+            <span><b style="font-family: var(--wal-font-display)">Café</b>
+              <small class="wal-caption" style="display:block">Walnut, bone china, brass</small></span>
+          </button>
+
+          <button class="demo-tile wal-forest" type="button" data-palette="wal-forest" aria-pressed="false">
+            <span class="demo-tile-ground" style="background: var(--wal-bg)"></span>
+            <span class="demo-tile-cues">
+              <span style="background: var(--wal-cue-1)"></span><span style="background: var(--wal-cue-2)"></span>
+              <span style="background: var(--wal-cue-3)"></span><span style="background: var(--wal-cue-4)"></span>
+              <span style="background: var(--wal-cue-5)"></span>
+            </span>
+            <span><b style="font-family: var(--wal-font-display)">Forest</b>
+              <small class="wal-caption" style="display:block">Fern, mossy floor, campfire copper</small></span>
+          </button>
+
+          <button class="demo-tile wal-dusk" type="button" data-palette="wal-dusk" aria-pressed="false">
+            <span class="demo-tile-ground" style="background: var(--wal-bg)"></span>
+            <span class="demo-tile-cues">
+              <span style="background: var(--wal-cue-1)"></span><span style="background: var(--wal-cue-2)"></span>
+              <span style="background: var(--wal-cue-3)"></span><span style="background: var(--wal-cue-4)"></span>
+              <span style="background: var(--wal-cue-5)"></span>
+            </span>
+            <span><b style="font-family: var(--wal-font-display)">Dusk</b>
+              <small class="wal-caption" style="display:block">Twilight, afterglow, lantern</small></span>
+          </button>
+
+          <button class="demo-tile wal-bone" type="button" data-palette="wal-bone" aria-pressed="false">
+            <span class="demo-tile-ground" style="background: var(--wal-bg)"></span>
+            <span class="demo-tile-cues">
+              <span style="background: var(--wal-cue-1)"></span><span style="background: var(--wal-cue-2)"></span>
+              <span style="background: var(--wal-cue-3)"></span><span style="background: var(--wal-cue-4)"></span>
+              <span style="background: var(--wal-cue-5)"></span>
+            </span>
+            <span><b style="font-family: var(--wal-font-display)">Bone</b>
+              <small class="wal-caption" style="display:block">Washi tape, pressed flowers, light-first</small></span>
+          </button>
+
+          <div class="demo-tile" style="cursor:default">
+            <span class="demo-tile-ground" style="background: var(--wal-surface-2)"></span>
+            <span class="demo-tile-cues" style="place-items:center; grid-template-columns:1fr; border:var(--wal-hairline) dashed var(--wal-line)">
+              <span class="wal-caption" style="align-self:center; justify-self:center">8 numbers</span>
+            </span>
+            <span><b style="font-family: var(--wal-font-display)">Yours</b>
+              <small class="wal-caption" style="display:block">One :root block</small></span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ══════════ 05 · Components ══════════ -->
+    <section class="wal-section" id="components">
+      <div class="wal-wrap">
+        <header class="wal-section-head">
+          <p class="wal-index">05</p>
+          <h2>Components</h2>
+          <p class="wal-caption">Plain markup plus one class · all re-theme with the rods</p>
+        </header>
+
+        <div class="wal-grid wal-cols-2">
+          <div class="wal-stack wal-gap-sm">
+            <p class="wal-caption">.wal-btn</p>
+            <div class="wal-cluster">
+              <button class="wal-btn wal-btn-primary">Primary</button>
+              <button class="wal-btn wal-btn-secondary">Secondary</button>
+              <button class="wal-btn wal-btn-ghost">Ghost</button>
+              <button class="wal-btn wal-btn-primary" disabled>Disabled</button>
+            </div>
+          </div>
+
+          <div class="wal-stack wal-gap-sm">
+            <p class="wal-caption">.wal-badge · .wal-chip</p>
+            <div class="wal-cluster">
+              <span class="wal-chip">chip</span>
+              <span class="wal-badge wal-badge-accent">accent</span>
+              <span class="wal-badge wal-badge-bloom">bloom</span>
+              <span class="wal-badge wal-badge-gold">gold</span>
+              <span class="wal-badge wal-badge-olive">olive</span>
+              <span class="wal-badge wal-badge-cool">cool</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="wal-grid wal-cols-3 wal-mt-lg">
+          <div class="wal-card">
+            <p class="wal-caption">.wal-card</p>
+            <h3 class="wal-text-lg" style="margin:0">Printed plate</h3>
+            <p class="wal-text-sm" style="margin:0">Rebinds the ink scale, so it can stay
+              light on a dark page and every descendant follows.</p>
+          </div>
+          <div class="wal-metric">
+            <span class="wal-metric-value">640</span>
+            <span class="wal-metric-label">.wal-metric</span>
+          </div>
+          <div class="wal-card">
+            <p class="wal-caption">.wal-note</p>
+            <div class="wal-note" style="--wal-note-color: var(--wal-cool)">
+              <p class="wal-text-sm" style="margin:0">A titled block under a coloured rule.</p>
+            </div>
+          </div>
+        </div>
+
+        <p class="wal-caption wal-mt-lg">.wal-plate</p>
+        <dl class="wal-plate">
+          <div><dt>Layers</dt><dd>8</dd></div>
+          <div><dt>Runtime</dt><dd>None</dd></div>
+          <div><dt>Cues</dt><dd>5</dd></div>
+          <div><dt>Licence</dt><dd>MIT</dd></div>
+        </dl>
+
+        <div class="wal-grid wal-cols-2 wal-mt-lg">
+          <div class="wal-stack wal-gap-sm">
+            <p class="wal-caption">.wal-field · .wal-input · .wal-check</p>
+            <div class="wal-field">
+              <label class="wal-label" for="d-name" data-required>Name</label>
+              <input class="wal-input" id="d-name" placeholder="Ada Lovelace">
+              <span class="wal-hint">Shown on your public profile.</span>
+            </div>
+            <label class="wal-label"><input class="wal-check" type="checkbox" checked> Themed with accent-color</label>
+          </div>
+
+          <div class="wal-stack wal-gap-sm">
+            <p class="wal-caption">.wal-dialog · .wal-tooltip · .wal-timeline</p>
+            <div class="wal-cluster">
+              <button class="wal-btn wal-btn-primary wal-btn-sm" popovertarget="demo-dialog">Open dialog</button>
+              <div id="demo-dialog" class="wal-dialog" popover>
+                <h3>Native popover</h3>
+                <p>Driven by the HTML <code>popover</code> attribute and styled in CSS —
+                   no JavaScript, and it lands in the top layer for free.</p>
+                <button class="wal-btn wal-btn-secondary" popovertarget="demo-dialog" popovertargetaction="hide">Close</button>
+              </div>
+              <button class="wal-btn wal-btn-ghost wal-btn-sm wal-tooltip-trigger" type="button" aria-describedby="demo-tip">
+                Hover me
+                <span class="wal-tooltip" id="demo-tip" role="tooltip" aria-hidden="true">Styled in CSS; Escape dismisses it</span>
+              </button>
+            </div>
+            <div class="wal-timeline">
+              <div class="wal-timeline-item">
+                <div class="wal-timeline-date">0.4.0</div>
+                <div class="wal-timeline-content">
+                  <h3>Themed by colour script</h3>
+                  <p>One rod, five cues, one declaration per colour.</p>
+                </div>
+                <div class="wal-timeline-tags"><span class="wal-chip">tokens</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <p style="margin-block-start: var(--wal-space-xl)"><a class="wal-link-arrow" href="openings.html">The openings, their materials and the newest parts, each working <span aria-hidden="true">→</span></a></p>
+      </div>
+    </section>
+
+    <!-- ══════════ 06 · Desk ══════════ -->
+    <section class="wal-section" id="desk">
+      <div class="wal-wrap">
+        <header class="wal-section-head">
+          <p class="wal-index">06</p>
+          <h2>Papers on a walnut desk</h2>
+          <p class="wal-caption">One class, its grain drawn by the browser from the ground rod</p>
+        </header>
+
+        <div class="wal-grid wal-cols-2">
+          <pre class="demo-code" style="align-self: start">&lt;html class="wal-press wal-desk"&gt;</pre>
+          <div class="wal-stack wal-gap-sm">
+            <p class="wal-text-sm">
+              The grain under this page is the ground rod a few points darker, drawn
+              by the browser from noise rather than shipped as a photograph. Rotate
+              the ground hue above and the wood follows. On a light page it never goes
+              darker than the subtle ground, so every ink keeps its contrast on it.
+            </p>
+            <p class="wal-text-sm">
+              Every card, plate and metric rests a shadow above the desk, and the
+              finish decides how high: Catalogue's printed plates lie almost flat on
+              the wood; apply Soft above and they lift off it.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ══════════ 07 · Install ══════════ -->
+    <section class="wal-section" id="install">
+      <div class="wal-wrap">
+        <header class="wal-section-head">
+          <p class="wal-index">07</p>
+          <h2>Install</h2>
+          <p class="wal-caption">One link tag · no build step · no runtime</p>
+        </header>
+
+        <div class="wal-grid wal-cols-2">
+          <pre class="demo-code">&lt;link rel="stylesheet"
+  href="https://cdn.jsdelivr.net/gh/SKMinWoo/walnut.css@v0.4.0/dist/walnut.min.css"&gt;
+&lt;!-- optional: a named palette --&gt;
+&lt;link rel="stylesheet"
+  href="https://cdn.jsdelivr.net/gh/SKMinWoo/walnut.css@v0.4.0/dist/themes/press.css"&gt;
+
+&lt;html class="wal-press"
+      data-finish="catalogue"&gt;</pre>
+          <p class="wal-text-sm">
+            jsDelivr serves the tagged release straight from GitHub. Or copy
+            <code>dist/</code> into your project: it is plain CSS with no runtime.
+          </p>
+        </div>
+
+        <p class="wal-text-sm wal-color-muted wal-mt-md">
+          The base stylesheet already carries a complete script, so a palette file is
+          optional — and unnecessary if you are writing your own.
+        </p>
+
+        <div class="wal-rule wal-mt-xl"><span>Reference</span></div>
+
+        <details class="demo-ref">
+          <summary>Every token you can tune</summary>
+          <div class="demo-ref-body">
+            <table class="wal-table">
+              <thead><tr><th>Token</th><th>Controls</th></tr></thead>
+              <tbody>
+                <tr><td><code>--wal-hue</code> · <code>--wal-chroma</code></td><td>The ground rod — every neutral</td></tr>
+                <tr><td><code>--wal-&lt;cue&gt;-hue</code> · <code>-chroma</code></td><td>Each of the five cues</td></tr>
+                <tr><td><code>--wal-&lt;cue&gt;-ink</code></td><td>The cue as type, not as fill</td></tr>
+                <tr><td><code>--wal-&lt;cue&gt;-soft</code> · <code>-fg</code></td><td>Wash background · computed foreground</td></tr>
+                <tr><td><code>--wal-cue-1…5</code></td><td>Positional aliases, for iterating</td></tr>
+                <tr><td><code>--wal-l-*-light</code> · <code>-dark</code></td><td>Lightness stop per surface, per mode</td></tr>
+                <tr><td><code>--wal-cx-*</code></td><td>Chroma as a fraction of the rod</td></tr>
+                <tr><td><code>--wal-elevation</code> · <code>--wal-wash</code></td><td>Shadow depth · tinted light on body</td></tr>
+                <tr><td><code>--wal-line-boost</code></td><td>Hairline strength, without owning a colour</td></tr>
+                <tr><td><code>--wal-radius</code> and friends</td><td>Geometry, per component family</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </details>
+
+        <details class="demo-ref">
+          <summary>Fills and type are different colours</summary>
+          <div class="demo-ref-body">
+            <p class="wal-text-sm">
+              Goldenrod is a fine button and an illegible paragraph. Each cue therefore has
+              four forms, and picking the right one is most of what good theming is.
+            </p>
+            <table class="wal-table">
+              <thead><tr><th>Token</th><th>Use</th><th></th></tr></thead>
+              <tbody>
+                <tr><td><code>--wal-gold</code></td><td>The cue as a <strong>fill</strong></td>
+                    <td><span class="wal-badge" style="background: var(--wal-gold); min-inline-size: 3rem; min-block-size: 1.3em" aria-hidden="true"></span></td></tr>
+                <tr><td><code>--wal-gold-ink</code></td><td>The cue as <strong>type</strong></td>
+                    <td><span class="wal-color-gold">goldenrod text</span></td></tr>
+                <tr><td><code>--wal-gold-soft</code></td><td>A 15% wash</td>
+                    <td><span class="wal-badge wal-badge-gold">soft</span></td></tr>
+                <tr><td><code>--wal-gold-fg</code></td><td>Legible <strong>on</strong> the cue</td>
+                    <td><span class="wal-badge" style="background: var(--wal-gold); color: var(--wal-gold-fg)">on gold</span></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </details>
+
+        <details class="demo-ref">
+          <summary>Chroma is an input because the sRGB gamut is not a circle</summary>
+          <div class="demo-ref-body">
+            <p class="wal-text-sm">
+              The gamut is not the same width at every hue. At 62% lightness
+              <code>c = 0.17</code> is in gamut around terracotta and clips across much of
+              the green–blue arc, where the browser flattens it silently and the rendered
+              colour stops matching the hue you asked for. CSS cannot compute the gamut
+              boundary, so rotating a hue far from its shipped value means lowering its
+              chroma with it. Push the accent chroma to maximum in the workbench and sweep
+              the hue to see exactly where it stops tracking.
+            </p>
+          </div>
+        </details>
+
+        <details class="demo-ref">
+          <summary>Your CSS wins by default</summary>
+          <div class="demo-ref-body">
+            <pre class="demo-code">@layer reset, tokens, base, layout, components, finish, utilities, cinema;
+
+/* unlayered — beats all of the above */
+.wal-card { border-radius: 3px; }</pre>
+            <p class="wal-text-sm">
+              Unlayered declarations beat every layered one regardless of specificity, so
+              an ordinary rule of yours overrides the framework with no
+              <code>!important</code>. Two caveats: an unlayered rule only outranks the
+              framework <strong>for the properties it declares</strong> — override
+              <code>flex-direction</code> and walnut's <code>gap</code> still applies — and
+              <code>!important</code> inverts layer order, so walnut's reduced-motion block
+              deliberately still wins.
+            </p>
+          </div>
+        </details>
+
+        <details class="demo-ref">
+          <summary>The one naming trap</summary>
+          <div class="demo-ref-body">
+            <p class="wal-text-sm">
+              <code>wal-text-*</code> sets a font <strong>size</strong>.
+              <code>wal-color-*</code> sets a <strong>colour</strong>. There is no
+              <code>.wal-text-muted</code> class — that is a token name, and using it as a
+              class fails silently.
+            </p>
+            <pre class="demo-code">&lt;p class="wal-text-sm wal-color-muted"&gt;small and muted&lt;/p&gt;
+
+&lt;!-- does nothing: .wal-text-muted is not a class --&gt;
+&lt;p class="wal-text-muted"&gt;still full size, full contrast&lt;/p&gt;</pre>
+          </div>
+        </details>
+
+        <details class="demo-ref">
+          <summary>Browser support</summary>
+          <div class="demo-ref-body">
+            <p class="wal-text-sm">
+              <code>light-dark()</code> sets the floor: Chrome / Edge 123, Safari 17.5,
+              Firefox 120. Relative colour syntax — the computed <code>-fg</code> tokens —
+              sits behind <code>@supports</code> and degrades to a stated value.
+            </p>
+            <p class="wal-text-sm">
+              Above the floor, two things arrive later. <code>.wal-retune</code> and
+              <code>.wal-cue-in</code> tween registered <code>@property</code> values,
+              which Firefox has from 128; below that the page still switches, it
+              just cuts. On this page, the dimension arcs on the colour wheel use
+              <code>mod()</code> (Chrome / Edge 125) and are missing without it.
+            </p>
+          </div>
+        </details>
+      </div>
+    </section>
+  </main>
+
+  <footer class="wal-footer">
+    <div class="wal-wrap">
+      <dl class="wal-footer-grid">
+        <div><dt>Form</dt><dd>walnut.css <span data-version>0.4.0</span></dd></div>
+        <div><dt>Licence</dt><dd>MIT</dd></div>
+        <div><dt>Source</dt><dd><a href="https://github.com/SKMinWoo/walnut.css">github.com/SKMinWoo/walnut.css</a></dd></div>
+        <div><dt>Changelog</dt><dd><a href="https://github.com/SKMinWoo/walnut.css/blob/master/CHANGELOG.md">CHANGELOG.md</a></dd></div>
+      </dl>
+      <p class="wal-caption wal-mt-lg">Set in Jost, Inter, DM Mono and Courier Prime · Built by Alex Kim</p>
+    </div>
+  </footer>
+
+  <script>
+    const root = document.documentElement;
+    const PALETTES = ["wal-press", "wal-cafe", "wal-forest", "wal-dusk", "wal-bone"];
+    const reduceMotion = matchMedia("(prefers-reduced-motion: reduce)");
+
+    /* ── Reading the script back ──
+       Everything on this page that prints a number reads it from the computed
+       style of <html>, never from a slider or a variable of its own. That is
+       what lets the numbers follow the page while CSS is animating it: during
+       a tween or the load-in, getComputedStyle returns the in-flight value. */
+    const rods = [...document.querySelectorAll("[data-prop]")];
+    const generated = document.getElementById("generated");
+    const strip = document.getElementById("strip");
+    const hub = document.getElementById("hub-hue");
+    const arcBloom = document.getElementById("arc-bloom");
+    const arcCool = document.getElementById("arc-cool");
+    const lightness = [...document.querySelectorAll("[data-l]")];
+    const CUE_HUES = ["--wal-accent-hue", "--wal-bloom-hue", "--wal-gold-hue", "--wal-olive-hue", "--wal-cool-hue"];
+
+    const deg = (h) => ((h % 360) + 360) % 360;
+    const OFFSETS = { bloom: 27, cool: 209 };
+
+    /* The stock value of every registered token, read from the @property
+       rules themselves rather than restated here. The ramp is every
+       registered lightness stop, chroma multiplier and shift. */
+    const STOCK = {};
+    (function walk(rules) {
+      for (const r of rules) {
+        if (typeof CSSPropertyRule !== "undefined" && r instanceof CSSPropertyRule) STOCK[r.name] = r.initialValue;
+        else if (r.cssRules) walk(r.cssRules);
+      }
+    })([...document.styleSheets].flatMap((sheet) => { try { return [...sheet.cssRules]; } catch { return []; } }));
+    const RAMP = Object.keys(STOCK).filter((p) => /^--wal-(l|cx)-|^--wal-(ink|hover)-shift-/.test(p));
+    const places = (prop) => (prop.includes("chroma") ? 3 : prop === "--wal-hue" ? 1 : 0);
+    const fmt = (prop, v) => v.toFixed(places(prop));
+
+    let dragging = null;
+
+    function paint() {
+      const cs = getComputedStyle(root);
+      const val = (p) => parseFloat(cs.getPropertyValue(p));
+
+      // The sliders are readouts too. While the page tweens they move on
+      // their own, like motorised faders; the one under the pointer is left
+      // alone so it never fights the hand that is moving it.
+      for (const el of rods) {
+        const v = val(el.dataset.prop);
+        if (Number.isNaN(v)) continue;
+        if (el !== dragging) el.value = v;
+        const out = el.parentElement.querySelector("output");
+        if (out) out.textContent = el.dataset.prop.includes("chroma") ? fmt(el.dataset.prop, v) : fmt(el.dataset.prop, deg(v)) + "°";
+      }
+
+      // Laid out the way a palette file is, so what you copy looks like what
+      // ships in src/themes/.
+      const decl = (p, width) => {
+        const name = p + ":";
+        const num = fmt(p, val(p));
+        return `<span class="demo-k">${name}</span>${" ".repeat(Math.max(1, width - name.length))}<b>${num}</b>;`;
+      };
+      const pair = (cue) => {
+        const hue = `--wal-${cue}-hue`, chroma = `--wal-${cue}-chroma`;
+        const n = fmt(hue, val(hue));
+        return "  " + decl(hue, 18) + " ".repeat(Math.max(1, 5 - n.length)) + decl(chroma, 21);
+      };
+      // Everything else the page is running on that a stock :root would not
+      // give you, so the copied block really does render what is on the
+      // right: a palette's own bloom or cool, its ramp nudges, and a mode it
+      // forces. Bloom and cool are left out while they sit at their stock
+      // offset and chroma, because stating them would pin them.
+      const hue0 = val("--wal-accent-hue");
+      const derived = Object.entries(OFFSETS)
+        .filter(([cue, off]) =>
+          Math.abs(deg(val(`--wal-${cue}-hue`) - hue0) - off) > 0.5 ||
+          Math.abs(val(`--wal-${cue}-chroma`) - parseFloat(STOCK[`--wal-${cue}-chroma`])) > 0.0005)
+        .map(([cue]) => pair(cue));
+      const nudges = RAMP
+        .filter((p) => Math.abs(val(p) - parseFloat(STOCK[p])) > 0.05)
+        .map((p) => `  <span class="demo-k">${p}:</span> <b>${+val(p).toFixed(2)}${STOCK[p].trim().endsWith("%") ? "%" : ""}</b>;`);
+      const scheme = cs.colorScheme.trim();
+      generated.innerHTML = [
+        ":root {",
+        "  " + decl("--wal-hue", 14),
+        "  " + decl("--wal-chroma", 14),
+        "",
+        pair("accent"),
+        pair("gold"),
+        pair("olive"),
+        ...derived,
+        ...(nudges.length ? ["", ...nudges] : []),
+        ...(scheme === "light" || scheme === "dark" ? ["", `  <span class="demo-k">color-scheme:</span> <b>${scheme}</b>;`] : []),
+        "}",
+      ].join("\n");
+
+      // Live hue under each cue, and the offsets on the wheel — this is what
+      // makes "+27° and +209°" something you watch hold rather than a claim.
+      const hues = CUE_HUES.map(val);
+      strip.querySelectorAll("[data-hue]").forEach((el, i) => {
+        el.textContent = Number.isNaN(hues[i]) ? "—" : deg(hues[i]).toFixed(0) + "°";
+      });
+      hub.innerHTML = deg(hues[0]).toFixed(0) + "<small>°</small>";
+      arcBloom.textContent = "+" + deg(hues[1] - hues[0]).toFixed(0) + "°";
+      arcCool.textContent = "+" + deg(hues[4] - hues[0]).toFixed(0) + "°";
+
+      // Lightness stops are registered percentages; printed as 0–1 to match
+      // the oklch() the reader will write.
+      for (const el of lightness) {
+        const pct = val(el.dataset.l);
+        if (!Number.isNaN(pct)) el.textContent = (pct / 100).toFixed(2);
+      }
+    }
+
+    /* Repaint every frame for as long as <html> has a transition or an
+       animation in flight, then stop. Triggered by the root's own transition
+       and animation events, so nothing has to remember to start it. */
+    let following = false;
+    function follow() {
+      if (following) return;
+      following = true;
+      const frame = () => {
+        paint();
+        if (root.getAnimations().some((a) => a.playState === "running" || a.pending)) {
+          requestAnimationFrame(frame);
+        } else {
+          following = false;
+        }
+      };
+      requestAnimationFrame(frame);
+    }
+    root.addEventListener("transitionrun", (e) => { if (e.target === root) follow(); });
+    root.addEventListener("animationstart", (e) => { if (e.target === root) follow(); });
+
+    /* ── Rods ──
+       Each slider writes one custom property on <html>. A slider is direct
+       manipulation, so grabbing one drops .wal-retune — the page moves under
+       the thumb rather than chasing it — and ends the load-in if it is still
+       running, since a CSS animation would otherwise outrank the inline value
+       and the page would ignore the drag until it finished. */
+    const takeHold = () => root.classList.remove("wal-retune", "wal-cue-in");
+
+    for (const el of rods) {
+      el.addEventListener("pointerdown", () => { takeHold(); dragging = el; });
+      el.addEventListener("keydown", takeHold);
+      el.addEventListener("input", () => {
+        takeHold();
+        root.style.setProperty(el.dataset.prop, el.value);
+        paint();
+      });
+    }
+    addEventListener("pointerup", () => { dragging = null; });
+
+    // Reset is not direct manipulation: the page travels back to its palette.
+    document.getElementById("reset").addEventListener("click", () => {
+      root.classList.add("wal-retune");
+      for (const el of rods) root.style.removeProperty(el.dataset.prop);
+      paint();
+    });
+
+    /* ── Mode by attribute ──
+       Read the computed color-scheme rather than tracking a variable, so the
+       first click flips away from whatever the palette or the system chose.
+       color-scheme cannot tween, so the switch is a root view transition —
+       a crossfade — where the browser has one. */
+    const modeBtn = document.getElementById("mode");
+    const systemDark = matchMedia("(prefers-color-scheme: dark)");
+    // "light dark" means the system is choosing, so ask the system. Reading
+    // it as dark made the first click on a light Café page do nothing.
+    const currentMode = () => {
+      const scheme = getComputedStyle(root).colorScheme.trim();
+      if (scheme === "light" || scheme === "dark") return scheme;
+      return systemDark.matches ? "dark" : "light";
+    };
+    const syncModeBtn = () => { modeBtn.textContent = currentMode() === "dark" ? "Light" : "Dark"; };
+    systemDark.addEventListener("change", syncModeBtn);
+    let readerChoseMode = root.hasAttribute("data-theme");
+
+    modeBtn.addEventListener("click", () => {
+      readerChoseMode = true;
+      const next = currentMode() === "dark" ? "light" : "dark";
+      const flip = () => { root.setAttribute("data-theme", next); syncModeBtn(); paint(); remember(); };
+      // .ready rejects when a transition is skipped — a second click before
+      // the first finishes — and nothing else awaits it, so it would surface
+      // as an unhandled rejection. The flip itself has happened either way.
+      if (document.startViewTransition && !reduceMotion.matches) document.startViewTransition(flip).ready.catch(() => {});
+      else flip();
+    });
+    syncModeBtn();
+
+    /* ── Palette by class ──
+       Press and Bone are paper-first: on their own they force light. Café,
+       Forest and Dusk follow the system. So a palette click can also flip the
+       page between light and dark — and a mode flip cannot tween, so it cuts
+       straight through the retune.
+
+       Return "light" or "dark" to pin the page to that mode for this switch,
+       or null to let the incoming palette decide. `readerChoseMode` is true
+       once the reader has pressed the mode button; until then the mode they
+       are looking at was picked by the palette or by their system. */
+    function modeAfterSwitch(nextPalette, currentMode, readerChoseMode) {
+      // TODO: decide whose mode wins when the palette changes.
+      return null;
+    }
+
+    function applyPalette(name) {
+      const pin = modeAfterSwitch(name, currentMode(), readerChoseMode);
+      if (pin) root.setAttribute("data-theme", pin);
+
+      root.classList.remove("wal-cue-in");
+      root.classList.add("wal-retune");
+      root.classList.remove(...PALETTES);
+      root.classList.add(name);
+      syncPaletteButtons();
+      // A palette IS a script, so hand-turned rods are stale once one is
+      // picked. Dropping them in the same frame as the class change means
+      // the tween starts from where the reader left the rods.
+      for (const el of rods) root.style.removeProperty(el.dataset.prop);
+      syncModeBtn();
+      paint();
+      remember();
+    }
+
+    function syncPaletteButtons() {
+      const name = PALETTES.find((p) => root.classList.contains(p));
+      for (const b of document.querySelectorAll("[data-palette]")) {
+        b.setAttribute("aria-pressed", String(b.dataset.palette === name));
+      }
+    }
+    syncPaletteButtons();
+
+    for (const group of ["palette-switch", "palette-tiles"]) {
+      document.getElementById(group).addEventListener("click", (e) => {
+        const btn = e.target.closest("[data-palette]");
+        if (btn) applyPalette(btn.dataset.palette);
+      });
+    }
+
+    /* ── Finish by attribute ──
+       Radius, elevation, wash and rule strength are registered, so under
+       .wal-retune a finish switch tweens them; the label voice cuts. */
+    const finishBtn = document.getElementById("finish-toggle");
+    const syncFinishBtn = () => {
+      finishBtn.textContent = root.getAttribute("data-finish") === "catalogue"
+        ? "Apply the soft finish to this page"
+        : "Apply the catalogue finish to this page";
+    };
+    finishBtn.addEventListener("click", () => {
+      const next = root.getAttribute("data-finish") === "catalogue" ? "soft" : "catalogue";
+      root.classList.add("wal-retune");
+      root.setAttribute("data-finish", next);
+      syncFinishBtn();
+      remember();
+    });
+    syncFinishBtn();
+
+    /* ── Remembered across the docs pages ──
+       What the reader picked, for the script in <head> here and on
+       specimen.html to put back before first paint. A tab-long memory, and
+       a convenience only: without storage the pages simply open as they
+       are written. */
+    function remember() {
+      try {
+        sessionStorage.setItem("walnut-docs", JSON.stringify({
+          palette: PALETTES.find((p) => root.classList.contains(p)),
+          theme: root.getAttribute("data-theme") || undefined,
+          finish: root.getAttribute("data-finish"),
+        }));
+      } catch {}
+    }
+
+    /* ── Copy ── */
+    const copied = document.getElementById("copied");
+    document.getElementById("copy").addEventListener("click", async () => {
+      try {
+        await navigator.clipboard.writeText(generated.textContent);
+        copied.hidden = false;
+        setTimeout(() => { copied.hidden = true; }, 1600);
+      } catch {
+        // Clipboard denied (insecure context, or the user declined). Show the
+        // CSS rather than failing silently — the point is to get it out.
+        window.prompt("Copy your colour script:", generated.textContent);
+      }
+    });
+
+    paint();
+    follow();
+
+    /* Tooltips: the two lines WCAG 1.4.13 needs that CSS cannot do. Escape
+       dismisses whatever tip is showing; it re-arms on the next hover or focus. */
+    const TIPS = ".wal-tooltip-trigger";
+    addEventListener("keydown", (e) => { if (e.key === "Escape") document.querySelectorAll(`${TIPS}:is(:hover, :focus-visible)`).forEach((t) => t.classList.add("is-dismissed")); });
+    for (const ev of ["pointerover", "focusin"]) addEventListener(ev, () => document.querySelectorAll(`${TIPS}.is-dismissed:not(:hover, :focus-within)`).forEach((t) => t.classList.remove("is-dismissed")));
+
+    /* Masthead hairline appears once the page has moved. */
+    const nav = document.querySelector(".wal-nav");
+    const onScroll = () => nav.classList.toggle("is-scrolled", window.scrollY > 8);
+    addEventListener("scroll", onScroll, { passive: true });
+    onScroll();
+  </script>
+</body>
+</html>

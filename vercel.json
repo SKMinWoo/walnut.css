@@ -4,6 +4,9 @@
   "buildCommand": "npm run build",
   "outputDirectory": "public",
   "cleanUrls": true,
+  "redirects": [
+    { "source": "/next", "destination": "/", "permanent": true }
+  ],
   "headers": [
     {
       "source": "/dist/(.*)",

@@ -248,7 +248,13 @@ the platform can now draw with no script.
   brightness filter back down to the duotone's own. On the image, so the
   ink and the paper hold still around it.
 
-- **Docs: `next.html` shows all three.** Its catalogue recolours from the
+- **Docs: the catalogue is the home page.** The redesigned docs page,
+  `next.html` until now, is `docs/index.html`, and `/next` redirects to it.
+  The page it replaces documents every class and token, so it stays, whole,
+  as `docs/reference.html`. Plate 14's page goes back to the workbench
+  there, where its card is.
+
+- **Docs: the catalogue shows all three.** It recolours from the
   swatch; each colourway's "Open page" opens a gatefold window whose cover
   is the plate, in walnut, with every colour's oklch, hex and contrast in
   both modes, and an `#open=` address so Back closes it; its prints are duotones with an
