@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Plate 14, Walnut sideboard: walnut.css</title>
-  <meta name="description" content="A walnut.css detail page in three acts: the workbench card grows into it, and its colour script turns at each act as you scroll.">
+  <meta name="description" content="A walnut.css detail page in three acts: the reference's plate grows into it, and its palette turns at each act as you scroll.">
   <link rel="icon" type="image/svg+xml" href="favicon.svg">
   <link rel="alternate icon" href="favicon.ico">
 
@@ -44,6 +44,9 @@
     .wal-hero.plate-act { padding-block: var(--wal-space-2xl); text-align: start; }
     .plate-act .wal-wrap { inline-size: 100%; }
     .plate-lede { max-inline-size: 52ch; }
+    /* The site's footer row, as on the overview. */
+    .site-foot { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 1rem; color: var(--wal-text-muted); font-size: var(--wal-text-sm); }
+    @media (max-width: 560px) { .site-gh { display: none; } }
 
     /* The same four names as the specimen card on the workbench, so those
        elements travel between the pages instead of fading. Named for good
@@ -58,18 +61,15 @@
 
   <a href="#main" class="wal-skip">Skip to content</a>
 
-  <nav class="wal-nav">
-    <a class="wal-nav-brand" href="index.html">
-      walnut.css
-      <small>form no. <span data-version>0.4.0</span></small>
-    </a>
+  <nav class="wal-nav" aria-label="walnut.css">
+    <a class="wal-nav-brand" href="index.html">walnut.css</a>
     <div class="wal-nav-links">
-      <a href="#act-1">I. Golden hour</a>
-      <a href="#act-2">II. Twilight</a>
-      <a href="#act-3">III. Firelight</a>
+      <a href="index.html">Overview</a>
+      <a href="openings.html">Openings</a>
+      <a href="reference.html">Reference</a>
     </div>
     <div class="wal-nav-actions">
-      <a class="wal-btn wal-btn-secondary wal-btn-sm" href="reference.html">Back to the workbench</a>
+      <a class="wal-btn wal-btn-ghost wal-btn-sm site-gh" href="https://github.com/SKMinWoo/walnut.css">GitHub</a>
     </div>
   </nav>
 
@@ -83,9 +83,9 @@
           <h1 id="plate-title" style="margin: 0">Walnut sideboard</h1>
         </div>
         <p class="wal-text-md plate-lede">
-          Tambour doors, brass pulls, tapered legs. This page is in three acts:
-          scroll, and at each one the whole page (masthead, desk, every plate)
-          turns to a new colour script, the way a film's does from act to act.
+          Tambour doors, brass pulls, tapered legs. This page shows acts: scroll,
+          and at each section the whole page, from the masthead to every plate,
+          turns to a new palette.
         </p>
         <dl class="wal-plate" id="plate-specs" style="--wal-plate-min: 8rem">
           <div><dt>Width</dt><dd>180&#8239;<small>cm</small></dd></div>
@@ -113,10 +113,9 @@
             <p class="wal-caption">The doors</p>
             <h3 class="wal-text-lg" style="margin:0">Tambour, in quarter-sawn walnut</h3>
             <p class="wal-text-sm" style="margin:0">
-              Nothing in this act is styled differently from the one above. Its
-              section says <code>data-act="wal-dusk"</code>, and when it reached
-              the middle of the window the page retuned to Dusk: every surface,
-              rule and ink re-derived from new rods, in one tween.
+              Nothing here is styled differently from the act above. The section
+              says <code>data-act="wal-dusk"</code>; when it reached the middle of
+              the window, the page retuned to Dusk in one tween.
             </p>
           </div>
           <div class="wal-stack wal-gap-md">
@@ -148,9 +147,9 @@
             <p class="wal-caption">The legs</p>
             <h3 class="wal-text-lg" style="margin:0">Tapered, turned by hand</h3>
             <p class="wal-text-sm" style="margin:0">
-              Scroll back up and the acts play in reverse. Above the first, the
-              page keeps the script it opened with. An act lasts until the next
-              one begins, so a gap between acts never drops the page back.
+              Add <code>walnut-acts.js</code> and a <code>data-act</code> on each
+              section. Scroll back up and the acts play in reverse; a gap between
+              acts never drops the page back.
             </p>
           </div>
           <dl class="wal-plate">
@@ -163,19 +162,16 @@
           <li></li><li></li><li></li><li></li><li></li>
         </ol>
         <p class="wal-mt-xl">
-          <a class="wal-link-arrow" href="reference.html">Back to the workbench <span aria-hidden="true">→</span></a>
+          <a class="wal-link-arrow" href="reference.html">Back to the reference <span aria-hidden="true">→</span></a>
         </p>
       </div>
     </section>
   </main>
 
   <footer class="wal-footer">
-    <div class="wal-wrap">
-      <dl class="wal-footer-grid">
-        <div><dt>Form</dt><dd>walnut.css <span data-version>0.4.0</span></dd></div>
-        <div><dt>Plate</dt><dd>14, Walnut sideboard</dd></div>
-        <div><dt>Source</dt><dd><a href="https://github.com/SKMinWoo/walnut.css">github.com/SKMinWoo/walnut.css</a></dd></div>
-      </dl>
+    <div class="wal-wrap site-foot">
+      <span>walnut.css <span data-version>0.4.0</span>. MIT licence. Built by Alex Kim.</span>
+      <span><a href="https://github.com/SKMinWoo/walnut.css">GitHub</a> &nbsp; <a href="https://github.com/SKMinWoo/walnut.css/blob/master/CHANGELOG.md">Changelog</a></span>
     </div>
   </footer>
 
