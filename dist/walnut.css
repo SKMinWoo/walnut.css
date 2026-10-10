@@ -1359,6 +1359,14 @@ html::-webkit-scrollbar-thumb:hover { background: var(--wal-accent); }
     to   { opacity: 1; }
   }
 
+  /* The nav is sticky, so whatever an in-page link brings to the top would
+     land under it. Keep the nav's height clear. Only for a masthead, a nav
+     straight under <body>: a sticky box sticks only within its parent, so a
+     nav inside a section or a demo never covers the page. A nav that wraps
+     to two rows is taller than --wal-nav-h: set scroll-padding-block-start
+     on :root at that width, and an unlayered rule wins. */
+  :root:has(> body > .wal-nav) { scroll-padding-block-start: var(--wal-nav-h); }
+
   /* ═══ 2. Hero ═══ */
   .wal-hero {
     min-height: 100vh;

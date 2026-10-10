@@ -171,6 +171,8 @@
       .site-gh { display: none; }
       /* On a phone: the name and the controls, then the pages on a row of their own. */
       .wal-nav[aria-label="walnut.css"] .wal-nav-links { order: 3; flex: 1 0 100%; }
+      /* Two rows are taller than walnut's --wal-nav-h: links land clear of both. */
+      :root { scroll-padding-block-start: calc(var(--wal-nav-h) + 1.5rem); }
     }
     /* On this page: the sections, under the hero. */
     .demo-toc { display: flex; flex-wrap: wrap; gap: .5rem 1.25rem; margin-block-start: var(--wal-space-md); font-size: var(--wal-text-sm); }
@@ -1102,7 +1104,11 @@
       // forces. Bloom and cool are left out while they sit at their stock
       // offset and chroma, because stating them would pin them.
       const hue0 = val("--wal-accent-hue");
-      const derived = Object.entries(OFFSETS)
+      // The print-in brings every chroma up from 0, so midway bloom and cool
+      // look hand-set. Listing them then adds two lines that vanish as it
+      // lands, and the page below jumps: a link to #components landed 46px off.
+      const printingIn = root.getAnimations().some((a) => a.animationName?.startsWith("wal-cue-in"));
+      const derived = printingIn ? [] : Object.entries(OFFSETS)
         .filter(([cue, off]) =>
           Math.abs(deg(val(`--wal-${cue}-hue`) - hue0) - off) > 0.5 ||
           Math.abs(val(`--wal-${cue}-chroma`) - parseFloat(STOCK[`--wal-${cue}-chroma`])) > 0.0005)

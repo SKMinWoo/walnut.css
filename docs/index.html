@@ -718,9 +718,6 @@
       .next-photo-room-top, .next-drawer-code, .next-photo-out { grid-template-columns: 1fr; }
     }
 
-    /* In-page links land below the sticky nav. */
-    :root { scroll-padding-block-start: var(--wal-nav-h); }
-
     /* ── Motion: each piece plays once, or answers the reader ── */
     @media (prefers-reduced-motion: no-preference) {
       /* The bands rise like title cards as the page prints in. */
@@ -750,6 +747,8 @@
       .next-gh { display: none; }
       /* On a phone: the name and the controls, then the pages on a row of their own. */
       .next-nav .wal-nav-links { order: 3; flex: 1 0 100%; }
+      /* Two rows are taller than walnut's --wal-nav-h: links land clear of both. */
+      :root { scroll-padding-block-start: calc(var(--wal-nav-h) + 1.5rem); }
       .next-schedule tbody th small { display: block; margin: .2rem 0 0 2.65rem; }
     }
   </style>

@@ -311,6 +311,10 @@ the platform can now draw with no script.
 
 - **`.wal-nav-brand` is no longer underlined.** It took the underline every
   link in running text has; the nav's own links never did.
+- **In-page links land below the nav.** The nav is sticky, so a link to
+  `#install` put the heading under it. A page whose `<body>` holds a
+  `.wal-nav` now keeps `--wal-nav-h` clear with `scroll-padding-block-start`.
+  A nav that wraps to two rows is taller: set your own padding at that width.
 - **No blur in a bundled app.** Every `backdrop-filter` (the nav, the
   overlay, the dialog and window backdrops, `.wal-glass`) was written before
   its `-webkit-` twin. Lightning CSS (Next.js with Turbopack, Vite, Parcel,

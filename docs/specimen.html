@@ -50,6 +50,8 @@
       .site-gh { display: none; }
       /* On a phone: the name and the controls, then the pages on a row of their own. */
       .wal-nav[aria-label="walnut.css"] .wal-nav-links { order: 3; flex: 1 0 100%; }
+      /* Two rows are taller than walnut's --wal-nav-h: links land clear of both. */
+      :root { scroll-padding-block-start: calc(var(--wal-nav-h) + 1.5rem); }
     }
 
     /* The same four names as the specimen card on the workbench, so those
