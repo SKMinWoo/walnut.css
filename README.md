@@ -376,7 +376,7 @@ A side panel that runs in on a track from the right and throws its shadow across
 
 A page inside the page. `.wal-window` is the room it opens in, the whole viewport; on its own it opens like `.wal-dialog`, its panel (`.wal-window-panel`) rising the last few pixels into place. With `data-wal-open="gatefold"` and `walnut-motion.js` it opens like a gatefold sleeve: the cover travels out of the card's picture (`[data-wal-art]`, or the whole button), and the notes unfold beside it on the spine. Closing plays it back, and the cover goes home to the card. The window's own buttons drive it; from script, `walnut.open(dialog, button)` and `walnut.open.close(dialog)`. A window that a link or Back opens has no press to travel from: `walnut.open(dialog, card, { instant: true })` opens it in place, and closing still takes the cover home to that card. A close asked for while the window is still opening (Back pressed early, say) waits for it to land. A card whose picture is not drawn (`display: none` in a print or compact layout, say) has nowhere to travel from, so the window opens and closes in place.
 
-The cover's shape is `--wal-cover-ratio`, `10 / 11` unless you set it on the window or anywhere above it, and it needn't be the shape of the card's picture. The cover is never stretched: it leaves at one scale, cropped to the picture's shape, and the crop opens out as it lands. `--wal-cover-focus` says which part of the cover the picture is, read the way `object-position` is (`50% 50%` unless you set it; `50% 0%` for a screenshot whose top is the picture). Every colourway in [next.html](docs/next.html) opens this way, its 4:3 plate travelling out as a 4:3 cover. The notes are the cover's size and scroll inside it. On a phone the spread stacks and the notes fold down. Without the script, or under reduced motion, the window simply opens.
+The cover's shape is `--wal-cover-ratio`, `10 / 11` unless you set it on the window or anywhere above it, and it needn't be the shape of the card's picture. The cover is never stretched: it leaves at one scale, cropped to the picture's shape, and the crop opens out as it lands. `--wal-cover-focus` says which part of the cover the picture is, read the way `object-position` is (`50% 50%` unless you set it; `50% 0%` for a screenshot whose top is the picture). Every colourway on [the docs' home page](docs/index.html) opens this way, its 4:3 plate travelling out as a 4:3 cover. The notes are the cover's size and scroll inside it. On a phone the spread stacks and the notes fold down. Without the script, or under reduced motion, the window simply opens.
 
 ### Tint
 
@@ -577,7 +577,7 @@ walnut.recolour(target, () => { /* change anything */ }, { from: button });
 
 After every change the target fires a bubbling `wal-recolour` event from inside the change, so whatever a listener updates (a label, a chart) lands in the same picture. Without `data-wal-recolour`, or with `"retune"`, the same buttons and calls use `.wal-retune`'s tween; so does a browser without view-transition types. Reduced motion cuts. Acts keep retuning: a circle needs a control at its centre, and an act arrives by scrolling. Set `--wal-recolour-duration` on `:root` to tune the circle (760ms).
 
-For a style of your own, add `walnut.recolour.styles.mine = (target, change, from) => { … }`, make the change inside it with `walnut.recolour.apply(target, change)`, and set `data-wal-recolour="mine"`. [next.html](docs/next.html) recolours every way it can from the swatch: its catalogue plates, its Roll button and each colourway's "Wear it" button.
+For a style of your own, add `walnut.recolour.styles.mine = (target, change, from) => { … }`, make the change inside it with `walnut.recolour.apply(target, change)`, and set `data-wal-recolour="mine"`. [The docs' home page](docs/index.html) recolours every way it can from the swatch: its catalogue plates, its Roll button and each colourway's "Wear it" button.
 
 **Step inside.** The change can be anything, so it can be a whole page. Pass a function that swaps the list for a detail page in the colourway's own palette, and the detail opens out of the card that was pressed, already wearing its colours:
 
@@ -638,7 +638,7 @@ addEventListener("pagereveal", (e) => {
 });
 ```
 
-The docs do exactly this: the specimen card on the workbench grows into [plate 14's own page](docs/specimen.html) and back. Opt out with your own `@view-transition { navigation: none; }`. Reduced motion, and browsers without cross-document transitions (Firefox; Safari before 18.2), simply navigate.
+The docs do exactly this: the specimen card on [the reference](docs/reference.html)'s workbench grows into [plate 14's own page](docs/specimen.html) and back. Opt out with your own `@view-transition { navigation: none; }`. Reduced motion, and browsers without cross-document transitions (Firefox; Safari before 18.2), simply navigate.
 
 **Within one page.** The same name helpers open a page inside the page, with no navigation at all: a card in a list grows into a detail view where the list was. Name the pieces that travel for the moment of the change only, and move the names over inside it, because a name can be on one element at a time:
 
