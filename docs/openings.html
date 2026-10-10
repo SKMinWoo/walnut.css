@@ -1,0 +1,1315 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>walnut openings and parts</title>
+  <meta name="description" content="Four ways a walnut window or drawer opens, taken from mid-century furniture, the materials that give them weight, and seven parts walnut.css was missing. Every demo runs on the built framework.">
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <script>document.documentElement.classList.add("pitch-deck", "pitch-prairie");</script>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Archivo:ital,wdth,wght@0,62..125,100..900;1,62..125,100..900&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="../dist/walnut.css">
+  <link rel="stylesheet" href="../dist/walnut-scroll.css">
+  <link rel="stylesheet" href="../dist/themes/press.css">
+  <link rel="stylesheet" href="../dist/themes/cafe.css">
+  <link rel="stylesheet" href="../dist/themes/forest.css">
+  <link rel="stylesheet" href="../dist/themes/dusk.css">
+  <link rel="stylesheet" href="../dist/themes/bone.css">
+
+  <!-- Everything on the stages is walnut.css itself (dist/walnut.css and
+       dist/walnut-motion.js). The one <style> block below is the deck. -->
+
+  <!-- ═══ Deck furniture ═══ -->
+  <style>
+    /* The skeleton a published page is wrapped in pins a light, system-font
+       body; walnut's own base sits in a layer under it, so it is restated. */
+    :root { color-scheme: light dark; }
+    :root[data-theme="light"] { color-scheme: light; }
+    :root[data-theme="dark"] { color-scheme: dark; }
+    body { margin: 0; background: var(--wal-bg); color: var(--wal-text); font: 1.0625rem/1.55 var(--wal-font-body); }
+
+    /* Prairie, next.html's own palette: the deck's ground and its stages. */
+    .pitch-prairie {
+      --wal-hue: 250;           --wal-chroma: 0.012;
+      --wal-accent-hue: 33;     --wal-accent-chroma: 0.19;
+                                --wal-bloom-chroma:  0.125;
+      --wal-gold-hue: 86;       --wal-gold-chroma:   0.12;
+      --wal-olive-hue: 152;     --wal-olive-chroma:  0.11;
+                                --wal-cool-chroma:   0.105;
+      --wal-l-bg-light: 96.5%;      --wal-l-subtle-light: 93.5%;
+      --wal-l-surface-light: 99%;   --wal-l-surface-2-light: 94%;
+      --wal-l-line-light: 87%;      --wal-l-line-soft-light: 91%;
+    }
+    /* Walnut, the wood: a thing, not a palette choice. */
+    :root {
+      --pitch-walnut:    oklch(0.42 0.055 52);
+      --pitch-walnut-hi: oklch(0.53 0.062 60);
+      --pitch-walnut-lo: oklch(0.32 0.042 46);
+      --pitch-oiled: linear-gradient(180deg, var(--pitch-walnut-hi), var(--pitch-walnut) 26%, var(--pitch-walnut-lo));
+      --wal-font-display: "Archivo", system-ui, sans-serif;
+      --wal-font-body: "Archivo", system-ui, sans-serif;
+      --pitch-gutter: clamp(1rem, 4vw, 3rem);
+    }
+    @media (min-width: 900px) and (min-height: 620px) { html.pitch-deck { scroll-snap-type: y proximity; } }
+    h1, h2, h3, h4 { font-family: var(--wal-font-display); text-wrap: balance; }
+    h1 { font-stretch: 116%; font-weight: 820; font-size: clamp(2.8rem, 6.4vw, 5.2rem); line-height: .97; letter-spacing: -.03em; margin: 0; }
+    h2 { font-stretch: 112%; font-weight: 780; font-size: clamp(2rem, 3.4vw, 3rem); line-height: 1; letter-spacing: -.02em; margin: 0; }
+    p { text-wrap: pretty; }
+    code, pre { font-family: "DM Mono", ui-monospace, monospace; }
+
+    /* The bar */
+    .pitch-bar {
+      position: fixed; inset: 0 0 auto; z-index: 20;
+      display: flex; align-items: center; justify-content: space-between; gap: 1rem;
+      padding: calc(.6rem + env(safe-area-inset-top, 0px)) var(--pitch-gutter) .6rem;
+      background: color-mix(in oklch, var(--wal-bg) 86%, transparent);
+      backdrop-filter: blur(12px);
+      border-block-end: 1px solid var(--wal-line-soft);
+    }
+    .pitch-brand { font-stretch: 112%; font-weight: 800; color: var(--wal-text); text-decoration: none; }
+    .pitch-brand span { font-weight: 500; color: var(--wal-text-muted); font-stretch: 100%; margin-inline-start: .4rem; }
+    .pitch-seg { display: inline-flex; border: 1px solid var(--wal-line); border-radius: 6px; overflow: hidden; }
+    .pitch-seg button {
+      font: 600 var(--wal-text-sm)/1 var(--wal-font-body); padding: .5rem .8rem; border: 0; cursor: pointer;
+      background: var(--wal-surface); color: var(--wal-text-soft);
+    }
+    .pitch-seg button + button { border-inline-start: 1px solid var(--wal-line); }
+    .pitch-seg button[aria-pressed="true"] { background: var(--wal-text); color: var(--wal-bg); }
+    .pitch-tools { display: flex; align-items: center; gap: .5rem; }
+    .pitch-toggle {
+      display: inline-flex; align-items: center; gap: .45rem;
+      font: 600 var(--wal-text-sm)/1 var(--wal-font-body); padding: .5rem .8rem; cursor: pointer;
+      border: 1px solid var(--wal-line); border-radius: 6px; background: var(--wal-surface); color: var(--wal-text-soft);
+    }
+    .pitch-toggle::before {
+      content: ""; inline-size: 1.1rem; block-size: .6rem; border-radius: 2px; flex: none;
+      background: var(--pitch-oiled); box-shadow: inset 0 -2px 0 var(--wal-brass);
+      opacity: .45; transition: opacity var(--wal-duration) var(--wal-ease);
+    }
+    .pitch-toggle[aria-pressed="true"] { background: var(--wal-text); color: var(--wal-bg); border-color: var(--wal-text); }
+    .pitch-toggle[aria-pressed="true"]::before { opacity: 1; }
+    .pitch-toggle:focus-visible, .pitch-seg button:focus-visible { outline: 2px solid var(--wal-accent); outline-offset: 2px; }
+    .pitch-count { margin: 0 0 0 auto; font: 600 var(--wal-text-sm)/1 var(--wal-font-body); color: var(--wal-text-muted); font-variant-numeric: tabular-nums; }
+
+    /* A slide: the pitch on the left, the live demo on the right. */
+    .slide {
+      min-block-size: 100svh; scroll-snap-align: start;
+      display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); gap: clamp(2rem, 5vw, 5rem); align-items: center;
+      padding: calc(3.75rem + 2vh) var(--pitch-gutter) 2rem;
+      max-inline-size: 86rem; margin-inline: auto; box-sizing: border-box;
+    }
+    .slide-solo { grid-template-columns: minmax(0, 1fr); align-content: center; }
+    /* A chest grows downward, as it would on a page. Centred, pulling a
+       drawer would push the rows above it up as well. */
+    .slide:has(.demo .wal-chest) { align-items: start; }
+    .pitch { display: grid; grid-template-columns: minmax(0, 1fr); gap: .9rem; align-content: start; min-inline-size: 0; }
+    .pitch > * { margin: 0; }
+    .pitch-kicker { font-weight: 650; font-size: var(--wal-text-sm); color: var(--wal-text-muted); }
+    .pitch-what { font-size: 1.125rem; color: var(--wal-text); max-inline-size: 44ch; line-height: 1.45; }
+    .pitch-facts { display: grid; grid-template-columns: minmax(0, 1fr); gap: .75rem; margin: .2rem 0 0; }
+    .pitch-facts dt { font-weight: 700; font-size: var(--wal-text-sm); margin-block-end: .15rem; }
+    .pitch-facts dd { margin: 0; color: var(--wal-text-soft); max-inline-size: 52ch; font-size: .95rem; line-height: 1.5; }
+    .pitch-facts pre { margin: .3rem 0 0; font-size: .75rem; line-height: 1.55; padding: .75rem .9rem; white-space: pre; max-block-size: 13rem; overflow: auto; }
+    .pitch-status b { color: var(--wal-text); }
+    .pitch-status b::before {
+      content: ""; display: inline-block; inline-size: .6em; aspect-ratio: 1; border-radius: 50%;
+      margin-inline-end: .45em; vertical-align: .05em; background: var(--wal-gold);
+    }
+    .pitch-status [data-status="ships"]::before { background: var(--wal-olive); }
+
+    .demo { display: grid; grid-template-columns: minmax(0, 1fr); gap: .8rem; justify-items: center; min-inline-size: 0; }
+    .demo-note { margin: 0; font-size: var(--wal-text-sm); color: var(--wal-text-muted); text-align: center; max-inline-size: 52ch; }
+
+    /* Stages: a palette scope each, so a demo's palette is its own. */
+    .stage {
+      position: relative; inline-size: min(100%, 38rem); box-sizing: border-box; container-type: inline-size;
+      border-radius: 12px; overflow: hidden;
+      background: var(--wal-bg); color: var(--wal-text);
+      box-shadow: 0 0 0 1px var(--wal-line), 0 34px 60px -34px oklch(0.2 0.03 50 / .5);
+    }
+    .stage.is-wide { inline-size: min(100%, 44rem); }
+    .stage-pad { padding: 1.4rem; display: grid; gap: 1rem; align-content: start; }
+    .stage-head { display: flex; align-items: baseline; justify-content: space-between; gap: 1rem; margin: 0; }
+    .stage-head b { font-stretch: 112%; font-weight: 800; font-size: 1.15rem; }
+    .stage-head span { color: var(--wal-text-muted); font-size: var(--wal-text-sm); }
+
+    /* Chips */
+    .chips { display: flex; flex-wrap: wrap; justify-content: center; gap: .5rem; }
+    .pitch-chip {
+      display: inline-flex; align-items: center; gap: .45rem;
+      padding: .4rem .65rem .4rem .4rem; border-radius: 6px; cursor: pointer;
+      border: 1px solid var(--wal-line); background: var(--wal-surface); color: var(--wal-text);
+      font: 600 var(--wal-text-sm)/1.2 var(--wal-font-body);
+    }
+    .pitch-chip.is-plain { padding-inline-start: .75rem; }
+    .pitch-chip:hover { border-color: var(--wal-text-muted); }
+    .pitch-chip[aria-pressed="true"] { border-color: var(--wal-text); box-shadow: inset 0 0 0 1px var(--wal-text); }
+    .pitch-chip:focus-visible, .way-card:focus-visible { outline: 2px solid var(--wal-accent); outline-offset: 2px; }
+    .pitch-swatch {
+      inline-size: 1.9rem; block-size: .9rem; border-radius: 3px; flex: none;
+      background: linear-gradient(90deg, var(--wal-accent) 20%, var(--wal-bloom) 0 40%, var(--wal-gold) 0 60%, var(--wal-olive) 0 80%, var(--wal-cool) 0);
+      box-shadow: inset 0 0 0 1px oklch(0 0 0 / .12);
+    }
+
+    /* ── Colourways: the cards and the pages they open ── */
+    .way-art {
+      display: flex; gap: 3px; padding: 4px; border-radius: 6px; background: var(--pitch-oiled);
+      box-shadow: inset 0 1px 0 oklch(1 0 0 / .2), inset 0 -2px 0 oklch(0 0 0 / .18);
+    }
+    .way-art > i { flex: 1 1 0; border-radius: 2px; background: linear-gradient(180deg, oklch(1 0 0 / .16), oklch(1 0 0 / 0) 36%), var(--band); }
+    [data-band="accent"] { --band: var(--wal-accent); }
+    [data-band="bloom"]  { --band: var(--wal-bloom); }
+    [data-band="gold"]   { --band: var(--wal-gold); }
+    [data-band="olive"]  { --band: var(--wal-olive); }
+    [data-band="cool"]   { --band: var(--wal-cool); }
+    .way-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: .9rem; }
+    .way-card {
+      display: grid; gap: .55rem; align-content: start; text-align: start; padding: .6rem; cursor: pointer;
+      border: 1px solid var(--wal-line); border-radius: 10px; background: var(--wal-surface); color: var(--wal-text);
+      font: inherit; transition: border-color var(--wal-duration) var(--wal-ease), translate var(--wal-duration) var(--wal-ease), box-shadow var(--wal-duration) var(--wal-ease);
+    }
+    .way-card:hover { border-color: var(--wal-text-muted); }
+    .way-card .way-art { aspect-ratio: 10 / 11; }
+    .way-card-name { font-weight: 760; font-stretch: 110%; font-size: 1.05rem; line-height: 1.1; }
+    .way-card small { color: var(--wal-text-muted); font-size: var(--wal-text-xs); line-height: 1.35; }
+    .way-page { display: grid; gap: .85rem; align-content: start; }
+    .way-page > * { margin: 0; }
+    .way-kicker { font-size: var(--wal-text-sm); font-weight: 650; color: var(--wal-text-muted); }
+    .way-name { font-size: clamp(2rem, 5cqi, 2.8rem); font-stretch: 116%; font-weight: 820; line-height: 1; letter-spacing: -.02em; }
+    .way-page .way-name { font-size: 2.6rem; }
+    .way-mood { color: var(--wal-text-soft); max-inline-size: 44ch; }
+    .way-cues { list-style: none; padding: 0; display: grid; gap: .45rem; }
+    .way-cues li { display: grid; grid-template-columns: 2rem 4.2rem minmax(0, 1fr); gap: .7rem; align-items: center; font-size: var(--wal-text-sm); }
+    .way-cues i { block-size: 1.3rem; border-radius: 4px; background: var(--band); box-shadow: inset 0 0 0 1px oklch(0 0 0 / .1); }
+    .way-cues span { color: var(--wal-text-muted); }
+    .way-use { font-size: var(--wal-text-sm); color: var(--wal-text-soft); }
+    .way-use code { color: var(--wal-accent-ink); }
+    .way-close { justify-self: start; }
+
+    ::view-transition-old(wal-hero), ::view-transition-new(wal-hero) { block-size: 100%; object-fit: cover; }
+
+    /* Plan chest demo: a drawer front shows its colourway. */
+    .chest-front { display: grid; gap: .25rem; }
+    .chest-front b { font-stretch: 112%; font-weight: 780; font-size: 1.1rem; }
+    .chest-front small { color: var(--wal-text-muted); font-size: var(--wal-text-xs); }
+    .chest-strip { inline-size: 5.5rem; block-size: 1.1rem; flex: none; }
+    .chest-strip.way-art { padding: 2px; gap: 2px; border-radius: 4px; }
+    .chest-inside { padding: 1.3rem var(--wal-space-lg) 1.5rem; display: grid; gap: .8rem; }
+    .chest-inside .way-name { display: none; }
+
+    /* Sliding door demo */
+    .door-rows { display: grid; gap: .6rem; }
+    .door-row { display: flex; align-items: center; gap: .9rem; padding: .7rem; border: 1px solid var(--wal-line); border-radius: 10px; background: var(--wal-surface); }
+    .door-row .way-art { inline-size: 5rem; block-size: 2.6rem; flex: none; }
+    .door-row div { display: grid; gap: .1rem; min-inline-size: 0; }
+    .door-row b { font-stretch: 110%; font-weight: 760; }
+    .door-row small { color: var(--wal-text-muted); font-size: var(--wal-text-xs); }
+    .door-row .pitch-chip { margin-inline-start: auto; flex: none; }
+    .door-close { justify-self: start; margin-block-end: .4rem; }
+
+    /* Windows */
+    .gatefold-art { display: block; block-size: 100%; padding: 1rem; box-sizing: border-box; background: var(--pitch-oiled); }
+    .gatefold-art .way-art { block-size: 100%; box-sizing: border-box; background: none; box-shadow: none; padding: 0; gap: 6px; }
+    .gatefold-notes-in { padding: 1.6rem 1.6rem 1.4rem; display: grid; gap: .9rem; }
+
+    /* Step inside */
+    .room { min-block-size: 24rem; }
+    .room-page { padding: 1.4rem; display: grid; gap: .9rem; align-content: start; }
+    .room-page .way-art { block-size: 6.5rem; }
+
+    /* One way in */
+    .runners { display: grid; gap: .9rem; inline-size: min(100%, 34rem); }
+    .runner { display: grid; gap: .35rem; }
+    .runner b { font-size: var(--wal-text-sm); }
+    .runner small { color: var(--wal-text-muted); font-size: var(--wal-text-xs); }
+    .runner-track { position: relative; block-size: 2.4rem; border-radius: 8px; background: var(--wal-bg-subtle); box-shadow: inset 0 1px 3px var(--wal-shadow-ink); }
+    .runner-knob {
+      position: absolute; inset-block: .3rem; inset-inline-start: .3rem; inline-size: 5rem; border-radius: 5px;
+      background: var(--pitch-oiled); box-shadow: 0 2px 4px oklch(0.2 0.03 50 / .35);
+      transition: translate 900ms var(--wal-ease-glide);
+    }
+    .runner-knob.is-settle { transition-timing-function: var(--wal-ease-settle); }
+    .runners.is-run .runner-knob { translate: calc(min(34rem, 100cqi) - 5.6rem) 0; }
+    .runners-wrap { container-type: inline-size; inline-size: min(100%, 34rem); display: grid; gap: .9rem; justify-items: center; }
+    .curves { inline-size: 100%; block-size: auto; }
+
+    /* Materials: three chests, one per material */
+    .mats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: .9rem; align-items: start; }
+    .mats-col { display: grid; gap: .55rem; min-inline-size: 0; }
+    .mats-name { margin: 0; display: flex; align-items: center; gap: .5rem; font-weight: 760; font-stretch: 110%; }
+    .mats-chip { inline-size: 1.5rem; block-size: .95rem; border-radius: 3px; flex: none; box-shadow: inset 0 0 0 1px oklch(0 0 0 / .14); }
+    .mats-chip[data-mat="walnut"] { background: var(--pitch-oiled); }
+    .mats-chip[data-mat="brass"] { background: linear-gradient(var(--wal-brass-hi), var(--wal-brass) 45%, var(--wal-brass-lo)); }
+    .mats-chip[data-mat="stone"] { background: linear-gradient(oklch(0.87 0.012 85), oklch(0.73 0.014 78)); }
+    .mats .wal-chest summary { padding: .65rem .75rem; gap: .6rem; }
+    .mats .wal-chest summary::after { inline-size: 1.9rem; }
+    .mats .chest-front b { font-size: .95rem; }
+    .mats-in { padding: .85rem .8rem 1rem; display: grid; gap: .6rem; }
+    .mats-in > * { margin: 0; }
+    .mats-in p { font-size: var(--wal-text-xs); color: var(--wal-text-soft); line-height: 1.45; }
+    .mats-in svg { inline-size: 100%; block-size: auto; overflow: visible; }
+    .mats-in dl { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: .35rem .8rem; font-size: var(--wal-text-xs); }
+    .mats-in dt { color: var(--wal-text-muted); }
+    .mats-in dd { margin: 0; color: var(--wal-text); font-variant-numeric: tabular-nums; }
+
+    /* Superellipse demo */
+    .kit { padding: 1.4rem; display: grid; gap: 1rem; }
+    .kit-row { display: flex; flex-wrap: wrap; gap: .6rem; align-items: center; }
+    .kit-cards { display: grid; grid-template-columns: 1.2fr 1fr; gap: 1rem; }
+    .kit-photo { aspect-ratio: 4 / 3; border-radius: var(--wal-radius); corner-shape: var(--wal-corner-shape, round);
+      background: radial-gradient(120% 90% at 20% 15%, var(--wal-gold), transparent 55%), linear-gradient(160deg, var(--wal-accent), var(--wal-cool)); }
+    .kit .wal-card { padding: 1.1rem; display: grid; gap: .6rem; }
+    .kit .wal-card h3 { margin: 0; font-size: 1.3rem; font-stretch: 112%; font-weight: 780; }
+    .kit .wal-card p { margin: 0; color: var(--wal-text-soft); font-size: var(--wal-text-sm); }
+    .kit .wal-metric { padding: 1rem; }
+    .shape-out { font: 500 var(--wal-text-sm)/1 "DM Mono", monospace; color: var(--wal-text-soft); }
+    .radius-control { display: flex; gap: .6rem; align-items: center; font-size: var(--wal-text-sm); color: var(--wal-text-soft); }
+
+    /* Any colour demo */
+    .labels { list-style: none; margin: 0; padding: 0; display: grid; gap: .1rem; }
+    .labels li { display: grid; grid-template-columns: 1.1rem minmax(0, 1fr) auto auto; align-items: center; gap: .8rem; padding: .45rem .2rem; border-block-end: 1px solid var(--wal-line-soft); font-size: var(--wal-text-sm); }
+    .labels .dot { inline-size: 1.1rem; block-size: 1.1rem; border-radius: 50%; background: var(--wal-tint); box-shadow: inset 0 0 0 1px oklch(0 0 0 / .15); }
+    .labels code { font-size: var(--wal-text-xs); color: var(--wal-text-muted); }
+    .labels .wal-chip { font-size: var(--wal-text-xs); }
+    .labels .solid { padding: .2rem .55rem; border-radius: 4px; font-weight: 650; font-size: var(--wal-text-xs); }
+    .labels .ratio { grid-column: 2 / -1; font: 500 var(--wal-text-xs)/1 "DM Mono", monospace; color: var(--wal-text-muted); }
+    .tint-add { display: flex; gap: .6rem; align-items: center; font-size: var(--wal-text-sm); color: var(--wal-text-soft); }
+    .tint-add input { inline-size: 2.6rem; block-size: 2rem; padding: 0; border: 1px solid var(--wal-line); border-radius: 6px; background: none; }
+    .tint-score { margin: 0; font-weight: 650; font-size: var(--wal-text-sm); }
+    .tint-score.is-fail { color: var(--wal-danger); }
+
+    /* No script left demo */
+    .ns-site { block-size: 23rem; overflow: auto; overscroll-behavior: contain; position: relative; }
+    .ns-site .wal-nav { --wal-nav-h: 3.2rem; }
+    .ns-site .wal-nav-brand { font-stretch: 112%; font-weight: 800; }
+    .ns-site section { padding: 1.4rem; display: grid; gap: .6rem; min-block-size: 15rem; align-content: start; border-block-end: 1px solid var(--wal-line-soft); }
+    .ns-site section > * { margin: 0; }
+    .ns-site section h4 { font-size: 1.5rem; font-stretch: 110%; font-weight: 760; }
+    .ns-site section p { color: var(--wal-text-soft); font-size: var(--wal-text-sm); max-inline-size: 52ch; }
+    .ns-site .wal-nav-actions .pitch-chip { padding: .35rem .6rem; }
+    .ns-legend { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .5rem 1.2rem; inline-size: min(100%, 38rem); font-size: var(--wal-text-sm); color: var(--wal-text-soft); }
+    .ns-legend b { color: var(--wal-text); }
+
+    /* Native parts demo */
+    .parts-bar { display: flex; flex-wrap: wrap; align-items: center; gap: .6rem; justify-content: space-between; }
+    .parts-slide { display: grid; gap: .7rem; padding: 1.1rem; border: 1px solid var(--wal-line); border-radius: 12px; background: var(--wal-surface); color: var(--wal-text); }
+    .parts-slide .way-art { block-size: 7.5rem; }
+    .parts-slide b { font-stretch: 112%; font-weight: 800; font-size: 1.4rem; }
+    .parts-slide p { margin: 0; color: var(--wal-text-soft); font-size: var(--wal-text-sm); }
+    .carousel-wrap { padding-inline: 1.4rem; }
+
+    /* Shuffle demo */
+    .mat-grid { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: .7rem; }
+    .mat { display: grid; gap: .35rem; padding: .45rem; border: 1px solid var(--wal-line); border-radius: 8px; background: var(--wal-surface); }
+    .mat i { display: block; block-size: 3.2rem; border-radius: 5px; background: var(--c); box-shadow: inset 0 0 0 1px oklch(0 0 0 / .08), inset 0 1px 0 oklch(1 0 0 / .18); }
+    .mat b { font-size: var(--wal-text-sm); font-weight: 680; line-height: 1.15; }
+    .mat small { font-size: var(--wal-text-xs); color: var(--wal-text-muted); }
+    .shuffle-controls { display: grid; gap: .5rem; justify-items: center; }
+
+    /* Charts demo */
+    .chart-row { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 1.8rem; align-items: end; }
+    .chart-row > div { display: grid; gap: .2rem; min-inline-size: 0; }
+    .ring-box { display: grid; gap: .8rem; justify-items: center; padding-block-end: .4rem; }
+    .chart-title { margin: 0; font-weight: 700; }
+    .chart-title small { display: block; font-weight: 500; color: var(--wal-text-muted); font-size: var(--wal-text-xs); }
+
+    /* Print demo: the preview sheet */
+    .sheet-wrap { padding: 1.4rem; background: var(--wal-bg-subtle); display: grid; place-items: center; }
+    .sheet {
+      inline-size: min(100%, 26rem); aspect-ratio: 210 / 297; box-sizing: border-box; overflow: hidden;
+      background: var(--wal-bg); color: var(--wal-text); display: grid; grid-template-rows: auto 1fr auto;
+      box-shadow: 0 1px 2px oklch(0 0 0 / .1), 0 12px 24px -12px oklch(0.2 0.02 60 / .4);
+      font-size: .62rem; line-height: 1.45;
+    }
+    .sheet-head, .sheet-foot { display: none; justify-content: space-between; padding: .9rem 1.4rem 0; font-size: .5rem; color: #6a6a6a; }
+    .sheet-foot { padding: 0 1.4rem .9rem; }
+    .sheet-body { padding: 1.2rem 1.4rem; display: grid; gap: .6rem; align-content: start; }
+    .sheet-body > * { margin: 0; }
+    .sheet-nav { display: flex; gap: 1rem; padding-block-end: .5rem; border-block-end: 1px solid var(--wal-line-soft); color: var(--wal-text-soft); }
+    .sheet-nav b { margin-inline-end: auto; color: var(--wal-text); }
+    .sheet h3 { font-size: 1.5rem; line-height: 1; font-stretch: 116%; font-weight: 820; letter-spacing: -.02em; }
+    .sheet .way-art { block-size: 3.6rem; }
+    .sheet-photo { block-size: 5.2rem; border-radius: 6px; background: radial-gradient(90% 120% at 25% 20%, var(--wal-gold), transparent 60%), linear-gradient(150deg, var(--wal-olive), var(--wal-cool)); }
+    .sheet a { color: var(--wal-accent-ink); }
+    .sheet table { border-collapse: collapse; inline-size: 100%; }
+    .sheet td, .sheet th { text-align: start; padding: .2rem .3rem; border-block-end: 1px solid var(--wal-line-soft); }
+    .sheet-cta { justify-self: start; padding: .35rem .7rem; border-radius: 99px; background: var(--wal-accent); color: var(--wal-accent-fg); font-weight: 650; }
+    /* The print rules, drawn on screen. */
+    .sheet.is-paper { color-scheme: light; background: #fff; color: #1d1d1f; }
+    .sheet.is-paper .sheet-head, .sheet.is-paper .sheet-foot { display: flex; }
+    .sheet.is-paper .sheet-nav, .sheet.is-paper .sheet-cta { display: none; }
+    .sheet.is-paper .sheet-body { padding-block-start: .5rem; }
+    .sheet.is-paper a::after { content: " (" attr(data-href) ")"; color: #6a6a6a; font-size: .85em; }
+    .sheet.is-paper .sheet-photo { filter: grayscale(.2); }
+
+    /* Contents and the pick list */
+    .contents { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 2rem; margin: 0; }
+    .contents h3 { font-size: 1rem; margin: 0 0 .6rem; color: var(--wal-text-muted); font-weight: 650; font-stretch: 100%; }
+    .contents ol, .contents ul { margin: 0; padding-inline-start: 1.4rem; display: grid; gap: .35rem; }
+    .contents a { color: var(--wal-text); }
+    .pick-list li { color: var(--wal-text-soft); }
+    .pick-list b { color: var(--wal-text); }
+    .api-list { display: grid; gap: .7rem; margin: 0; padding: 0; list-style: none; }
+    .api-list li { color: var(--wal-text-soft); font-size: .95rem; max-inline-size: 56ch; }
+    .api-list b { color: var(--wal-text); }
+
+    @media (max-width: 900px) {
+      .slide { grid-template-columns: minmax(0, 1fr); min-block-size: auto; padding-block: 5.5rem 4rem; }
+      .contents { grid-template-columns: minmax(0, 1fr); }
+    }
+    @media (max-width: 560px) {
+      .pitch-brand span, .pitch-count { display: none; }
+      .pitch-seg button, .pitch-toggle { padding: .45rem .5rem; font-size: .8rem; }
+      .pitch-toggle::before { display: none; }
+      .mats { grid-template-columns: minmax(0, 1fr); }
+      .way-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: .5rem; }
+      .way-card { padding: .4rem; }
+      .way-card small { display: none; }
+      .way-card-name { font-size: .9rem; }
+      .kit-cards { grid-template-columns: minmax(0, 1fr); }
+      .mat-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .chart-row { grid-template-columns: minmax(0, 1fr); }
+      .ns-legend { grid-template-columns: minmax(0, 1fr); }
+      .door-row small { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+  <header class="pitch-bar">
+    <a class="pitch-brand" href="#top">walnut.css <span>Openings and parts</span></a>
+    <p class="pitch-count" id="count" aria-live="off">1 of 16</p>
+    <div class="pitch-tools">
+    <button class="pitch-toggle" type="button" id="motion" aria-pressed="false">Materials</button>
+    <div class="pitch-seg" role="group" aria-label="Mode">
+      <button type="button" data-mode="" aria-pressed="true">System</button>
+      <button type="button" data-mode="light" aria-pressed="false">Light</button>
+      <button type="button" data-mode="dark" aria-pressed="false">Dark</button>
+    </div>
+    </div>
+  </header>
+
+  <main>
+
+    <!-- ════ Title ════ -->
+    <section class="slide slide-solo" id="top">
+      <div class="pitch">
+        <p class="pitch-kicker">walnut.css <span data-version>0.4.0</span></p>
+        <h1>Openings, materials and parts</h1>
+        <p class="pitch-what">walnut opens things the way furniture does: four openings taken from mid-century pieces, and materials that give them weight. Then seven parts that close the gaps a walnut site used to fill with a script or a second library. Every demo runs on the built walnut.css and the browser's own elements.</p>
+        <div class="contents">
+          <div>
+            <h3>How walnut opens things</h3>
+            <ol>
+              <li><a href="#o1">Plan chest</a></li>
+              <li><a href="#o2">Sliding door</a></li>
+              <li><a href="#o4">Gatefold</a></li>
+              <li><a href="#o5">Step inside</a></li>
+              <li><a href="#materials">Materials</a></li>
+            </ol>
+            <p class="demo-note" style="text-align: start; margin-block-start: .6rem"><a href="#api">One way to open anything</a> follows them.</p>
+          </div>
+          <div>
+            <h3>Seven new parts</h3>
+            <ol>
+              <li><a href="#m1">Superellipse corners</a></li>
+              <li><a href="#m2">Any colour, legible</a></li>
+              <li><a href="#m3">No script left</a></li>
+              <li><a href="#m4">Native parts</a></li>
+              <li><a href="#m5">Shuffle</a></li>
+              <li><a href="#m6">Charts from the script</a></li>
+              <li><a href="#m7">Prints like a catalogue</a></li>
+            </ol>
+          </div>
+        </div>
+        <p class="demo-note" style="text-align: start">Use the arrow keys or scroll. Windows open over the whole deck, as they would over your site. Materials and the mode switch at the top right reach every demo.</p>
+      </div>
+    </section>
+
+    <!-- ════ O1 Plan chest ════ -->
+    <section class="slide" id="o1">
+      <div class="pitch">
+        <p class="pitch-kicker">How walnut opens things, 1 of 4</p>
+        <h2>Plan chest</h2>
+        <p class="pitch-what">Each row is a drawer front. Pull one and the drawer slides out of the slot beneath it while the rows below make room. One drawer opens at a time, like the wide flat drawers architects keep their drawings in.</p>
+        <dl class="pitch-facts">
+          <div><dt>Why you would use it</dt><dd>A page inside your page that keeps its place in the flow: a project list, case studies, pricing, an FAQ. Nothing covers the page, so the reader never loses where they were.</dd></div>
+          <div><dt>On your site</dt><dd><pre><code>&lt;div class="wal-chest"&gt;
+  &lt;details name="work"&gt;
+    &lt;summary&gt;Shelf Life&lt;/summary&gt;
+    &lt;div&gt;…the case study…&lt;/div&gt;
+  &lt;/details&gt;
+&lt;/div&gt;</code></pre></dd></div>
+          <div><dt>Status</dt><dd class="pitch-status"><b data-status="ships">Ships, pure CSS.</b> <span>A native &lt;details&gt;, so it opens with no script, find-in-page opens it, and the shared name keeps it to one drawer at a time. Under Materials it is walnut. A browser without animated details opens it at once.</span></dd></div>
+        </dl>
+      </div>
+      <div class="demo">
+        <div class="stage wal-palette pitch-prairie">
+          <div class="wal-chest" data-chest></div>
+        </div>
+        <p class="demo-note">Each drawer wears its own colourway. Open one, then another, then turn on Materials at the top and do it again.</p>
+      </div>
+    </section>
+
+    <!-- ════ O2 Sliding door ════ -->
+    <section class="slide" id="o2">
+      <div class="pitch">
+        <p class="pitch-kicker">How walnut opens things, 2 of 4</p>
+        <h2>Sliding door</h2>
+        <p class="pitch-what">The panel runs in from the edge on a track, like the doors of an Eames storage unit. It starts with a little resistance, glides, and comes to rest on a soft close. Its leading edge carries the pull, and its shadow falls across the page.</p>
+        <dl class="pitch-facts">
+          <div><dt>Why you would use it</dt><dd>The drawer every site needs, for a menu, a basket or a case study. walnut's drawer today asks you to script focus, Escape and inert. This one is a &lt;dialog&gt;, so the browser does all three.</dd></div>
+          <div><dt>On your site</dt><dd><pre><code>&lt;button commandfor="menu" command="show-modal"&gt;Menu&lt;/button&gt;
+
+&lt;dialog id="menu" class="wal-door" closedby="any"&gt;
+  &lt;button class="wal-door-pull" commandfor="menu"
+          command="close" aria-label="Close"&gt;&lt;/button&gt;
+  &lt;div class="wal-door-body"&gt;…&lt;/div&gt;
+&lt;/dialog&gt;</code></pre></dd></div>
+          <div><dt>Status</dt><dd class="pitch-status"><b data-status="ships">Ships, pure CSS, no script at all.</b> <span>commandfor opens it and closedby lets a click outside close it, so it retires .wal-drawer's three scripting chores. Under Materials it runs in heavy and knocks against its stop. On a phone it rises from the bottom.</span></dd></div>
+        </dl>
+      </div>
+      <div class="demo">
+        <div class="stage wal-palette pitch-prairie">
+          <div class="stage-pad">
+            <p class="stage-head"><b>Colourways</b><span>Open one in a drawer</span></p>
+            <div class="door-rows" data-doors></div>
+          </div>
+        </div>
+        <p class="demo-note">Close it with the pull on its edge, Escape, or a click on the page.</p>
+      </div>
+    </section>
+
+    <!-- ════ O4 Gatefold ════ -->
+    <section class="slide" id="o4">
+      <div class="pitch">
+        <p class="pitch-kicker">How walnut opens things, 3 of 4</p>
+        <h2>Gatefold</h2>
+        <p class="pitch-what">The card is a record sleeve. It travels to the left of the window as the cover, and the notes unfold from behind it on the spine, the way a gatefold LP opens to its inner spread.</p>
+        <dl class="pitch-facts">
+          <div><dt>Why you would use it</dt><dd>A detail page with a natural shape: the picture on one side and the words on the other. It suits case studies, products and colourways. On a phone the spread stacks and the notes fold down.</dd></div>
+          <div><dt>On your site</dt><dd><pre><code>&lt;button commandfor="forest" command="show-modal"&gt;…&lt;/button&gt;
+
+&lt;dialog id="forest" class="wal-window" data-wal-open="gatefold"&gt;
+  &lt;div class="wal-gatefold-spread"&gt;
+    &lt;figure class="wal-gatefold-cover"&gt;…&lt;/figure&gt;
+    &lt;div class="wal-gatefold-notes"&gt;…&lt;/div&gt;
+  &lt;/div&gt;
+&lt;/dialog&gt;
+&lt;script src="walnut-motion.js" defer&gt;&lt;/script&gt;</code></pre></dd></div>
+          <div><dt>Status</dt><dd class="pitch-status"><b data-status="ships">Ships, with walnut-motion.js.</b> <span>Without the script it opens as a plain spread. The cover never stretches: shaped otherwise than the card's picture, it leaves cropped to the picture and opens out as it lands. Under Materials the notes come down like a heavy board and knock.</span></dd></div>
+        </dl>
+      </div>
+      <div class="demo">
+        <div class="stage wal-palette pitch-prairie">
+          <div class="stage-pad">
+            <p class="stage-head"><b>Colourways</b><span>Three of six</span></p>
+            <div class="way-grid" data-cards="gatefold"></div>
+          </div>
+        </div>
+        <p class="demo-note">Close it from the notes, with Escape, or by clicking beside the spread.</p>
+      </div>
+    </section>
+
+    <!-- ════ O5 Step inside ════ -->
+    <section class="slide" id="o5">
+      <div class="pitch">
+        <p class="pitch-kicker">How walnut opens things, 4 of 4</p>
+        <h2>Step inside</h2>
+        <p class="pitch-what">Open a colourway and you walk into it. Its colours open out of the card in the soft circle you picked for recolouring, and the page that arrives is the colourway's own, in its own palette. Back walks you out the same way.</p>
+        <dl class="pitch-facts">
+          <div><dt>Why you would use it</dt><dd>For a detail page that should feel like another room: a colourway, a collection, a project with its own brand colours. A site's palette changes and its openings then share one gesture.</dd></div>
+          <div><dt>On your site</dt><dd><pre><code>&lt;main id="page" data-wal-recolour="swatch"&gt;…&lt;/main&gt;
+
+walnut.recolour(page, () =&gt; showDetail("forest"), { from: card });</code></pre></dd></div>
+          <div><dt>Status</dt><dd class="pitch-status"><b data-status="ships">Ships today.</b> <span>walnut-recolour.js already takes a function and makes any change inside the circle, and swapping the page is a change.</span></dd></div>
+        </dl>
+      </div>
+      <div class="demo">
+        <div class="stage wal-palette pitch-prairie room" id="o5-stage" data-wal-recolour="swatch">
+          <div class="stage-pad" id="o5-cat">
+            <p class="stage-head"><b>Colourways</b><span>Three of six</span></p>
+            <div class="way-grid" data-cards="step"></div>
+          </div>
+          <div class="room-page" id="o5-room" hidden>
+            <button class="pitch-chip is-plain" type="button" id="o5-back" style="justify-self: start">Back to the colourways</button>
+            <div class="way-page" id="o5-page"></div>
+          </div>
+        </div>
+        <p class="demo-note">Open one, then go back.</p>
+      </div>
+    </section>
+
+    <!-- ════ Materials ════ -->
+    <section class="slide" id="materials">
+      <div class="pitch">
+        <p class="pitch-kicker">How walnut moves</p>
+        <h2>Materials</h2>
+        <p class="pitch-what">Turn on materials and every opening moves like the thing it is made of. A walnut drawer is heavy: it runs out, strikes its stop, knocks back and settles. Brass is quick and rings as it lands. Stone is slow to start and slower to stop, and never bounces.</p>
+        <dl class="pitch-facts">
+          <div><dt>Why you would use it</dt><dd>Weight is most of what makes a piece of furniture feel made, and a screen cannot show it, only how a thing comes to rest. Motion that says what a part is made of tells the reader what to expect of it, the way the palette says what it is for.</dd></div>
+          <div><dt>On your site</dt><dd><pre><code>&lt;html data-motion="materials"&gt;
+
+&lt;!-- or one part, and everything inside it --&gt;
+&lt;div class="wal-chest" data-wal-material="stone"&gt;…&lt;/div&gt;</code></pre></dd></div>
+          <div><dt>Status</dt><dd class="pitch-status"><b data-status="ships">Ships, pure CSS.</b> <span>On &lt;html&gt; it makes drawers, doors and windows walnut, and menus, pickers and charts brass. A material is four tokens, so a part of your own takes one by moving on them. Under reduced motion every opening is instant, whatever it is made of.</span></dd></div>
+        </dl>
+      </div>
+      <div class="demo">
+        <div class="stage wal-palette pitch-prairie is-wide">
+          <div class="stage-pad">
+            <p class="stage-head"><b>Three chests</b><span>The same drawers in three materials</span></p>
+            <div class="mats" data-mats></div>
+          </div>
+        </div>
+        <button class="pitch-chip is-plain" type="button" id="mats-go">Pull all three</button>
+        <p class="demo-note">Each drawer holds the curve it runs on; the dashed line is its stop. Pull all three at once and watch them land, then open the second drawer of one and watch the first shut.</p>
+      </div>
+    </section>
+
+    <!-- ════ One way in ════ -->
+    <section class="slide" id="api">
+      <div class="pitch">
+        <p class="pitch-kicker">How walnut opens things</p>
+        <h2>One way to open anything</h2>
+        <p class="pitch-what">All four open the browser's own elements, so a site chooses a movement with an attribute and keeps the same markup.</p>
+        <ul class="api-list">
+          <li><b>Native first.</b> &lt;details&gt; and &lt;dialog&gt; bring focus, Escape, inert and find-in-page. commandfor and closedby open and close them with no script.</li>
+          <li><b>One attribute.</b> data-wal-open picks the movement for a window, and data-motion picks how everything moves.</li>
+          <li><b>walnut-motion.js, optional.</b> It measures the control you pressed and plays the movement. Without it every window still opens, natively, and so it does under reduced motion.</li>
+          <li><b>Your own movement.</b> walnut.open.styles.mine = { open(dialog, from) {…}, close(dialog, from) {…} }, the same shape as your own recolour style.</li>
+          <li><b>Four tokens.</b> Every movement runs on --wal-open-duration, --wal-open-ease and their two closing twins: glide and settle by default, a material's curves under Materials. Your CSS can run on them too.</li>
+          <li><b>For your portfolio.</b> Sliding door makes the case-study drawer native. Gatefold gives each case study its reel as the cover and the write-up as the notes.</li>
+        </ul>
+      </div>
+      <div class="demo">
+        <div class="runners-wrap">
+          <svg class="curves" id="curves" viewBox="0 0 340 150" role="img" aria-label="The two easings, plotted: glide starts slowly and runs long; settle starts quickly and finishes slowly."></svg>
+          <div class="runners" id="runners">
+            <div class="runner"><b>Glide</b><div class="runner-track"><i class="runner-knob"></i></div><small>A drawer on ball-bearing runners: some resistance, a long run, no bump at the end.</small></div>
+            <div class="runner"><b>Settle</b><div class="runner-track"><i class="runner-knob is-settle"></i></div><small>A soft-close damper: quick travel, then the damper takes the last part.</small></div>
+          </div>
+          <button class="pitch-chip is-plain" type="button" id="runners-go">Run both</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ════ Divider ════ -->
+    <section class="slide slide-solo" id="m">
+      <div class="pitch">
+        <p class="pitch-kicker">Part two</p>
+        <h1>Seven new parts</h1>
+        <p class="pitch-what">walnut themed and moved well, but a walnut site still reached for a script or a second library for a carousel, a select, a chart, a label in a colour someone picked, or a page that prints. Each of these closes one of those gaps with a class or a token.</p>
+      </div>
+    </section>
+
+    <!-- ════ M1 Superellipse corners ════ -->
+    <section class="slide" id="m1">
+      <div class="pitch">
+        <p class="pitch-kicker">New parts, 1 of 7</p>
+        <h2>Superellipse corners</h2>
+        <p class="pitch-what">Every corner in the kit becomes a true superellipse, the curve Piet Hein drew for Stockholm's Sergels torg in 1959 and Bruno Mathsson built into his tables. One token reshapes every button, card, chip and field.</p>
+        <dl class="pitch-facts">
+          <div><dt>Why you would use it</dt><dd>A rounded rectangle is a straight edge joined to a quarter circle, and the join shows. A superellipse has no join, so the shape looks made rather than drawn. The same token gives Catalogue a bevelled corner, like a clipped index card.</dd></div>
+          <div><dt>On your site</dt><dd><pre><code>:root { --wal-corner-shape: squircle; }
+
+&lt;section style="--wal-corner-shape: bevel"&gt;…&lt;/section&gt;</code></pre></dd></div>
+          <div><dt>Status</dt><dd class="pitch-status"><b data-status="ships">Ships.</b> <span>Every walnut rule that sets a radius also reads --wal-corner-shape, and the Catalogue finish bevels its corners. Where corner-shape is not supported, corners stay round.</span></dd></div>
+        </dl>
+      </div>
+      <div class="demo">
+        <div class="stage wal-palette pitch-prairie" id="m1-stage" style="--wal-corner-shape: squircle; --wal-radius: 18px; --wal-btn-radius: 14px; --wal-chip-radius: 10px; --wal-badge-radius: 8px">
+          <div class="kit">
+            <div class="kit-cards">
+              <div class="wal-card">
+                <h3>Plate 14</h3>
+                <p>A walnut credenza with five doors, one for each cue.</p>
+                <div class="kit-row"><span class="wal-btn wal-btn-primary">Order a sample</span><span class="wal-btn wal-btn-secondary">Details</span></div>
+              </div>
+              <div class="kit-photo" role="img" aria-label="A gradient in the palette's colours"></div>
+            </div>
+            <div class="kit-row">
+              <span class="wal-chip">Walnut</span><span class="wal-chip">Brass pulls</span><span class="wal-chip">1959</span>
+              <span class="wal-badge wal-badge-accent">New</span>
+              <input class="wal-input" style="flex: 1 1 10rem; min-inline-size: 0" value="Superellipse" aria-label="A text field">
+            </div>
+          </div>
+        </div>
+        <div class="chips" id="m1-shapes">
+          <button class="pitch-chip is-plain" type="button" data-shape="round" aria-pressed="false">Round</button>
+          <button class="pitch-chip is-plain" type="button" data-shape="squircle" aria-pressed="true">Squircle</button>
+          <button class="pitch-chip is-plain" type="button" data-shape="superellipse(4)" aria-pressed="false">Superellipse 4</button>
+          <button class="pitch-chip is-plain" type="button" data-shape="bevel" aria-pressed="false">Bevel</button>
+          <button class="pitch-chip is-plain" type="button" data-shape="scoop" aria-pressed="false">Scoop</button>
+          <button class="pitch-chip is-plain" type="button" data-shape="notch" aria-pressed="false">Notch</button>
+        </div>
+        <label class="radius-control">Radius <input type="range" id="m1-radius" min="4" max="32" value="18"> <span class="shape-out" id="m1-out">18px, squircle</span></label>
+      </div>
+    </section>
+
+    <!-- ════ M2 Any colour ════ -->
+    <section class="slide" id="m2">
+      <div class="pitch">
+        <p class="pitch-kicker">New parts, 2 of 7</p>
+        <h2>Any colour, legible</h2>
+        <p class="pitch-what">Hand walnut any colour, a brand colour or one your users picked, and it returns the four forms every cue has: the fill, the ink, the wash and the text that sits on the fill. Each passes contrast in light and in dark.</p>
+        <dl class="pitch-facts">
+          <div><dt>Why you would use it</dt><dd>Labels in a tracker, categories in a calendar, a client's colour on a case study. A yellow tag someone picks is unreadable on most sites. With .wal-tint it stays yellow and its text stays readable.</dd></div>
+          <div><dt>On your site</dt><dd><pre><code>&lt;span class="wal-chip wal-tint" style="--wal-tint: #f5d90a"&gt;Design&lt;/span&gt;
+&lt;span class="wal-fill-tint wal-tint" style="--wal-tint: #f5d90a"&gt;Design&lt;/span&gt;
+
+.price { color: --wal-ink(#0a7f6f); }   /* as a CSS function */</code></pre></dd></div>
+          <div><dt>Status</dt><dd class="pitch-status"><b data-status="ships">Ships.</b> <span>The class works wherever walnut's computed colours do. The functions use CSS @function, which Chrome and Edge have today.</span></dd></div>
+        </dl>
+      </div>
+      <div class="demo">
+        <div class="stage wal-palette pitch-prairie">
+          <div class="stage-pad">
+            <p class="stage-head"><b>Labels</b><span>Colours people picked</span></p>
+            <ul class="labels" id="labels"></ul>
+            <label class="tint-add">Try your own <input type="color" id="tint-pick" value="#2fbf71"></label>
+          </div>
+        </div>
+        <p class="tint-score" id="tint-score" aria-live="polite"></p>
+        <p class="demo-note">Each ratio is measured from the rendered pixels. Switch to dark and they are measured again.</p>
+      </div>
+    </section>
+
+    <!-- ════ M3 No script left ════ -->
+    <section class="slide" id="m3">
+      <div class="pitch">
+        <p class="pitch-kicker">New parts, 3 of 7</p>
+        <h2>No script left</h2>
+        <p class="pitch-what">walnut asks your script to set four state classes. The browser can now do all four, so a walnut site needs no script at all to behave.</p>
+        <dl class="pitch-facts">
+          <div><dt>Why you would use it</dt><dd>Fewer moving parts and nothing to keep in step. Every state is right before any script has loaded, and none of it can break when one does not.</dd></div>
+          <div><dt>On your site</dt><dd><pre><code>&lt;!-- the same nav as today, minus the script --&gt;
+&lt;nav class="wal-nav"&gt;…&lt;div class="wal-nav-links"&gt;…&lt;/div&gt;&lt;/nav&gt;
+
+&lt;button interestfor="save-tip"&gt;Save&lt;/button&gt;
+&lt;span id="save-tip" popover="hint" class="wal-tip"&gt;Saves a draft&lt;/span&gt;</code></pre></dd></div>
+          <div><dt>Status</dt><dd class="pitch-status"><b data-status="ships">Ships, on the existing classes, with .wal-tip.</b> <span>The state classes keep working as the fallback, so a browser without these features is no worse off than today.</span></dd></div>
+        </dl>
+      </div>
+      <div class="demo">
+        <div class="stage wal-palette pitch-prairie">
+          <div class="ns-site" id="ns-site">
+            <nav class="wal-nav">
+              <span class="wal-nav-brand">walnut</span>
+              <div class="wal-nav-links">
+                <a href="#ns-rooms">Rooms</a><a href="#ns-colour">Colour</a><a href="#ns-install">Install</a>
+              </div>
+              <div class="wal-nav-actions">
+                <button class="pitch-chip is-plain" type="button" interestfor="ns-tip">Save</button>
+                <span class="wal-tip" id="ns-tip" popover="hint">Saves a draft</span>
+                <button class="pitch-chip is-plain" type="button" commandfor="ns-door" command="show-modal">Menu</button>
+              </div>
+            </nav>
+            <section id="ns-rooms"><h4>Rooms</h4><p>Scroll this little page. The masthead gains a rule and a shadow once it is stuck, and the link for the section you are reading lights up.</p></section>
+            <section id="ns-colour"><h4>Colour</h4><p>Hover or focus Save for its tooltip; Escape closes it. Menu opens a drawer that is a dialog.</p></section>
+            <section id="ns-install"><h4>Install</h4><p>There is no script on this stage. Every state you see is the browser's.</p></section>
+          </div>
+        </div>
+        <ul class="ns-legend">
+          <li><b>.is-scrolled</b> becomes a scroll-driven animation on the masthead's rule.</li>
+          <li><b>.is-active</b> becomes scroll-target-group, the browser's scroll-spy.</li>
+          <li><b>.is-dismissed</b> becomes interestfor and popover="hint".</li>
+          <li><b>.is-open</b> becomes a &lt;dialog&gt; opened with commandfor.</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- ════ M4 Native parts ════ -->
+    <section class="slide" id="m4">
+      <div class="pitch">
+        <p class="pitch-kicker">New parts, 4 of 7</p>
+        <h2>Native parts</h2>
+        <p class="pitch-what">A carousel, a select that shows real swatches, and a menu that knows where it fits. All three are the browser's own elements, styled by walnut, with no script and no library.</p>
+        <dl class="pitch-facts">
+          <div><dt>Why you would use it</dt><dd>These are the three parts a site most often installs a library for. The browser's versions work with a keyboard and a screen reader from the start.</dd></div>
+          <div><dt>On your site</dt><dd><pre><code>&lt;link rel="stylesheet" href="walnut-scroll.css"&gt;
+&lt;ul class="wal-carousel"&gt;&lt;li&gt;…&lt;/li&gt;&lt;/ul&gt;
+
+&lt;select class="wal-select"&gt;
+  &lt;button&gt;&lt;selectedcontent&gt;&lt;/selectedcontent&gt;&lt;/button&gt;
+  &lt;option&gt;&lt;i class="swatch"&gt;&lt;/i&gt; Forest&lt;/option&gt;
+&lt;/select&gt;
+
+&lt;button popovertarget="more"&gt;More&lt;/button&gt;
+&lt;div id="more" popover class="wal-menu"&gt;…&lt;/div&gt;</code></pre></dd></div>
+          <div><dt>Status</dt><dd class="pitch-status"><b data-status="ships">Ships.</b> <span>Chrome and Edge draw all three today. Elsewhere the carousel is a plain swipeable row and the select is the system's own. The carousel's dots and arrows are in their own sheet, since Next.js and Vite cannot read them yet. Under Materials the menu and the picker are brass.</span></dd></div>
+        </dl>
+      </div>
+      <div class="demo">
+        <div class="stage wal-palette pitch-prairie" id="m4-stage" data-wal-recolour="swatch">
+          <div class="stage-pad">
+            <div class="parts-bar">
+              <select class="wal-select" id="m4-select" aria-label="Palette for this stage">
+                <button><selectedcontent></selectedcontent></button>
+              </select>
+              <button class="pitch-chip is-plain" type="button" popovertarget="m4-menu">More</button>
+              <div class="wal-menu" id="m4-menu" popover>
+                <button type="button" popovertarget="m4-menu" popovertargetaction="hide">Copy the palette</button>
+                <button type="button" popovertarget="m4-menu" popovertargetaction="hide">Download the tokens</button>
+                <button type="button" popovertarget="m4-menu" popovertargetaction="hide">Share this colourway</button>
+              </div>
+            </div>
+            <div class="carousel-wrap">
+              <ul class="wal-carousel" id="m4-carousel" aria-label="Colourways"></ul>
+            </div>
+          </div>
+        </div>
+        <p class="demo-note">The select recolours the stage from where it sits. Each dot under the carousel is its slide's lead colour.</p>
+      </div>
+    </section>
+
+    <!-- ════ M5 Shuffle ════ -->
+    <section class="slide" id="m5">
+      <div class="pitch">
+        <p class="pitch-kicker">New parts, 5 of 7</p>
+        <h2>Shuffle</h2>
+        <p class="pitch-what">Filter or sort a grid and every card glides to its new place. Cards that leave fold away and cards that arrive rise into the gaps.</p>
+        <dl class="pitch-facts">
+          <div><dt>Why you would use it</dt><dd>Catalogues, portfolios, shops and dashboards all filter. Without this the grid jumps and the reader has to find their place again.</dd></div>
+          <div><dt>On your site</dt><dd><pre><code>&lt;ul class="wal-shuffle" id="materials"&gt;…&lt;/ul&gt;
+
+walnut.shuffle(materials, () =&gt; showOnly("wood"));
+&lt;script src="walnut-motion.js" defer&gt;&lt;/script&gt;</code></pre></dd></div>
+          <div><dt>Status</dt><dd class="pitch-status"><b data-status="ships">Ships, with walnut.shuffle in walnut-motion.js.</b> <span>It is a view transition scoped to the grid, so the rest of the page stays live while it moves. Without view transitions the grid changes at once.</span></dd></div>
+        </dl>
+      </div>
+      <div class="demo">
+        <div class="stage wal-palette pitch-prairie">
+          <div class="stage-pad">
+            <p class="stage-head"><b>Materials</b><span id="mat-count">12 of 12</span></p>
+            <ul class="mat-grid wal-shuffle" id="mat-grid"></ul>
+          </div>
+        </div>
+        <div class="shuffle-controls">
+          <div class="chips" id="mat-filter">
+            <button class="pitch-chip is-plain" type="button" data-kind="" aria-pressed="true">All</button>
+            <button class="pitch-chip is-plain" type="button" data-kind="Wood" aria-pressed="false">Wood</button>
+            <button class="pitch-chip is-plain" type="button" data-kind="Stone" aria-pressed="false">Stone</button>
+            <button class="pitch-chip is-plain" type="button" data-kind="Metal" aria-pressed="false">Metal</button>
+            <button class="pitch-chip is-plain" type="button" data-kind="Cloth" aria-pressed="false">Cloth</button>
+          </div>
+          <div class="chips" id="mat-sort">
+            <button class="pitch-chip is-plain" type="button" data-sort="name" aria-pressed="true">By name</button>
+            <button class="pitch-chip is-plain" type="button" data-sort="light" aria-pressed="false">Light to dark</button>
+            <button class="pitch-chip is-plain" type="button" data-sort="hue" aria-pressed="false">By hue</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ════ M6 Charts ════ -->
+    <section class="slide" id="m6">
+      <div class="pitch">
+        <p class="pitch-kicker">New parts, 6 of 7</p>
+        <h2>Charts from the script</h2>
+        <p class="pitch-what">Column and ring charts in plain HTML, drawn in the palette's five cues and made like furniture. The columns stand on a brass rail, each on a brass shoe like a sideboard's legs; the gridlines are inlaid stringing; the ring sits in a brass bezel with a tick at each quarter.</p>
+        <dl class="pitch-facts">
+          <div><dt>Why you would use it</dt><dd>A small chart on a landing page or a case study rarely justifies a charting library, and a library's chart never looks like the site. These are the site's colours and its materials, and a new palette regrades every chart.</dd></div>
+          <div><dt>On your site</dt><dd><pre><code>&lt;ol class="wal-chart" style="--max: 80"&gt;
+  &lt;li&gt;&lt;b&gt;May&lt;/b&gt;&lt;span style="--v: 42"&gt;42&lt;/span&gt;&lt;span style="--v: 18"&gt;18&lt;/span&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;b&gt;Jun&lt;/b&gt;&lt;span style="--v: 48"&gt;48&lt;/span&gt;&lt;span style="--v: 22"&gt;22&lt;/span&gt;&lt;/li&gt;
+&lt;/ol&gt;
+&lt;ul class="wal-key"&gt;&lt;li&gt;Search&lt;/li&gt;&lt;li&gt;Links&lt;/li&gt;&lt;/ul&gt;
+
+&lt;div class="wal-ring" style="--a: 58; --b: 34"&gt;58%&lt;small&gt;on a phone&lt;/small&gt;&lt;/div&gt;</code></pre></dd></div>
+          <div><dt>Status</dt><dd class="pitch-status"><b data-status="ships">Ships, pure CSS.</b> <span>The brass and the stringing are the same in every palette and both modes, so a chart reads as part of the furniture. A new --v moves its column; under Materials it strikes and rings.</span></dd></div>
+        </dl>
+      </div>
+      <div class="demo">
+        <div class="stage wal-palette pitch-prairie is-wide" id="m6-stage" data-wal-recolour="swatch">
+          <div class="stage-pad">
+            <p class="chart-title">Where visitors came from <small>Example data, in hundreds, May to October</small></p>
+            <div class="chart-row">
+              <div>
+                <ol class="wal-chart" id="m6-chart" style="--max: 80" aria-label="Visits by source, in hundreds">
+                  <li aria-label="May: search 42, links 18, direct 12"><b>May</b><span style="--v: 42">42</span><span style="--v: 18">18</span><span style="--v: 12">12</span></li>
+                  <li aria-label="June: search 48, links 22, direct 14"><b>Jun</b><span style="--v: 48">48</span><span style="--v: 22">22</span><span style="--v: 14">14</span></li>
+                  <li aria-label="July: search 51, links 30, direct 13"><b>Jul</b><span style="--v: 51">51</span><span style="--v: 30">30</span><span style="--v: 13">13</span></li>
+                  <li aria-label="August: search 58, links 26, direct 17"><b>Aug</b><span style="--v: 58">58</span><span style="--v: 26">26</span><span style="--v: 17">17</span></li>
+                  <li aria-label="September: search 63, links 34, direct 19"><b>Sep</b><span style="--v: 63">63</span><span style="--v: 34">34</span><span style="--v: 19">19</span></li>
+                  <li aria-label="October: search 71, links 39, direct 22"><b>Oct</b><span style="--v: 71">71</span><span style="--v: 39">39</span><span style="--v: 22">22</span></li>
+                </ol>
+                <ul class="wal-key"><li>Search</li><li>Links</li><li>Direct</li></ul>
+              </div>
+              <div class="ring-box">
+                <div class="wal-ring" id="m6-ring" style="--a: 58; --b: 34; --c: 8; --wal-ring-size: 8.5rem" role="img" aria-label="Devices: phone 58 percent, desktop 34, tablet 8">58%<small>on a phone</small></div>
+                <ul class="wal-key"><li>Phone</li><li>Desktop</li><li>Tablet</li></ul>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="chips" id="m6-year">
+          <button class="pitch-chip is-plain" type="button" data-year="now" aria-pressed="true">This year</button>
+          <button class="pitch-chip is-plain" type="button" data-year="last" aria-pressed="false">Last year</button>
+        </div>
+        <div class="chips" data-chips="m6-stage"></div>
+      </div>
+    </section>
+
+    <!-- ════ M7 Print ════ -->
+    <section class="slide" id="m7">
+      <div class="pitch">
+        <p class="pitch-kicker">New parts, 7 of 7</p>
+        <h2>Prints like a catalogue</h2>
+        <p class="pitch-what">Print a walnut page and it comes out as a catalogue sheet: sheet numbers, the address after every link, colour kept to the parts that carry meaning, and nothing that only makes sense on a screen.</p>
+        <dl class="pitch-facts">
+          <div><dt>Why you would use it</dt><dd>Résumés, case studies, recipes, invoices and documentation all get printed or saved as PDF, and most sites print as a broken screenshot. A walnut page would print well with nothing added.</dd></div>
+          <div><dt>On your site</dt><dd><pre><code>/* nothing: it is in walnut's stylesheet.
+   A running head of your own is one line: */
+@page { @top-left { content: "Alex Kim, case studies"; } }</code></pre></dd></div>
+          <div><dt>Status</dt><dd class="pitch-status"><b data-status="ships">Ships, in the stylesheet.</b> <span>Sheet numbers and running heads print from the page margins in Chrome and Edge; elsewhere the sheet prints without them.</span></dd></div>
+        </dl>
+      </div>
+      <div class="demo">
+        <div class="stage wal-palette wal-forest">
+          <div class="sheet-wrap">
+            <article class="sheet" id="sheet">
+              <div class="sheet-head"><span>walnut.css</span><span>Colourways</span></div>
+              <div class="sheet-body">
+                <div class="sheet-nav"><b>walnut</b><span>Rooms</span><span>Colour</span><span>Install</span></div>
+                <h3>Forest</h3>
+                <div class="way-art" aria-hidden="true"><i data-band="accent"></i><i data-band="bloom"></i><i data-band="gold"></i><i data-band="olive"></i><i data-band="cool"></i></div>
+                <p>Fern on a mossy floor at dawn, with campfire copper. Forest leads with green and keeps its ground close to the leaf, so every neutral reads as part of the same wood.</p>
+                <div class="sheet-photo" role="img" aria-label="A photograph graded in the palette"></div>
+                <table><tr><th>Cue</th><th>Role</th></tr><tr><td>Accent</td><td>The lead</td></tr><tr><td>Bloom</td><td>The warm mid</td></tr><tr><td>Cool</td><td>The split complement</td></tr></table>
+                <p>The whole palette is in <a href="https://github.com/SKMinWoo/walnut.css" data-href="github.com/SKMinWoo/walnut.css">the walnut repository</a>.</p>
+                <span class="sheet-cta">Wear Forest</span>
+              </div>
+              <div class="sheet-foot"><span>Sheet 1 of 2</span><span>walnut.css/docs/next.html</span></div>
+            </article>
+          </div>
+        </div>
+        <div class="chips" id="sheet-mode">
+          <button class="pitch-chip is-plain" type="button" data-paper="" aria-pressed="true">On screen</button>
+          <button class="pitch-chip is-plain" type="button" data-paper="1" aria-pressed="false">On paper</button>
+        </div>
+        <p class="demo-note">On paper the masthead and the button go, the link prints its address, and the sheet gains its heads and number. This preview applies the same rules on screen.</p>
+      </div>
+    </section>
+
+    <!-- ════ Shipped ════ -->
+    <section class="slide slide-solo" id="pick">
+      <div class="pitch">
+        <p class="pitch-kicker">Where it lives</p>
+        <h2>In walnut.css now</h2>
+        <p class="pitch-what">Every stage in this deck runs on the built framework: dist/walnut.css, and dist/walnut-motion.js for the gatefold and the shuffle. The deck styles only itself.</p>
+        <div class="contents pick-list">
+          <div>
+            <h3>Openings and materials</h3>
+            <ol>
+              <li><b>Plan chest.</b> .wal-chest on &lt;details&gt;. Pure CSS.</li>
+              <li><b>Sliding door.</b> .wal-door on &lt;dialog&gt;. Pure CSS.</li>
+              <li><b>Gatefold.</b> .wal-window with data-wal-open="gatefold", played by walnut-motion.js.</li>
+              <li><b>Step inside.</b> walnut.recolour with a change, from walnut-recolour.js.</li>
+              <li><b>Materials.</b> data-motion="materials" on the page, or data-wal-material on any part.</li>
+            </ol>
+          </div>
+          <div>
+            <h3>Parts</h3>
+            <ol>
+              <li><b>Corners.</b> --wal-corner-shape; Catalogue bevels.</li>
+              <li><b>Any colour.</b> .wal-tint, .wal-fill-tint, --wal-ink() and --wal-soft().</li>
+              <li><b>No script left.</b> The nav's own state, and .wal-tip.</li>
+              <li><b>Native parts.</b> .wal-carousel, .wal-select and .wal-menu.</li>
+              <li><b>Shuffle.</b> .wal-shuffle and walnut.shuffle().</li>
+              <li><b>Charts.</b> .wal-chart, .wal-ring and .wal-key.</li>
+              <li><b>Print.</b> Nothing to add; it is in the stylesheet.</li>
+            </ol>
+          </div>
+        </div>
+        <p class="pitch-what">Every class and token is in <a href="index.html">the reference</a>, and <a href="next.html">the catalogue</a> opens each colourway in a gatefold.</p>
+      </div>
+    </section>
+  </main>
+
+  <!-- Dialogs are built here by the deck script, one per demo window. -->
+  <div id="windows"></div>
+
+  <!-- ═══ Deck: the demos ═══ -->
+  <script>
+    (() => {
+      const $ = (id) => document.getElementById(id);
+      const root = document.documentElement;
+      const reduce = matchMedia("(prefers-reduced-motion: reduce)");
+      const esc = (s) => s.replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]);
+
+      const WAYS = [
+        { id: "bone", cls: "wal-bone", name: "Bone", short: "Washi teal, pressed flowers", mood: "Washi tape teal, pressed flowers and a vermilion stamp, on paper that stays light." },
+        { id: "forest", cls: "wal-forest", name: "Forest", short: "Fern, moss, campfire copper", mood: "Fern on a mossy floor at dawn, with campfire copper." },
+        { id: "dusk", cls: "wal-dusk", name: "Dusk", short: "Twilight, afterglow, lantern", mood: "Twilight violet, the afterglow, and a lantern's glow." },
+        { id: "cafe", cls: "wal-cafe", name: "Café", short: "China blue, brass, walnut", mood: "Golden hour, with china blue, brass fixtures and a walnut counter." },
+        { id: "press", cls: "wal-press", name: "Press", short: "A parts catalogue on a desk", mood: "A 1960s parts catalogue on a walnut desk, with tomato plate numbers on paper." },
+        { id: "prairie", cls: "pitch-prairie", name: "Prairie", short: "Limestone and burnt orange", mood: "Cool limestone kept close to grey, with a burnt orange lead." },
+      ];
+      const ROLES = [["accent", "Accent", "the lead, for anything you can act on"], ["bloom", "Bloom", "the warm mid, for washes"],
+        ["gold", "Gold", "the metal, for rules and markers"], ["olive", "Olive", "the botanical, the calm one"], ["cool", "Cool", "the split complement"]];
+      const art = (extra = "", cls = "") => `<span class="way-art${cls && " " + cls}" aria-hidden="true" ${extra}>${ROLES.map(([k]) => `<i data-band="${k}"></i>`).join("")}</span>`;
+      const page = (w, idPrefix) => `
+        <p class="way-kicker">Colourway</p>
+        <h3 class="way-name" id="${idPrefix}-${w.id}-name">${esc(w.name)}</h3>
+        <p class="way-mood">${esc(w.mood)}</p>
+        <ul class="way-cues">${ROLES.map(([k, n, d]) => `<li><i data-band="${k}"></i><b>${n}</b><span>${d}</span></li>`).join("")}</ul>
+        <p class="way-use">On your site: <code>&lt;html class="${w.cls}"&gt;</code></p>`;
+      const card = (w, attrs = "") => `
+        <button class="way-card wal-palette ${w.cls}" type="button" ${attrs}>
+          ${art('data-wal-art')}
+          <span class="way-card-name">${esc(w.name)}</span>
+          <small>${esc(w.short)}</small>
+        </button>`;
+      const THREE = WAYS.slice(0, 3);
+      const windows = $("windows");
+
+      /* ── O1 Plan chest ── */
+      document.querySelector("[data-chest]").innerHTML = WAYS.slice(0, 4).map((w) => `
+        <details name="chest" class="wal-palette ${w.cls}">
+          <summary>${art("", "chest-strip")}
+            <span class="chest-front"><b>${esc(w.name)}</b><small>${esc(w.short)}</small></span>
+          </summary>
+          <div class="chest-inside way-page">${page(w, "o1")}</div>
+        </details>`).join("");
+
+      /* ── O2 Sliding door ── */
+      document.querySelector("[data-doors]").innerHTML = THREE.map((w) => `
+        <div class="door-row wal-palette ${w.cls}">
+          ${art()}
+          <div><b>${esc(w.name)}</b><small>${esc(w.short)}</small></div>
+          <button class="pitch-chip is-plain" type="button" commandfor="o2-${w.id}" command="show-modal">Open</button>
+        </div>`).join("");
+      windows.insertAdjacentHTML("beforeend", THREE.map((w) => `
+        <dialog class="wal-door wal-palette ${w.cls}" id="o2-${w.id}" closedby="any" aria-labelledby="o2-${w.id}-name">
+          <button class="wal-door-pull" type="button" commandfor="o2-${w.id}" command="close" aria-label="Close"></button>
+          <div class="wal-door-body way-page">
+            <button class="pitch-chip is-plain door-close" type="button" commandfor="o2-${w.id}" command="close">Close</button>
+            ${art()}
+            ${page(w, "o2")}
+          </div>
+        </dialog>`).join(""));
+
+      /* ── O4 Gatefold ── */
+      document.querySelector('[data-cards="gatefold"]').innerHTML = THREE.map((w) =>
+        card(w, `commandfor="o4-${w.id}" command="show-modal"`)).join("");
+      windows.insertAdjacentHTML("beforeend", THREE.map((w) => `
+        <dialog class="wal-window wal-palette ${w.cls}" id="o4-${w.id}" data-wal-open="gatefold" closedby="any" aria-labelledby="o4-${w.id}-name">
+          <div class="wal-gatefold-spread">
+            <figure class="wal-gatefold-cover"><span class="gatefold-art">${art()}</span></figure>
+            <div class="wal-gatefold-notes">
+              <div class="gatefold-notes-in way-page">
+                <button class="pitch-chip is-plain way-close" type="button" commandfor="o4-${w.id}" command="close">Close</button>
+                ${page(w, "o4")}
+              </div>
+            </div>
+          </div>
+        </dialog>`).join(""));
+
+      /* ── O5 Step inside: the swatch recolour carries the page in ── */
+      {
+        const stage = $("o5-stage"), cat = $("o5-cat"), room = $("o5-room");
+        const grid = document.querySelector('[data-cards="step"]');
+        grid.innerHTML = THREE.map((w) => card(w, `data-way="${w.id}"`)).join("");
+        let from = null, worn = "pitch-prairie";
+        const go = (target, by, change) => {
+          if (window.walnut?.recolour) walnut.recolour(target, change, { from: by, style: "swatch" });
+          else change();
+        };
+        for (const b of grid.querySelectorAll("[data-way]")) {
+          const w = WAYS.find((x) => x.id === b.dataset.way);
+          b.addEventListener("click", () => {
+            from = b;
+            go(stage, b, () => {
+              stage.classList.replace(worn, w.cls); worn = w.cls;
+              $("o5-page").innerHTML = page(w, "o5");
+              cat.hidden = true; room.hidden = false;
+              $("o5-back").focus({ preventScroll: true });
+            });
+          });
+        }
+        $("o5-back").addEventListener("click", () => {
+          go(stage, $("o5-back"), () => {
+            stage.classList.replace(worn, "pitch-prairie"); worn = "pitch-prairie";
+            room.hidden = true; cat.hidden = false;
+            from?.focus({ preventScroll: true });
+          });
+        });
+      }
+
+      /* ── Curves, plotted from the tokens themselves ── */
+      const stops = (name) => getComputedStyle(root).getPropertyValue(name).match(/linear\((.*)\)/)[1].split(",").map((s, i, all) => {
+        const [y, x] = s.trim().split(/\s+/);
+        return [x ? parseFloat(x) / 100 : i / (all.length - 1), parseFloat(y)];
+      });
+      const trace = (pts, W, H, P, top = P) => pts.map(([x, y], i) => `${i ? "L" : "M"}${(P + x * (W - 2 * P)).toFixed(1)} ${(H - P - y * (H - P - top)).toFixed(1)}`).join(" ");
+
+      /* ── One way in: the two default easings ── */
+      {
+        const svg = $("curves");
+        const W = 340, H = 150, P = 14;
+        svg.innerHTML = `
+          <rect x="${P}" y="${P}" width="${W - 2 * P}" height="${H - 2 * P}" fill="none" stroke="var(--wal-line-soft)"/>
+          <path d="${trace(stops("--wal-ease-glide"), W, H, P)}" fill="none" stroke="var(--wal-accent)" stroke-width="2.5"/>
+          <path d="${trace(stops("--wal-ease-settle"), W, H, P)}" fill="none" stroke="var(--wal-cool)" stroke-width="2.5"/>
+          <text x="${W - P - 4}" y="${P + 30}" text-anchor="end" font-size="11" fill="var(--wal-text-soft)">settle</text>
+          <text x="${W / 2 + 22}" y="${H / 2 + 22}" font-size="11" fill="var(--wal-text-soft)">glide</text>`;
+        $("runners-go").addEventListener("click", () => $("runners").classList.toggle("is-run"));
+      }
+
+      /* ── Materials: three chests, each drawer holding its own curve ── */
+      {
+        const MATERIALS = [
+          { id: "walnut", name: "Walnut", ease: "--wal-ease-walnut", open: "1.05s", shut: "0.8s", knock: "6.5%, then 1.6%",
+            line: "Slow to get going. It strikes its stop past halfway through the move, knocks back, and knocks once more, smaller." },
+          { id: "brass", name: "Brass", ease: "--wal-ease-brass", open: "0.48s", shut: "0.38s", knock: "5%, 1.8%, then 0.6%",
+            line: "Quick from the first moment, at its stop in a quarter of a second, and then it rings like a spring: three knocks, each smaller and quicker." },
+          { id: "stone", name: "Stone", ease: "--wal-ease-stone", open: "1.2s", shut: "1s", knock: "None",
+            line: "Slow to start and slower to stop, and no bounce at all. Stone does not give; it grinds to a dead stop." },
+        ];
+        const box = document.querySelector("[data-mats]");
+        box.innerHTML = MATERIALS.map((m) => `
+          <div class="mats-col">
+            <p class="mats-name"><i class="mats-chip" data-mat="${m.id}" aria-hidden="true"></i>${m.name}</p>
+            <div class="wal-chest" data-wal-material="${m.id}">
+              <details name="mat-${m.id}">
+                <summary><span class="chest-front"><b>Curve</b><small>Opens in ${m.open}</small></span></summary>
+                <div class="mats-in"><svg viewBox="0 0 200 96" role="img" aria-label="The ${m.name.toLowerCase()} curve"></svg><p>${m.line}</p></div>
+              </details>
+              <details name="mat-${m.id}">
+                <summary><span class="chest-front"><b>Figures</b><small>Shuts in ${m.shut}</small></span></summary>
+                <div class="mats-in"><dl><dt>Opens</dt><dd>${m.open}</dd><dt>Shuts</dt><dd>${m.shut}</dd><dt>Knocks back</dt><dd>${m.knock}</dd></dl></div>
+              </details>
+            </div>
+          </div>`).join("");
+        const W = 200, H = 96, P = 6, TOP = 20;
+        box.querySelectorAll("svg").forEach((svg, i) => {
+          const y1 = H - P - (H - P - TOP);
+          svg.innerHTML = `
+            <line x1="${P}" x2="${W - P}" y1="${y1}" y2="${y1}" stroke="var(--wal-text-muted)" stroke-dasharray="3 3"/>
+            <text x="${W - P}" y="${y1 - 6}" text-anchor="end" font-size="10" fill="var(--wal-text-muted)">stop</text>
+            <line x1="${P}" x2="${W - P}" y1="${H - P}" y2="${H - P}" stroke="var(--wal-line)"/>
+            <path d="${trace(stops(MATERIALS[i].ease), W, H, P, TOP)}" fill="none" stroke="var(--wal-accent)" stroke-width="2.2" stroke-linejoin="round"/>`;
+        });
+        const go = $("mats-go");
+        const firsts = () => [...box.querySelectorAll(".wal-chest > details:first-of-type")];
+        const label = () => { go.textContent = firsts().every((d) => d.open) ? "Push all three home" : "Pull all three"; };
+        go.addEventListener("click", () => {
+          const out = !firsts().every((d) => d.open);
+          for (const d of box.querySelectorAll("details")) d.open = false;
+          if (out) firsts().forEach((d) => { d.open = true; });
+          label();
+        });
+        box.querySelectorAll("details").forEach((d) => d.addEventListener("toggle", label));
+      }
+
+      /* ── M1 corners ── */
+      {
+        const stage = $("m1-stage"), out = $("m1-out"), range = $("m1-radius");
+        const show = () => {
+          const r = +range.value;
+          stage.style.setProperty("--wal-radius", `${r}px`);
+          stage.style.setProperty("--wal-btn-radius", `${Math.round(r * .78)}px`);
+          stage.style.setProperty("--wal-chip-radius", `${Math.round(r * .55)}px`);
+          stage.style.setProperty("--wal-badge-radius", `${Math.round(r * .45)}px`);
+          out.textContent = `${r}px, ${stage.style.getPropertyValue("--wal-corner-shape").trim()}`;
+        };
+        for (const b of document.querySelectorAll("[data-shape]")) {
+          b.addEventListener("click", () => {
+            stage.style.setProperty("--wal-corner-shape", b.dataset.shape);
+            for (const o of document.querySelectorAll("[data-shape]")) o.setAttribute("aria-pressed", String(o === b));
+            show();
+          });
+        }
+        range.addEventListener("input", show);
+        show();
+      }
+
+      /* ── M2 any colour: ratios measured from rendered pixels ── */
+      {
+        const LABELS = [["Design", "#f5d90a"], ["Bug", "#e5383b"], ["Research", "#14b8a6"], ["Writing", "#ff8fab"],
+          ["Backend", "#1d3a8a"], ["Ops", "#7c5c3b"], ["Later", "#9aa0a6"], ["Growth", "#7bd389"]];
+        const list = $("labels");
+        const ctx = Object.assign(document.createElement("canvas"), { width: 1, height: 1 }).getContext("2d", { willReadFrequently: true });
+        const rgb = (css) => { ctx.clearRect(0, 0, 1, 1); ctx.fillStyle = "#000"; ctx.fillStyle = css; ctx.fillRect(0, 0, 1, 1); return [...ctx.getImageData(0, 0, 1, 1).data].slice(0, 3); };
+        const lum = ([r, g, b]) => [r, g, b].map((v) => { v /= 255; return v <= 0.04045 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4; }).reduce((s, v, i) => s + v * [0.2126, 0.7152, 0.0722][i], 0);
+        const ratio = (a, b) => { const [x, y] = [lum(a), lum(b)].sort((p, q) => q - p); return (x + 0.05) / (y + 0.05); };
+        const add = (name, hex) => {
+          const li = document.createElement("li");
+          li.className = "wal-tint";
+          li.style.setProperty("--wal-tint", hex);
+          li.innerHTML = `<i class="dot"></i><span>${esc(name)} <code>${hex}</code></span><span class="wal-chip wal-tint">${esc(name)}</span><span class="solid wal-fill-tint">${esc(name)}</span><span class="ratio"></span>`;
+          list.append(li);
+        };
+        const measure = () => {
+          let pass = 0, all = 0;
+          for (const li of list.children) {
+            const chip = li.querySelector(".wal-chip"), solid = li.querySelector(".solid");
+            const cs = getComputedStyle(chip), ss = getComputedStyle(solid);
+            const r1 = ratio(rgb(cs.color), rgb(cs.backgroundColor)), r2 = ratio(rgb(ss.color), rgb(ss.backgroundColor));
+            li.querySelector(".ratio").textContent = `wash ${r1.toFixed(1)}:1, fill ${r2.toFixed(1)}:1`;
+            all += 2; pass += (r1 >= 4.5) + (r2 >= 4.5);
+          }
+          const score = $("tint-score");
+          score.textContent = `${pass} of ${all} text pairs pass 4.5:1 in ${matchMedia("(prefers-color-scheme: dark)").matches && !root.dataset.theme || root.dataset.theme === "dark" ? "dark" : "light"}.`;
+          score.classList.toggle("is-fail", pass < all);
+        };
+        LABELS.forEach(([n, h]) => add(n, h));
+        $("tint-pick").addEventListener("change", (e) => { add("Yours", e.target.value); requestAnimationFrame(measure); });
+        window.pitchMeasureTints = measure;
+        requestAnimationFrame(measure);
+      }
+
+      /* ── M3: the in-page links scroll their own little page ── */
+      {
+        const site = $("ns-site");
+        for (const a of site.querySelectorAll(".wal-nav-links a")) {
+          a.addEventListener("click", (e) => {
+            e.preventDefault();
+            const to = site.querySelector(a.getAttribute("href"));
+            site.scrollTo({ top: to.offsetTop - site.querySelector(".wal-nav").offsetHeight, behavior: reduce.matches ? "instant" : "smooth" });
+          });
+        }
+        windows.insertAdjacentHTML("beforeend", `
+          <dialog class="wal-door wal-palette pitch-prairie" id="ns-door" closedby="any" aria-label="Menu">
+            <button class="wal-door-pull" type="button" commandfor="ns-door" command="close" aria-label="Close"></button>
+            <div class="wal-door-body way-page">
+              <button class="pitch-chip is-plain door-close" type="button" commandfor="ns-door" command="close">Close</button>
+              <h3 class="way-name">Menu</h3>
+              <p class="way-mood">This drawer is a dialog. Nothing on this slide set .is-open; the browser opened it, moved focus into it, and made the page behind it inert.</p>
+            </div>
+          </dialog>`);
+      }
+
+      /* ── M4 native parts ── */
+      {
+        const select = $("m4-select"), stage = $("m4-stage");
+        select.insertAdjacentHTML("beforeend", WAYS.map((w) =>
+          `<option value="${w.cls}" ${w.cls === "pitch-prairie" ? "selected" : ""}><i class="pitch-swatch wal-palette ${w.cls}"></i>${esc(w.name)}</option>`).join(""));
+        let worn = "pitch-prairie";
+        select.addEventListener("change", () => {
+          const next = select.value;
+          const change = () => { stage.classList.replace(worn, next); worn = next; };
+          if (window.walnut?.recolour) walnut.recolour(stage, change, { from: select, style: "swatch" }); else change();
+        });
+        $("m4-carousel").innerHTML = WAYS.map((w) => `
+          <li class="wal-palette ${w.cls}" aria-label="${esc(w.name)}">
+            <div class="parts-slide">${art()}<b>${esc(w.name)}</b><p>${esc(w.mood)}</p></div>
+          </li>`).join("");
+      }
+
+      /* ── M5 shuffle ── */
+      {
+        const MATS = [
+          ["Walnut", "Wood", 0.42, 0.055, 52], ["Teak", "Wood", 0.56, 0.085, 60], ["White oak", "Wood", 0.79, 0.05, 78],
+          ["Travertine", "Stone", 0.87, 0.03, 82], ["Slate", "Stone", 0.43, 0.02, 250], ["Verde marble", "Stone", 0.47, 0.06, 165],
+          ["Brass", "Metal", 0.79, 0.105, 86], ["Copper", "Metal", 0.62, 0.12, 48], ["Blackened steel", "Metal", 0.3, 0.012, 260],
+          ["Mustard wool", "Cloth", 0.75, 0.13, 88], ["Teal bouclé", "Cloth", 0.55, 0.08, 200], ["Cognac leather", "Cloth", 0.5, 0.11, 50],
+        ];
+        const grid = $("mat-grid");
+        grid.innerHTML = MATS.map(([n, k, l, c, h]) =>
+          `<li class="mat" data-kind="${k}" data-l="${l}" data-h="${h}" data-name="${esc(n)}"><i style="--c: oklch(${l} ${c} ${h})"></i><b>${esc(n)}</b><small>${k}, lightness ${Math.round(l * 100)}</small></li>`).join("");
+        let kind = "", sort = "name";
+        const ORDER = { name: (a, b) => a.dataset.name.localeCompare(b.dataset.name), light: (a, b) => b.dataset.l - a.dataset.l, hue: (a, b) => a.dataset.h - b.dataset.h };
+        const apply = () => {
+          const items = [...grid.children].sort(ORDER[sort]);
+          grid.append(...items);
+          let shown = 0;
+          for (const li of items) { li.hidden = !!kind && li.dataset.kind !== kind; shown += !li.hidden; }
+          $("mat-count").textContent = `${shown} of ${items.length}`;
+        };
+        const press = (group, b) => { for (const o of group.querySelectorAll("button")) o.setAttribute("aria-pressed", String(o === b)); };
+        for (const b of $("mat-filter").querySelectorAll("button")) b.addEventListener("click", () => { press($("mat-filter"), b); kind = b.dataset.kind; walnut.shuffle(grid, apply); });
+        for (const b of $("mat-sort").querySelectorAll("button")) b.addEventListener("click", () => { press($("mat-sort"), b); sort = b.dataset.sort; walnut.shuffle(grid, apply); });
+        apply();
+      }
+
+      /* ── M6: two years of figures, and palette chips recoloured from the swatch ── */
+      {
+        const YEARS = {
+          now: { search: [42, 48, 51, 58, 63, 71], links: [18, 22, 30, 26, 34, 39], direct: [12, 14, 13, 17, 19, 22], ring: [58, 34] },
+          last: { search: [30, 34, 33, 41, 44, 50], links: [12, 15, 19, 18, 24, 27], direct: [9, 10, 11, 12, 14, 15], ring: [51, 41] },
+        };
+        const MONTHS = ["May", "June", "July", "August", "September", "October"];
+        const chart = $("m6-chart"), ring = $("m6-ring");
+        const show = (year) => {
+          const d = YEARS[year];
+          [...chart.children].forEach((li, i) => {
+            const v = [d.search[i], d.links[i], d.direct[i]];
+            li.querySelectorAll("span").forEach((s, j) => { s.style.setProperty("--v", v[j]); s.textContent = v[j]; });
+            li.setAttribute("aria-label", `${MONTHS[i]}: search ${v[0]}, links ${v[1]}, direct ${v[2]}`);
+          });
+          const [a, b] = d.ring, c = 100 - a - b;
+          ring.style.setProperty("--a", a); ring.style.setProperty("--b", b); ring.style.setProperty("--c", c);
+          ring.firstChild.textContent = `${a}%`;
+          ring.setAttribute("aria-label", `Devices: phone ${a} percent, desktop ${b}, tablet ${c}`);
+        };
+        for (const b of $("m6-year").querySelectorAll("button")) {
+          b.addEventListener("click", () => {
+            for (const o of $("m6-year").querySelectorAll("button")) o.setAttribute("aria-pressed", String(o === b));
+            show(b.dataset.year);
+          });
+        }
+        for (const row of document.querySelectorAll("[data-chips]")) {
+          const id = row.dataset.chips, stage = $(id);
+          for (const w of WAYS) {
+            const b = document.createElement("button");
+            b.type = "button"; b.className = "pitch-chip";
+            b.dataset.walPalette = w.cls;
+            b.setAttribute("aria-controls", id);
+            b.setAttribute("aria-pressed", String(stage.classList.contains(w.cls)));
+            b.innerHTML = `<i class="pitch-swatch wal-palette ${w.cls}" aria-hidden="true"></i>${esc(w.name)}`;
+            row.append(b);
+          }
+        }
+      }
+
+      /* ── M7: screen or paper ── */
+      for (const b of $("sheet-mode").querySelectorAll("button")) {
+        b.addEventListener("click", () => {
+          $("sheet").classList.toggle("is-paper", !!b.dataset.paper);
+          for (const o of $("sheet-mode").querySelectorAll("button")) o.setAttribute("aria-pressed", String(o === b));
+        });
+      }
+
+      /* ── Mode, keys and the slide count ── */
+      const modes = [...document.querySelectorAll("[data-mode]")];
+      for (const b of modes) {
+        b.addEventListener("click", () => {
+          if (b.dataset.mode) root.dataset.theme = b.dataset.mode; else delete root.dataset.theme;
+          for (const o of modes) o.setAttribute("aria-pressed", String(o === b));
+          requestAnimationFrame(() => window.pitchMeasureTints?.());
+        });
+      }
+      matchMedia("(prefers-color-scheme: dark)").addEventListener("change", () => window.pitchMeasureTints?.());
+      $("motion").addEventListener("click", (e) => {
+        const on = e.currentTarget.getAttribute("aria-pressed") !== "true";
+        if (on) root.dataset.motion = "materials"; else delete root.dataset.motion;
+        e.currentTarget.setAttribute("aria-pressed", String(on));
+      });
+      const slides = [...document.querySelectorAll(".slide")];
+      const count = $("count");
+      let current = 0;
+      const seen = new IntersectionObserver((entries) => {
+        for (const e of entries) if (e.isIntersecting) { current = slides.indexOf(e.target); count.textContent = `${current + 1} of ${slides.length}`; }
+      }, { threshold: .55 });
+      slides.forEach((s) => seen.observe(s));
+      addEventListener("keydown", (e) => {
+        if (e.defaultPrevented || e.altKey || e.ctrlKey || e.metaKey) return;
+        if (document.querySelector("dialog[open]") || e.target.closest?.("input, select, textarea, [contenteditable], .ns-site, .wal-carousel")) return;
+        const step = { ArrowDown: 1, PageDown: 1, ArrowRight: 1, ArrowUp: -1, PageUp: -1, ArrowLeft: -1 }[e.key];
+        if (!step) return;
+        e.preventDefault();
+        const to = slides[Math.max(0, Math.min(slides.length - 1, current + step))];
+        to.scrollIntoView({ behavior: reduce.matches ? "instant" : "smooth", block: "start" });
+      });
+    })();
+  </script>
+  <script src="../dist/walnut-recolour.js" defer></script>
+  <script src="../dist/walnut-motion.js" defer></script>
+</body>
+</html>

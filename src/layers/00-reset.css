@@ -102,4 +102,10 @@ table {
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
   }
+
+  /* Pseudo-elements `*` does not reach, each in a rule of its own: a
+     browser that does not know one drops only that rule, not the list. */
+  *::backdrop { transition-duration: 0.01ms !important; }
+  *::details-content { transition-duration: 0.01ms !important; }
+  *::picker(select) { transition-duration: 0.01ms !important; }
 }

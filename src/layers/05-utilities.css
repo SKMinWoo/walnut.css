@@ -216,6 +216,8 @@
 .wal-fill-gold { background-color: var(--wal-gold); color: var(--wal-gold-fg); }
 .wal-fill-olive { background-color: var(--wal-olive); color: var(--wal-olive-fg); }
 .wal-fill-cool { background-color: var(--wal-cool); color: var(--wal-cool-fg); }
+/* Any colour as a fill, with .wal-tint naming it (04-components.css, 38. Tint). */
+.wal-fill-tint { background-color: var(--wal-tint-fill); color: var(--wal-tint-fg); }
 
 /* ── Display & Visibility ────────────────────────────────────────────── */
 
@@ -257,8 +259,8 @@
 
 .wal-glass {
   background-color: color-mix(in oklch, var(--wal-surface) 70%, transparent);
-  backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
 }
 
 .wal-gradient-text {
@@ -266,4 +268,84 @@
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
+}
+
+/* ── Print: a catalogue sheet ────────────────────────────────────────────
+   Print a walnut page and it comes out as a sheet from a catalogue: A4,
+   light, flat, numbered "Sheet 2 of 5" at the foot, with the furniture
+   of a screen left off and every link's address printed after it, since
+   paper cannot be clicked.
+
+   What is left off: the masthead, the progress bar, the drawers and
+   doors, and anything you mark data-wal-print="skip". A chest prints with
+   every drawer out. Charts, rings, keys, colour scripts and swatches print
+   in colour, because their colours are what they say; everything else
+   prints as the browser decides. Headings stay with what follows them and
+   a card, plate, metric or chart is never cut across two sheets.
+
+   The !important is on purpose: a print sheet hides the nav even where a
+   site's own unlayered CSS sets its display. */
+@media print {
+  @page {
+    size: A4;
+    margin: 18mm 16mm 20mm;
+
+    @bottom-left {
+      content: "Sheet " counter(page) " of " counter(pages);
+      font: 8pt var(--wal-font-body);
+      color: #666;
+    }
+  }
+
+  :root,
+  [data-theme],
+  .wal-dark {
+    color-scheme: light;
+  }
+
+  :root,
+  [data-finish] {
+    --wal-elevation: 0;
+    --wal-wash: 0;
+    --wal-tooth: none;
+  }
+
+  .wal-nav,
+  .wal-progress-bar,
+  .wal-drawer,
+  .wal-drawer-overlay,
+  .wal-door,
+  [data-wal-print="skip"] {
+    display: none !important;
+  }
+
+  a[href^="http"]::after {
+    content: " (" attr(href) ")";
+    font-size: 0.8em;
+    color: var(--wal-text-muted);
+    overflow-wrap: anywhere;
+  }
+
+  h1, h2, h3, h4 { break-after: avoid; }
+
+  figure, table, .wal-card, .wal-plate, .wal-metric, .wal-chart, .wal-ring {
+    break-inside: avoid;
+  }
+
+  .wal-chart, .wal-ring, .wal-key, .wal-script, .wal-swatch, .wal-duotone {
+    print-color-adjust: exact;
+  }
+
+  /* Out at once: with its transition left on, the change to print media
+     slides every drawer out, and the sheet is set mid-slide. */
+  .wal-chest details::details-content {
+    block-size: auto;
+    content-visibility: visible;
+    transition: none;
+  }
+
+  .wal-chest details > *:not(summary) {
+    translate: none;
+    transition: none;
+  }
 }

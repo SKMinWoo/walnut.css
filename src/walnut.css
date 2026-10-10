@@ -22,6 +22,11 @@
 @import "./layers/05-utilities.css"   layer(utilities);
 @import "./layers/06-cinema.css"      layer(cinema);
 
+/* The carousel's dots and arrows and the nav's scroll-spy, in selectors CSS
+   bundlers cannot parse yet. Leave it out of a bundled app's import and link
+   dist/walnut-scroll.css instead (see that file). */
+/* @import "./walnut-scroll.css"; */
+
 /* Theming, in full:
 
      <html class="wal-press" data-theme="light" data-finish="catalogue">

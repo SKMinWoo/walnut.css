@@ -2,9 +2,11 @@
    THEME — DUSK
    Mountain sunset, purple twilight, lantern glow.
    ───────────────────────────────────────────────────
-   The warm sunset accent is the emotional centre: a lantern against a twilight
-   sky. Rose gold adds metal; lavender replaces the botanical cue so the
-   tertiary stays inside the violet family instead of arguing with it.
+   The twilight leads: a violet accent over a violet-grey ground, with bloom
+   left on its default step (+27°) so it lands on the magenta of the
+   afterglow. The sunset is still here, moved off the accent. The lantern is
+   the gold, the alpenglow on the peaks is the olive slot, and the last blue
+   in the sky is the cool, pinned because a violet's default (+209°) is green.
 ═══════════════════════════════════════════════════ */
 
 .wal-dusk,
@@ -15,9 +17,10 @@
   --wal-chroma: 0.035;
 
   /* ── The five cues ── */
-  --wal-accent-hue: 40;   --wal-accent-chroma: 0.18;  /* sunset orange */
-  --wal-gold-hue:   30;   --wal-gold-chroma:   0.12;  /* rose gold     */
-  --wal-olive-hue:  290;  --wal-olive-chroma:  0.10;  /* lavender      */
+  --wal-accent-hue: 302;  --wal-accent-chroma: 0.17;  /* twilight violet */
+                          --wal-bloom-chroma:  0.14;  /* afterglow       */
+  --wal-gold-hue:   62;   --wal-gold-chroma:   0.135; /* lantern         */
+  --wal-olive-hue:  15;   --wal-olive-chroma:  0.10;  /* alpenglow       */
   --wal-cool-hue:   250;  --wal-cool-chroma:   0.12;  /* last blue in the sky */
 
   /* ── Ramp nudges ── a twilight ground runs deeper than a lit café */
@@ -26,8 +29,9 @@
   --wal-l-surface-dark:   21%;
   --wal-l-surface-2-dark: 25%;
 
-  /* The lantern is the brightest thing on the page — it has to out-glow the
-     sky behind it, which a 62% accent does not. */
+  /* Dusk is lit from below. In the dark the sky, the lantern and the
+     alpenglow all sit above the shared stops, so they glow against the deeper
+     ground instead of sinking into it; the lantern highest of all. */
   --wal-l-accent-dark: 68%;
   --wal-l-gold-dark:   72%;
   --wal-l-olive-dark:  62%;

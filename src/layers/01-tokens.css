@@ -146,9 +146,11 @@
 @property --wal-line-boost { syntax: "<number>";     inherits: true; initial-value: 1; }
 
 
-/* ═══ THE DEFAULT SCRIPT — CAFÉ ═══
-   Coffee shop in golden hour. Walnut wood, bone china, brass fixtures.
-   Restated as an explicit theme in src/themes/cafe.css. */
+/* ═══ THE DEFAULT SCRIPT ═══
+   Terracotta, apricot, goldenrod, botanical and adriatic on a warm amber
+   ground. Café used to restate this script as a theme; it now has a script of
+   its own (src/themes/cafe.css), and this one belongs to no class: it is what
+   a page wears when it names no palette. */
 :root {
   /* ── The ground rod ── */
   --wal-hue:    55;
@@ -215,6 +217,12 @@
   --wal-radius-full:  999px;
   --wal-hairline:     1px;
   --wal-line-boost:   1;
+  /* The shape of every corner a radius makes (04-components.css, 43.
+     Corners). round is the circle's arc; squircle is Piet Hein's
+     superellipse, the Superellipse table's own edge; bevel is a cut
+     corner, which is the catalogue finish's. A browser without
+     corner-shape draws round whatever this says. */
+  --wal-corner-shape: round;
 
   /* Atmosphere. --wal-elevation scales every shadow offset (0 flattens the
      page completely); --wal-wash scales the tinted light on <body>. Both are
@@ -236,9 +244,64 @@
   --wal-duration:      0.2s;
   --wal-duration-slow: 0.4s;
 
+  /* Things on runners. Glide is a drawer on ball-bearing runners: a little
+     resistance, a long run, and it comes to rest without a bump. Settle is a
+     soft-close damper: most of the travel is quick, then the damper takes
+     the rest. */
+  --wal-ease-glide:  linear(0, 0.008 3%, 0.04 8%, 0.12 15%, 0.3 25%, 0.53 36%, 0.73 47%, 0.86 58%, 0.94 70%, 0.982 84%, 1);
+  --wal-ease-settle: linear(0, 0.18 8%, 0.46 20%, 0.7 32%, 0.84 43%, 0.92 54%, 0.963 66%, 0.987 80%, 1);
+
+  /* How the openings move: .wal-chest, .wal-door and .wal-window. Open and
+     close are separate so a material (06-cinema.css, Materials) can give
+     the two directions different weights; a drawer pulled out and a drawer
+     pushed shut do not land the same way. */
+  --wal-open-duration:  620ms;
+  --wal-open-ease:      var(--wal-ease-glide);
+  --wal-close-duration: 620ms;
+  --wal-close-ease:     var(--wal-ease-settle);
+
+  /* How each material comes to a stop. Not drawn by eye: each is a small
+     model of the thing, sampled into linear() stops.
+
+     walnut       Heavy. It starts slowly, arrives at its stop with speed,
+                  knocks back 6.5% of its travel, comes in again, and has a
+                  last 1.6% hop before it is still.
+     walnut-shut  The same drawer pushed home: it shuts at 60%, bounces 4.5%
+                  open, and closes.
+     brass        Light and already moving. It strikes its stop and rings
+                  like a spring: 5%, then 1.8%, then 0.6%, each quicker.
+     stone        Too heavy to bounce. It takes a long time to get going,
+                  then friction brings it down to a dead stop.
+
+     A collision never passes its stop, so every value stays between 0 and
+     1: nothing overshoots a size or slides past the edge of the screen. */
+  --wal-ease-walnut:      linear(0, 0.003 2.1%, 0.011 4.2%, 0.026 6.4%, 0.045 8.6%, 0.071 10.9%, 0.103 13.3%, 0.185 18.3%, 0.256 22%, 0.344 26.1%, 0.454 30.9%, 0.812 45.9%, 0.916 50.7%, 1 55%, 0.971 57.9%, 0.952 60.7%, 0.939 63.6%, 0.935 66.5%, 0.939 69.3%, 0.951 72.2%, 0.971 75.1%, 1 78%, 0.988 80.7%, 0.984 83.5%, 0.988 86.2%, 1 89%, 1);
+  --wal-ease-walnut-shut: linear(0, 0.003 2.3%, 0.011 4.6%, 0.026 7%, 0.045 9.4%, 0.071 11.9%, 0.103 14.5%, 0.185 20%, 0.269 24.7%, 0.375 30%, 0.731 46.3%, 0.841 51.5%, 0.927 55.9%, 1 60%, 0.98 62.5%, 0.966 65%, 0.958 67.5%, 0.955 70%, 0.958 72.5%, 0.966 75%, 0.98 77.5%, 1 80%, 0.99 85%, 0.992 87.5%, 1 90%, 1);
+  --wal-ease-brass:       linear(0, 0.167 6%, 0.321 12%, 0.459 18%, 0.584 24%, 0.694 30%, 0.792 36.1%, 0.873 42.1%, 0.94 48.1%, 1 55%, 0.978 56.6%, 0.963 58.2%, 0.953 59.8%, 0.95 61.5%, 0.953 63.1%, 0.963 64.8%, 0.978 66.4%, 1 68%, 0.987 70%, 0.982 72%, 0.986 74%, 1 76%, 0.994 78.2%, 1 80.5%, 1);
+  --wal-ease-stone:       linear(0, 0.006 8.5%, 0.015 12%, 0.029 15.4%, 0.047 18.7%, 0.07 21.8%, 0.1 24.9%, 0.134 27.9%, 0.198 32.4%, 0.273 36.7%, 0.339 39.9%, 0.455 44.9%, 0.534 48.5%, 0.612 52.4%, 0.681 56.2%, 0.745 60.1%, 0.802 64%, 0.852 67.9%, 0.894 71.8%, 0.925 75.1%, 0.95 78.4%, 0.97 81.7%, 0.985 85%, 0.999 90.9%, 1);
+
+  /* ── Hardware ──
+     Brass is the hardware, not the palette. It stays brass on every palette
+     and in both modes, the way a drawer pull does not change when the
+     cabinet is repainted. The charts' rail, feet and bezel are brass. -lo
+     is the shadowed edge, and is what holds a rail at 3:1 on a light
+     ground. */
+  --wal-brass:    oklch(0.75 0.1 82);
+  --wal-brass-hi: oklch(0.9 0.07 92);
+  --wal-brass-lo: oklch(0.5 0.08 68);
+
   /* ── Furniture ── */
   --wal-nav-h:         64px;
   --wal-tracking-label: 0.1em;
+
+  /* ── The desk ──
+     The grain under .wal-desk, drawn by the browser rather than shipped as a
+     photograph: ridged noise stretched along the board, so its creases run
+     long the way walnut's figure does. It is a MASK — only its alpha is read —
+     so the colour comes from --wal-desk-ink, which is the ground rod, and the
+     grain re-themes with the script like every other neutral. stitchTiles
+     makes the 640px tile repeat without a seam. */
+  --wal-desk-grain: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='640' height='640'><filter id='g' x='0' y='0' width='100%' height='100%' color-interpolation-filters='sRGB'><feTurbulence type='turbulence' baseFrequency='0.003 0.06' numOctaves='3' seed='4' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -2.4 0 0 0 0.85'/></filter><rect width='100%' height='100%' filter='url(%23g)'/></svg>");
 }
 
 
@@ -321,6 +384,18 @@
     oklch(var(--wal-l-surface-2-light) calc(var(--wal-chroma) * var(--wal-cx-ground-light)) var(--wal-hue)),
     oklch(var(--wal-l-surface-2-dark)  calc(var(--wal-chroma) * var(--wal-cx-ground-dark))  var(--wal-hue)));
 
+  /* The grain of the desk under .wal-desk: the ground a little darker and a
+     little richer — figure in the wood, not light on it.
+
+     The two modes are bounded differently, and the bound is contrast. Page
+     text sits directly on the grain. On a dark page the ink is lighter than
+     the ground, so a darker grain line only adds contrast and the grain can be
+     stated relative to the ground. On a light page it takes contrast away, so
+     the grain goes no darker than --wal-bg-subtle: a ground every ink in the
+     script, muted included, is already tuned to clear 4.5:1 on. */
+  --wal-desk-ink: light-dark(
+    oklch(var(--wal-l-subtle-light)          calc(var(--wal-chroma) * var(--wal-cx-ground-light) * 1.6) var(--wal-hue)),
+    oklch(calc(var(--wal-l-bg-dark) - 4%)    calc(var(--wal-chroma) * var(--wal-cx-ground-dark)  * 1.4) var(--wal-hue)));
   /* ── Ground: hairlines ──
      --wal-line and --wal-line-soft are derived in the next rule, with the
      shadows, because a finish scales them. */

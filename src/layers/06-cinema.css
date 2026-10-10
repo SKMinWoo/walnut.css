@@ -4,6 +4,10 @@
    general-purpose scroll and view-transition helpers.
    ═══════════════════════════════════════════════════════════════════════ */
 
+/* The radius of the recolour circle (see "From the swatch" below). Declared
+   out here because a registration is not a conditional rule. */
+@property --wal-spread { syntax: "<length>"; inherits: false; initial-value: 0px; }
+
 @media (prefers-reduced-motion: no-preference) {
 
   /* ── Retune ────────────────────────────────────────────────────────────
@@ -189,6 +193,25 @@
     animation-name: wal-reveal-scale-up;
   }
 
+  /* Develop: a photograph comes up out of blank paper as it rises into
+     view, the way a print does in the developer tray.
+
+         <figure class="wal-duotone wal-reveal-develop"><img …></figure>
+
+     Brightness pushes every grey to white; as it falls back, the darkest
+     greys drop below white first, so the shadows come up first and the
+     highlights last. On the image, not the figure: the figure's ink and
+     paper stay put while the picture develops in them. Made for
+     .wal-duotone, whose filter it ends on. Like the other reveals it is
+     tied to scrolling, so scrolling back up takes the print back to paper. */
+  @keyframes wal-develop { from { filter: grayscale(1) contrast(1.08) brightness(7); } }
+  .wal-reveal-develop img {
+    animation: wal-develop linear both;
+    animation-timeline: view();
+    animation-range: entry 0% cover 50%;
+    animation-timing-function: cubic-bezier(0.3, 0.7, 0.4, 1);
+  }
+
   /* ── Scroll Progress ───────────────────────────────────────────────── */
   
   @keyframes wal-progress-grow {
@@ -231,6 +254,30 @@
 
   /* ── View Transitions ──────────────────────────────────────────────── */
 
+  /* Between pages. A same-origin navigation from one walnut page to another
+     crossfades instead of cutting: it becomes a view transition, and plays
+     the root crossfade below. Whatever the two pages share — the masthead,
+     the desk, the ground — is the same pixels on both sides of the fade, so
+     it holds still while only the papers change. Nothing slides.
+
+     Name an element the same on both pages and it travels between them
+     instead of fading: a card on one page and the heading of its detail page,
+     say, and the card grows into the page. Name it only for the navigation —
+     in the old page's `pageswap` event and the new page's `pagereveal` —
+     if the page also runs same-document transitions, or they will catch it
+     too. The groups take walnut's easing and duration below.
+
+     Both pages need this rule, which any walnut page has. Opt out with your
+     own `@view-transition { navigation: none; }`, which outranks this one. A
+     browser without cross-document transitions (Firefox; Safari before 18.2)
+     simply navigates, and so does reduced motion. */
+  @view-transition { navigation: auto; }
+
+  ::view-transition-group(*) {
+    animation-duration: var(--wal-duration-slow);
+    animation-timing-function: var(--wal-ease);
+  }
+
   /* View transition name helpers */
   .wal-transition-name-hero { view-transition-name: wal-hero; }
   .wal-transition-name-header { view-transition-name: wal-header; }
@@ -269,6 +316,152 @@
 
   @keyframes wal-fade-out { to   { opacity: 0; } }
   @keyframes wal-fade-in  { from { opacity: 0; } }
+
+  /* ── From the swatch ───────────────────────────────────────────────────
+     The recolour walnut-recolour.js runs for data-wal-recolour="swatch": the
+     new palette opens out of the button that asked for it, in a circle with
+     a soft edge, until it covers the page or the section being recoloured.
+
+         <html class="wal-forest" data-wal-recolour="swatch">
+         <button data-wal-palette="wal-dusk">Dusk</button>
+
+     The script names the recoloured element wal-recolour for the length of
+     the change, and leaves the circle's centre and final radius in
+     --wal-recolour-x, -y and -r on <html>. Everything else is here: the
+     "after" picture is masked by a radial gradient whose radius is a
+     registered length, so the browser can tween it.
+
+     A view transition, not a tween of the rods, and that is the point:
+     every frame shows either the old palette or the finished new one, never
+     a mix, so contrast is final from the first frame. A mask is not a
+     clip-path: the edge is a 96px fade, light spreading rather than a
+     shape being cut.
+
+     While it runs the rest of the page holds still and nothing in the new
+     picture replays a colour transition of its own. An element with a
+     permanent view-transition-name of its own is pictured separately and
+     crossfades instead; name such things only for their own transitions.
+     Lasts --wal-recolour-duration. */
+  :root:active-view-transition-type(wal-recolour)::view-transition-group(root),
+  :root:active-view-transition-type(wal-recolour)::view-transition-group(wal-recolour) { animation: none; }
+  :root:active-view-transition-type(wal-recolour)::view-transition-old(root),
+  :root:active-view-transition-type(wal-recolour)::view-transition-new(root),
+  :root:active-view-transition-type(wal-recolour)::view-transition-old(wal-recolour),
+  :root:active-view-transition-type(wal-recolour)::view-transition-new(wal-recolour) {
+    animation: none;
+    mix-blend-mode: normal;
+  }
+  :root:active-view-transition-type(wal-recolour),
+  :root:active-view-transition-type(wal-recolour) *,
+  :root:active-view-transition-type(wal-recolour) *::before,
+  :root:active-view-transition-type(wal-recolour) *::after { transition: none !important; }
+
+  :root:active-view-transition-type(wal-swatch)::view-transition-new(wal-recolour) {
+    mask-image: radial-gradient(circle at var(--wal-recolour-x, 50%) var(--wal-recolour-y, 50%),
+                                #000 calc(var(--wal-spread) - 96px), transparent var(--wal-spread));
+    animation: wal-spread var(--wal-recolour-duration, 760ms) cubic-bezier(0.5, 0, 0.2, 1) both;
+  }
+  @keyframes wal-spread { to { --wal-spread: var(--wal-recolour-r, 150vmax); } }
+
+  /* ── Shuffle ───────────────────────────────────────────────────────────
+     A grid that is filtered or sorted, with every item travelling to its
+     new place instead of jumping there. walnut.shuffle (walnut-motion.js)
+     runs the change as a view transition scoped to the list:
+
+         <ul class="wal-shuffle" id="tiles">…</ul>
+         walnut.shuffle(tiles, () => { …hide, show or reorder items… });
+
+     While it runs, .is-shuffling gives each item a view-transition name of
+     its own, made by the browser from the element (match-element), so
+     nothing needs an id. The names are on only for the change, so no other
+     transition catches them. An item that stays travels; one that leaves
+     shrinks and fades; one that arrives grows in once the others are on
+     their way. A browser without scoped transitions runs it on the
+     document, and without any, the change simply happens. */
+  .wal-shuffle.is-shuffling > * {
+    view-transition-name: match-element;
+    view-transition-class: wal-shuffle;
+  }
+
+  ::view-transition-group(*.wal-shuffle) {
+    animation-duration: 0.52s;
+    animation-timing-function: var(--wal-ease-glide);
+  }
+
+  ::view-transition-old(*.wal-shuffle):only-child {
+    animation: wal-shuffle-out 0.26s cubic-bezier(0.4, 0, 1, 1) both;
+  }
+
+  ::view-transition-new(*.wal-shuffle):only-child {
+    animation: wal-shuffle-in 0.42s 0.14s var(--wal-ease-glide) both;
+  }
+
+  @keyframes wal-shuffle-out { to { opacity: 0; scale: 0.9; translate: 0 0.4rem; } }
+  @keyframes wal-shuffle-in { from { opacity: 0; scale: 0.92; translate: 0 0.6rem; } }
+
+  /* ── Materials ─────────────────────────────────────────────────────────
+     Weight, felt in how a thing comes to a stop.
+
+         <html data-motion="materials">
+         <div class="wal-chest" data-wal-material="stone">…</div>
+
+     walnut  For drawers and doors. Slow to get going and heavy when it
+             lands: a drawer hits its stop, knocks back, and settles. A
+             second and a bit out, 0.8s home.
+     brass   For hardware: menus, pickers, a chart's columns and ring. Quick
+             to its stop, a quarter of a second, and then it rings like a
+             spring, three knocks each smaller and quicker than the last.
+     stone   For big, slow surfaces. No bounce at all; it grinds to a
+             dead stop. Over a second each way.
+
+     data-motion="materials" on <html> gives every part its own: walnut for
+     .wal-chest, .wal-door and .wal-window, brass for .wal-menu, .wal-select,
+     .wal-chart and .wal-ring. data-wal-material names one for an element
+     and for everything inside it. Without either, openings glide and
+     settle as they always have.
+
+     A material is no more than the four opening tokens (01-tokens.css),
+     each curve a small model of the thing sampled into linear(). A part of
+     your own takes a material by moving on them:
+
+         transition: translate var(--wal-open-duration) var(--wal-open-ease);
+
+     Like everything in this layer it is off under reduced motion, where
+     the reset makes every opening instant. */
+  [data-wal-material="walnut"],
+  :where(:is([data-motion="materials"], [data-motion="materials"] *):is(.wal-chest, .wal-door, .wal-window):not([data-wal-material] *)) {
+    --wal-open-duration:  1050ms;
+    --wal-open-ease:      var(--wal-ease-walnut);
+    --wal-close-duration: 800ms;
+    --wal-close-ease:     var(--wal-ease-walnut-shut);
+  }
+
+  [data-wal-material="brass"],
+  :where(:is([data-motion="materials"], [data-motion="materials"] *):is(.wal-menu, .wal-select, .wal-chart, .wal-ring):not([data-wal-material] *)),
+  :where([data-wal-material="brass"] *:is(.wal-menu, .wal-select)) {
+    --wal-open-duration:  480ms;
+    --wal-open-ease:      var(--wal-ease-brass);
+    --wal-close-duration: 380ms;
+    --wal-close-ease:     var(--wal-ease-brass);
+  }
+
+  [data-wal-material="stone"],
+  :where([data-wal-material="stone"] *:is(.wal-menu, .wal-select)) {
+    --wal-open-duration:  1200ms;
+    --wal-open-ease:      var(--wal-ease-stone);
+    --wal-close-duration: 1000ms;
+    --wal-close-ease:     var(--wal-ease-stone);
+  }
+
+  /* Menus and pickers set a quick pace on themselves (04-components.css),
+     which an ancestor's material would not reach by inheritance; these
+     carry it down to them. */
+  :where([data-wal-material="walnut"] *:is(.wal-menu, .wal-select)) {
+    --wal-open-duration:  1050ms;
+    --wal-open-ease:      var(--wal-ease-walnut);
+    --wal-close-duration: 800ms;
+    --wal-close-ease:     var(--wal-ease-walnut-shut);
+  }
 
   /* ── Cinematic Keyframes ───────────────────────────────────────────── */
 
@@ -372,4 +565,35 @@
   .wal-swatch .wal-swatch-color {
     forced-color-adjust: none;
   }
+
+  /* So are a chart's, and its columns and shares are backgrounds. The
+     stringing and the rail go to the system's text colour. */
+  .wal-chart > li > span::after,
+  .wal-ring::before,
+  .wal-key > li::before {
+    forced-color-adjust: none;
+  }
+
+  .wal-chart {
+    background: none;
+    border-block-end: 2px solid CanvasText;
+  }
+
+  .wal-chart::after { display: none; }
+
+  /* A stuck masthead's rule is a filled box. */
+  .wal-nav::after {
+    background: none;
+    border-block-end: var(--wal-hairline) solid CanvasText;
+  }
+
+  /* The grain is texture, not content, and would only be forced to Canvas
+     on a Canvas ground. */
+  .wal-desk::before { display: none; }
+
+  /* A duotone's ink is a background, which is forced to Canvas, and a grey
+     photograph screened over Canvas is a white rectangle. The photograph
+     is the content: show it plainly. */
+  .wal-duotone img { mix-blend-mode: normal; }
+  .wal-duotone::after { display: none; }
 }

@@ -17,11 +17,20 @@
   --wal-hue:    55;
   --wal-chroma: 0.025;
 
-  /* ── The five cues ── watercolour: pigment, not ink */
-  --wal-accent-hue: 25;   --wal-accent-chroma: 0.17;  /* terracotta stamp */
-  --wal-gold-hue:   85;   --wal-gold-chroma:   0.13;  /* dried stem       */
-  --wal-olive-hue:  130;  --wal-olive-chroma:  0.09;  /* pressed leaf     */
-  --wal-cool-hue:   225;  --wal-cool-chroma:   0.09;  /* indigo thread    */
+  /* ── The five cues ── watercolour: pigment, not ink.
+     The washi tape leads. The hanko stamp that used to lead is still on the
+     page, in the cool slot: the slot names say where a cue is used, not what
+     temperature it is, and success and danger are their own tokens, so any
+     slot can hold any hue. A teal at the accent's stops runs out of sRGB at
+     0.089 chroma, which is why the accent is the quietest number here and
+     still reads first.
+     Bloom and cool are pinned; from a teal their defaults are a second blue
+     and an amber. */
+  --wal-accent-hue: 208;  --wal-accent-chroma: 0.088; /* asagi washi tape */
+  --wal-bloom-hue:  355;  --wal-bloom-chroma:  0.11;  /* pressed flower   */
+  --wal-gold-hue:   85;   --wal-gold-chroma:   0.10;  /* dried stem       */
+  --wal-olive-hue:  130;  --wal-olive-chroma:  0.075; /* pressed leaf     */
+  --wal-cool-hue:   30;   --wal-cool-chroma:   0.13;  /* hanko vermilion  */
 
   /* ── Ramp nudges ── layered paper: the card stock sits ABOVE the page, so
      surface runs brighter than bg rather than darker. */

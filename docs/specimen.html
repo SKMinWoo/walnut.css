@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en" class="wal-cafe wal-desk" data-finish="catalogue">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Plate 14, Walnut sideboard: walnut.css</title>
+  <meta name="description" content="A walnut.css detail page in three acts: the workbench card grows into it, and its colour script turns at each act as you scroll.">
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
+  <link rel="alternate icon" href="favicon.ico">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Courier+Prime:ital,wght@0,400;0,700;1,400&family=DM+Mono:ital,wght@0,300;0,400;0,500&family=Inter:wght@100..900&family=Jost:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="../dist/walnut.css">
+  <link rel="stylesheet" href="../dist/walnut-scroll.css">
+  <link rel="stylesheet" href="../dist/themes/press.css">
+  <link rel="stylesheet" href="../dist/themes/cafe.css">
+  <link rel="stylesheet" href="../dist/themes/forest.css">
+  <link rel="stylesheet" href="../dist/themes/dusk.css">
+  <link rel="stylesheet" href="../dist/themes/bone.css">
+
+  <script>
+    /* The reader's mode and finish from the workbench, applied before first
+       paint. Not the palette: on this page the acts own the script. */
+    try {
+      const saved = JSON.parse(sessionStorage.getItem("walnut-docs") || "{}");
+      const root = document.documentElement;
+      if (saved.theme === "light" || saved.theme === "dark") root.dataset.theme = saved.theme;
+      if (saved.finish === "catalogue" || saved.finish === "soft") root.dataset.finish = saved.finish;
+    } catch {}
+  </script>
+  <!-- Hold first paint until the elements that travel in from the workbench
+       exist, or an arriving view transition would find nothing to land on. -->
+  <link rel="expect" href="#plate-script" blocking="render">
+  <script src="../dist/walnut-acts.js" defer></script>
+
+  <style>
+    /* Page furniture. Everything inside the acts is stock walnut. */
+
+    /* Each act is a scene: tall enough that the turn from one script to the
+       next happens with the reader inside it, not at a glance. */
+    .plate-act { min-block-size: 88vh; display: grid; align-content: center; }
+    .wal-hero.plate-act { padding-block: var(--wal-space-2xl); text-align: start; }
+    .plate-act .wal-wrap { inline-size: 100%; }
+    .plate-lede { max-inline-size: 52ch; }
+
+    /* The same four names as the specimen card on the workbench, so those
+       elements travel between the pages instead of fading. Named for good
+       here: this page runs no transitions of its own. */
+    #plate-index  { view-transition-name: plate-14-index; }
+    #plate-title  { view-transition-name: plate-14-title; }
+    #plate-specs  { view-transition-name: plate-14-specs; }
+    #plate-script { view-transition-name: plate-14-script; }
+  </style>
+</head>
+<body>
+
+  <a href="#main" class="wal-skip">Skip to content</a>
+
+  <nav class="wal-nav">
+    <a class="wal-nav-brand" href="index.html">
+      walnut.css
+      <small>form no. <span data-version>0.4.0</span></small>
+    </a>
+    <div class="wal-nav-links">
+      <a href="#act-1">I. Golden hour</a>
+      <a href="#act-2">II. Twilight</a>
+      <a href="#act-3">III. Firelight</a>
+    </div>
+    <div class="wal-nav-actions">
+      <a class="wal-btn wal-btn-secondary wal-btn-sm" href="index.html">Back to the workbench</a>
+    </div>
+  </nav>
+
+  <main id="main">
+
+    <!-- ══════════ I · Golden hour ══════════ -->
+    <header class="wal-hero plate-act" id="act-1" data-act="wal-cafe">
+      <div class="wal-wrap wal-stack wal-gap-lg">
+        <div>
+          <p class="wal-index" id="plate-index">Plate 14</p>
+          <h1 id="plate-title" style="margin: 0">Walnut sideboard</h1>
+        </div>
+        <p class="wal-text-md plate-lede">
+          Tambour doors, brass pulls, tapered legs. This page is in three acts:
+          scroll, and at each one the whole page (masthead, desk, every plate)
+          turns to a new colour script, the way a film's does from act to act.
+        </p>
+        <dl class="wal-plate" id="plate-specs" style="--wal-plate-min: 8rem">
+          <div><dt>Width</dt><dd>180&#8239;<small>cm</small></dd></div>
+          <div><dt>Depth</dt><dd>45&#8239;<small>cm</small></dd></div>
+          <div><dt>Height</dt><dd>72&#8239;<small>cm</small></dd></div>
+          <div><dt>Model</dt><dd>211</dd></div>
+        </dl>
+        <ol class="wal-script" id="plate-script">
+          <li></li><li></li><li></li><li></li><li></li>
+        </ol>
+        <p class="wal-caption">Act I, golden hour: <code>data-act="wal-cafe"</code></p>
+      </div>
+    </header>
+
+    <!-- ══════════ II · Twilight ══════════ -->
+    <section class="wal-section plate-act" id="act-2" data-act="wal-dusk">
+      <div class="wal-wrap">
+        <header class="wal-section-head">
+          <p class="wal-index">II</p>
+          <h2>Twilight</h2>
+          <p class="wal-caption">Mountain sunset and lantern glow: <code>data-act="wal-dusk"</code></p>
+        </header>
+        <div class="wal-grid wal-cols-2">
+          <div class="wal-card">
+            <p class="wal-caption">The doors</p>
+            <h3 class="wal-text-lg" style="margin:0">Tambour, in quarter-sawn walnut</h3>
+            <p class="wal-text-sm" style="margin:0">
+              Nothing in this act is styled differently from the one above. Its
+              section says <code>data-act="wal-dusk"</code>, and when it reached
+              the middle of the window the page retuned to Dusk: every surface,
+              rule and ink re-derived from new rods, in one tween.
+            </p>
+          </div>
+          <div class="wal-stack wal-gap-md">
+            <div class="wal-metric">
+              <span class="wal-metric-value">38</span>
+              <span class="wal-metric-label">Slats per door</span>
+            </div>
+            <div class="wal-note" style="--wal-note-color: var(--wal-gold)">
+              <p class="wal-text-sm" style="margin:0">The brass pulls take the gold cue, so they change with the act too.</p>
+            </div>
+          </div>
+        </div>
+        <ol class="wal-script wal-mt-lg">
+          <li></li><li></li><li></li><li></li><li></li>
+        </ol>
+      </div>
+    </section>
+
+    <!-- ══════════ III · Firelight ══════════ -->
+    <section class="wal-section plate-act" id="act-3" data-act="wal-forest">
+      <div class="wal-wrap">
+        <header class="wal-section-head">
+          <p class="wal-index">III</p>
+          <h2>Firelight</h2>
+          <p class="wal-caption">Fern and campfire copper: <code>data-act="wal-forest"</code></p>
+        </header>
+        <div class="wal-grid wal-cols-2">
+          <div class="wal-card">
+            <p class="wal-caption">The legs</p>
+            <h3 class="wal-text-lg" style="margin:0">Tapered, turned by hand</h3>
+            <p class="wal-text-sm" style="margin:0">
+              Scroll back up and the acts play in reverse. Above the first, the
+              page keeps the script it opened with. An act lasts until the next
+              one begins, so a gap between acts never drops the page back.
+            </p>
+          </div>
+          <dl class="wal-plate">
+            <div><dt>Finish</dt><dd>Oil</dd></div>
+            <div><dt>Pulls</dt><dd>Brass</dd></div>
+            <div><dt>Plate</dt><dd>14</dd></div>
+          </dl>
+        </div>
+        <ol class="wal-script wal-mt-lg">
+          <li></li><li></li><li></li><li></li><li></li>
+        </ol>
+        <p class="wal-mt-xl">
+          <a class="wal-link-arrow" href="index.html">Back to the workbench <span aria-hidden="true">→</span></a>
+        </p>
+      </div>
+    </section>
+  </main>
+
+  <footer class="wal-footer">
+    <div class="wal-wrap">
+      <dl class="wal-footer-grid">
+        <div><dt>Form</dt><dd>walnut.css <span data-version>0.4.0</span></dd></div>
+        <div><dt>Plate</dt><dd>14, Walnut sideboard</dd></div>
+        <div><dt>Source</dt><dd><a href="https://github.com/SKMinWoo/walnut.css">github.com/SKMinWoo/walnut.css</a></dd></div>
+      </dl>
+    </div>
+  </footer>
+
+</body>
+</html>
