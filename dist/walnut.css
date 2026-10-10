@@ -1219,8 +1219,8 @@ html::-webkit-scrollbar-thumb:hover { background: var(--wal-accent); }
     top: 0;
     z-index: 100;
     background: color-mix(in oklch, var(--wal-bg) 80%, transparent);
-    backdrop-filter: blur(18px);
     -webkit-backdrop-filter: blur(18px);
+    backdrop-filter: blur(18px);
     /* min-height, not height, and allowed to wrap. At narrow widths the links
        drop to a second row instead of overlapping the brand and running off
        the page — which is what a fixed height plus nowrap did. Nothing is
@@ -1868,8 +1868,8 @@ html::-webkit-scrollbar-thumb:hover { background: var(--wal-accent); }
     position: fixed;
     inset: 0;
     background: color-mix(in oklch, var(--wal-bg) 50%, transparent);
-    backdrop-filter: blur(4px);
     -webkit-backdrop-filter: blur(4px);
+    backdrop-filter: blur(4px);
     z-index: 1000;
     opacity: 0;
     pointer-events: none;
@@ -2153,8 +2153,8 @@ html::-webkit-scrollbar-thumb:hover { background: var(--wal-accent); }
 
     &::backdrop {
       background: color-mix(in oklch, var(--wal-bg) 60%, transparent);
-      backdrop-filter: blur(8px);
       -webkit-backdrop-filter: blur(8px);
+      backdrop-filter: blur(8px);
       transition:
         opacity var(--wal-duration-slow) var(--wal-ease),
         display var(--wal-duration-slow) allow-discrete,
@@ -3121,8 +3121,8 @@ html::-webkit-scrollbar-thumb:hover { background: var(--wal-accent); }
        behind it, so the backdrop takes none of the window's colours. */
     &::backdrop {
       background: oklch(0.16 0.015 var(--wal-hue) / 0.36);
-      backdrop-filter: blur(5px) saturate(0.8);
       -webkit-backdrop-filter: blur(5px) saturate(0.8);
+      backdrop-filter: blur(5px) saturate(0.8);
       opacity: 0;
       transition:
         opacity var(--wal-close-duration) var(--wal-ease),
@@ -3937,8 +3937,8 @@ html::-webkit-scrollbar-thumb:hover { background: var(--wal-accent); }
    reduced: backdrop-filter over a paper ground reads as a smudge. */
 [data-finish="catalogue"] .wal-nav {
   background: var(--wal-bg);
-  backdrop-filter: none;
   -webkit-backdrop-filter: none;
+  backdrop-filter: none;
   border-bottom: var(--wal-border);
 
   &.is-scrolled {
@@ -4289,8 +4289,8 @@ html::-webkit-scrollbar-thumb:hover { background: var(--wal-accent); }
 
 .wal-glass {
   background-color: color-mix(in oklch, var(--wal-surface) 70%, transparent);
-  backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
 }
 
 .wal-gradient-text {

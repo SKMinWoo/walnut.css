@@ -290,6 +290,13 @@ the platform can now draw with no script.
 
 ### Fixed
 
+- **No blur in a bundled app.** Every `backdrop-filter` (the nav, the
+  overlay, the dialog and window backdrops, `.wal-glass`) was written before
+  its `-webkit-` twin. Lightning CSS (Next.js with Turbopack, Vite, Parcel,
+  Bun) reads the later one as overriding the first and prints the prefix
+  alone, which Chrome ignores, so it drew none of them. They are now
+  prefixed first, and the build refuses the old order.
+
 - **Muted text failed AA everywhere.** `--wal-text-muted` measured 2.05–4.28:1
   in all 40 palette × mode × ground cases. It now clears 4.5:1 on `bg`,
   `bg-subtle`, `surface` and `surface-2` in every palette and mode, and stays

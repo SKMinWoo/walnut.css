@@ -226,6 +226,12 @@ function assertVersionStamped(found) {
  *
  *   :target-current  ::scroll-marker  ::scroll-marker-group  ::scroll-button()
  *
+ * One more spelling parses but is rewritten. A declaration followed by its
+ * own prefixed twin is read as the twin overriding it, and only the twin is
+ * printed: every blur walnut had (`backdrop-filter`, then
+ * `-webkit-backdrop-filter`) reached Chrome as the prefix alone, and Chrome
+ * drew none of them. Prefixed first, as the convention has it, prints both.
+ *
  * A pattern check, not a parse, since walnut does not depend on Lightning
  * CSS: it stops these coming back, not the next one.
  *
@@ -239,10 +245,16 @@ function assertBundlerSafe(css) {
     [/@function\s+--[\w-]+\([^)]*</, "a typed @function parameter"],
     [/:target-current|::scroll-marker|::scroll-button/, "a scroll selector, which belongs in walnut-scroll.css"],
   ];
-  const hits = css.split("\n").flatMap((line, i) =>
+  const lines = css.split("\n");
+  const hits = lines.flatMap((line, i) =>
     rules.filter(([re]) => re.test(line)).map(([, what]) => `  line ${i + 1}: ${what}\n      ${line.trim()}`));
+  // Across lines, since the twin is usually on the next one.
+  for (const m of css.matchAll(/(?<![-\w])([a-z][a-z-]*)\s*:[^;{}]*;\s*-(?:webkit|moz)-\1\s*:/g)) {
+    const at = css.slice(0, m.index).split("\n").length;
+    hits.push(`  line ${at}: ${m[1]} before its prefixed twin, which is then printed alone\n      ${lines[at - 1].trim()}`);
+  }
   if (hits.length) {
-    throw new Error(`dist/walnut.css would be rejected by Lightning CSS (Next.js, Vite, Parcel, Bun):\n${hits.join("\n")}`);
+    throw new Error(`dist/walnut.css would be rejected or rewritten by Lightning CSS (Next.js, Vite, Parcel, Bun):\n${hits.join("\n")}`);
   }
 }
 

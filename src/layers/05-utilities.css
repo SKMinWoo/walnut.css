@@ -259,8 +259,8 @@
 
 .wal-glass {
   background-color: color-mix(in oklch, var(--wal-surface) 70%, transparent);
-  backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
 }
 
 .wal-gradient-text {

@@ -136,8 +136,8 @@
    reduced: backdrop-filter over a paper ground reads as a smudge. */
 [data-finish="catalogue"] .wal-nav {
   background: var(--wal-bg);
-  backdrop-filter: none;
   -webkit-backdrop-filter: none;
+  backdrop-filter: none;
   border-bottom: var(--wal-border);
 
   &.is-scrolled {
