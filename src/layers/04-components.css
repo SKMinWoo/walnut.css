@@ -2031,6 +2031,16 @@
     }
   }
 
+  /* Each half moves as a transform on its own layer. Kept on that layer while
+     the window is open: dropped the moment the notes land, their page would
+     be painted again in that frame, and the landing is the frame where a
+     stutter shows. */
+  @media (prefers-reduced-motion: no-preference) {
+    .wal-window[open] :is(.wal-gatefold-cover, .wal-gatefold-notes) {
+      will-change: transform;
+    }
+  }
+
   @media (max-width: 44rem) {
     .wal-gatefold-spread {
       grid-template-columns: minmax(0, 1fr);
