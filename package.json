@@ -31,7 +31,10 @@
     "./scroll": "./dist/walnut-scroll.css",
     "./acts": "./dist/walnut-acts.js",
     "./recolour": "./dist/walnut-recolour.js",
-    "./motion": "./dist/walnut-motion.js",
+    "./motion": {
+      "types": "./dist/walnut-motion.d.ts",
+      "default": "./dist/walnut-motion.js"
+    },
     "./themes/*.css": "./dist/themes/*.css",
     "./themes/*": "./dist/themes/*.css",
     "./src/*": "./src/*",

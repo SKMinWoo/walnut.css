@@ -146,6 +146,9 @@ the platform can now draw with no script.
   carousel is a row you swipe and the nav lights a link from `.is-active`.
 - **`walnut.shuffle`** and `.wal-shuffle`: a filter or sort where every
   item travels to its new place, as a view transition scoped to the list.
+- **`walnut-motion.d.ts`**: types for `walnut.open` and `walnut.shuffle`,
+  and for `window.walnut`, so a TypeScript app can load the script and call
+  them as they are (`walnut.css/motion` resolves to both).
 - **`walnut-motion.js`**, the third optional script, for the gatefold and
   the shuffle.
 - **Print.** A walnut page prints as a catalogue sheet: A4, light, flat,

@@ -97,6 +97,11 @@ const scripts = Object.fromEntries(SCRIPTS.map((file) => [file,
   `/*! walnut.css v${VERSION} · ${file.replace(/^walnut-|\.js$/g, "")} | MIT License | github.com/SKMinWoo/walnut.css */\n` +
   fs.readFileSync(path.join(SRC, file), "utf8")]));
 
+// Their types, for a TypeScript app. Copied as written: a declaration file
+// carries no code to stamp.
+const TYPINGS = ["walnut-motion.d.ts"];
+const typings = Object.fromEntries(TYPINGS.map((file) => [file, fs.readFileSync(path.join(SRC, file), "utf8")]));
+
 // ─── Companion stylesheets ───
 // Optional too: walnut-scroll.css holds the selectors CSS bundlers cannot
 // parse yet (see its header, and assertBundlerSafe below), so walnut.css can
@@ -288,6 +293,7 @@ fs.writeFileSync(path.join(DIST, "walnut.css"), bundle);
 fs.writeFileSync(path.join(DIST, "walnut.min.css"), minified);
 for (const [file, js] of Object.entries(scripts)) fs.writeFileSync(path.join(DIST, file), js);
 for (const [file, css] of Object.entries(sheets)) fs.writeFileSync(path.join(DIST, file), css);
+for (const [file, dts] of Object.entries(typings)) fs.writeFileSync(path.join(DIST, file), dts);
 for (const [theme, css] of Object.entries(themeCss)) {
   fs.writeFileSync(path.join(DIST, "themes", `${theme}.css`), css);
 }
