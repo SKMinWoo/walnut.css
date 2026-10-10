@@ -46,7 +46,11 @@
     .plate-lede { max-inline-size: 52ch; }
     /* The site's footer row, as on the overview. */
     .site-foot { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 1rem; color: var(--wal-text-muted); font-size: var(--wal-text-sm); }
-    @media (max-width: 560px) { .site-gh { display: none; } }
+    @media (max-width: 560px) {
+      .site-gh { display: none; }
+      /* On a phone: the name and the controls, then the pages on a row of their own. */
+      .wal-nav[aria-label="walnut.css"] .wal-nav-links { order: 3; flex: 1 0 100%; }
+    }
 
     /* The same four names as the specimen card on the workbench, so those
        elements travel between the pages instead of fading. Named for good

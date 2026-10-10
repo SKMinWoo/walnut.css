@@ -270,7 +270,9 @@ the platform can now draw with no script.
 
 - **Docs: one site.** The overview, openings, reference and plate 14 share
   one nav (Overview, Openings, Reference, GitHub) and one footer, and their
-  copy is cut to what each part does, what it is for, and where it ships.
+  copy is cut to what each part does, what it is for, and where it ships. On
+  a phone the nav keeps the name and controls on top and gives the pages a
+  row of their own, rather than leaving a button stranded on a second line.
 
 - **Dialog and popover entrances.** A `.wal-dialog` that is a `<dialog>` or a
   `[popover]` rises the last 0.75rem into place as it fades in, and sinks back

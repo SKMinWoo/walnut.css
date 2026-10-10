@@ -373,11 +373,9 @@
       .contents { grid-template-columns: minmax(0, 1fr); }
     }
     @media (max-width: 560px) {
-      /* Two rows: the site's pages, then the demos' controls. */
-      .pitch-bar { flex-wrap: wrap; row-gap: .45rem; }
-      .pitch-brand { display: none; }
-      .pitch-site { flex: 1 0 100%; gap: 1.25rem; margin: 0; }
-      .pitch-tools { flex: 1 0 100%; justify-content: space-between; }
+      /* On a phone: the name and the controls, then the pages on a row of their own. */
+      .pitch-bar { flex-wrap: wrap; gap: .45rem .5rem; }
+      .pitch-site { order: 3; flex: 1 0 100%; gap: 1.25rem; margin: 0; }
       .slide { padding-block-start: 7rem; }
       .pitch-seg button, .pitch-toggle { padding: .45rem .5rem; font-size: .8rem; }
       .pitch-toggle::before { display: none; }
