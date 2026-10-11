@@ -265,69 +265,66 @@
     .next-cycle .wal-btn:hover { background: color-mix(in oklch, currentColor 14%, transparent); color: inherit; border-color: currentColor; }
     .next-cycle code { background: transparent; border-color: currentColor; color: inherit; }
 
-    /* ── Colourways: a catalogue spread ──
-       The catalogue lies open on the desk. The left page is the range: one
-       credenza in every colourway, the way a furniture catalogue shows one
-       model in each of its lacquers. The right page is the piece in the
-       colourway this page is wearing, with its numbers. Walnut and brass
-       are the same on every plate. A palette class on a plate lacquers its
-       doors and lights its backdrop, and choosing one puts that same class
-       on the page, so a plate and the page it makes cannot disagree. */
-    .next-spread {
-      --next-fold: clamp(3.5rem, 8vw, 7rem);
-      position: relative; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: var(--next-fold);
-    }
-    /* The fold: each page dips a little into the spine. A shade with a
-       crease down the middle, never a picture of paper. */
-    .next-spread::before {
-      --next-crease: light-dark(oklch(0.3 0.02 var(--wal-hue) / .07), oklch(0 0 0 / .3));
-      --next-crease-line: light-dark(oklch(0.3 0.02 var(--wal-hue) / .12), oklch(0 0 0 / .45));
-      content: ""; position: absolute; inset-block: 0; inset-inline: calc(50% - var(--next-fold) / 2); pointer-events: none;
-      background:
-        linear-gradient(var(--next-crease-line), var(--next-crease-line)) 50% 0 / 1px 100% no-repeat,
-        linear-gradient(90deg, transparent 22%, color-mix(in oklch, var(--next-crease) 30%, transparent) 40%, var(--next-crease) 50%,
-                        color-mix(in oklch, var(--next-crease) 30%, transparent) 60%, transparent 78%);
-    }
-    .next-page { display: flex; flex-direction: column; min-inline-size: 0; container-type: inline-size; }
-    /* Both are <p>, which walnut's base caps at 65ch; these run the page. */
-    :is(.next-runhead, .next-pagefoot) { max-width: none; }
-    /* Running heads sit at each page's outer edge, as in a bound book. */
-    .next-runhead {
-      margin: 0 0 clamp(2rem, 4vw, 3rem); padding-block-end: .7rem;
-      border-block-end: 2px solid var(--wal-text);
-      font-size: var(--wal-text-sm); font-weight: 650;
-    }
-    .next-page + .next-page .next-runhead { text-align: end; font-weight: 450; color: var(--wal-text-muted); }
-    .next-pagefoot {
-      margin: auto 0 0; padding-block-start: .9rem;
-      border-block-start: var(--wal-hairline) solid var(--wal-line);
-      font-size: var(--wal-text-sm); color: var(--wal-text-muted);
-    }
-    .next-page + .next-page .next-pagefoot { text-align: end; }
-    /* margin-top: auto drops each foot to the bottom of its page; the gap
-       keeps it clear of the page's last block when the page is full. */
-    .next-page > :nth-last-child(2) { margin-block-end: clamp(2.5rem, 5vw, 3.5rem); }
+    /* ── Colourways: a plan chest ──
+       One credenza in six lacquers, the way a catalogue shows a model in
+       each of its finishes, kept in walnut's own .wal-chest: each drawer is
+       a <details>, and pulling one out pushes the open one home. The chest
+       is walnut, so a drawer runs out heavy and knocks on its stop. Each
+       drawer is a palette scope wearing its colourway, so its front, its
+       plate and its contents are in that colourway before you wear it.
+       Walnut and brass are the same on every plate. */
 
-    /* Each plate is a palette scope that re-derives every token whenever the
-       page's own numbers move, so while the range is off screen it is skipped:
-       less style work on each frame of a tween or a drag elsewhere. Until it
-       is first drawn it stands in at two rows of 4:3 plates and their
-       captions, measured in its page's width. */
-    .next-range {
-      list-style: none; margin: 0; padding: 0;
-      display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: clamp(1.4rem, 2.6vw, 2rem) clamp(.75rem, 1.6vw, 1.15rem);
-      content-visibility: auto; contain-intrinsic-block-size: auto calc(50cqi + 7rem);
+    /* Not content-visibility: auto on the chest, as the old catalogue had:
+       under it a drawer's first frames are held shut and it then jumps
+       (Edge, 2026-10). A shut drawer's contents are skipped anyway. */
+    .next-chest summary { gap: clamp(.9rem, 2.4vw, 1.6rem); padding: .65rem clamp(.75rem, 2vw, 1.25rem); }
+    .next-chest summary > .next-plate { flex: none; inline-size: clamp(4.75rem, 11vw, 6.75rem); }
+    .next-drawer-name { flex: 1; display: grid; gap: .2rem; min-inline-size: 0; }
+    .next-drawer-name strong { font-family: var(--wal-font-display); font-stretch: 110%; font-weight: 760; font-size: clamp(1.15rem, 2vw, 1.5rem); line-height: 1.05; }
+    .next-drawer-name small { color: var(--wal-text-muted); font-size: var(--wal-text-sm); line-height: 1.3; }
+    /* Brass, on the front of whichever drawer the page is wearing. */
+    .next-drawer-worn {
+      display: none; flex: none; padding: .3rem .55rem; border-radius: 2px;
+      font: 650 var(--wal-text-xs) / 1 var(--wal-font-body);
+      color: var(--next-brass-ink); background: var(--next-brushed);
+      box-shadow: inset 0 1px 0 oklch(1 0 0 / .55), 0 1px 2px oklch(0.2 0.03 50 / .3);
     }
+    .next-drawer:has(.next-wear[aria-pressed="true"]) .next-drawer-worn { display: block; }
+
+    /* Inside: the piece, larger, with what to do with it; then its
+       numbers and the lines a site writes to wear it. */
+    .next-drawer-in {
+      display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); gap: clamp(1.25rem, 3.5vw, 3rem);
+      padding: clamp(1.25rem, 3vw, 2.25rem) clamp(.75rem, 2.5vw, 1.75rem) clamp(1.5rem, 3.5vw, 2.5rem);
+    }
+    .next-drawer-about, .next-drawer-facts { display: grid; gap: 1rem; align-content: start; min-inline-size: 0; }
+    .next-drawer-about > p { margin: 0; color: var(--wal-text-soft); }
+    .next-drawer-about .next-plate { aspect-ratio: 3 / 2; }
+    .next-drawer-facts > p { margin: 0; font-size: var(--wal-text-sm); color: var(--wal-text-soft); }
+    .next-drawer-code { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: .75rem; align-items: start; }
+    .next-drawer-code pre { margin: 0; white-space: pre; overflow-x: auto; font-size: var(--wal-text-xs); }
+    .next-wear[aria-pressed="true"] { cursor: default; box-shadow: inset 0 2px 5px oklch(0.3 0.05 60 / .35); }
+
+    /* In the cabinet finish the chest is a walnut case and the fronts are
+       panels set into it, as the kit's storage unit is; the pulls are
+       brass bars. */
+    [data-finish="cabinet"] .next-chest {
+      gap: 6px; padding: 8px; border: 0;
+      border-radius: var(--wal-radius-lg);
+      background: var(--next-oiled);
+      box-shadow: inset 0 1px 0 oklch(1 0 0 / .2), 0 30px 50px -30px oklch(0.2 0.03 50 / calc(.5 * var(--wal-elevation)));
+    }
+    [data-finish="cabinet"] .next-chest > details { border: 0; border-radius: 3px; overflow: clip; }
+    [data-finish="cabinet"] .next-chest summary::after {
+      inline-size: 3.25rem; block-size: .55rem;
+      background: var(--next-brushed);
+      box-shadow: inset 0 1px 0 oklch(1 0 0 / .55), 0 1px 2px oklch(0.2 0.03 50 / .45);
+    }
+
     /* A light-first palette (Bone, Press) stays light on a page that is dark
        because the system is, which is what choosing it would do to the page.
-       A dark the reader asked for is kept, so its plate is shown dark too. */
-    :root[data-theme="dark"] .next-plate { color-scheme: dark; }
-    .next-swatch {
-      inline-size: 100%; display: grid; gap: .65rem; padding: 0; border: 0; background: none; cursor: pointer;
-      text-align: start; color: var(--wal-text); font: inherit;
-    }
-    .next-swatch strong { display: block; font-family: var(--wal-font-display); font-stretch: 110%; font-size: var(--wal-text-md); line-height: 1.1; }
-    .next-swatch small { display: block; margin-block-start: .15rem; color: var(--wal-text-muted); font-size: var(--wal-text-xs); line-height: 1.3; }
+       A dark the reader asked for is kept, so its drawer is shown dark too. */
+    :root[data-theme="dark"] :is(.next-drawer, .next-plate) { color-scheme: dark; }
     /* The plate: a studio backdrop in the colourway's own ground, lit from
        above, with the piece's shadow on the floor. Sized in cqi, so the
        piece scales with its plate. */
@@ -336,52 +333,27 @@
       aspect-ratio: 4 / 3; container-type: inline-size;
       border: var(--wal-hairline) solid var(--wal-line); border-radius: var(--wal-radius-sm);
       background: radial-gradient(95% 80% at 50% 26%, var(--wal-surface), var(--wal-bg) 74%);
-      transition: translate .45s var(--wal-ease), box-shadow .45s var(--wal-ease);
     }
     .next-plate::after {
       content: ""; position: absolute; inset: 64% 8% 24%; pointer-events: none;
       background: radial-gradient(closest-side, light-dark(oklch(0.25 0.03 50 / .3), oklch(0 0 0 / .5)), transparent);
     }
-    .next-swatch:hover .next-plate { translate: 0 -4px; box-shadow: 0 18px 36px -20px var(--wal-accent); }
-    /* currentColor, not --wal-text: the plate is inside its colourway, and
-       this is the button's own colour, the page's ink. */
-    .next-swatch[aria-pressed="true"] .next-plate { outline: 2px solid currentColor; outline-offset: 3px; }
-    .next-swatch[aria-pressed="true"] .next-plate::before {
-      content: "On this page" / "";
-      position: absolute; inset-block-start: 5cqi; inset-inline-start: 5cqi; z-index: 2;
-      padding: .28rem .5rem; border-radius: 2px;
-      font: 650 var(--wal-text-xs) / 1 var(--wal-font-body);
-      color: var(--next-brass-ink); background: var(--next-brushed);
-      box-shadow: inset 0 1px 0 oklch(1 0 0 / .55), 0 1px 2px oklch(0.2 0.03 50 / .3);
-    }
-    /* A phone's plate is too small to carry the words over the piece, so
-       the tab keeps only its brass. */
-    @container (inline-size < 150px) {
-      .next-swatch[aria-pressed="true"] .next-plate::before { content: "" / ""; inline-size: 15cqi; block-size: 7cqi; padding: 0; }
-    }
 
-    /* The piece itself, in whatever this page is wearing: no colourway
-       class, so it takes the page's own numbers. */
-    .next-feature { margin: 0 0 clamp(1.5rem, 3vw, 2rem); display: grid; gap: 1.1rem; }
-    .next-feature .next-plate { aspect-ratio: 3 / 2; }
-    .next-feature figcaption { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: .3rem 1rem; }
-    .next-feature figcaption strong {
-      font-family: var(--wal-font-display); font-stretch: 112%; font-weight: 780;
-      font-size: clamp(1.75rem, 2.8vw, 2.4rem); line-height: 1; letter-spacing: -0.015em;
-    }
-    .next-feature figcaption small { color: var(--wal-text-muted); font-size: var(--wal-text-sm); }
-    /* The finish schedule: each lacquer and the room, by the numbers. */
-    .next-schedule { inline-size: 100%; border-collapse: collapse; margin-block-end: 1.5rem; font-size: var(--wal-text-sm); }
-    .next-schedule :is(th, td) { padding: .5rem 0; border-block-end: var(--wal-hairline) solid var(--wal-line); text-align: start; font-weight: 450; }
+    /* The finish schedule: each colour, its two numbers, and the lowest
+       contrast of any text on it or in it. */
+    .next-schedule { inline-size: 100%; border-collapse: collapse; font-size: var(--wal-text-sm); }
+    .next-schedule :is(th, td) { padding: .5rem 0; border-block-end: var(--wal-hairline) solid var(--wal-line); text-align: start; font-weight: 450; vertical-align: middle; }
     .next-schedule thead th { padding-block-start: 0; color: var(--wal-text-muted); font-size: var(--wal-text-xs); }
-    .next-schedule :is(td, thead th + th) { text-align: end; inline-size: 5.5rem; }
+    .next-schedule :is(td, thead th + th) { text-align: end; padding-inline-start: .9rem; white-space: nowrap; }
     .next-schedule td { font: 400 var(--wal-text-xs) / 1 var(--wal-font-mono); font-variant-numeric: tabular-nums; color: var(--wal-text-soft); }
-    .next-schedule tbody i {
-      display: inline-block; vertical-align: -.2em; inline-size: 1.75rem; block-size: 1rem; margin-inline-end: .7rem;
-      border-radius: 2px; background: var(--door); box-shadow: inset 0 0 0 1px oklch(0 0 0 / .14);
+    .next-schedule td.is-low { color: var(--wal-danger); font-weight: 650; }
+    .next-schedule tbody th small { margin-inline-start: .45rem; color: var(--wal-text-muted); font-size: var(--wal-text-xs); }
+    /* The colour as it is in light and in dark, side by side. */
+    .next-chip {
+      display: inline-flex; vertical-align: -.2em; inline-size: 2rem; block-size: 1rem; margin-inline-end: .65rem;
+      border-radius: 2px; overflow: hidden; outline: 1px solid oklch(0 0 0 / .14); outline-offset: -1px;
     }
-    /* The ground is the page itself, so its chip needs an edge to be seen. */
-    .next-schedule tbody tr:last-child i { box-shadow: inset 0 0 0 1px var(--wal-line); }
+    .next-chip > b { flex: 1; }
     /* The hero's credenza in miniature: the doors are the five cues. */
     .next-credenza {
       position: relative; z-index: 1; display: flex; gap: 1cqi;
@@ -415,17 +387,16 @@
     .next-credenza > i:nth-child(3) { --door: var(--wal-gold); }
     .next-credenza > i:nth-child(4) { --door: var(--wal-olive); }
     .next-credenza > i:nth-child(5) { --door: var(--wal-cool); }
-    /* The small print under the schedule. */
-    .next-spec {
-      margin: 0 0 1.5rem; display: grid; grid-template-columns: max-content minmax(0, 1fr); gap: .55rem 1.5rem; align-items: start;
-      font-size: var(--wal-text-sm);
-    }
-    .next-spec > div { display: contents; }
-    .next-spec dt { color: var(--wal-text-muted); }
-    .next-spec dd { margin: 0; }
-
     .next-install { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 1rem; align-items: center; }
     .next-install pre { margin: 0; white-space: pre; overflow-x: auto; }
+    /* What else there is, a line each. */
+    .next-extras-wrap { overflow-x: auto; margin-block-start: clamp(2rem, 4vw, 3rem); }
+    .next-extras { inline-size: 100%; border-collapse: collapse; font-size: var(--wal-text-sm); }
+    .next-extras :is(th, td) { padding: .7rem 1.25rem .7rem 0; border-block-end: var(--wal-hairline) solid var(--wal-line); text-align: start; vertical-align: baseline; font-weight: 450; }
+    .next-extras thead th { padding-block-start: 0; color: var(--wal-text-muted); font-size: var(--wal-text-xs); }
+    .next-extras tbody th { font-weight: 650; }
+    .next-extras td:last-child { color: var(--wal-text-soft); }
+    .next-extras code { white-space: nowrap; }
 
     .next-foot { padding-block: 3rem; border-top: var(--wal-border); }
     .next-foot .next-wrap { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 1rem; color: var(--wal-text-muted); font-size: var(--wal-text-sm); }
@@ -641,38 +612,14 @@
       .next-bands b { writing-mode: vertical-rl; rotate: .5turn; }
     }
 
-    @media (max-width: 960px) {
-      /* Too narrow to lie open: the pages are read one after the other,
-         the range first, then the piece. */
-      .next-spread { grid-template-columns: minmax(0, 1fr); row-gap: clamp(3rem, 9vw, 4.5rem); }
-      .next-spread::before { display: none; }
-      .next-page + .next-page :is(.next-runhead, .next-pagefoot) { text-align: start; }
-    }
-
-    /* ── The plate opens as a gatefold ──
-       Each colourway in the range opens into a page of its own, over this
-       one: walnut's .wal-window with data-wal-open="gatefold". The plate is
-       the card's picture, so it travels out as the cover, and the notes
-       unfold beside it on the spine. The window is walnut, so they land
-       with a knock. It wears the colourway as a scoped palette, so it opens
-       in its own room before you ever wear it. */
-    .next-range > li { display: grid; gap: .4rem; align-content: start; }
-    .next-open {
-      justify-self: start; display: inline-flex; align-items: baseline; gap: .3rem;
-      padding: .15rem 0; border: 0; background: none; cursor: pointer;
-      font: 620 var(--wal-text-sm) / 1.25 var(--wal-font-display); color: var(--wal-accent-ink);
-      text-decoration: underline 1px color-mix(in oklch, currentColor 35%, transparent); text-underline-offset: .22em;
-    }
-    .next-open:hover { text-decoration-color: currentColor; }
-
-    /* Walnut out of the box: a colourway's page and the photo's room put
-       every lightness stop back to walnut's own, so a stop the palette does
-       not set is the one it would get on your site, not this page's. In
+    /* Walnut out of the box: a drawer and the photo's room put every
+       lightness stop back to walnut's own, so a stop the palette does not
+       set is the one it would get on your site, not this page's. In
        :where(), so a palette class on the same element still sets its own;
        registered rods, so `initial` is walnut's number. Not bloom's or
        cool's hue: walnut derives those from the accent in a rule as weak as
        this one, and this one would win. */
-    :where(.next-colourway, .next-photo-room) {
+    :where(.next-drawer, .next-photo-room) {
       --wal-hue: initial; --wal-chroma: initial; --wal-accent-hue: initial; --wal-accent-chroma: initial;
       --wal-bloom-chroma: initial; --wal-gold-hue: initial; --wal-gold-chroma: initial;
       --wal-olive-hue: initial; --wal-olive-chroma: initial; --wal-cool-chroma: initial;
@@ -688,83 +635,6 @@
       --wal-cx-ground-light: initial; --wal-cx-ground-dark: initial; --wal-cx-surface-light: initial; --wal-cx-surface-dark: initial;
       --wal-cx-line-light: initial; --wal-cx-line-dark: initial; --wal-cx-ink-light: initial; --wal-cx-ink-dark: initial;
     }
-    /* The cover is the plate at the plate's own 4:3, so it travels at one
-       scale. The spread is wider than walnut's, for the notes beside it. */
-    .next-colourway { --wal-cover-ratio: 4 / 3; }
-    .next-colourway .wal-gatefold-spread { inline-size: min(84rem, 100%, calc((100dvh - 3rem) * 2 * var(--wal-cover-ratio))); }
-    .next-cw-hero { block-size: 100%; aspect-ratio: auto; border: 0; border-radius: 0; }
-    .next-cw-sheet { padding: clamp(1.25rem, 2.6vw, 2.25rem); }
-    /* As with the plates: a light-first colourway stays light on a page that
-       is dark because the system is, and goes dark for a reader who chose it. */
-    :root[data-theme="dark"] .next-colourway { color-scheme: dark; }
-    /* The notes' running head, as on the catalogue's own pages. */
-    .next-cw-trail {
-      display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: .35rem 1rem;
-      margin: 0 0 clamp(1.25rem, 3vw, 2rem); padding-block-end: .7rem;
-      border-block-end: 2px solid var(--wal-text);
-      font-size: var(--wal-text-sm); font-weight: 650;
-    }
-    .next-cw-trail button {
-      padding: 0; border: 0; background: none; cursor: pointer;
-      font: inherit; color: var(--wal-accent-ink);
-      text-decoration: underline 1px; text-underline-offset: .2em;
-    }
-    .next-cw-intro { display: grid; gap: 1rem; align-content: start; }
-    .next-cw-intro h2 { inline-size: fit-content; font-size: clamp(2.4rem, 4.6vw, 3.75rem); line-height: .95; }
-    .next-cw-intro h2:focus:not(:focus-visible) { outline: none; }
-    .next-cw-note { margin: 0; font: 650 var(--wal-text-md) / 1.3 var(--wal-font-display); color: var(--wal-accent-ink); }
-    .next-cw-about { margin: 0; color: var(--wal-text-soft); }
-    .next-cw-acts { display: flex; flex-wrap: wrap; gap: .75rem; align-items: center; }
-    [data-finish="cabinet"] #cw-wear[aria-pressed="true"] { cursor: default; box-shadow: inset 0 2px 5px oklch(0.3 0.05 60 / .35); }
-    .next-cw-worn:empty { display: none; }
-    :is(.next-cw-worn, .next-cw-pass) { margin: 0; font-size: var(--wal-text-sm); color: var(--wal-text-soft); }
-    .next-cw-section { margin-block-start: clamp(2rem, 4.5vw, 3.25rem); display: grid; gap: 1.25rem; }
-    .next-cw-section > header { display: grid; gap: .5rem; max-inline-size: 48rem; }
-    .next-cw-section h3 { margin: 0; font-size: clamp(1.4rem, 2.2vw, 1.75rem); }
-    .next-cw-section > header p { margin: 0; color: var(--wal-text-soft); }
-    .next-cw-code { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 1rem; align-items: start; }
-    .next-cw-code pre { margin: 0; }
-
-    /* A colour, by the numbers: a live swatch split into day and night,
-       its name in this colourway, its job, its two numbers, the colour each
-       mode makes of them, and the contrast of every text pair it is in. */
-    .next-cues { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 15rem), 1fr)); gap: 1rem; }
-    .next-cue {
-      display: grid; gap: .8rem; align-content: start; padding: 1rem;
-      border: var(--wal-hairline) solid var(--wal-line); border-radius: var(--wal-radius);
-      background: var(--wal-surface); color: var(--wal-text);
-    }
-    .next-cue-chip {
-      display: grid; grid-template-columns: 1fr 1fr; block-size: 6rem; overflow: hidden;
-      border-radius: var(--wal-radius-sm); outline: 1px solid oklch(0 0 0 / .12); outline-offset: -1px;
-    }
-    .next-cue-chip > span {
-      display: flex; flex-direction: column; justify-content: space-between; padding: .55rem .7rem;
-      background: var(--cue); color: var(--cue-fg); font-size: var(--wal-text-xs);
-    }
-    .next-cue-chip > span:first-child { color-scheme: light; }
-    .next-cue-chip > span:last-child { color-scheme: dark; }
-    .next-cue-chip b { font: 760 1.6rem / 1 var(--wal-font-display); color: inherit; }
-    .next-cue h4 { margin: 0; display: flex; flex-wrap: wrap; align-items: baseline; gap: .1rem .5rem; font: 720 var(--wal-text-lg) / 1.15 var(--wal-font-display); }
-    .next-cue h4 span { font-weight: 450; font-size: var(--wal-text-sm); color: var(--wal-text-muted); }
-    .next-cue > p { margin: 0; font-size: var(--wal-text-sm); color: var(--wal-text-soft); }
-    .next-cue dl { margin: 0; display: grid; grid-template-columns: max-content minmax(0, 1fr); gap: .3rem .9rem; font-size: var(--wal-text-sm); align-items: baseline; }
-    .next-cue dl > div { display: contents; }
-    .next-cue dt { color: var(--wal-text-muted); }
-    .next-cue dd { margin: 0; font-family: var(--wal-font-mono); font-size: var(--wal-text-xs); font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
-    .next-cue dd i { font-style: normal; color: var(--wal-text-muted); }
-    .next-cue table { inline-size: 100%; border-collapse: collapse; font-size: var(--wal-text-xs); }
-    .next-cue :is(th, td) { padding: .35rem 0; border-block-start: var(--wal-hairline) solid var(--wal-line); text-align: start; font-weight: 450; }
-    .next-cue thead th { border: 0; padding-block-start: 0; color: var(--wal-text-muted); }
-    .next-cue :is(td, thead th:not(:first-child)) { text-align: end; inline-size: 3.75rem; }
-    .next-cue td { font-family: var(--wal-font-mono); font-variant-numeric: tabular-nums; }
-    :is(.next-cue, .next-photo-read) td.is-low { color: var(--wal-danger); font-weight: 650; }
-
-    /* The plate is 4:3 and the header it grows into 3:2: each picture
-       covers the box as it grows, rather than stretching to fit it. */
-    ::view-transition-old(wal-hero),
-    ::view-transition-new(wal-hero) { block-size: 100%; object-fit: cover; }
-
     /* ── A palette from a photo ── */
     .next-photo { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); gap: clamp(1.5rem, 4vw, 3.5rem); align-items: start; }
     .next-photo-in { display: grid; gap: 1rem; justify-items: start; }
@@ -816,27 +686,25 @@
     .next-photo-out pre { margin: 0; }
 
     /* ── How it works ──
-       Every piece this page shows off explains itself where it is: what you
-       just saw, why a site would want it, the lines you write, and what
-       ships it. A brass inlay along the top marks each one. */
-    .next-hows { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 24rem), 1fr)); gap: clamp(1rem, 2.5vw, 1.5rem); margin-block-start: clamp(3rem, 7vw, 5rem); }
+       Each piece explains itself beside its demo: a line on what it does,
+       the lines you write, and what ships it. A brass inlay along the top
+       marks each one. */
+    .next-hows { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 22rem), 1fr)); gap: clamp(1rem, 2.5vw, 1.5rem); margin-block-start: clamp(2.5rem, 6vw, 4rem); }
     .next-how {
-      display: grid; gap: 1rem; align-content: start; padding: clamp(1.1rem, 2.6vw, 1.6rem);
+      display: grid; gap: .9rem; align-content: start; padding: clamp(1.1rem, 2.6vw, 1.5rem);
       border: var(--wal-hairline) solid var(--wal-line); border-radius: var(--wal-radius);
       background: var(--wal-surface); color: var(--wal-text);
       box-shadow: inset 0 3px 0 var(--next-brass);
     }
-    .next-how h3 { margin: 0; font-size: clamp(1.35rem, 2.2vw, 1.7rem); line-height: 1.05; }
-    .next-how > :is(p, ol) { margin: 0; color: var(--wal-text-soft); max-inline-size: 68ch; }
-    .next-how > ol { padding-inline-start: 1.25rem; list-style: decimal; display: grid; gap: .4rem; font-size: var(--wal-text-sm); }
-    .next-how dl { margin: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 15rem), 1fr)); gap: 1rem 1.5rem; align-items: start; }
-    .next-how dt { font: 650 var(--wal-text-sm) / 1.3 var(--wal-font-display); margin-block-end: .35rem; }
-    .next-how dd { margin: 0; font-size: var(--wal-text-sm); color: var(--wal-text-soft); }
-    .next-how dl > div:has(pre) { grid-column: 1 / -1; }
+    .next-how h3 { margin: 0; font-size: clamp(1.25rem, 2vw, 1.5rem); line-height: 1.1; }
+    .next-how > :is(p, ol) { margin: 0; color: var(--wal-text-soft); max-inline-size: 64ch; }
+    .next-how > ol { padding-inline-start: 1.25rem; list-style: decimal; display: grid; gap: .35rem; font-size: var(--wal-text-sm); }
     .next-how pre { margin: 0; white-space: pre; overflow-x: auto; font-size: var(--wal-text-xs); line-height: 1.6; }
+    .next-how > .next-ships { font-size: var(--wal-text-sm); color: var(--wal-text-muted); }
+    .next-ships b { font-weight: 650; color: var(--wal-text); }
     /* Grid items grow to their longest line of code unless told they may be
        narrower; then the code scrolls inside its own box instead. */
-    .next-hows > *, .next-how > *, .next-how dl > * { min-inline-size: 0; }
+    .next-hows > *, .next-how > * { min-inline-size: 0; }
 
     /* The prints' ink, chosen for all three at once. */
     .next-ink-row { grid-column: 1 / -1; display: flex; flex-wrap: wrap; align-items: center; gap: .6rem 1rem; font-size: var(--wal-text-sm); color: var(--wal-text-muted); }
@@ -844,19 +712,11 @@
     .next-inks button { padding-inline: .8rem; }
 
     @media (max-width: 900px) {
-      .next-photo { grid-template-columns: 1fr; }
-    }
-    /* walnut's phone cover is a band; this one keeps the plate's shape, so
-       the credenza is not stretched on its way out. */
-    @media (max-width: 44rem) {
-      .next-colourway .wal-gatefold-cover { aspect-ratio: var(--wal-cover-ratio); block-size: auto; }
+      .next-photo, .next-drawer-in { grid-template-columns: 1fr; }
     }
     @media (max-width: 560px) {
-      .next-photo-room-top, .next-cw-code, .next-photo-out { grid-template-columns: 1fr; }
+      .next-photo-room-top, .next-drawer-code, .next-photo-out { grid-template-columns: 1fr; }
     }
-
-    /* In-page links land below the sticky nav. */
-    :root { scroll-padding-block-start: var(--wal-nav-h); }
 
     /* ── Motion: each piece plays once, or answers the reader ── */
     @media (prefers-reduced-motion: no-preference) {
@@ -884,7 +744,12 @@
       .next-rods { grid-template-columns: 1fr; }
       .next-islands { grid-template-columns: 1fr; }
       .next-install { grid-template-columns: 1fr; }
-      .next-nav .wal-nav-links { display: none; }
+      .next-gh { display: none; }
+      /* On a phone: the name and the controls, then the pages on a row of their own. */
+      .next-nav .wal-nav-links { order: 3; flex: 1 0 100%; }
+      /* Two rows are taller than walnut's --wal-nav-h: links land clear of both. */
+      :root { scroll-padding-block-start: calc(var(--wal-nav-h) + 1.5rem); }
+      .next-schedule tbody th small { display: block; margin: .2rem 0 0 2.65rem; }
     }
   </style>
 </head>
@@ -892,18 +757,15 @@
 
   <a href="#main" class="wal-skip">Skip to content</a>
 
-  <nav class="wal-nav next-nav">
-    <a class="wal-nav-brand" href="#main">walnut.css</a>
+  <nav class="wal-nav next-nav" aria-label="walnut.css">
+    <a class="wal-nav-brand" href="index.html">walnut.css</a>
     <div class="wal-nav-links">
-      <a href="#numbers">Numbers</a>
-      <a href="#colours">Colours</a>
-      <a href="#kit">Kit</a>
-      <a href="#house">House</a>
-      <a href="#palettes">Palettes</a>
-      <a href="#photo">Photo</a>
-      <a href="#install">Install</a>
+      <a href="index.html" aria-current="page">Overview</a>
+      <a href="openings.html">Openings</a>
+      <a href="reference.html">Reference</a>
     </div>
     <div class="wal-nav-actions">
+      <a class="wal-btn wal-btn-ghost wal-btn-sm next-gh" href="https://github.com/SKMinWoo/walnut.css">GitHub</a>
       <button class="wal-btn wal-btn-secondary wal-btn-sm" type="button" id="mode">Dark</button>
     </div>
   </nav>
@@ -1111,12 +973,12 @@
               </div>
               <div class="wal-timeline-item">
                 <div class="wal-timeline-date">Next</div>
-                <div class="wal-timeline-content"><h3>Acts and page transitions</h3><p>Pages that change palette as you scroll, and crossfade between each other.</p></div>
+                <div class="wal-timeline-content"><h3>Openings and materials</h3><p>Drawers, doors and windows with weight, and pages that change palette as you scroll.</p></div>
               </div>
             </div>
           </div>
         </div>
-        <p class="next-kit-more"><a class="wal-link-arrow" href="openings.html">The openings, their materials and the newest parts, each working <span aria-hidden="true">→</span></a></p>
+        <p class="next-kit-more"><a class="wal-link-arrow" href="openings.html">Drawers, doors, windows and the newest parts, each working <span aria-hidden="true">→</span></a></p>
       </div>
     </section>
 
@@ -1124,7 +986,7 @@
       <div class="next-wrap">
         <div class="next-head">
           <h2>Built from real things</h2>
-          <p>Walnut and brass keep their own colour. The palette lacquers the doors, glazes the glass, tints the stone and grades the prints, so a new script refits the whole room.</p>
+          <p>Walnut and brass keep their own colour. Lacquer, glass and prints take the palette's, so a new palette refits the room.</p>
         </div>
         <div class="next-house">
           <figure class="next-glass next-reveal is-lit" id="glass" style="--i: 0">
@@ -1177,210 +1039,98 @@
                 <button type="button" data-ink-all="cool" aria-pressed="false">Cool</button>
               </div>
             </div>
-            <p class="next-credit">Photos from Unsplash, via picsum.photos. Each print is walnut's .wal-duotone: two blend modes and the palette's own colours.</p>
+            <p class="next-credit">Photos from Unsplash, via picsum.photos.</p>
           </div>
         </div>
         <div class="next-hows">
           <article class="next-how" aria-labelledby="how-duotone">
             <h3 id="how-duotone">Duotone prints</h3>
-            <p>Each print is an ordinary photo, graded into one of the palette's colours by CSS alone. The picture is made grey and screened over the colour's deep ink, then the paper is multiplied over it: a true two-colour print. Change the palette or the mode and every print regrades. As each comes into view it develops out of blank paper, shadows first, the way a print comes up in the tray.</p>
-            <dl>
-              <div><dt>Why you would use it</dt><dd>Imagery that always belongs to the palette, from any stock photo, with no image editing and nothing to redo when the palette changes.</dd></div>
-              <div><dt>What ships it</dt><dd>walnut.css: .wal-duotone, inked in the accent unless data-ink names bloom, gold, olive or cool, and .wal-reveal-develop. In forced colours the photo is shown as it is. Without scroll-driven animations, or with reduced motion, it is simply there.</dd></div>
-              <div><dt>On your site</dt><dd><pre>&lt;figure class="wal-duotone wal-reveal-develop" data-ink="cool"&gt;
+            <p>Any photo, graded into one of the palette's colours by CSS alone. It regrades when the palette or mode changes, and develops out of blank paper as it scrolls in.</p>
+            <pre>&lt;figure class="wal-duotone wal-reveal-develop" data-ink="cool"&gt;
   &lt;img src="photo.jpg" alt="…"&gt;
-&lt;/figure&gt;</pre></dd></div>
-            </dl>
+&lt;/figure&gt;</pre>
+            <p class="next-ships"><b>walnut.css</b>, no script. data-ink picks accent, bloom, gold, olive or cool. Forced colours show the photo as it is.</p>
           </article>
         </div>
       </div>
     </section>
 
     <section class="next-section" id="palettes">
-      <div class="next-wrap next-spread">
-        <div class="next-page">
-          <p class="next-runhead">The walnut collection</p>
-          <div class="next-head">
-            <h2>Six colourways</h2>
-            <p>One credenza in six lacquers, the way a catalogue shows a model in each of its finishes. The case is oiled walnut and the pulls are brass on every one; the doors and the room are a palette's numbers and nothing else. Choose one and the new colours open out from the plate you pressed. Open its page to see every colour it is made of, by the numbers.</p>
-          </div>
-          <ol class="next-range" id="range">
-            <li class="next-reveal" style="--i: 0">
-              <button class="next-swatch" type="button" data-wal-palette="next-script" aria-pressed="true">
-                <span class="next-plate next-script wal-palette" data-wal-art><span class="next-credenza"><i></i><i></i><i></i><i></i><i></i></span></span>
-                <span><strong>Prairie</strong><small>Made for this page</small></span>
-              </button>
-              <button class="next-open" type="button" data-open="next-script">Open page<span class="wal-sr-only"> for Prairie</span> <span aria-hidden="true">→</span></button>
-            </li>
-            <li class="next-reveal" style="--i: 1">
-              <button class="next-swatch" type="button" data-wal-palette="wal-forest" aria-pressed="false">
-                <span class="next-plate wal-forest wal-palette" data-wal-art><span class="next-credenza"><i></i><i></i><i></i><i></i><i></i></span></span>
-                <span><strong>Forest</strong><small>Fern and campfire copper</small></span>
-              </button>
-              <button class="next-open" type="button" data-open="wal-forest">Open page<span class="wal-sr-only"> for Forest</span> <span aria-hidden="true">→</span></button>
-            </li>
-            <li class="next-reveal" style="--i: 2">
-              <button class="next-swatch" type="button" data-wal-palette="wal-bone" aria-pressed="false">
-                <span class="next-plate wal-bone wal-palette" data-wal-art><span class="next-credenza"><i></i><i></i><i></i><i></i><i></i></span></span>
-                <span><strong>Bone</strong><small>Washi tape and pressed flowers</small></span>
-              </button>
-              <button class="next-open" type="button" data-open="wal-bone">Open page<span class="wal-sr-only"> for Bone</span> <span aria-hidden="true">→</span></button>
-            </li>
-            <li class="next-reveal" style="--i: 3">
-              <button class="next-swatch" type="button" data-wal-palette="wal-cafe" aria-pressed="false">
-                <span class="next-plate wal-cafe wal-palette" data-wal-art><span class="next-credenza"><i></i><i></i><i></i><i></i><i></i></span></span>
-                <span><strong>Café</strong><small>China blue and brass</small></span>
-              </button>
-              <button class="next-open" type="button" data-open="wal-cafe">Open page<span class="wal-sr-only"> for Café</span> <span aria-hidden="true">→</span></button>
-            </li>
-            <li class="next-reveal" style="--i: 4">
-              <button class="next-swatch" type="button" data-wal-palette="wal-dusk" aria-pressed="false">
-                <span class="next-plate wal-dusk wal-palette" data-wal-art><span class="next-credenza"><i></i><i></i><i></i><i></i><i></i></span></span>
-                <span><strong>Dusk</strong><small>Twilight and lantern glow</small></span>
-              </button>
-              <button class="next-open" type="button" data-open="wal-dusk">Open page<span class="wal-sr-only"> for Dusk</span> <span aria-hidden="true">→</span></button>
-            </li>
-            <li class="next-reveal" style="--i: 5">
-              <button class="next-swatch" type="button" data-wal-palette="wal-press" aria-pressed="false">
-                <span class="next-plate wal-press wal-palette" data-wal-art><span class="next-credenza"><i></i><i></i><i></i><i></i><i></i></span></span>
-                <span><strong>Press</strong><small>Tomato on paper stock</small></span>
-              </button>
-              <button class="next-open" type="button" data-open="wal-press">Open page<span class="wal-sr-only"> for Press</span> <span aria-hidden="true">→</span></button>
-            </li>
-          </ol>
-          <p class="next-pagefoot">Prairie is this page's own. The other five ship with walnut, one class each, and every text colour in all six passes AA in light and dark.</p>
-        </div>
-        <div class="next-page">
-          <p class="next-runhead">Case pieces</p>
-          <figure class="next-feature next-reveal" style="--i: 1">
-            <span class="next-plate"><span class="next-credenza"><i></i><i></i><i></i><i></i><i></i></span></span>
-            <figcaption><strong id="feature-name">Prairie</strong><small id="feature-note">Made for this page</small></figcaption>
-          </figure>
-          <table class="next-schedule">
-            <thead><tr><th scope="col">Colour</th><th scope="col">Hue</th><th scope="col">Chroma</th></tr></thead>
-            <tbody>
-                <tr><th scope="row"><i style="--door: var(--wal-accent)"></i>Accent</th><td data-spec="--wal-accent-hue"></td><td data-spec="--wal-accent-chroma"></td></tr>
-                <tr><th scope="row"><i style="--door: var(--wal-bloom)"></i>Bloom</th><td data-spec="--wal-bloom-hue"></td><td data-spec="--wal-bloom-chroma"></td></tr>
-                <tr><th scope="row"><i style="--door: var(--wal-gold)"></i>Gold</th><td data-spec="--wal-gold-hue"></td><td data-spec="--wal-gold-chroma"></td></tr>
-                <tr><th scope="row"><i style="--door: var(--wal-olive)"></i>Olive</th><td data-spec="--wal-olive-hue"></td><td data-spec="--wal-olive-chroma"></td></tr>
-                <tr><th scope="row"><i style="--door: var(--wal-cool)"></i>Cool</th><td data-spec="--wal-cool-hue"></td><td data-spec="--wal-cool-chroma"></td></tr>
-                <tr><th scope="row"><i style="--door: var(--wal-bg)"></i>Ground</th><td data-spec="--wal-hue"></td><td data-spec="--wal-chroma"></td></tr>
-            </tbody>
-          </table>
-          <dl class="next-spec">
-            <div><dt>Case</dt><dd>Oiled walnut, with brass pulls and feet</dd></div>
-            <div><dt>Modes</dt><dd>Light and dark, from the same numbers</dd></div>
-          </dl>
-          <div class="wal-cluster">
-            <button class="wal-btn wal-btn-primary wal-btn-sm" type="button" id="copy-spec">Copy CSS</button>
-            <span class="wal-badge wal-badge-olive" id="spec-copied" hidden>Copied</span>
-          </div>
-          <p class="next-pagefoot"><a class="wal-link-arrow" href="specimen.html">Watch a page change its palette as you scroll <span aria-hidden="true">→</span></a></p>
-        </div>
-      </div>
       <div class="next-wrap">
+        <div class="next-head">
+          <h2>Six colourways</h2>
+          <p>Five ship with walnut, one class each; Prairie is this page's own. Pull out a drawer to see a colourway by the numbers, then wear it on the page.</p>
+        </div>
+        <div class="wal-chest next-chest" data-wal-material="walnut">
+          <details class="next-drawer wal-palette next-script" name="colourway" data-room="next-script">
+            <summary><span class="next-plate" aria-hidden="true"><span class="next-credenza"><i></i><i></i><i></i><i></i><i></i></span></span><span class="next-drawer-name"><strong>Prairie</strong><small>Made for this page</small></span><span class="next-drawer-worn">On this page</span></summary>
+          </details>
+          <details class="next-drawer wal-palette wal-forest" name="colourway" data-room="wal-forest">
+            <summary><span class="next-plate" aria-hidden="true"><span class="next-credenza"><i></i><i></i><i></i><i></i><i></i></span></span><span class="next-drawer-name"><strong>Forest</strong><small>Fern and campfire copper</small></span><span class="next-drawer-worn">On this page</span></summary>
+          </details>
+          <details class="next-drawer wal-palette wal-bone" name="colourway" data-room="wal-bone">
+            <summary><span class="next-plate" aria-hidden="true"><span class="next-credenza"><i></i><i></i><i></i><i></i><i></i></span></span><span class="next-drawer-name"><strong>Bone</strong><small>Washi tape and pressed flowers</small></span><span class="next-drawer-worn">On this page</span></summary>
+          </details>
+          <details class="next-drawer wal-palette wal-cafe" name="colourway" data-room="wal-cafe">
+            <summary><span class="next-plate" aria-hidden="true"><span class="next-credenza"><i></i><i></i><i></i><i></i><i></i></span></span><span class="next-drawer-name"><strong>Café</strong><small>China blue and brass</small></span><span class="next-drawer-worn">On this page</span></summary>
+          </details>
+          <details class="next-drawer wal-palette wal-dusk" name="colourway" data-room="wal-dusk">
+            <summary><span class="next-plate" aria-hidden="true"><span class="next-credenza"><i></i><i></i><i></i><i></i><i></i></span></span><span class="next-drawer-name"><strong>Dusk</strong><small>Twilight and lantern glow</small></span><span class="next-drawer-worn">On this page</span></summary>
+          </details>
+          <details class="next-drawer wal-palette wal-press" name="colourway" data-room="wal-press">
+            <summary><span class="next-plate" aria-hidden="true"><span class="next-credenza"><i></i><i></i><i></i><i></i><i></i></span></span><span class="next-drawer-name"><strong>Press</strong><small>Tomato on paper stock</small></span><span class="next-drawer-worn">On this page</span></summary>
+          </details>
+        </div>
+        <template id="drawer-in">
+          <div class="next-drawer-in">
+            <div class="next-drawer-about">
+              <span class="next-plate" role="img"><span class="next-credenza"><i></i><i></i><i></i><i></i><i></i></span></span>
+              <p data-about></p>
+              <div class="wal-cluster"><button class="wal-btn wal-btn-primary next-wear" type="button" data-wal-palette aria-pressed="false">Wear it on this page</button></div>
+            </div>
+            <div class="next-drawer-facts">
+              <table class="next-schedule">
+                <thead><tr><th scope="col">Colour</th><th scope="col">Hue</th><th scope="col">Chroma</th><th scope="col">Contrast</th></tr></thead>
+                <tbody></tbody>
+              </table>
+              <p data-pass></p>
+              <div class="next-drawer-code">
+                <pre data-css></pre>
+                <button class="wal-btn wal-btn-secondary wal-btn-sm" type="button" data-copy>Copy</button>
+              </div>
+            </div>
+          </div>
+        </template>
+        <p class="next-kit-more"><a class="wal-link-arrow" href="specimen.html">Watch a page change its palette as you scroll <span aria-hidden="true">→</span></a></p>
         <div class="next-hows">
           <article class="next-how" aria-labelledby="how-swatch">
-            <h3 id="how-swatch">From the swatch</h3>
-            <p>Choose a colourway, roll a palette or wear one from its page, and the new colours open out of the button you pressed, in a circle with a soft edge, until they cover the page. Every frame shows either the old palette or the finished new one, never a mix, so the text is readable the whole way.</p>
-            <dl>
-              <div><dt>Why you would use it</dt><dd>A theme picker whose change starts where the reader acted, so cause and effect are plain. It recolours the whole page, or one section.</dd></div>
-              <div><dt>What ships it</dt><dd>walnut-recolour.js, a small optional script, with the circle in walnut.css. It keeps every button's aria-pressed in step, and aria-controls points a button at one section. Without view transition types it falls back to walnut's tween; with reduced motion the colours simply change.</dd></div>
-              <div><dt>On your site</dt><dd><pre>&lt;script src="walnut-recolour.js" defer&gt;&lt;/script&gt;
+            <h3 id="how-swatch">Recolour from the button</h3>
+            <p>A new palette opens out of the button that chose it. Every frame is all old or all new, so text stays readable throughout.</p>
+            <pre>&lt;script src="walnut-recolour.js" defer&gt;&lt;/script&gt;
 &lt;html class="wal-forest" data-wal-recolour="swatch"&gt;
-&lt;button data-wal-palette="wal-dusk"&gt;Dusk&lt;/button&gt;</pre></dd></div>
-            </dl>
+&lt;button data-wal-palette="wal-dusk"&gt;Dusk&lt;/button&gt;</pre>
+            <p class="next-ships"><b>walnut-recolour.js</b>, optional. It keeps aria-pressed in step, and aria-controls aims a button at one section. Reduced motion swaps at once.</p>
           </article>
-          <article class="next-how" aria-labelledby="how-page">
-            <h3 id="how-page">A page for every colourway</h3>
-            <p>Open page, under each plate, opens that colourway's own page over this one, like a gatefold sleeve: the plate travels out as the cover, and the notes turn over on the spine to lie beside it, landing with a knock. They list every colour the palette is made of: its numbers, what it computes to in light and dark, and the contrast of every text pair. The address changes too, so Back closes it and a link opens it.</p>
-            <dl>
-              <div><dt>Why you would use it</dt><dd>Detail pages for a catalogue, a portfolio or a product range that open in place, with no second page to load and no lost place to come back to.</dd></div>
-              <div><dt>On your site</dt><dd>A dialog with .wal-window and data-wal-open="gatefold", whose cover is the card's picture, larger. The card's own button opens it with commandfor. Open a page for the whole recipe.</dd></div>
-              <div><dt>What ships it</dt><dd>walnut.css draws the window and the spread, walnut-motion.js moves them, and data-wal-material="walnut" gives them their weight. The page wears its colourway with .wal-palette.</dd></div>
-            </dl>
+          <article class="next-how" aria-labelledby="how-chest">
+            <h3 id="how-chest">Drawers</h3>
+            <p>Each drawer is a <code>&lt;details&gt;</code>. One <code>name</code> makes them a chest, so pulling one out pushes the last one home. In walnut, a drawer runs out heavy and knocks on its stop.</p>
+            <pre>&lt;div class="wal-chest" data-wal-material="walnut"&gt;
+  &lt;details name="colourway"&gt;
+    &lt;summary&gt;Forest&lt;/summary&gt;
+    &lt;div&gt;…&lt;/div&gt;
+  &lt;/details&gt;
+&lt;/div&gt;</pre>
+            <p class="next-ships"><b>walnut.css</b>, no script. Keyboard and find-in-page work as they do on any details.</p>
           </article>
         </div>
       </div>
     </section>
 
-    <dialog class="wal-window next-colourway wal-palette next-script" id="colourway" data-wal-open="gatefold" data-wal-material="walnut" closedby="any" aria-labelledby="cw-title">
-      <div class="wal-gatefold-spread">
-        <figure class="wal-gatefold-cover">
-          <span class="next-plate next-cw-hero" id="cw-plate" role="img" aria-label="The credenza, lacquered in Prairie"><span class="next-credenza"><i></i><i></i><i></i><i></i><i></i></span></span>
-        </figure>
-        <div class="wal-gatefold-notes">
-          <div class="next-cw-sheet">
-            <div class="next-cw-trail">
-              <span>The walnut collection</span>
-              <button type="button" id="cw-home">Close</button>
-            </div>
-            <div class="next-cw-intro">
-              <h2 id="cw-title" tabindex="-1" autofocus>Prairie</h2>
-              <p class="next-cw-note" id="cw-note">Made for this page</p>
-              <p class="next-cw-about" id="cw-about"></p>
-              <div class="next-cw-acts">
-                <button class="wal-btn wal-btn-primary" type="button" id="cw-wear" data-wal-palette="next-script" aria-pressed="false">Wear it on this page</button>
-                <button class="wal-btn wal-btn-secondary" type="button" id="cw-back">Back to the collection</button>
-              </div>
-              <p class="next-cw-worn" id="cw-worn" aria-live="polite"></p>
-              <p class="next-cw-pass" id="cw-pass"></p>
-            </div>
-
-            <section class="next-cw-section" aria-labelledby="cw-colours-h">
-              <header>
-                <h3 id="cw-colours-h">The colours</h3>
-                <p>A ground and five colours, each set by a hue and a chroma, with a lightness for each mode from walnut's ramp. Each card shows the colour in light and dark, the oklch and hex it computes to, and the contrast of the text it is part of. AA asks for 4.5.</p>
-              </header>
-              <ol class="next-cues" id="cw-cues"></ol>
-            </section>
-
-            <section class="next-cw-section" aria-labelledby="cw-site-h">
-              <header>
-                <h3 id="cw-site-h">On your site</h3>
-                <p id="cw-site-note"></p>
-              </header>
-              <div class="next-cw-code">
-                <pre id="cw-css"></pre>
-                <button class="wal-btn wal-btn-secondary wal-btn-sm" type="button" id="cw-copy">Copy</button>
-              </div>
-            </section>
-
-            <section class="next-cw-section" aria-labelledby="cw-how-h">
-              <div class="next-how">
-                <h3 id="cw-how-h">How this page opened</h3>
-                <p>This is still the page you were reading. It opened like a gatefold sleeve: the plate you chose travelled out as the cover, and these notes turned over on the spine to lie beside it. The window is walnut, so they came down with a knock. Close it, press Escape or click beside it, and the notes fold back and the cover goes home to its plate. The address now ends in <code id="cw-hash">#open=prairie</code>, so Back closes it, and the link opens straight here.</p>
-                <pre>&lt;button commandfor="forest" command="show-modal"&gt;
-  &lt;span class="plate" data-wal-art&gt;…&lt;/span&gt; Forest
-&lt;/button&gt;
-
-&lt;dialog class="wal-window wal-palette wal-forest" id="forest"
-        data-wal-open="gatefold" data-wal-material="walnut"
-        closedby="any" style="--wal-cover-ratio: 4 / 3"&gt;
-  &lt;div class="wal-gatefold-spread"&gt;
-    &lt;figure class="wal-gatefold-cover"&gt;…the plate, larger…&lt;/figure&gt;
-    &lt;div class="wal-gatefold-notes"&gt;…&lt;/div&gt;
-  &lt;/div&gt;
-&lt;/dialog&gt;
-
-&lt;script src="walnut-motion.js" defer&gt;&lt;/script&gt;</pre>
-                <dl>
-                  <div><dt>From script</dt><dd>This page opens one window for all six and writes the address, so it calls walnut.open(window, card) itself. A link or Back opens it with { instant: true }: in place, over its plate, so it still goes home there.</dd></div>
-                  <div><dt>Where it works</dt><dd>The window is a dialog, so it opens anywhere. Without walnut-motion.js, and with reduced motion, it simply opens. On a phone the spread stacks and the notes fold down.</dd></div>
-                  <div><dt>What ships it</dt><dd>walnut.css draws the window, the spread and the weight; walnut-motion.js moves them; .wal-palette gives the window this colourway's colours.</dd></div>
-                </dl>
-              </div>
-            </section>
-          </div>
-        </div>
-      </div>
-    </dialog>
-
     <section class="next-section" id="photo">
       <div class="next-wrap">
         <div class="next-head">
           <h2>A palette from a photo</h2>
-          <p>Choose a photo, or bring one of your own. Its colours become walnut's numbers, fitted so every text colour passes AA in light and dark, ready to paste into your site.</p>
+          <p>Choose a photo or bring your own. Its colours become walnut's numbers, fitted so every text colour passes AA in light and dark, ready to paste.</p>
         </div>
         <div class="next-photo">
           <div class="next-photo-in">
@@ -1431,16 +1181,12 @@
           <article class="next-how" aria-labelledby="how-photo">
             <h3 id="how-photo">How a photo becomes a palette</h3>
             <ol>
-              <li>The photo is shrunk to 72 pixels across, and every pixel is read as an oklch colour.</li>
-              <li>Pixels are grouped by hue, 10° to a group. Greys and the extremes of light and dark go to the ground instead, which takes the photo's average cast at a whisper of chroma.</li>
-              <li>Five groups become the colours: the strongest first, each at least 28° from any already taken, so a sunset does not give you five oranges. The strongest leads as the accent, its nearest neighbour is bloom and the furthest is cool; of the other two, the one nearer yellow is gold.</li>
-              <li>Each colour's chroma is fitted inside sRGB in light and dark, and every text pair is measured. A colour that fails is pulled back a little; if it still fails, its lightness moves the least that passes, in that mode only.</li>
+              <li>The photo is read at 72 pixels across, each pixel as an oklch colour.</li>
+              <li>Pixels are grouped by hue, 10° to a group. Greys and extremes give the ground its faint cast.</li>
+              <li>Five groups become the colours: the strongest first, each at least 28° from any already taken, so a sunset does not give five oranges. The strongest leads as the accent; the rest take roles by where they sit on the wheel.</li>
+              <li>Each colour is fitted inside sRGB and every text pair is measured. One that fails is pulled back, or its lightness moves the least that passes.</li>
             </ol>
-            <dl>
-              <div><dt>Why you would use it</dt><dd>A palette that belongs with your own photography, already checked for contrast in both modes.</dd></div>
-              <div><dt>On your site</dt><dd>Paste the CSS above into your stylesheet, after walnut.css. It is the same numbers walnut is always themed with, so nothing else changes.</dd></div>
-              <div><dt>What ships it</dt><dd>Nothing: this is a tool on this page, and what it writes is plain walnut. Your photo is read in this tab and never uploaded.</dd></div>
-            </dl>
+            <p class="next-ships"><b>Nothing to install.</b> Paste the CSS after walnut.css. Your photo is read in this tab and never uploaded.</p>
           </article>
         </div>
       </div>
@@ -1450,11 +1196,23 @@
       <div class="next-wrap">
         <div class="next-head">
           <h2>Install</h2>
-          <p>One stylesheet, no build step and no runtime. Palette files and the three small scripts, for acts, for recolouring from the swatch and for the openings, are optional.</p>
+          <p>One stylesheet, 17 KB gzipped. No build step, no runtime. Everything else is optional.</p>
         </div>
         <div class="next-install">
           <pre id="install-code">&lt;link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/SKMinWoo/walnut.css@v0.4.0/dist/walnut.min.css"&gt;</pre>
           <button class="wal-btn wal-btn-primary" type="button" id="copy-install">Copy</button>
+        </div>
+        <div class="next-extras-wrap">
+          <table class="next-extras">
+            <thead><tr><th scope="col">Add</th><th scope="col">For</th></tr></thead>
+            <tbody>
+              <tr><th scope="row"><code>themes/forest.css</code></th><td>A shipped palette: Forest, Bone, Café, Dusk or Press. One class on a page or a section.</td></tr>
+              <tr><th scope="row"><code>walnut-recolour.js</code></th><td>Palette buttons that recolour the page from the button pressed.</td></tr>
+              <tr><th scope="row"><code>walnut-motion.js</code></th><td>Doors you drag shut by the pull, windows that open as a gatefold, and lists that shuffle.</td></tr>
+              <tr><th scope="row"><code>walnut-acts.js</code></th><td>A page that changes palette section by section as you scroll.</td></tr>
+              <tr><th scope="row"><code>walnut-scroll.css</code></th><td>Carousel dots and a nav that lights the section in view, with no script. Chrome and Edge.</td></tr>
+            </tbody>
+          </table>
         </div>
       </div>
     </section>
@@ -1462,13 +1220,12 @@
 
   <footer class="next-foot">
     <div class="next-wrap">
-      <span>walnut.css <span data-version>0.4.0</span>, MIT licence</span>
-      <span><a href="https://github.com/SKMinWoo/walnut.css">Source on GitHub</a> &nbsp; <a href="reference.html">Reference</a> &nbsp; <a href="openings.html">Openings</a></span>
+      <span>walnut.css <span data-version>0.4.0</span>. MIT licence. Built by Alex Kim.</span>
+      <span><a href="https://github.com/SKMinWoo/walnut.css">GitHub</a> &nbsp; <a href="https://github.com/SKMinWoo/walnut.css/blob/master/CHANGELOG.md">Changelog</a></span>
     </div>
   </footer>
 
   <script src="../dist/walnut-recolour.js"></script>
-  <script src="../dist/walnut-motion.js"></script>
   <script>
     (() => {
       const root = document.documentElement;
@@ -1494,13 +1251,13 @@
       const apart = (x, y) => Math.abs((((x - y) % 360) + 540) % 360 - 180); // degrees round the wheel
 
       /* ── Palettes: one class on <html> ──
-         The page wears one palette class at a time, the same class its plate
-         in the catalogue wears: Prairie, this page's own, or one of walnut's
-         five. The plates are walnut-recolour.js's data-wal-palette buttons.
-         The rods, the wheel and a roll write numbers inline on top. */
-      const range = $("range");
-      const swatches = [...range.querySelectorAll("[data-wal-palette]")];
-      const ROOMS = swatches.map((b) => b.dataset.walPalette);
+         The page wears one palette class at a time, the same class its
+         drawer in the chest wears: Prairie, this page's own, or one of
+         walnut's five. Each drawer's Wear button is a walnut-recolour.js
+         data-wal-palette button. The rods, the wheel and a roll write
+         numbers inline on top. */
+      const drawers = [...document.querySelectorAll(".next-drawer")];
+      const ROOMS = drawers.map((d) => d.dataset.room);
       const HOUSE = "next-script";
       const roomOf = () => ROOMS.find((c) => root.classList.contains(c)) ?? HOUSE;
       const enter = (room) => { root.classList.remove(...ROOMS); root.classList.add(room); };
@@ -1517,7 +1274,6 @@
       const bands = [...document.querySelectorAll("[data-band]")];
       const rods = [...document.querySelectorAll("input[data-prop]")];
       const generated = $("generated");
-      const spec = [...document.querySelectorAll("[data-spec]")];
       let dragging = null;
 
       function paint() {
@@ -1546,7 +1302,6 @@
             .filter((p) => !PINS.includes(p) || apart(num(cs, p), lead + num(offset, p)) > 0.05);
           generated.innerHTML = [":root {", ...shown.map((p) => line(p, 22)), "}"].join("\n");
         }
-        for (const cell of spec) cell.textContent = fmt(cell.dataset.spec, num(cs, cell.dataset.spec));
         const a = num(cs, "--wal-accent-hue");
         $("hub").textContent = Math.round(deg(a)) + "°";
         $("arc-bloom").textContent = "+" + Math.round(deg(num(cs, "--wal-bloom-hue") - a)) + "°";
@@ -1597,8 +1352,8 @@
       /* ── Sharing: the palette lives in the URL ──
          #p=bone names a shipped palette, Prairie needs none, #s= carries the
          ten rods whenever any is written on top, and #open=bone is that
-         colourway's page, open. */
-      let opened = null; // the colourway whose page is open
+         colourway's drawer, pulled out. */
+      let opened = null; // the colourway whose drawer is out
       const keyOf = (room) => (room === HOUSE ? "prairie" : room.slice(4));
       const roomFor = (key) => ROOMS.find((r) => keyOf(r) === key) ?? null;
       const linked = () => new URLSearchParams(location.hash.slice(1));
@@ -1731,24 +1486,16 @@
         }, { from: e.currentTarget });
       });
 
-      /* ── Colourways: choosing one puts its class on the page ── */
-      const featureName = $("feature-name");
-      const featureNote = $("feature-note");
-      // A palette button is pressed while the page wears its palette with no
-      // number written over it; from then on the piece is the reader's own.
-      // walnut-recolour.js keeps the buttons in step on every recolour; this
-      // is for the rods and the wheel, which change the page without one.
+      /* ── Colourways: wearing one puts its class on the page ──
+         A Wear button is pressed while the page wears its palette with no
+         number written over it; from then on the palette is the reader's
+         own. walnut-recolour.js keeps the buttons in step on every
+         recolour; this is for the rods and the wheel, which change the page
+         without one. */
       function mark() {
-        const room = swatches.find((b) => b.dataset.walPalette === roomOf());
-        const worn = written() ? null : room;
-        const name = (b) => b.querySelector("strong").textContent;
         for (const b of document.querySelectorAll("[data-wal-palette]:not([aria-controls])")) {
           b.setAttribute("aria-pressed", String(!written() && b.dataset.walPalette === roomOf()));
         }
-        featureName.textContent = worn ? name(worn) : "Your own";
-        featureNote.textContent = worn ? worn.querySelector("small").textContent
-          : roomOf() === HOUSE ? "Rolled, or set by hand" : `Set by hand, starting from ${name(room)}`;
-        if (opened) wearing();
       }
 
       /* ── Finish ── */
@@ -1837,7 +1584,6 @@
         }
       };
       $("copy-css").addEventListener("click", () => copy(generated.textContent, copied));
-      $("copy-spec").addEventListener("click", () => copy(generated.textContent, $("spec-copied")));
       $("copy-link").addEventListener("click", () => { share(); copy(location.href, copied); });
       $("copy-install").addEventListener("click", (e) => {
         copy($("install-code").textContent).then(() => {
@@ -1920,47 +1666,23 @@
       const r1 = (x) => (Math.floor(x * 10) / 10).toFixed(1);
       const title = (s) => s[0].toUpperCase() + s.slice(1);
 
-      /* ── A page for every colourway ──
-         Open page, under a plate, opens that colourway's own page over this
-         one, as a gatefold: the window is walnut's .wal-window, moved by
-         walnut-motion.js, and each plate is its card's picture
-         ([data-wal-art]), so it travels out as the cover and goes home to
-         its plate on closing. The window is a scoped .wal-palette, so it is
-         in its own colours before you wear them, and #open= in the address
-         means Back closes it and a link opens it. */
-      const COLOURWAYS = {
-        "next-script": {
-          about: "This page's own, and the one it opens in. The ground is a cool limestone kept close to grey, so the five colours carry all of it: brick leads, with apricot, ochre, prairie grass and a sky blue across the wheel.",
-          nick: { ground: "Limestone", accent: "Brick", bloom: "Apricot", gold: "Ochre", olive: "Prairie grass", cool: "Sky" },
-        },
-        "wal-forest": {
-          about: "A mossy forest floor at dawn. Fern leads on a ground of leaf litter, campfire copper warms it, and the cool is the sky through the canopy. Its dark mode goes deeper than walnut's own.",
-          nick: { ground: "Leaf litter", accent: "Fern", bloom: "Campfire copper", gold: "Morning light", olive: "Lichen", cool: "Dawn sky" },
-        },
-        "wal-bone": {
-          about: "Sunlit linen and Japanese stationery. It is light first: it keeps a page light even when the system is dark, unless the reader asks for dark. Washi tape leads, with a pressed flower, a dried stem, a pressed leaf and a vermilion seal.",
-          nick: { ground: "Linen", accent: "Washi tape", bloom: "Pressed flower", gold: "Dried stem", olive: "Pressed leaf", cool: "Hanko vermilion" },
-        },
-        "wal-cafe": {
-          about: "A coffee shop at golden hour. China blue leads against a warm amber room, with the glaze on the cups, the brass, the late sun and the walnut counter.",
-          nick: { ground: "Amber room", accent: "China blue", bloom: "Glaze", gold: "Brass", olive: "Golden hour", cool: "Walnut counter" },
-        },
-        "wal-dusk": {
-          about: "A mountain sunset going to twilight. Violet leads on a dusky ground, with the afterglow, a lantern, the alpenglow and the last blue in the sky. In the dark mode the colours are lit from below.",
-          nick: { ground: "Dusky violet", accent: "Twilight", bloom: "Afterglow", gold: "Lantern", olive: "Alpenglow", cool: "Last blue" },
-        },
-        "wal-press": {
-          about: "A 1960s parts catalogue, on paper stock. It is light first, like Bone. Tomato leads, with apricot, goldenrod, olive and an Adriatic blue.",
-          nick: { ground: "Paper stock", accent: "Tomato", bloom: "Apricot", gold: "Goldenrod", olive: "Olive", cool: "Adriatic" },
-        },
+      /* ── The chest ──
+         Each drawer is a .wal-palette scope wearing its colourway, so
+         everything in it, read back here, is that colourway's: its numbers,
+         the colours they compute to in light and dark, and the contrast of
+         every text pair. Filled once, before any drawer is pulled, so each
+         slides out at its full height. */
+      const ABOUT = {
+        "next-script": "This page's own. A cool limestone ground kept close to grey, so the five colours carry it: brick leads, with apricot, ochre, prairie grass and sky.",
+        "wal-forest": "A mossy forest floor at dawn: fern on leaf litter, warmed by campfire copper. Its dark mode goes deeper than walnut's own.",
+        "wal-bone": "Sunlit linen and Japanese stationery. Light first: it keeps a page light when the system is dark, unless the reader asks for dark.",
+        "wal-cafe": "A coffee shop at golden hour: china blue against a warm amber room, with brass and a walnut counter.",
+        "wal-dusk": "A mountain sunset going to twilight: violet on a dusky ground, with afterglow and lantern light. In dark mode the colours are lit from below.",
+        "wal-press": "A 1960s parts catalogue on paper stock. Light first, like Bone: tomato leads, with goldenrod, olive and an Adriatic blue.",
       };
       const ROLES = {
-        ground: "The page itself: its surfaces, hairlines and text. Kept low in chroma, so the five colours carry the palette.",
-        accent: "The lead, and the one colour that means you can act: links and the main button.",
-        bloom: "The warm second voice: gradients, washes and highlights beside the accent.",
-        gold: "The metal: rules, markers and ornament.",
-        olive: "The calm colour, the one that recedes: tags and quiet states.",
-        cool: "The split complement, the one colour that argues with the rest.",
+        ground: "surfaces and text", accent: "links, main button", bloom: "washes, highlights",
+        gold: "rules, markers", olive: "tags, quiet states", cool: "the contrast colour",
       };
       // Prairie is this page's own, so on a site it is these numbers, as in
       // the .next-script rule above.
@@ -1975,147 +1697,65 @@
         "  --wal-l-surface-light: 99%;   --wal-l-surface-2-light: 94%;",
         "  --wal-l-line-light: 87%;      --wal-l-line-soft-light: 91%;",
         "}"].join("\n");
+      const PAIRS = { ground: ["text", "muted"], cue: ["ink", "surface", "fg", "wash"] };
+      const drawerOf = (room) => drawers.find((d) => d.dataset.room === room);
+      const nameOf = (room) => drawerOf(room).querySelector("strong").textContent;
 
-      const cw = $("colourway"), cwPlate = $("cw-plate"), cwTitle = $("cw-title");
-      const plateOf = (room) => swatches.find((b) => b.dataset.walPalette === room);
-      const nameOf = (room) => plateOf(room).querySelector("strong").textContent;
-      const openerOf = (room) => range.querySelector(`[data-open="${room}"]`);
-      const cardOf = (room) => plateOf(room).closest("li");
-      let shown = null; // the colourway in the window, open or last open
+      function fillDrawer(drawer) {
+        const room = drawer.dataset.room, n = nameOf(room);
+        drawer.append(document.importNode($("drawer-in").content, true));
+        drawer.querySelector(".next-drawer-about .next-plate").setAttribute("aria-label", `The credenza, lacquered in ${n}`);
+        drawer.querySelector("[data-about]").textContent = ABOUT[room];
+        drawer.querySelector(".next-wear").dataset.walPalette = room;
 
-      // The page, written out for one colourway: its words, then every
-      // colour read off the page's own computed numbers, so what the cards
-      // say is what the page is wearing.
-      function fill(room) {
-        const n = nameOf(room), info = COLOURWAYS[room];
-        cw.classList.remove(...ROOMS);
-        cw.classList.add(room);
-        cwTitle.textContent = n;
-        cwPlate.setAttribute("aria-label", `The credenza, lacquered in ${n}`);
-        $("cw-note").textContent = plateOf(room).querySelector("small").textContent;
-        $("cw-about").textContent = info.about;
-        $("cw-wear").dataset.walPalette = room;
-        $("cw-hash").textContent = "#open=" + keyOf(room);
-
-        const get = fromStyle(getComputedStyle(cw));
+        const get = fromStyle(getComputedStyle(drawer));
         const k = { light: coloursOf(get, "light"), dark: coloursOf(get, "dark") };
         const score = measure(get);
-        const lead = get("--wal-accent-hue");
-        const follows = (cue, off) => apart(get(`--wal-${cue}-hue`), lead + off) < 0.05;
-        const hueNote = { accent: "the lead", bloom: follows("bloom", 27) ? "the accent + 27°" : "pinned",
-          cool: follows("cool", 209) ? "the accent + 209°" : "pinned" };
-        const td = (x) => `<td${x < AA ? ' class="is-low"' : ""}>${r1(x)}</td>`;
-        const row = (label, cue, pair) => `<tr><th scope="row">${label}</th>${td(score.at("light", cue, pair))}${td(score.at("dark", cue, pair))}</tr>`;
-        const card = (cue) => {
+        const worst = (cue) => Math.min(...MODES.flatMap((m) => PAIRS[cue === "ground" ? "ground" : "cue"].map((p) => score.at(m, cue, p))));
+        drawer.querySelector(".next-schedule tbody").innerHTML = ["ground", ...CUE_NAMES].map((cue) => {
           const ground = cue === "ground";
           const [light, dark] = ground ? [k.light.bg, k.dark.bg] : [k.light[cue].fill, k.dark[cue].fill];
           const hue = get(ground ? "--wal-hue" : `--wal-${cue}-hue`), chroma = get(ground ? "--wal-chroma" : `--wal-${cue}-chroma`);
-          const note = hueNote[cue] ? ` <i>${hueNote[cue]}</i>` : "";
-          const rows = ground ? row("Text on it", "ground", "text") + row("Muted text on it", "ground", "muted")
-            : row("As text", cue, "ink") + row("Text on it", cue, "fg");
-          return `<li class="next-cue">
-            <div class="next-cue-chip" style="--cue: var(--wal-${ground ? "bg" : cue}); --cue-fg: var(--wal-${ground ? "text" : cue + "-fg"})" aria-hidden="true"><span><b>Aa</b>Light</span><span><b>Aa</b>Dark</span></div>
-            <h4>${title(cue)} <span>${info.nick[cue]}</span></h4>
-            <p>${ROLES[cue]}</p>
-            <dl>
-              <div><dt>Hue</dt><dd>${Math.round(deg(hue))}°${note}</dd></div>
-              <div><dt>Chroma</dt><dd>${chroma.toFixed(3)}</dd></div>
-              <div><dt>Light</dt><dd>${lch(light)} <i>${hex(srgb(...light))}</i></dd></div>
-              <div><dt>Dark</dt><dd>${lch(dark)} <i>${hex(srgb(...dark))}</i></dd></div>
-            </dl>
-            <table><thead><tr><th scope="col"><span class="wal-sr-only">Contrast</span></th><th scope="col">Light</th><th scope="col">Dark</th></tr></thead><tbody>${rows}</tbody></table>
-          </li>`;
-        };
-        $("cw-cues").innerHTML = ["ground", ...CUE_NAMES].map(card).join("");
-        $("cw-pass").textContent = score.pass === score.all
-          ? `All ${score.all} of its text pairs pass AA, in light and dark.`
-          : `${score.pass} of its ${score.all} text pairs pass AA, in light and dark; the rest are marked below.`;
+          const low = worst(cue);
+          return `<tr><th scope="row"><span class="next-chip" aria-hidden="true"><b style="background: ${lch(light)}"></b><b style="background: ${lch(dark)}"></b></span>${title(cue)}<small>${ROLES[cue]}</small></th>`
+            + `<td>${Math.round(deg(hue))}°</td><td>${chroma.toFixed(3)}</td><td${low < AA ? ' class="is-low"' : ""}>${r1(low)}</td></tr>`;
+        }).join("");
+        drawer.querySelector("[data-pass]").textContent = (score.pass === score.all
+          ? `All ${score.all} text pairs pass AA in light and dark.`
+          : `${score.pass} of ${score.all} text pairs pass AA in light and dark.`)
+          + " Contrast is each colour's weakest pair; the chips are light, then dark.";
+        drawer.querySelector("[data-css]").textContent = room === HOUSE ? PRAIRIE_CSS
+          : [`<link rel="stylesheet" href="dist/themes/${keyOf(room)}.css">`, "",
+            "<!-- the whole site -->", `<html class="${room}">`, "",
+            "<!-- or one section -->", `<section class="wal-palette ${room}">`].join("\n");
+      }
+      drawers.forEach(fillDrawer);
 
-        if (room === HOUSE) {
-          $("cw-site-note").textContent = "Prairie is this page's own, so on your site it is these numbers. Paste them after walnut.css and every page wears it.";
-          $("cw-css").textContent = PRAIRIE_CSS;
-        } else {
-          $("cw-site-note").textContent = `${n} ships with walnut, as one class. Put it on <html> for the whole site, or on any section with .wal-palette for that section alone, the way this page wears it.`;
-          $("cw-css").textContent = [`<link rel="stylesheet" href="dist/walnut.css">`, `<link rel="stylesheet" href="dist/themes/${keyOf(room)}.css">`, "",
-            `<html class="${room}">`, "", `<section class="wal-palette ${room}">…</section>`].join("\n");
-        }
+      // The drawer that is out is in the address, so a link opens it.
+      for (const d of drawers) {
+        d.addEventListener("toggle", () => {
+          if (d.open) opened = d.dataset.room;
+          else if (opened === d.dataset.room) opened = null;
+          share();
+        });
       }
-      function wearing() {
-        $("cw-worn").textContent = !written() && roomOf() === opened ? `This page is wearing ${nameOf(opened)} now.` : "";
-      }
-
-      const inView = (el) => { const r = el.getBoundingClientRect(); return r.bottom > 0 && r.top < innerHeight; };
-
-      // Which page is open changes at once, so the address written straight
-      // after is right; only what you see waits for the movement. A page
-      // with no plate on screen to travel from (a link, or Forward) opens in
-      // place, over its plate, so the cover still has a home to go to.
-      function open(room, { push = true, instant = false } = {}) {
-        if (!plateOf(room)) return;
-        fill(room);
-        opened = shown = room;
-        const card = cardOf(room);
-        if (!inView(card)) {
-          instant = true;
-          card.scrollIntoView({ block: "center", behavior: "instant" });
-        }
-        walnut.open(cw, card, { instant });
-        wearing();
-        if (push) history.pushState({ open: keyOf(room) }, "", hashFor(room));
-      }
-      function close({ instant = false } = {}) {
-        if (!opened) return;
-        opened = null;
-        if (instant) cw.close();
-        else walnut.open.close(cw);
-      }
-      // However the window closed (its buttons, Escape, a click beside it,
-      // or Back), the reader is back at the plate, and the address agrees.
-      cw.addEventListener("close", () => {
-        if (cw.open) return; // already open again, on another colourway
-        // A window a link opened had nothing focused before it to go back
-        // to, so focus is left in the closed window, or nowhere.
-        const lost = document.activeElement;
-        if (!lost || lost === document.body || cw.contains(lost)) openerOf(shown).focus({ preventScroll: true });
-        if (!opened) return; // closed by Back: the address is right already
-        opened = null;
-        if (history.state?.open) history.back();
-        else share();
-      });
-      // Back, from the page: through the browser's history when this page
-      // put the entry there, so the browser's own Back agrees with it.
-      function leave() {
-        if (history.state?.open) history.back();
-        else { close(); share(); }
-      }
-      range.addEventListener("click", (e) => {
-        const b = e.target.closest("[data-open]");
-        if (b) open(b.dataset.open);
-      });
-      $("cw-back").addEventListener("click", leave);
-      $("cw-home").addEventListener("click", leave);
-      $("cw-copy").addEventListener("click", (e) => {
-        copy($("cw-css").textContent).then(() => {
-          e.target.textContent = "Copied";
-          setTimeout(() => { e.target.textContent = "Copy"; }, 1600);
+      document.querySelector(".next-chest").addEventListener("click", (e) => {
+        const b = e.target.closest("[data-copy]");
+        if (!b) return;
+        copy(b.parentElement.querySelector("[data-css]").textContent).then(() => {
+          b.textContent = "Copied";
+          setTimeout(() => { b.textContent = "Copy"; }, 1600);
         });
       });
-      // Back and Forward, and the nav's own links: a link to another section
-      // closes the page at once, so the section is there to land on. A link
-      // to the collection closes it the usual way, back to the plate.
-      addEventListener("popstate", () => {
-        const id = /^#[\w-]+$/.test(location.hash) ? location.hash.slice(1) : null;
-        const anchor = id && id !== "palettes" ? document.getElementById(id) : null;
-        const want = roomFor(linked().get("open"));
-        if (want !== opened) {
-          if (want) open(want, { push: false });
-          else {
-            close({ instant: !!anchor });
-            if (anchor) anchor.scrollIntoView({ behavior: "instant" });
-          }
-        }
-        if (!id) share();
-      });
+      const pullOut = (room) => {
+        const d = drawerOf(room);
+        if (!d) return;
+        d.open = true;
+        opened = room;
+        d.scrollIntoView({ block: "start", behavior: "instant" });
+      };
+      // A link to a drawer, followed from this page.
+      addEventListener("hashchange", () => { const want = roomFor(linked().get("open")); if (want) pullOut(want); });
 
       /* ── A palette from a photo ──
          The photo is read small, its colours grouped by hue, five of them
@@ -2380,9 +2020,9 @@
       syncMode();
       paint();
       follow();
-      // A link straight to a colourway's page opens it, with no show.
+      // A link straight to a drawer opens it.
       const linkedRoom = roomFor(linked().get("open"));
-      if (linkedRoom) open(linkedRoom, { push: false, instant: true });
+      if (linkedRoom) pullOut(linkedRoom);
     })();
   </script>
 </body>

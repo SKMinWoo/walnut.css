@@ -100,7 +100,9 @@ the platform can now draw with no script.
 - **Openings.** `.wal-chest`, a plan chest of `<details>` drawers that
   slide out of their slots in the flow of the page. `.wal-door`, a sliding
   side panel on a `<dialog>` opened with `commandfor`, so it needs none of
-  `.wal-drawer`'s script. `.wal-window`, a page inside the page, which
+  `.wal-drawer`'s script; with `walnut-motion.js` its pull also drags it
+  shut, and let go a third of the way or with a flick it closes, short of
+  that it runs back to its stop. `.wal-window`, a page inside the page, which
   `walnut-motion.js` opens as a gatefold from the card that opened it
   (`data-wal-open="gatefold"`, `walnut.open`). A window that a link or Back
   opens can open in place and still go home to its card
@@ -118,6 +120,8 @@ the platform can now draw with no script.
   the four new opening tokens, `--wal-open-duration`, `--wal-open-ease`,
   `--wal-close-duration` and `--wal-close-ease`, so a part of your own takes
   one by transitioning on them.
+- **`aria-current="page"` in `.wal-nav-links`** is underlined the way
+  `.is-active` is, so a nav of pages marks the one you are on with no class.
 - **Charts.** `.wal-chart` (columns on a brass rail, stringing for
   gridlines), `.wal-ring` (shares inlaid in a brass bezel) and `.wal-key`,
   drawn from the markup with no script. Under Materials they are brass, and
@@ -253,15 +257,22 @@ the platform can now draw with no script.
 - **Docs: the catalogue is the home page.** The redesigned docs page,
   `next.html` until now, is `docs/index.html`, and `/next` redirects to it.
   The page it replaces documents every class and token, so it stays, whole,
-  as `docs/reference.html`. Plate 14's page goes back to the workbench
-  there, where its card is.
+  as `docs/reference.html`. Plate 14's page goes back to the reference,
+  where its card is.
 
 - **Docs: the catalogue shows all three.** It recolours from the
-  swatch; each colourway's "Open page" opens a gatefold window whose cover
-  is the plate, in walnut, with every colour's oklch, hex and contrast in
-  both modes, and an `#open=` address so Back closes it; its prints are duotones with an
-  ink row; and a new tool reads a photo into a palette whose every text pair
-  passes AA. The README has the in-page morph under "Between pages".
+  swatch; its colourways are a walnut `.wal-chest`, each drawer pulling out
+  with every colour's oklch and its worst contrast in both modes, the CSS
+  to copy, and a button to wear it, and an `#open=` address pulls one out;
+  its prints are duotones with an ink row; and a new tool reads a photo
+  into a palette whose every text pair passes AA. The README has the
+  in-page morph under "Between pages".
+
+- **Docs: one site.** The overview, openings, reference and plate 14 share
+  one nav (Overview, Openings, Reference, GitHub) and one footer, and their
+  copy is cut to what each part does, what it is for, and where it ships. On
+  a phone the nav keeps the name and controls on top and gives the pages a
+  row of their own, rather than leaving a button stranded on a second line.
 
 - **Dialog and popover entrances.** A `.wal-dialog` that is a `<dialog>` or a
   `[popover]` rises the last 0.75rem into place as it fades in, and sinks back
@@ -298,6 +309,12 @@ the platform can now draw with no script.
 
 ### Fixed
 
+- **`.wal-nav-brand` is no longer underlined.** It took the underline every
+  link in running text has; the nav's own links never did.
+- **In-page links land below the nav.** The nav is sticky, so a link to
+  `#install` put the heading under it. A page whose `<body>` holds a
+  `.wal-nav` now keeps `--wal-nav-h` clear with `scroll-padding-block-start`.
+  A nav that wraps to two rows is taller: set your own padding at that width.
 - **No blur in a bundled app.** Every `backdrop-filter` (the nav, the
   overlay, the dialog and window backdrops, `.wal-glass`) was written before
   its `-webkit-` twin. Lightning CSS (Next.js with Turbopack, Vite, Parcel,
