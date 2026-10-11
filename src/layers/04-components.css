@@ -59,6 +59,9 @@
       color: var(--wal-text);
       line-height: 1.2;
       white-space: nowrap;
+      /* A masthead's name, not a link in running text: no underline, as the
+         nav's own links have none at rest. */
+      text-decoration: none;
 
       small {
         font-family: var(--wal-font-label);
@@ -85,7 +88,8 @@
       &::-webkit-scrollbar { display: none; }
 
       /* Scroll-spy from the browser, with no script, is in
-         walnut-scroll.css; .is-active is the script's way. */
+         walnut-scroll.css; .is-active is the script's way, and
+         aria-current="page" marks the page you are on. */
 
       a { white-space: nowrap; }
 
@@ -112,7 +116,8 @@
         }
 
         &:hover::after,
-        &.is-active::after {
+        &.is-active::after,
+        &[aria-current="page"]::after {
           transform: scaleX(1);
           transform-origin: left;
         }
@@ -143,6 +148,14 @@
     from { opacity: 0; }
     to   { opacity: 1; }
   }
+
+  /* The nav is sticky, so whatever an in-page link brings to the top would
+     land under it. Keep the nav's height clear. Only for a masthead, a nav
+     straight under <body>: a sticky box sticks only within its parent, so a
+     nav inside a section or a demo never covers the page. A nav that wraps
+     to two rows is taller than --wal-nav-h: set scroll-padding-block-start
+     on :root at that width, and an unlayered rule wins. */
+  :root:has(> body > .wal-nav) { scroll-padding-block-start: var(--wal-nav-h); }
 
   /* ═══ 2. Hero ═══ */
   .wal-hero {
@@ -1739,7 +1752,9 @@
      or Escape close it, so focus, the inert page behind and the Escape key
      are all the browser's. It runs in on a track from the right and throws
      its shadow across the page; on a phone it rises from below. The
-     leading edge is its pull, which closes it.
+     leading edge is its pull, which closes it. With walnut-motion.js the
+     pull can be dragged as well: the door follows the hand, and let go a
+     third of the way out, or flicked, it shuts.
 
      This is .wal-drawer without the script that drawer needs for its
      classes and its focus. Like the chest, it moves on the four opening
@@ -1793,6 +1808,19 @@
       opacity: 1;
       transition-duration: var(--wal-open-duration);
     }
+
+    /* Taken in hand by its pull (walnut-motion.js): the door goes where
+       the hand puts it, so nothing eases it, and its shadow thins with the
+       share of it that is out (--wal-door-out, 0 to 1). */
+    &[data-wal-held] {
+      transition: none;
+      user-select: none;
+    }
+
+    &[data-wal-held]::backdrop {
+      transition: none;
+      opacity: calc(1 - var(--wal-door-out, 0));
+    }
   }
 
   @starting-style {
@@ -1807,8 +1835,12 @@
     padding: 0;
     border: 0;
     cursor: pointer;
+    /* A finger on the pull drags the door, not the page. */
+    touch-action: none;
     background: color-mix(in oklch, var(--wal-surface), var(--wal-text) 9%);
     box-shadow: inset -1px 0 0 var(--wal-line);
+
+    [data-wal-held] > & { cursor: grabbing; }
 
     /* The handle: a long slot, the height of a hand. */
     &::before {

@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>walnut openings and parts</title>
-  <meta name="description" content="Four ways a walnut window or drawer opens, taken from mid-century furniture, the materials that give them weight, and seven parts walnut.css was missing. Every demo runs on the built framework.">
+  <title>Openings and parts: walnut.css</title>
+  <meta name="description" content="Drawers, doors and windows that open like mid-century furniture, the materials that give them weight, and seven parts that replace a script or a library. Every demo runs on walnut.css.">
   <link rel="icon" href="favicon.svg" type="image/svg+xml">
   <script>document.documentElement.classList.add("pitch-deck", "pitch-prairie");</script>
 
@@ -93,7 +93,12 @@
     .pitch-toggle[aria-pressed="true"] { background: var(--wal-text); color: var(--wal-bg); border-color: var(--wal-text); }
     .pitch-toggle[aria-pressed="true"]::before { opacity: 1; }
     .pitch-toggle:focus-visible, .pitch-seg button:focus-visible { outline: 2px solid var(--wal-accent); outline-offset: 2px; }
-    .pitch-count { margin: 0 0 0 auto; font: 600 var(--wal-text-sm)/1 var(--wal-font-body); color: var(--wal-text-muted); font-variant-numeric: tabular-nums; }
+    /* The site's three pages, as the other pages' walnut nav has them. */
+    .pitch-site { display: flex; gap: 1.25rem; }
+    .pitch-site a { padding-block: .3rem; color: var(--wal-text); text-decoration: none; font: 500 var(--wal-text-sm)/1.2 var(--wal-font-display); white-space: nowrap; }
+    .pitch-site a:hover { box-shadow: inset 0 -2px 0 var(--wal-line); }
+    .pitch-site a[aria-current="page"] { box-shadow: inset 0 -2px 0 var(--wal-accent); }
+    .pitch-site a:focus-visible { outline: 2px solid var(--wal-accent); outline-offset: 2px; }
 
     /* A slide: the pitch on the left, the live demo on the right. */
     .slide {
@@ -103,6 +108,12 @@
       max-inline-size: 86rem; margin-inline: auto; box-sizing: border-box;
     }
     .slide-solo { grid-template-columns: minmax(0, 1fr); align-content: center; }
+    /* The site's footer row, as on the overview. */
+    .pitch-foot {
+      display: flex; flex-wrap: wrap; justify-content: space-between; gap: 1rem;
+      padding: 2.5rem var(--pitch-gutter) 3rem; border-top: var(--wal-border);
+      color: var(--wal-text-muted); font-size: var(--wal-text-sm);
+    }
     /* A chest grows downward, as it would on a page. Centred, pulling a
        drawer would push the rows above it up as well. */
     .slide:has(.demo .wal-chest) { align-items: start; }
@@ -362,7 +373,10 @@
       .contents { grid-template-columns: minmax(0, 1fr); }
     }
     @media (max-width: 560px) {
-      .pitch-brand span, .pitch-count { display: none; }
+      /* On a phone: the name and the controls, then the pages on a row of their own. */
+      .pitch-bar { flex-wrap: wrap; gap: .45rem .5rem; }
+      .pitch-site { order: 3; flex: 1 0 100%; gap: 1.25rem; margin: 0; }
+      .slide { padding-block-start: 7rem; }
       .pitch-seg button, .pitch-toggle { padding: .45rem .5rem; font-size: .8rem; }
       .pitch-toggle::before { display: none; }
       .mats { grid-template-columns: minmax(0, 1fr); }
@@ -381,8 +395,12 @@
 <body>
 
   <header class="pitch-bar">
-    <a class="pitch-brand" href="#top">walnut.css <span>Openings and parts</span></a>
-    <p class="pitch-count" id="count" aria-live="off">1 of 16</p>
+    <a class="pitch-brand" href="index.html">walnut.css</a>
+    <nav class="pitch-site" aria-label="walnut.css">
+      <a href="index.html">Overview</a>
+      <a href="openings.html" aria-current="page">Openings</a>
+      <a href="reference.html">Reference</a>
+    </nav>
     <div class="pitch-tools">
     <button class="pitch-toggle" type="button" id="motion" aria-pressed="false">Materials</button>
     <div class="pitch-seg" role="group" aria-label="Mode">
@@ -400,10 +418,10 @@
       <div class="pitch">
         <p class="pitch-kicker">walnut.css <span data-version>0.4.0</span></p>
         <h1>Openings, materials and parts</h1>
-        <p class="pitch-what">walnut opens things the way furniture does: four openings taken from mid-century pieces, and materials that give them weight. Then seven parts that close the gaps a walnut site used to fill with a script or a second library. Every demo runs on the built walnut.css and the browser's own elements.</p>
+        <p class="pitch-what">Drawers, doors and windows that open like mid-century furniture, materials that give them weight, and seven parts that replace a script or a library. Every demo runs on the built walnut.css.</p>
         <div class="contents">
           <div>
-            <h3>How walnut opens things</h3>
+            <h3>Openings</h3>
             <ol>
               <li><a href="#o1">Plan chest</a></li>
               <li><a href="#o2">Sliding door</a></li>
@@ -411,10 +429,10 @@
               <li><a href="#o5">Step inside</a></li>
               <li><a href="#materials">Materials</a></li>
             </ol>
-            <p class="demo-note" style="text-align: start; margin-block-start: .6rem"><a href="#api">One way to open anything</a> follows them.</p>
+            <p class="demo-note" style="text-align: start; margin-block-start: .6rem">Then <a href="#api">one way to open anything</a>.</p>
           </div>
           <div>
-            <h3>Seven new parts</h3>
+            <h3>Parts</h3>
             <ol>
               <li><a href="#m1">Superellipse corners</a></li>
               <li><a href="#m2">Any colour, legible</a></li>
@@ -426,43 +444,43 @@
             </ol>
           </div>
         </div>
-        <p class="demo-note" style="text-align: start">Use the arrow keys or scroll. Windows open over the whole deck, as they would over your site. Materials and the mode switch at the top right reach every demo.</p>
+        <p class="demo-note" style="text-align: start">Scroll or use the arrow keys. Materials and the mode, top right, reach every demo.</p>
       </div>
     </section>
 
     <!-- ════ O1 Plan chest ════ -->
     <section class="slide" id="o1">
       <div class="pitch">
-        <p class="pitch-kicker">How walnut opens things, 1 of 4</p>
+        <p class="pitch-kicker">Openings, 1 of 4</p>
         <h2>Plan chest</h2>
-        <p class="pitch-what">Each row is a drawer front. Pull one and the drawer slides out of the slot beneath it while the rows below make room. One drawer opens at a time, like the wide flat drawers architects keep their drawings in.</p>
+        <p class="pitch-what">Each row is a drawer front. Pull one and it slides out of its slot while the rows below make room, one drawer at a time, like an architect's plan chest.</p>
         <dl class="pitch-facts">
-          <div><dt>Why you would use it</dt><dd>A page inside your page that keeps its place in the flow: a project list, case studies, pricing, an FAQ. Nothing covers the page, so the reader never loses where they were.</dd></div>
+          <div><dt>Use it for</dt><dd>Project lists, case studies, pricing, FAQs. It stays in the page, so nothing is covered.</dd></div>
           <div><dt>On your site</dt><dd><pre><code>&lt;div class="wal-chest"&gt;
   &lt;details name="work"&gt;
     &lt;summary&gt;Shelf Life&lt;/summary&gt;
     &lt;div&gt;…the case study…&lt;/div&gt;
   &lt;/details&gt;
 &lt;/div&gt;</code></pre></dd></div>
-          <div><dt>Status</dt><dd class="pitch-status"><b data-status="ships">Ships, pure CSS.</b> <span>A native &lt;details&gt;, so it opens with no script, find-in-page opens it, and the shared name keeps it to one drawer at a time. Under Materials it is walnut. A browser without animated details opens it at once.</span></dd></div>
+          <div><dt>Ships in</dt><dd class="pitch-status"><b data-status="ships">walnut.css, no script.</b> <span>A native &lt;details&gt;, so the keyboard and find-in-page work.</span></dd></div>
         </dl>
       </div>
       <div class="demo">
         <div class="stage wal-palette pitch-prairie">
           <div class="wal-chest" data-chest></div>
         </div>
-        <p class="demo-note">Each drawer wears its own colourway. Open one, then another, then turn on Materials at the top and do it again.</p>
+        <p class="demo-note">Each drawer wears its own colourway. Open one, then another, then turn on Materials and do it again.</p>
       </div>
     </section>
 
     <!-- ════ O2 Sliding door ════ -->
     <section class="slide" id="o2">
       <div class="pitch">
-        <p class="pitch-kicker">How walnut opens things, 2 of 4</p>
+        <p class="pitch-kicker">Openings, 2 of 4</p>
         <h2>Sliding door</h2>
-        <p class="pitch-what">The panel runs in from the edge on a track, like the doors of an Eames storage unit. It starts with a little resistance, glides, and comes to rest on a soft close. Its leading edge carries the pull, and its shadow falls across the page.</p>
+        <p class="pitch-what">A panel runs in from the edge on a track, like the doors of an Eames storage unit. Drag its pull to slide it shut; let go early and it runs back to its stop.</p>
         <dl class="pitch-facts">
-          <div><dt>Why you would use it</dt><dd>The drawer every site needs, for a menu, a basket or a case study. walnut's drawer today asks you to script focus, Escape and inert. This one is a &lt;dialog&gt;, so the browser does all three.</dd></div>
+          <div><dt>Use it for</dt><dd>Menus, baskets, case studies. It is a &lt;dialog&gt;, so focus, Escape and inert come from the browser.</dd></div>
           <div><dt>On your site</dt><dd><pre><code>&lt;button commandfor="menu" command="show-modal"&gt;Menu&lt;/button&gt;
 
 &lt;dialog id="menu" class="wal-door" closedby="any"&gt;
@@ -470,7 +488,7 @@
           command="close" aria-label="Close"&gt;&lt;/button&gt;
   &lt;div class="wal-door-body"&gt;…&lt;/div&gt;
 &lt;/dialog&gt;</code></pre></dd></div>
-          <div><dt>Status</dt><dd class="pitch-status"><b data-status="ships">Ships, pure CSS, no script at all.</b> <span>commandfor opens it and closedby lets a click outside close it, so it retires .wal-drawer's three scripting chores. Under Materials it runs in heavy and knocks against its stop. On a phone it rises from the bottom.</span></dd></div>
+          <div><dt>Ships in</dt><dd class="pitch-status"><b data-status="ships">walnut.css, no script.</b> <span>walnut-motion.js adds the drag. On a phone the door rises from the bottom.</span></dd></div>
         </dl>
       </div>
       <div class="demo">
@@ -480,18 +498,18 @@
             <div class="door-rows" data-doors></div>
           </div>
         </div>
-        <p class="demo-note">Close it with the pull on its edge, Escape, or a click on the page.</p>
+        <p class="demo-note">Close it by dragging or pressing the pull, with Escape, or with a click on the page.</p>
       </div>
     </section>
 
     <!-- ════ O4 Gatefold ════ -->
     <section class="slide" id="o4">
       <div class="pitch">
-        <p class="pitch-kicker">How walnut opens things, 3 of 4</p>
+        <p class="pitch-kicker">Openings, 3 of 4</p>
         <h2>Gatefold</h2>
-        <p class="pitch-what">The card is a record sleeve. It travels to the left of the window as the cover, and the notes unfold from behind it on the spine, the way a gatefold LP opens to its inner spread.</p>
+        <p class="pitch-what">The card opens like a record sleeve: its picture travels out as the cover and the notes unfold beside it on the spine.</p>
         <dl class="pitch-facts">
-          <div><dt>Why you would use it</dt><dd>A detail page with a natural shape: the picture on one side and the words on the other. It suits case studies, products and colourways. On a phone the spread stacks and the notes fold down.</dd></div>
+          <div><dt>Use it for</dt><dd>Detail pages with a picture and words: case studies, products, colourways. On a phone the notes fold down.</dd></div>
           <div><dt>On your site</dt><dd><pre><code>&lt;button commandfor="forest" command="show-modal"&gt;…&lt;/button&gt;
 
 &lt;dialog id="forest" class="wal-window" data-wal-open="gatefold"&gt;
@@ -501,7 +519,7 @@
   &lt;/div&gt;
 &lt;/dialog&gt;
 &lt;script src="walnut-motion.js" defer&gt;&lt;/script&gt;</code></pre></dd></div>
-          <div><dt>Status</dt><dd class="pitch-status"><b data-status="ships">Ships, with walnut-motion.js.</b> <span>Without the script it opens as a plain spread. The cover never stretches: shaped otherwise than the card's picture, it leaves cropped to the picture and opens out as it lands. Under Materials the notes come down like a heavy board and knock.</span></dd></div>
+          <div><dt>Ships in</dt><dd class="pitch-status"><b data-status="ships">walnut.css with walnut-motion.js.</b> <span>Without the script it opens as a plain spread.</span></dd></div>
         </dl>
       </div>
       <div class="demo">
@@ -518,15 +536,15 @@
     <!-- ════ O5 Step inside ════ -->
     <section class="slide" id="o5">
       <div class="pitch">
-        <p class="pitch-kicker">How walnut opens things, 4 of 4</p>
+        <p class="pitch-kicker">Openings, 4 of 4</p>
         <h2>Step inside</h2>
-        <p class="pitch-what">Open a colourway and you walk into it. Its colours open out of the card in the soft circle you picked for recolouring, and the page that arrives is the colourway's own, in its own palette. Back walks you out the same way.</p>
+        <p class="pitch-what">Open a colourway and its colours spread out of the card, bringing in its own page in its own palette. Back walks you out the same way.</p>
         <dl class="pitch-facts">
-          <div><dt>Why you would use it</dt><dd>For a detail page that should feel like another room: a colourway, a collection, a project with its own brand colours. A site's palette changes and its openings then share one gesture.</dd></div>
+          <div><dt>Use it for</dt><dd>A detail page that should feel like another room: a collection, or a project with its own colours.</dd></div>
           <div><dt>On your site</dt><dd><pre><code>&lt;main id="page" data-wal-recolour="swatch"&gt;…&lt;/main&gt;
 
 walnut.recolour(page, () =&gt; showDetail("forest"), { from: card });</code></pre></dd></div>
-          <div><dt>Status</dt><dd class="pitch-status"><b data-status="ships">Ships today.</b> <span>walnut-recolour.js already takes a function and makes any change inside the circle, and swapping the page is a change.</span></dd></div>
+          <div><dt>Ships in</dt><dd class="pitch-status"><b data-status="ships">walnut-recolour.js.</b> <span>walnut.recolour takes any change, and swapping the page is one.</span></dd></div>
         </dl>
       </div>
       <div class="demo">
@@ -549,14 +567,14 @@ walnut.recolour(page, () =&gt; showDetail("forest"), { from: card });</code></pr
       <div class="pitch">
         <p class="pitch-kicker">How walnut moves</p>
         <h2>Materials</h2>
-        <p class="pitch-what">Turn on materials and every opening moves like the thing it is made of. A walnut drawer is heavy: it runs out, strikes its stop, knocks back and settles. Brass is quick and rings as it lands. Stone is slow to start and slower to stop, and never bounces.</p>
+        <p class="pitch-what">Turn on materials and every opening moves like what it is made of. Walnut is heavy and knocks on its stop. Brass is quick and rings. Stone starts slow, stops slower and never bounces.</p>
         <dl class="pitch-facts">
-          <div><dt>Why you would use it</dt><dd>Weight is most of what makes a piece of furniture feel made, and a screen cannot show it, only how a thing comes to rest. Motion that says what a part is made of tells the reader what to expect of it, the way the palette says what it is for.</dd></div>
+          <div><dt>Use it for</dt><dd>Motion that tells the reader what a part is, the way the palette tells them what it is for.</dd></div>
           <div><dt>On your site</dt><dd><pre><code>&lt;html data-motion="materials"&gt;
 
 &lt;!-- or one part, and everything inside it --&gt;
 &lt;div class="wal-chest" data-wal-material="stone"&gt;…&lt;/div&gt;</code></pre></dd></div>
-          <div><dt>Status</dt><dd class="pitch-status"><b data-status="ships">Ships, pure CSS.</b> <span>On &lt;html&gt; it makes drawers, doors and windows walnut, and menus, pickers and charts brass. A material is four tokens, so a part of your own takes one by moving on them. Under reduced motion every opening is instant, whatever it is made of.</span></dd></div>
+          <div><dt>Ships in</dt><dd class="pitch-status"><b data-status="ships">walnut.css, no script.</b> <span>On &lt;html&gt;, openings are walnut and menus, pickers and charts brass. Reduced motion makes every opening instant.</span></dd></div>
         </dl>
       </div>
       <div class="demo">
@@ -567,23 +585,22 @@ walnut.recolour(page, () =&gt; showDetail("forest"), { from: card });</code></pr
           </div>
         </div>
         <button class="pitch-chip is-plain" type="button" id="mats-go">Pull all three</button>
-        <p class="demo-note">Each drawer holds the curve it runs on; the dashed line is its stop. Pull all three at once and watch them land, then open the second drawer of one and watch the first shut.</p>
+        <p class="demo-note">Each drawer holds the curve it runs on; the dashed line is its stop. Pull all three and watch them land.</p>
       </div>
     </section>
 
     <!-- ════ One way in ════ -->
     <section class="slide" id="api">
       <div class="pitch">
-        <p class="pitch-kicker">How walnut opens things</p>
+        <p class="pitch-kicker">Openings</p>
         <h2>One way to open anything</h2>
-        <p class="pitch-what">All four open the browser's own elements, so a site chooses a movement with an attribute and keeps the same markup.</p>
+        <p class="pitch-what">Every opening is the browser's own element, so you choose a movement with an attribute and keep your markup.</p>
         <ul class="api-list">
-          <li><b>Native first.</b> &lt;details&gt; and &lt;dialog&gt; bring focus, Escape, inert and find-in-page. commandfor and closedby open and close them with no script.</li>
-          <li><b>One attribute.</b> data-wal-open picks the movement for a window, and data-motion picks how everything moves.</li>
-          <li><b>walnut-motion.js, optional.</b> It measures the control you pressed and plays the movement. Without it every window still opens, natively, and so it does under reduced motion.</li>
-          <li><b>Your own movement.</b> walnut.open.styles.mine = { open(dialog, from) {…}, close(dialog, from) {…} }, the same shape as your own recolour style.</li>
-          <li><b>Four tokens.</b> Every movement runs on --wal-open-duration, --wal-open-ease and their two closing twins: glide and settle by default, a material's curves under Materials. Your CSS can run on them too.</li>
-          <li><b>For your portfolio.</b> Sliding door makes the case-study drawer native. Gatefold gives each case study its reel as the cover and the write-up as the notes.</li>
+          <li><b>Native first.</b> &lt;details&gt; and &lt;dialog&gt; bring focus, Escape, inert and find-in-page; commandfor and closedby need no script.</li>
+          <li><b>One attribute.</b> data-wal-open picks a window's movement; data-motion picks how everything moves.</li>
+          <li><b>walnut-motion.js, optional.</b> Without it every window still opens, natively.</li>
+          <li><b>Your own movement.</b> walnut.open.styles.mine = { open(dialog, from) {…}, close(dialog, from) {…} }.</li>
+          <li><b>Four tokens.</b> --wal-open-duration, --wal-open-ease and their closing twins. Your own CSS can move on them too.</li>
         </ul>
       </div>
       <div class="demo">
@@ -601,24 +618,24 @@ walnut.recolour(page, () =&gt; showDetail("forest"), { from: card });</code></pr
     <!-- ════ Divider ════ -->
     <section class="slide slide-solo" id="m">
       <div class="pitch">
-        <p class="pitch-kicker">Part two</p>
-        <h1>Seven new parts</h1>
-        <p class="pitch-what">walnut themed and moved well, but a walnut site still reached for a script or a second library for a carousel, a select, a chart, a label in a colour someone picked, or a page that prints. Each of these closes one of those gaps with a class or a token.</p>
+        <p class="pitch-kicker">Parts</p>
+        <h1>Seven parts, no extra library</h1>
+        <p class="pitch-what">A carousel, a select, a chart, a label in any colour, a page that prints. Each used to take a script or a second library. Now each is a class or a token.</p>
       </div>
     </section>
 
     <!-- ════ M1 Superellipse corners ════ -->
     <section class="slide" id="m1">
       <div class="pitch">
-        <p class="pitch-kicker">New parts, 1 of 7</p>
+        <p class="pitch-kicker">Parts, 1 of 7</p>
         <h2>Superellipse corners</h2>
-        <p class="pitch-what">Every corner in the kit becomes a true superellipse, the curve Piet Hein drew for Stockholm's Sergels torg in 1959 and Bruno Mathsson built into his tables. One token reshapes every button, card, chip and field.</p>
+        <p class="pitch-what">Every corner in the kit becomes a superellipse, the curve Piet Hein drew for Stockholm's Sergels torg in 1959. One token reshapes every button, card, chip and field.</p>
         <dl class="pitch-facts">
-          <div><dt>Why you would use it</dt><dd>A rounded rectangle is a straight edge joined to a quarter circle, and the join shows. A superellipse has no join, so the shape looks made rather than drawn. The same token gives Catalogue a bevelled corner, like a clipped index card.</dd></div>
+          <div><dt>Use it for</dt><dd>Corners that look made rather than drawn. The same token bevels the Catalogue finish.</dd></div>
           <div><dt>On your site</dt><dd><pre><code>:root { --wal-corner-shape: squircle; }
 
 &lt;section style="--wal-corner-shape: bevel"&gt;…&lt;/section&gt;</code></pre></dd></div>
-          <div><dt>Status</dt><dd class="pitch-status"><b data-status="ships">Ships.</b> <span>Every walnut rule that sets a radius also reads --wal-corner-shape, and the Catalogue finish bevels its corners. Where corner-shape is not supported, corners stay round.</span></dd></div>
+          <div><dt>Ships in</dt><dd class="pitch-status"><b data-status="ships">walnut.css.</b> <span>Where corner-shape is not supported, corners stay round.</span></dd></div>
         </dl>
       </div>
       <div class="demo">
@@ -654,16 +671,16 @@ walnut.recolour(page, () =&gt; showDetail("forest"), { from: card });</code></pr
     <!-- ════ M2 Any colour ════ -->
     <section class="slide" id="m2">
       <div class="pitch">
-        <p class="pitch-kicker">New parts, 2 of 7</p>
+        <p class="pitch-kicker">Parts, 2 of 7</p>
         <h2>Any colour, legible</h2>
-        <p class="pitch-what">Hand walnut any colour, a brand colour or one your users picked, and it returns the four forms every cue has: the fill, the ink, the wash and the text that sits on the fill. Each passes contrast in light and in dark.</p>
+        <p class="pitch-what">Give walnut any colour, a brand's or one a user picked, and it returns a fill, an ink, a wash and readable text on the fill, in light and dark.</p>
         <dl class="pitch-facts">
-          <div><dt>Why you would use it</dt><dd>Labels in a tracker, categories in a calendar, a client's colour on a case study. A yellow tag someone picks is unreadable on most sites. With .wal-tint it stays yellow and its text stays readable.</dd></div>
+          <div><dt>Use it for</dt><dd>Tags, categories and labels in colours people choose. A yellow tag stays yellow, and readable.</dd></div>
           <div><dt>On your site</dt><dd><pre><code>&lt;span class="wal-chip wal-tint" style="--wal-tint: #f5d90a"&gt;Design&lt;/span&gt;
 &lt;span class="wal-fill-tint wal-tint" style="--wal-tint: #f5d90a"&gt;Design&lt;/span&gt;
 
 .price { color: --wal-ink(#0a7f6f); }   /* as a CSS function */</code></pre></dd></div>
-          <div><dt>Status</dt><dd class="pitch-status"><b data-status="ships">Ships.</b> <span>The class works wherever walnut's computed colours do. The functions use CSS @function, which Chrome and Edge have today.</span></dd></div>
+          <div><dt>Ships in</dt><dd class="pitch-status"><b data-status="ships">walnut.css.</b> <span>The CSS functions use @function, in Chrome and Edge today.</span></dd></div>
         </dl>
       </div>
       <div class="demo">
@@ -682,17 +699,17 @@ walnut.recolour(page, () =&gt; showDetail("forest"), { from: card });</code></pr
     <!-- ════ M3 No script left ════ -->
     <section class="slide" id="m3">
       <div class="pitch">
-        <p class="pitch-kicker">New parts, 3 of 7</p>
+        <p class="pitch-kicker">Parts, 3 of 7</p>
         <h2>No script left</h2>
-        <p class="pitch-what">walnut asks your script to set four state classes. The browser can now do all four, so a walnut site needs no script at all to behave.</p>
+        <p class="pitch-what">walnut used to ask your script to set four state classes. The browser now does all four.</p>
         <dl class="pitch-facts">
-          <div><dt>Why you would use it</dt><dd>Fewer moving parts and nothing to keep in step. Every state is right before any script has loaded, and none of it can break when one does not.</dd></div>
+          <div><dt>Use it for</dt><dd>Fewer moving parts. Every state is right before any script loads.</dd></div>
           <div><dt>On your site</dt><dd><pre><code>&lt;!-- the same nav as today, minus the script --&gt;
 &lt;nav class="wal-nav"&gt;…&lt;div class="wal-nav-links"&gt;…&lt;/div&gt;&lt;/nav&gt;
 
 &lt;button interestfor="save-tip"&gt;Save&lt;/button&gt;
 &lt;span id="save-tip" popover="hint" class="wal-tip"&gt;Saves a draft&lt;/span&gt;</code></pre></dd></div>
-          <div><dt>Status</dt><dd class="pitch-status"><b data-status="ships">Ships, on the existing classes, with .wal-tip.</b> <span>The state classes keep working as the fallback, so a browser without these features is no worse off than today.</span></dd></div>
+          <div><dt>Ships in</dt><dd class="pitch-status"><b data-status="ships">walnut.css.</b> <span>The state classes still work as the fallback.</span></dd></div>
         </dl>
       </div>
       <div class="demo">
@@ -726,11 +743,11 @@ walnut.recolour(page, () =&gt; showDetail("forest"), { from: card });</code></pr
     <!-- ════ M4 Native parts ════ -->
     <section class="slide" id="m4">
       <div class="pitch">
-        <p class="pitch-kicker">New parts, 4 of 7</p>
+        <p class="pitch-kicker">Parts, 4 of 7</p>
         <h2>Native parts</h2>
-        <p class="pitch-what">A carousel, a select that shows real swatches, and a menu that knows where it fits. All three are the browser's own elements, styled by walnut, with no script and no library.</p>
+        <p class="pitch-what">A carousel, a select that shows real swatches, and a menu that knows where it fits: the browser's own elements, styled by walnut.</p>
         <dl class="pitch-facts">
-          <div><dt>Why you would use it</dt><dd>These are the three parts a site most often installs a library for. The browser's versions work with a keyboard and a screen reader from the start.</dd></div>
+          <div><dt>Use it for</dt><dd>The three parts sites most often install a library for, ready for keyboards and screen readers.</dd></div>
           <div><dt>On your site</dt><dd><pre><code>&lt;link rel="stylesheet" href="walnut-scroll.css"&gt;
 &lt;ul class="wal-carousel"&gt;&lt;li&gt;…&lt;/li&gt;&lt;/ul&gt;
 
@@ -741,7 +758,7 @@ walnut.recolour(page, () =&gt; showDetail("forest"), { from: card });</code></pr
 
 &lt;button popovertarget="more"&gt;More&lt;/button&gt;
 &lt;div id="more" popover class="wal-menu"&gt;…&lt;/div&gt;</code></pre></dd></div>
-          <div><dt>Status</dt><dd class="pitch-status"><b data-status="ships">Ships.</b> <span>Chrome and Edge draw all three today. Elsewhere the carousel is a plain swipeable row and the select is the system's own. The carousel's dots and arrows are in their own sheet, since Next.js and Vite cannot read them yet. Under Materials the menu and the picker are brass.</span></dd></div>
+          <div><dt>Ships in</dt><dd class="pitch-status"><b data-status="ships">walnut.css, with walnut-scroll.css for the carousel's dots.</b> <span>Chrome and Edge draw all three; elsewhere the carousel swipes and the select is the system's.</span></dd></div>
         </dl>
       </div>
       <div class="demo">
@@ -770,16 +787,16 @@ walnut.recolour(page, () =&gt; showDetail("forest"), { from: card });</code></pr
     <!-- ════ M5 Shuffle ════ -->
     <section class="slide" id="m5">
       <div class="pitch">
-        <p class="pitch-kicker">New parts, 5 of 7</p>
+        <p class="pitch-kicker">Parts, 5 of 7</p>
         <h2>Shuffle</h2>
-        <p class="pitch-what">Filter or sort a grid and every card glides to its new place. Cards that leave fold away and cards that arrive rise into the gaps.</p>
+        <p class="pitch-what">Filter or sort a grid and every card glides to its new place. Cards that leave fold away; cards that arrive rise into the gaps.</p>
         <dl class="pitch-facts">
-          <div><dt>Why you would use it</dt><dd>Catalogues, portfolios, shops and dashboards all filter. Without this the grid jumps and the reader has to find their place again.</dd></div>
+          <div><dt>Use it for</dt><dd>Catalogues, portfolios, shops and dashboards: anywhere a grid filters.</dd></div>
           <div><dt>On your site</dt><dd><pre><code>&lt;ul class="wal-shuffle" id="materials"&gt;…&lt;/ul&gt;
 
 walnut.shuffle(materials, () =&gt; showOnly("wood"));
 &lt;script src="walnut-motion.js" defer&gt;&lt;/script&gt;</code></pre></dd></div>
-          <div><dt>Status</dt><dd class="pitch-status"><b data-status="ships">Ships, with walnut.shuffle in walnut-motion.js.</b> <span>It is a view transition scoped to the grid, so the rest of the page stays live while it moves. Without view transitions the grid changes at once.</span></dd></div>
+          <div><dt>Ships in</dt><dd class="pitch-status"><b data-status="ships">walnut-motion.js.</b> <span>Without view transitions the grid simply changes.</span></dd></div>
         </dl>
       </div>
       <div class="demo">
@@ -809,11 +826,11 @@ walnut.shuffle(materials, () =&gt; showOnly("wood"));
     <!-- ════ M6 Charts ════ -->
     <section class="slide" id="m6">
       <div class="pitch">
-        <p class="pitch-kicker">New parts, 6 of 7</p>
+        <p class="pitch-kicker">Parts, 6 of 7</p>
         <h2>Charts from the script</h2>
-        <p class="pitch-what">Column and ring charts in plain HTML, drawn in the palette's five cues and made like furniture. The columns stand on a brass rail, each on a brass shoe like a sideboard's legs; the gridlines are inlaid stringing; the ring sits in a brass bezel with a tick at each quarter.</p>
+        <p class="pitch-what">Column and ring charts in plain HTML, in the palette's five colours, standing on brass shoes like a sideboard's legs.</p>
         <dl class="pitch-facts">
-          <div><dt>Why you would use it</dt><dd>A small chart on a landing page or a case study rarely justifies a charting library, and a library's chart never looks like the site. These are the site's colours and its materials, and a new palette regrades every chart.</dd></div>
+          <div><dt>Use it for</dt><dd>A small chart on a landing page or a case study, without a charting library. A new palette regrades it.</dd></div>
           <div><dt>On your site</dt><dd><pre><code>&lt;ol class="wal-chart" style="--max: 80"&gt;
   &lt;li&gt;&lt;b&gt;May&lt;/b&gt;&lt;span style="--v: 42"&gt;42&lt;/span&gt;&lt;span style="--v: 18"&gt;18&lt;/span&gt;&lt;/li&gt;
   &lt;li&gt;&lt;b&gt;Jun&lt;/b&gt;&lt;span style="--v: 48"&gt;48&lt;/span&gt;&lt;span style="--v: 22"&gt;22&lt;/span&gt;&lt;/li&gt;
@@ -821,7 +838,7 @@ walnut.shuffle(materials, () =&gt; showOnly("wood"));
 &lt;ul class="wal-key"&gt;&lt;li&gt;Search&lt;/li&gt;&lt;li&gt;Links&lt;/li&gt;&lt;/ul&gt;
 
 &lt;div class="wal-ring" style="--a: 58; --b: 34"&gt;58%&lt;small&gt;on a phone&lt;/small&gt;&lt;/div&gt;</code></pre></dd></div>
-          <div><dt>Status</dt><dd class="pitch-status"><b data-status="ships">Ships, pure CSS.</b> <span>The brass and the stringing are the same in every palette and both modes, so a chart reads as part of the furniture. A new --v moves its column; under Materials it strikes and rings.</span></dd></div>
+          <div><dt>Ships in</dt><dd class="pitch-status"><b data-status="ships">walnut.css, no script.</b> <span>The brass stays brass in every palette and mode.</span></dd></div>
         </dl>
       </div>
       <div class="demo">
@@ -858,15 +875,15 @@ walnut.shuffle(materials, () =&gt; showOnly("wood"));
     <!-- ════ M7 Print ════ -->
     <section class="slide" id="m7">
       <div class="pitch">
-        <p class="pitch-kicker">New parts, 7 of 7</p>
+        <p class="pitch-kicker">Parts, 7 of 7</p>
         <h2>Prints like a catalogue</h2>
-        <p class="pitch-what">Print a walnut page and it comes out as a catalogue sheet: sheet numbers, the address after every link, colour kept to the parts that carry meaning, and nothing that only makes sense on a screen.</p>
+        <p class="pitch-what">Print a walnut page and it comes out as a catalogue sheet: sheet numbers, link addresses written out, and colour kept where it means something.</p>
         <dl class="pitch-facts">
-          <div><dt>Why you would use it</dt><dd>Résumés, case studies, recipes, invoices and documentation all get printed or saved as PDF, and most sites print as a broken screenshot. A walnut page would print well with nothing added.</dd></div>
+          <div><dt>Use it for</dt><dd>Résumés, case studies, recipes, invoices and docs that get printed or saved as PDF.</dd></div>
           <div><dt>On your site</dt><dd><pre><code>/* nothing: it is in walnut's stylesheet.
    A running head of your own is one line: */
 @page { @top-left { content: "Alex Kim, case studies"; } }</code></pre></dd></div>
-          <div><dt>Status</dt><dd class="pitch-status"><b data-status="ships">Ships, in the stylesheet.</b> <span>Sheet numbers and running heads print from the page margins in Chrome and Edge; elsewhere the sheet prints without them.</span></dd></div>
+          <div><dt>Ships in</dt><dd class="pitch-status"><b data-status="ships">walnut.css.</b> <span>Sheet numbers and running heads print in Chrome and Edge.</span></dd></div>
         </dl>
       </div>
       <div class="demo">
@@ -899,15 +916,15 @@ walnut.shuffle(materials, () =&gt; showOnly("wood"));
     <!-- ════ Shipped ════ -->
     <section class="slide slide-solo" id="pick">
       <div class="pitch">
-        <p class="pitch-kicker">Where it lives</p>
-        <h2>In walnut.css now</h2>
-        <p class="pitch-what">Every stage in this deck runs on the built framework: dist/walnut.css, and dist/walnut-motion.js for the gatefold and the shuffle. The deck styles only itself.</p>
+        <p class="pitch-kicker">Summary</p>
+        <h2>Where each one lives</h2>
+        <p class="pitch-what">Every demo here runs on dist/walnut.css, with dist/walnut-motion.js for the door's drag, the gatefold and the shuffle. This page's own CSS only lays it out.</p>
         <div class="contents pick-list">
           <div>
             <h3>Openings and materials</h3>
             <ol>
               <li><b>Plan chest.</b> .wal-chest on &lt;details&gt;. Pure CSS.</li>
-              <li><b>Sliding door.</b> .wal-door on &lt;dialog&gt;. Pure CSS.</li>
+              <li><b>Sliding door.</b> .wal-door on &lt;dialog&gt;. Pure CSS; walnut-motion.js adds the drag.</li>
               <li><b>Gatefold.</b> .wal-window with data-wal-open="gatefold", played by walnut-motion.js.</li>
               <li><b>Step inside.</b> walnut.recolour with a change, from walnut-recolour.js.</li>
               <li><b>Materials.</b> data-motion="materials" on the page, or data-wal-material on any part.</li>
@@ -926,10 +943,15 @@ walnut.shuffle(materials, () =&gt; showOnly("wood"));
             </ol>
           </div>
         </div>
-        <p class="pitch-what">Every class and token is in <a href="reference.html">the reference</a>, and <a href="index.html">the catalogue</a> opens each colourway in a gatefold.</p>
+        <p class="pitch-what">Every class and token is in <a href="reference.html">the reference</a>, and <a href="index.html#palettes">the overview's colourways</a> pull out as walnut drawers.</p>
       </div>
     </section>
   </main>
+
+  <footer class="pitch-foot">
+    <span>walnut.css <span data-version>0.4.0</span>. MIT licence. Built by Alex Kim.</span>
+    <span><a href="https://github.com/SKMinWoo/walnut.css">GitHub</a> &nbsp; <a href="https://github.com/SKMinWoo/walnut.css/blob/master/CHANGELOG.md">Changelog</a></span>
+  </footer>
 
   <!-- Dialogs are built here by the deck script, one per demo window. -->
   <div id="windows"></div>
@@ -1292,10 +1314,9 @@ walnut.shuffle(materials, () =&gt; showOnly("wood"));
         e.currentTarget.setAttribute("aria-pressed", String(on));
       });
       const slides = [...document.querySelectorAll(".slide")];
-      const count = $("count");
-      let current = 0;
+      let current = 0; // the section in view, for the arrow keys
       const seen = new IntersectionObserver((entries) => {
-        for (const e of entries) if (e.isIntersecting) { current = slides.indexOf(e.target); count.textContent = `${current + 1} of ${slides.length}`; }
+        for (const e of entries) if (e.isIntersecting) current = slides.indexOf(e.target);
       }, { threshold: .55 });
       slides.forEach((s) => seen.observe(s));
       addEventListener("keydown", (e) => {

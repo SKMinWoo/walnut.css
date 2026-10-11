@@ -1,7 +1,7 @@
 /* walnut.css · motion
    ─────────────────────────────────────────────────────────────────────────
-   Two movements CSS cannot make on its own, because each needs to know
-   where something was before it moved.
+   Three movements CSS cannot make on its own: two need to know where
+   something was before it moved, and one follows a hand.
 
    The gatefold. A .wal-window marked data-wal-open="gatefold" opens out of
    the button that opened it: the cover travels from the card's picture and
@@ -25,16 +25,22 @@
    walnut.open(dialog, card, { instant: true }) opens it in place, and it
    still goes home to that card when it closes.
 
+   The pull. A .wal-door's pull can be dragged as well as pressed: the door
+   comes with it, and let go far enough, or flicked, it shuts. Nothing to
+   call; every door on the page has it once this file is loaded.
+
    The shuffle. walnut.shuffle(list, change) runs a change to a list, a
    filter or a sort, so that every item travels to its new place. The
    travelling is CSS (06-cinema.css, Shuffle); this sets it going.
 
-   Both move on the opening tokens of the element they move, so a material
-   (06-cinema.css, Materials) reaches them: under walnut the notes come
-   down flat with a knock. Under reduced motion the window simply opens and
-   the change simply happens, and so they do in a browser without the
-   commands API or view transitions. The window works without this file
-   at all; it just opens the way .wal-dialog does.
+   All three move on the opening tokens of the element they move, so a
+   material (06-cinema.css, Materials) reaches them: under walnut the notes
+   come down flat with a knock, and a door let go short of shut knocks on
+   its stop. Under reduced motion the window simply opens, the door lands
+   at once and the change simply happens, and so they do in a browser
+   without the commands API or view transitions. The window and the door
+   work without this file at all; the window opens the way .wal-dialog
+   does, and the pull is pressed rather than dragged.
    ───────────────────────────────────────────────────────────────────────── */
 (() => {
   const walnut = (window.walnut ??= {});
@@ -225,6 +231,79 @@
   }, true);
 
   walnut.open = Object.assign(open, { close, styles: STYLES });
+
+  /* ── The pull ──
+     A door's pull shuts it when pressed. Taken in hand, it drags the door
+     the way it shuts, and the shadow the door throws thins as it goes. Let
+     go a third of the way, or with a flick, and the door runs home; let go
+     short of that and it goes back to its stop on its material's curve,
+     knocking as it lands. The door stays CSS's to move: the hand only holds
+     its translate while it is on the pull, and the door's own transition
+     takes it from wherever the hand let go. */
+  const SLOP = 4; // px a press may wander and still be a press
+  // Which way a door shuts: off the edge it stands against, so away from
+  // the widest stretch of screen it leaves open.
+  function track(door) {
+    const r = door.getBoundingClientRect();
+    const gaps = [[r.left, "x", 1], [innerWidth - r.right, "x", -1], [r.top, "y", 1], [innerHeight - r.bottom, "y", -1]];
+    const [, axis, sign] = gaps.reduce((a, b) => (b[0] > a[0] ? b : a));
+    return { axis, sign, size: axis === "x" ? r.width : r.height };
+  }
+  // How far out the door is now, in px toward shut: it may be grabbed
+  // while it is still running out, partway along its transition.
+  function outOf(door, { axis, sign, size }) {
+    const [x = "0", y = "0"] = getComputedStyle(door).translate.replace("none", "0").split(" ");
+    const v = axis === "x" ? x : y;
+    return sign * (v.endsWith("%") ? (parseFloat(v) * size) / 100 : parseFloat(v) || 0);
+  }
+
+  addEventListener("pointerdown", (e) => {
+    const pull = e.target instanceof Element ? e.target.closest(".wal-door-pull") : null;
+    const door = pull?.closest(".wal-door");
+    if (!door?.open || !e.isPrimary || e.button !== 0) return;
+    const t = track(door);
+    const from = outOf(door, t);
+    const at = (p) => (t.axis === "x" ? p.clientX : p.clientY) * t.sign;
+    const start = at(e);
+    let held = false, out = from, last = { out, time: e.timeStamp }, speed = 0;
+    pull.setPointerCapture(e.pointerId);
+
+    const move = (p) => {
+      const d = from + at(p) - start;
+      if (!held && Math.abs(d - from) < SLOP) return;
+      held = true;
+      door.dataset.walHeld = "";
+      // It runs freely toward shut, and only grudgingly further open.
+      out = Math.min(d < 0 ? d / 4 : d, t.size);
+      door.style.translate = t.axis === "x" ? `${out * t.sign}px 0` : `0 ${out * t.sign}px`;
+      door.style.setProperty("--wal-door-out", Math.max(0, out / t.size).toFixed(3));
+      const dt = p.timeStamp - last.time;
+      if (dt > 0) speed = 0.6 * ((out - last.out) / dt) + 0.4 * speed;
+      last = { out, time: p.timeStamp };
+    };
+    const end = (p) => {
+      pull.removeEventListener("pointermove", move);
+      pull.removeEventListener("pointerup", end);
+      pull.removeEventListener("pointercancel", end);
+      door.removeEventListener("close", end);
+      if (!held) return;
+      // A flick, or a third of the way out and not coming back: it shuts.
+      const shut = p.type === "pointerup" && (speed > 0.5 || (out > t.size / 3 && speed > -0.2));
+      // Let go: the transition is on again, from where the hand left it.
+      delete door.dataset.walHeld;
+      door.style.removeProperty("translate");
+      door.style.removeProperty("--wal-door-out");
+      if (shut && door.open) door.close();
+      // A drag is not a press: the click that follows it does nothing.
+      const eat = (c) => { c.preventDefault(); c.stopImmediatePropagation(); };
+      addEventListener("click", eat, { capture: true, once: true });
+      setTimeout(() => removeEventListener("click", eat, { capture: true }));
+    };
+    pull.addEventListener("pointermove", move);
+    pull.addEventListener("pointerup", end);
+    pull.addEventListener("pointercancel", end);
+    door.addEventListener("close", end);
+  });
 
   /* ── Shuffle ──
      Scoped to the list where the browser can (element.startViewTransition),
