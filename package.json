@@ -35,6 +35,10 @@
       "types": "./dist/walnut-motion.d.ts",
       "default": "./dist/walnut-motion.js"
     },
+    "./tabs": {
+      "types": "./dist/walnut-tabs.d.ts",
+      "default": "./dist/walnut-tabs.js"
+    },
     "./themes/*.css": "./dist/themes/*.css",
     "./themes/*": "./dist/themes/*.css",
     "./src/*": "./src/*",

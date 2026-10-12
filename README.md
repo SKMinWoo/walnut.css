@@ -376,7 +376,7 @@ A side panel that runs in on a track from the right and throws its shadow across
 
 A page inside the page. `.wal-window` is the room it opens in, the whole viewport; on its own it opens like `.wal-dialog`, its panel (`.wal-window-panel`) rising the last few pixels into place. With `data-wal-open="gatefold"` and `walnut-motion.js` it opens like a gatefold sleeve: the cover travels out of the card's picture (`[data-wal-art]`, or the whole button), and the notes unfold beside it on the spine. Closing plays it back, and the cover goes home to the card. The window's own buttons drive it; from script, `walnut.open(dialog, button)` and `walnut.open.close(dialog)`. A window that a link or Back opens has no press to travel from: `walnut.open(dialog, card, { instant: true })` opens it in place, and closing still takes the cover home to that card. A close asked for while the window is still opening (Back pressed early, say) waits for it to land. A card whose picture is not drawn (`display: none` in a print or compact layout, say) has nowhere to travel from, so the window opens and closes in place.
 
-The cover's shape is `--wal-cover-ratio`, `10 / 11` unless you set it on the window or anywhere above it, and it needn't be the shape of the card's picture. The cover is never stretched: it leaves at one scale, cropped to the picture's shape, and the crop opens out as it lands. `--wal-cover-focus` says which part of the cover the picture is, read the way `object-position` is (`50% 50%` unless you set it; `50% 0%` for a screenshot whose top is the picture). Every colourway on [the docs' home page](docs/index.html) opens this way, its 4:3 plate travelling out as a 4:3 cover. The notes are the cover's size and scroll inside it. On a phone the spread stacks and the notes fold down. Without the script, or under reduced motion, the window simply opens.
+The cover's shape is `--wal-cover-ratio`, `10 / 11` unless you set it on the window or anywhere above it, and it needn't be the shape of the card's picture. The cover is never stretched: it leaves at one scale, cropped to the picture's shape, and the crop opens out as it lands. `--wal-cover-focus` says which part of the cover the picture is, read the way `object-position` is (`50% 50%` unless you set it; `50% 0%` for a screenshot whose top is the picture). The Gatefold tab on [the docs' home page](docs/index.html#motion-gatefold) opens Forest this way. The notes are the cover's size and scroll inside it. On a phone the spread stacks and the notes fold down. Without the script, or under reduced motion, the window simply opens.
 
 ### Tint
 
@@ -425,6 +425,23 @@ A chip or badge with `.wal-tint` wears the ink on the wash; add `.wal-fill-tint`
 ```
 
 Three parts the browser now draws itself, dressed in walnut. The **menu** is a popover anchored to its button: it opens below, or above, or to the other side, whichever has room, closes on <kbd>Escape</kbd> and on a click outside, and keeps the button's `aria-expanded` in step. The **select** uses `appearance: base-select`, so an option can hold any markup and `<selectedcontent>` copies the chosen one into the button; a browser without it shows the ordinary select with the same border. The **carousel** is a snapping list; with `walnut-scroll.css` it has a dot per slide (`::scroll-marker`) and Previous and Next buttons that grey out at either end (`::scroll-button`), and without them it is a row you swipe. Under [Materials](#materials) the menu and the select are brass.
+
+### Tabs
+
+```html
+<div class="wal-tabs" data-label="Install">
+  <section data-tab="CDN" id="install-cdn">…</section>
+  <section data-tab="Download" id="install-download">…</section>
+</div>
+
+<script src="walnut-tabs.js" defer></script>
+```
+
+Sections you switch between. `walnut-tabs.js` builds a row of tabs from each section's `data-tab` and shows one section at a time. <kbd>←</kbd> and <kbd>→</kbd> choose the next tab, <kbd>Home</kbd> and <kbd>End</kbd> the first and last. Each section's id is a link that opens its tab (choosing one puts it in the address bar, with no history entry), and find-in-page opens the tab with the match, because the others are `hidden="until-found"`. `data-selected` on a section shows it first, and the box fires `wal-tabchange`. Without the script the sections stack, each under its name, and print shows them all.
+
+The default style is a row over a rule, with a bar under the chosen tab. `data-style="index"` makes card tabs: the chosen one stands up into its panel, with a brass top edge. `data-numbered` numbers them 01, 02, 03.
+
+An app that renders its own tabs keeps doing so: a `.wal-tablist` with `role="tablist"` and `role="tab"` buttons gets the same styles, and with the script loaded the arrow keys move focus and click the next tab, so the app's own click handler chooses. `data-running` on the row fills the chosen tab's bar over `--wal-tab-run`, for tabs that advance on their own. On a ground of its own, set `--wal-tab-ink`, `--wal-tab-ink-soft`, `--wal-tab-ink-muted`, `--wal-tab-mark`, `--wal-tab-no` and `--wal-tab-rule`.
 
 ### Chart
 
@@ -542,7 +559,16 @@ An act lasts until the next one begins. Above the first, the page keeps the scri
 
 Acts change the script, never the mode. Press and Bone are light-first, so their act will flip a dark page to light; give the page a `data-theme`, or cast palettes that agree. A palette class of your own on `<html>` that no act names can't be recognised and taken off, so cast it as the first act instead.
 
-`walnut-acts.js` is optional, one of three small scripts walnut ships: CSS has no way for a section to hand its palette to `<html>`. It wakes only when an act's edge crosses the middle of the window, so scrolling within an act costs nothing. [specimen.html](docs/specimen.html) is a page in three acts.
+Acts can also play inside something that scrolls on its own, such as a full-screen `.wal-window`. Mark the scroller `data-wal-acts` and give it `.wal-palette`: its acts recolour the scroller, not the page, as they reach the middle of it. A window that opens part-way down starts in the right act without a tween.
+
+```html
+<dialog class="wal-window wal-palette wal-cafe" data-wal-acts>
+  <section data-act="wal-cafe">…</section>
+  <section data-act="wal-dusk">…</section>
+</dialog>
+```
+
+`walnut-acts.js` is optional, one of four small scripts walnut ships: CSS has no way for a section to hand its palette to `<html>`. It wakes only when an act's edge crosses the middle of the window, so scrolling within an act costs nothing. The full-page view on [the docs' home page](docs/index.html#motion-full-page) is a window in three acts.
 
 ### From the swatch
 
@@ -577,7 +603,7 @@ walnut.recolour(target, () => { /* change anything */ }, { from: button });
 
 After every change the target fires a bubbling `wal-recolour` event from inside the change, so whatever a listener updates (a label, a chart) lands in the same picture. Without `data-wal-recolour`, or with `"retune"`, the same buttons and calls use `.wal-retune`'s tween; so does a browser without view-transition types. Reduced motion cuts. Acts keep retuning: a circle needs a control at its centre, and an act arrives by scrolling. Set `--wal-recolour-duration` on `:root` to tune the circle (760ms).
 
-For a style of your own, add `walnut.recolour.styles.mine = (target, change, from) => { … }`, make the change inside it with `walnut.recolour.apply(target, change)`, and set `data-wal-recolour="mine"`. [The docs' home page](docs/index.html) recolours every way it can from the swatch: its catalogue plates, its Roll button and each colourway's "Wear it" button.
+For a style of your own, add `walnut.recolour.styles.mine = (target, change, from) => { … }`, make the change inside it with `walnut.recolour.apply(target, change)`, and set `data-wal-recolour="mine"`. [The docs' home page](docs/index.html) recolours from the swatch wherever its palette changes: Random palette, Reset, the Palette panel's swatches and each shipped palette's "Use on this page" button.
 
 **Step inside.** The change can be anything, so it can be a whole page. Pass a function that swaps the list for a detail page in the colourway's own palette, and the detail opens out of the card that was pressed, already wearing its colours:
 
@@ -638,7 +664,7 @@ addEventListener("pagereveal", (e) => {
 });
 ```
 
-The docs do exactly this: the specimen card on [the reference](docs/reference.html)'s workbench grows into [plate 14's own page](docs/specimen.html) and back. Opt out with your own `@view-transition { navigation: none; }`. Reduced motion, and browsers without cross-document transitions (Firefox; Safari before 18.2), simply navigate.
+Opt out with your own `@view-transition { navigation: none; }`. Reduced motion, and browsers without cross-document transitions (Firefox; Safari before 18.2), simply navigate.
 
 **Within one page.** The same name helpers open a page inside the page, with no navigation at all: a card in a list grows into a detail view where the list was. Name the pieces that travel for the moment of the change only, and move the names over inside it, because a name can be on one element at a time:
 

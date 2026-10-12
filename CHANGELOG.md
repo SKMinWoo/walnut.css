@@ -157,6 +157,20 @@ the platform can now draw with no script.
   them as they are (`walnut.css/motion` resolves to both).
 - **`walnut-motion.js`**, the third optional script, for the gatefold and
   the shuffle.
+- **Tabs.** `.wal-tabs` turns its `data-tab` sections into tabs with
+  `walnut-tabs.js`, the fourth optional script: arrow keys, Home and End,
+  a link to every tab, and find-in-page that opens the tab it finds in
+  (`hidden="until-found"`). Two styles, a rule (the default) and
+  `data-style="index"` card tabs. `.wal-tablist` styles a row an app
+  renders itself, and the script's keys work on it, so a React row keeps
+  its own state. `data-numbered` numbers the tabs, and `data-running`
+  fills the chosen tab's bar for tabs that advance on their own. Without
+  the script the sections stack under their names (index panels stay
+  cards, so what is made for the card keeps its contrast), and print shows
+  every panel. Types in `walnut-tabs.d.ts`, export `walnut.css/tabs`.
+- **`window.walnut` is typed as `WalnutGlobal`**, an interface each
+  script's types add to, so `walnut.css/motion` and `walnut.css/tabs` can
+  both be imported.
 - **Print.** A walnut page prints as a catalogue sheet: A4, light, flat,
   numbered at the foot, with link addresses printed, screen furniture left
   off (or anything marked `data-wal-print="skip"`) and every chest drawer
@@ -216,7 +230,10 @@ the platform can now draw with no script.
   first, the page keeps its opening script. A page opened or reloaded
   mid-scroll starts in the right act without a tween, reduced motion cuts,
   and acts never change the mode. An IntersectionObserver wakes it only at
-  an act's edge, so scrolling within an act does no work.
+  an act's edge, so scrolling within an act does no work. Acts can also play
+  inside a scroller of their own, such as a full-screen `.wal-window`: mark
+  it `data-wal-acts` and give it `.wal-palette`, and its acts recolour it
+  rather than the page, cutting into place each time it is shown.
 
 - **Page-to-page transitions.** `@view-transition { navigation: auto; }`:
   a same-origin navigation between walnut pages crossfades, so what the pages
@@ -254,25 +271,24 @@ the platform can now draw with no script.
   brightness filter back down to the duotone's own. On the image, so the
   ink and the paper hold still around it.
 
-- **Docs: the catalogue is the home page.** The redesigned docs page,
-  `next.html` until now, is `docs/index.html`, and `/next` redirects to it.
-  The page it replaces documents every class and token, so it stays, whole,
-  as `docs/reference.html`. Plate 14's page goes back to the reference,
-  where its card is.
+- **Docs: one page.** The site is a single page that uses walnut's own
+  tabs, side panels and dialogs in place of subpages: theming, components,
+  charts and photos, motion, browser features, when to use walnut, and
+  getting started. The openings deck is the Motion tabs, plate 14's page is
+  the Full-page view (a window in three acts), and the reference sits under
+  Get started with a search box. `/reference`, `/openings` and `/specimen`
+  redirect to those places, `/next` to the top, and the old homepage's
+  section names and `#p=…&open=…` addresses are rewritten to their new
+  anchors. Copy is cut to what each part does, in a sentence or two.
 
-- **Docs: the catalogue shows all three.** It recolours from the
-  swatch; its colourways are a walnut `.wal-chest`, each drawer pulling out
-  with every colour's oklch and its worst contrast in both modes, the CSS
-  to copy, and a button to wear it, and an `#open=` address pulls one out;
-  its prints are duotones with an ink row; and a new tool reads a photo
-  into a palette whose every text pair passes AA. The README has the
-  in-page morph under "Between pages".
-
-- **Docs: one site.** The overview, openings, reference and plate 14 share
-  one nav (Overview, Openings, Reference, GitHub) and one footer, and their
-  copy is cut to what each part does, what it is for, and where it ships. On
-  a phone the nav keeps the name and controls on top and gives the pages a
-  row of their own, rather than leaving a button stranded on a second line.
+- **Docs: palettes you can measure and share.** Your palette shows each
+  colour's hue and its worst contrast as you move it. Shipped palettes are
+  a walnut `.wal-chest`, each drawer pulling out with every colour's hue,
+  chroma and worst contrast in both modes, the CSS to copy and a button to
+  use it; `#palette-forest` pulls one out. A tool reads a photo into a
+  palette whose every text pair passes AA. The palette lives in the query
+  (`?p=bone`, and `?s=` for numbers of your own), so a link carries it and
+  the hash is left to sections and tabs.
 
 - **Dialog and popover entrances.** A `.wal-dialog` that is a `<dialog>` or a
   `[popover]` rises the last 0.75rem into place as it fades in, and sinks back
@@ -286,13 +302,6 @@ the platform can now draw with no script.
   percent at most, and muted text on the darkest speck still clears 4.8:1.
   A paper repainted by a `.wal-fill-*` or `.wal-bg-*` utility stays flat:
   gold's dark foreground on a toothed gold fill measured 4.3:1.
-
-- **Docs: `openings.html`**, a deck of the openings, the materials and the
-  seven new parts, each demo running on the built framework.
-
-- **Docs: plate 14 has a page of its own** (`docs/specimen.html`), which the
-  workbench's specimen card grows into and which is in three acts. The
-  workbench now remembers the reader's palette, mode and finish for the tab.
 
 ### Changed
 
