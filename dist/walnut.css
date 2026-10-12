@@ -4008,17 +4008,21 @@ html::-webkit-scrollbar-thumb:hover { background: var(--wal-accent); }
     }
   }
 
-  .wal-tabs.is-enhanced[data-style="index"] {
-    > .wal-tablist { margin-block-end: 0; }
+  .wal-tabs.is-enhanced[data-style="index"] > .wal-tablist { margin-block-end: 0; }
 
-    > [role="tabpanel"]:not([hidden]) {
-      position: relative;
-      padding: clamp(1.25rem, 3.4vw, 2.75rem);
-      border-radius: var(--wal-radius-sm) var(--wal-radius-lg) var(--wal-radius-lg);
-      background: var(--wal-surface);
-      color: var(--wal-text);
-      box-shadow: var(--wal-shadow-lg), var(--wal-shadow-sm);
-    }
+  /* Each panel is a card, with the script or without: what is made for the
+     card keeps its contrast when the panels stack on a ground of their own. */
+  .wal-tabs[data-style="index"] > [data-tab]:not([hidden]) {
+    position: relative;
+    padding: clamp(1.25rem, 3.4vw, 2.75rem);
+    border-radius: var(--wal-radius-sm) var(--wal-radius-lg) var(--wal-radius-lg);
+    background: var(--wal-surface);
+    color: var(--wal-text);
+    box-shadow: var(--wal-shadow-lg), var(--wal-shadow-sm);
+  }
+
+  .wal-tabs:not(.is-enhanced)[data-style="index"] > [data-tab] {
+    border-radius: var(--wal-radius-lg);
   }
 
   @media (forced-colors: active) {
@@ -4054,7 +4058,7 @@ html::-webkit-scrollbar-thumb:hover { background: var(--wal-accent); }
       .wal-input, .wal-badge, .wal-dialog, .wal-tooltip, .wal-iconbtn, .wal-tip,
       .wal-select, .wal-menu, .wal-door, .wal-window-panel,
       .wal-gatefold-cover, .wal-gatefold-notes,
-      .wal-tablist > [role="tab"], .wal-tabs > [role="tabpanel"],
+      .wal-tablist > [role="tab"], .wal-tabs > [data-tab],
       .wal-rounded, .wal-rounded-sm, .wal-rounded-lg, .wal-rounded-full) {
     corner-shape: var(--wal-corner-shape, round);
   }

@@ -165,8 +165,9 @@ the platform can now draw with no script.
   renders itself, and the script's keys work on it, so a React row keeps
   its own state. `data-numbered` numbers the tabs, and `data-running`
   fills the chosen tab's bar for tabs that advance on their own. Without
-  the script the sections stack under their names, and print shows every
-  panel. Types in `walnut-tabs.d.ts`, export `walnut.css/tabs`.
+  the script the sections stack under their names (index panels stay
+  cards, so what is made for the card keeps its contrast), and print shows
+  every panel. Types in `walnut-tabs.d.ts`, export `walnut.css/tabs`.
 - **`window.walnut` is typed as `WalnutGlobal`**, an interface each
   script's types add to, so `walnut.css/motion` and `walnut.css/tabs` can
   both be imported.
