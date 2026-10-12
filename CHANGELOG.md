@@ -229,7 +229,10 @@ the platform can now draw with no script.
   first, the page keeps its opening script. A page opened or reloaded
   mid-scroll starts in the right act without a tween, reduced motion cuts,
   and acts never change the mode. An IntersectionObserver wakes it only at
-  an act's edge, so scrolling within an act does no work.
+  an act's edge, so scrolling within an act does no work. Acts can also play
+  inside a scroller of their own, such as a full-screen `.wal-window`: mark
+  it `data-wal-acts` and give it `.wal-palette`, and its acts recolour it
+  rather than the page, cutting into place each time it is shown.
 
 - **Page-to-page transitions.** `@view-transition { navigation: auto; }`:
   a same-origin navigation between walnut pages crossfades, so what the pages

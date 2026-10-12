@@ -559,7 +559,16 @@ An act lasts until the next one begins. Above the first, the page keeps the scri
 
 Acts change the script, never the mode. Press and Bone are light-first, so their act will flip a dark page to light; give the page a `data-theme`, or cast palettes that agree. A palette class of your own on `<html>` that no act names can't be recognised and taken off, so cast it as the first act instead.
 
-`walnut-acts.js` is optional, one of four small scripts walnut ships: CSS has no way for a section to hand its palette to `<html>`. It wakes only when an act's edge crosses the middle of the window, so scrolling within an act costs nothing. [specimen.html](docs/specimen.html) is a page in three acts.
+Acts can also play inside something that scrolls on its own, such as a full-screen `.wal-window`. Mark the scroller `data-wal-acts` and give it `.wal-palette`: its acts recolour the scroller, not the page, as they reach the middle of it. A window that opens part-way down starts in the right act without a tween.
+
+```html
+<dialog class="wal-window wal-palette wal-cafe" data-wal-acts>
+  <section data-act="wal-cafe">…</section>
+  <section data-act="wal-dusk">…</section>
+</dialog>
+```
+
+`walnut-acts.js` is optional, one of four small scripts walnut ships: CSS has no way for a section to hand its palette to `<html>`. It wakes only when an act's edge crosses the middle of the window, so scrolling within an act costs nothing. The full-page view on [the docs' home page](docs/index.html#motion-full-page) is a window in three acts.
 
 ### From the swatch
 

@@ -12,6 +12,16 @@
    An act lasts until the next one begins. Above the first, the page has the
    script it was loaded with.
 
+   Acts can also play inside something that scrolls on its own, such as a
+   full-screen .wal-window. Mark the scroller data-wal-acts and give it
+   .wal-palette: the acts inside it retune the scroller, not the page, as
+   they reach the middle of it.
+
+       <dialog class="wal-window wal-palette wal-cafe" data-wal-acts>
+         <section data-act="wal-cafe">…</section>
+         <section data-act="wal-dusk">…</section>
+       </dialog>
+
    CSS cannot do this on its own: nothing lets a section hand its palette to
    <html>. So this is a script, and an optional one — without it the acts are
    ordinary sections and the page keeps one script throughout.
@@ -26,9 +36,8 @@
    --wal-retune-duration, and under reduced motion they cut.
    ───────────────────────────────────────────────────────────────────────── */
 (() => {
-  const root = document.documentElement;
-  const acts = [...document.querySelectorAll("[data-act]")];
-  if (!acts.length) return;
+  const all = [...document.querySelectorAll("[data-act]")];
+  if (!all.length) return;
 
   /* Where on the window an act takes the page, as a fraction of its height
      from the top: 0.5 is the middle. */
@@ -50,53 +59,88 @@
     return owner;
   }
 
-  // What each act writes on <html>: a palette class, and any rods it states.
+  // What each act writes on its stage: a palette class, and any rods it states.
   const classOf = (act) => act.dataset.act || null;
   const rodsOf = (el) => [...el.style].filter((p) => p.startsWith("--wal-")).map((p) => [p, el.style.getPropertyValue(p)]);
 
-  /* Every palette class an act might have to take off <html>: the ones the
-     acts name, and walnut's own. Two palette classes on one element are
-     settled by stylesheet order, not by intent, so the page's opening
-     palette has to come off while an act holds the page. A palette class of
-     your own that no act names cannot be recognised — cast it as the first
-     act instead of putting it on <html>. */
+  /* Every palette class an act might have to take off its stage: the ones
+     the acts name, and walnut's own. Two palette classes on one element are
+     settled by stylesheet order, not by intent, so the stage's opening
+     palette has to come off while an act holds it. A palette class of your
+     own that no act names cannot be recognised — cast it as the first act
+     instead of putting it on the stage. */
   const palettes = new Set(["wal-cafe", "wal-press", "wal-forest", "wal-dusk", "wal-bone",
-    ...acts.map(classOf).filter(Boolean)]);
+    ...all.map(classOf).filter(Boolean)]);
 
-  // The page's own script, to come back to above the first act. Its rods
-  // count as written, so the first act clears them like any other's.
-  const opening = {
-    classes: [...root.classList].filter((c) => palettes.has(c)),
-    rods: rodsOf(root),
-  };
-  let current, written = opening.rods;
-
-  function cast(act, tween) {
-    if (act === current) return;
-    current = act;
-    if (tween) root.classList.add("wal-retune");
-    // The outgoing act's rods and class come off in the same frame as the
-    // incoming one's go on, so the tween runs from where the page was.
-    for (const [prop] of written) root.style.removeProperty(prop);
-    for (const c of palettes) root.classList.remove(c);
-    const next = act ? { classes: [classOf(act)].filter(Boolean), rods: rodsOf(act) } : opening;
-    root.classList.add(...next.classes);
-    for (const [prop, value] of next.rods) root.style.setProperty(prop, value);
-    written = next.rods;
+  // The page is one stage, and every data-wal-acts scroller is another.
+  const stages = new Map();
+  for (const act of all) {
+    const box = act.parentElement.closest("[data-wal-acts]");
+    if (!stages.has(box)) stages.set(box, []);
+    stages.get(box).push(act);
   }
 
-  /* Until the page has settled, every change cuts: a page that tweened on
-     load would look like it was still loading. "Settled" is a frame after
-     `load`, by which time a reload has restored the reader's scroll position
-     — the observer's first look can come before that, see the top of the
-     page, and would otherwise tween from act I to wherever the reader was.
-     (A #fragment link still glides there under walnut's smooth scrolling,
-     and the acts turn as it passes them, which is what a glide should do.) */
-  let settled = false;
-  const look = () => cast(actAt(acts, innerHeight * CUE), settled);
-  const io = new IntersectionObserver(look, { rootMargin: `-${CUE * 100}% 0px -${(1 - CUE) * 100}% 0px` });
-  for (const act of acts) io.observe(act);
-  const settle = () => requestAnimationFrame(() => { look(); settled = true; });
-  if (document.readyState === "complete") settle();
-  else addEventListener("load", settle, { once: true });
+  for (const [box, acts] of stages) play(box, acts);
+
+  function play(box, acts) {
+    const stage = box ?? document.documentElement;
+
+    // The stage's own script, to come back to above the first act. Its rods
+    // count as written, so the first act clears them like any other's.
+    const opening = {
+      classes: [...stage.classList].filter((c) => palettes.has(c)),
+      rods: rodsOf(stage),
+    };
+    let current, written = opening.rods;
+
+    function cast(act, tween) {
+      if (act === current) return;
+      current = act;
+      // A scroller's tween comes off for a cut. The page's stays, as it
+      // always has, for retunes of its own.
+      if (tween) stage.classList.add("wal-retune");
+      else if (box) stage.classList.remove("wal-retune");
+      // The outgoing act's rods and class come off in the same frame as the
+      // incoming one's go on, so the tween runs from where the stage was.
+      for (const [prop] of written) stage.style.removeProperty(prop);
+      for (const c of palettes) stage.classList.remove(c);
+      const next = act ? { classes: [classOf(act)].filter(Boolean), rods: rodsOf(act) } : opening;
+      stage.classList.add(...next.classes);
+      for (const [prop, value] of next.rods) stage.style.setProperty(prop, value);
+      written = next.rods;
+    }
+
+    // The cue line, in px from the top of the window: the middle of the
+    // window, or of the scroller.
+    function line() {
+      if (!box) return innerHeight * CUE;
+      const r = box.getBoundingClientRect();
+      return r.top + box.clientHeight * CUE;
+    }
+
+    /* Until the page has settled, every change cuts: a page that tweened on
+       load would look like it was still loading. "Settled" is a frame after
+       `load`, by which time a reload has restored the reader's scroll
+       position — the observer's first look can come before that, see the top
+       of the page, and would otherwise tween from act I to wherever the
+       reader was. (A #fragment link still glides there under walnut's smooth
+       scrolling, and the acts turn as it passes them, which is what a glide
+       should do.) A scroller that is not shown, a shut dialog, has nothing
+       to look at; the first look after it is shown again cuts too, so a
+       window opens already in the act it opens on. */
+    let settled = false, shown = true;
+    const look = () => {
+      if (box && !box.getClientRects().length) { shown = false; return; }
+      cast(actAt(acts, line()), settled && shown);
+      shown = true;
+    };
+    const io = new IntersectionObserver(look, {
+      root: box,
+      rootMargin: `-${CUE * 100}% 0px -${(1 - CUE) * 100}% 0px`,
+    });
+    for (const act of acts) io.observe(act);
+    const settle = () => requestAnimationFrame(() => { look(); settled = true; });
+    if (document.readyState === "complete") settle();
+    else addEventListener("load", settle, { once: true });
+  }
 })();
