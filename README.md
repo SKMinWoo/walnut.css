@@ -426,6 +426,23 @@ A chip or badge with `.wal-tint` wears the ink on the wash; add `.wal-fill-tint`
 
 Three parts the browser now draws itself, dressed in walnut. The **menu** is a popover anchored to its button: it opens below, or above, or to the other side, whichever has room, closes on <kbd>Escape</kbd> and on a click outside, and keeps the button's `aria-expanded` in step. The **select** uses `appearance: base-select`, so an option can hold any markup and `<selectedcontent>` copies the chosen one into the button; a browser without it shows the ordinary select with the same border. The **carousel** is a snapping list; with `walnut-scroll.css` it has a dot per slide (`::scroll-marker`) and Previous and Next buttons that grey out at either end (`::scroll-button`), and without them it is a row you swipe. Under [Materials](#materials) the menu and the select are brass.
 
+### Tabs
+
+```html
+<div class="wal-tabs" data-label="Install">
+  <section data-tab="CDN" id="install-cdn">…</section>
+  <section data-tab="Download" id="install-download">…</section>
+</div>
+
+<script src="walnut-tabs.js" defer></script>
+```
+
+Sections you switch between. `walnut-tabs.js` builds a row of tabs from each section's `data-tab` and shows one section at a time. <kbd>←</kbd> and <kbd>→</kbd> choose the next tab, <kbd>Home</kbd> and <kbd>End</kbd> the first and last. Each section's id is a link that opens its tab (choosing one puts it in the address bar, with no history entry), and find-in-page opens the tab with the match, because the others are `hidden="until-found"`. `data-selected` on a section shows it first, and the box fires `wal-tabchange`. Without the script the sections stack, each under its name, and print shows them all.
+
+The default style is a row over a rule, with a bar under the chosen tab. `data-style="index"` makes card tabs: the chosen one stands up into its panel, with a brass top edge. `data-numbered` numbers them 01, 02, 03.
+
+An app that renders its own tabs keeps doing so: a `.wal-tablist` with `role="tablist"` and `role="tab"` buttons gets the same styles, and with the script loaded the arrow keys move focus and click the next tab, so the app's own click handler chooses. `data-running` on the row fills the chosen tab's bar over `--wal-tab-run`, for tabs that advance on their own. On a ground of its own, set `--wal-tab-ink`, `--wal-tab-ink-soft`, `--wal-tab-ink-muted`, `--wal-tab-mark`, `--wal-tab-no` and `--wal-tab-rule`.
+
 ### Chart
 
 ```html
@@ -542,7 +559,7 @@ An act lasts until the next one begins. Above the first, the page keeps the scri
 
 Acts change the script, never the mode. Press and Bone are light-first, so their act will flip a dark page to light; give the page a `data-theme`, or cast palettes that agree. A palette class of your own on `<html>` that no act names can't be recognised and taken off, so cast it as the first act instead.
 
-`walnut-acts.js` is optional, one of three small scripts walnut ships: CSS has no way for a section to hand its palette to `<html>`. It wakes only when an act's edge crosses the middle of the window, so scrolling within an act costs nothing. [specimen.html](docs/specimen.html) is a page in three acts.
+`walnut-acts.js` is optional, one of four small scripts walnut ships: CSS has no way for a section to hand its palette to `<html>`. It wakes only when an act's edge crosses the middle of the window, so scrolling within an act costs nothing. [specimen.html](docs/specimen.html) is a page in three acts.
 
 ### From the swatch
 

@@ -157,6 +157,19 @@ the platform can now draw with no script.
   them as they are (`walnut.css/motion` resolves to both).
 - **`walnut-motion.js`**, the third optional script, for the gatefold and
   the shuffle.
+- **Tabs.** `.wal-tabs` turns its `data-tab` sections into tabs with
+  `walnut-tabs.js`, the fourth optional script: arrow keys, Home and End,
+  a link to every tab, and find-in-page that opens the tab it finds in
+  (`hidden="until-found"`). Two styles, a rule (the default) and
+  `data-style="index"` card tabs. `.wal-tablist` styles a row an app
+  renders itself, and the script's keys work on it, so a React row keeps
+  its own state. `data-numbered` numbers the tabs, and `data-running`
+  fills the chosen tab's bar for tabs that advance on their own. Without
+  the script the sections stack under their names, and print shows every
+  panel. Types in `walnut-tabs.d.ts`, export `walnut.css/tabs`.
+- **`window.walnut` is typed as `WalnutGlobal`**, an interface each
+  script's types add to, so `walnut.css/motion` and `walnut.css/tabs` can
+  both be imported.
 - **Print.** A walnut page prints as a catalogue sheet: A4, light, flat,
   numbered at the foot, with link addresses printed, screen furniture left
   off (or anything marked `data-wal-print="skip"`) and every chest drawer

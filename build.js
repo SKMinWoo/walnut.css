@@ -92,14 +92,14 @@ const minified = bundle
 // file). Copied with a banner rather than minified: each is a few hundred
 // bytes of code under its own explanation, and a minifier is one more thing
 // that can quietly ship different code.
-const SCRIPTS = ["walnut-acts.js", "walnut-recolour.js", "walnut-motion.js"];
+const SCRIPTS = ["walnut-acts.js", "walnut-recolour.js", "walnut-motion.js", "walnut-tabs.js"];
 const scripts = Object.fromEntries(SCRIPTS.map((file) => [file,
   `/*! walnut.css v${VERSION} · ${file.replace(/^walnut-|\.js$/g, "")} | MIT License | github.com/SKMinWoo/walnut.css */\n` +
   fs.readFileSync(path.join(SRC, file), "utf8")]));
 
 // Their types, for a TypeScript app. Copied as written: a declaration file
 // carries no code to stamp.
-const TYPINGS = ["walnut-motion.d.ts"];
+const TYPINGS = ["walnut-motion.d.ts", "walnut-tabs.d.ts"];
 const typings = Object.fromEntries(TYPINGS.map((file) => [file, fs.readFileSync(path.join(SRC, file), "utf8")]));
 
 // ─── Companion stylesheets ───

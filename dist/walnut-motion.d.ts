@@ -38,8 +38,10 @@ export interface WalnutMotion {
 }
 
 declare global {
+  /** walnut's scripts, each adding its own part as it loads. Each script's
+      types add theirs here, so two of them can be imported together. */
+  interface WalnutGlobal extends Partial<WalnutMotion> {}
   interface Window {
-    /** walnut's scripts, each adding its own part as it loads. */
-    walnut?: Partial<WalnutMotion>;
+    walnut?: WalnutGlobal;
   }
 }
