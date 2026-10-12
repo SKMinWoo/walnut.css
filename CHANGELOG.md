@@ -271,25 +271,24 @@ the platform can now draw with no script.
   brightness filter back down to the duotone's own. On the image, so the
   ink and the paper hold still around it.
 
-- **Docs: the catalogue is the home page.** The redesigned docs page,
-  `next.html` until now, is `docs/index.html`, and `/next` redirects to it.
-  The page it replaces documents every class and token, so it stays, whole,
-  as `docs/reference.html`. Plate 14's page goes back to the reference,
-  where its card is.
+- **Docs: one page.** The site is a single page that uses walnut's own
+  tabs, side panels and dialogs in place of subpages: theming, components,
+  charts and photos, motion, browser features, when to use walnut, and
+  getting started. The openings deck is the Motion tabs, plate 14's page is
+  the Full-page view (a window in three acts), and the reference sits under
+  Get started with a search box. `/reference`, `/openings` and `/specimen`
+  redirect to those places, `/next` to the top, and the old homepage's
+  section names and `#p=…&open=…` addresses are rewritten to their new
+  anchors. Copy is cut to what each part does, in a sentence or two.
 
-- **Docs: the catalogue shows all three.** It recolours from the
-  swatch; its colourways are a walnut `.wal-chest`, each drawer pulling out
-  with every colour's oklch and its worst contrast in both modes, the CSS
-  to copy, and a button to wear it, and an `#open=` address pulls one out;
-  its prints are duotones with an ink row; and a new tool reads a photo
-  into a palette whose every text pair passes AA. The README has the
-  in-page morph under "Between pages".
-
-- **Docs: one site.** The overview, openings, reference and plate 14 share
-  one nav (Overview, Openings, Reference, GitHub) and one footer, and their
-  copy is cut to what each part does, what it is for, and where it ships. On
-  a phone the nav keeps the name and controls on top and gives the pages a
-  row of their own, rather than leaving a button stranded on a second line.
+- **Docs: palettes you can measure and share.** Your palette shows each
+  colour's hue and its worst contrast as you move it. Shipped palettes are
+  a walnut `.wal-chest`, each drawer pulling out with every colour's hue,
+  chroma and worst contrast in both modes, the CSS to copy and a button to
+  use it; `#palette-forest` pulls one out. A tool reads a photo into a
+  palette whose every text pair passes AA. The palette lives in the query
+  (`?p=bone`, and `?s=` for numbers of your own), so a link carries it and
+  the hash is left to sections and tabs.
 
 - **Dialog and popover entrances.** A `.wal-dialog` that is a `<dialog>` or a
   `[popover]` rises the last 0.75rem into place as it fades in, and sinks back
@@ -303,13 +302,6 @@ the platform can now draw with no script.
   percent at most, and muted text on the darkest speck still clears 4.8:1.
   A paper repainted by a `.wal-fill-*` or `.wal-bg-*` utility stays flat:
   gold's dark foreground on a toothed gold fill measured 4.3:1.
-
-- **Docs: `openings.html`**, a deck of the openings, the materials and the
-  seven new parts, each demo running on the built framework.
-
-- **Docs: plate 14 has a page of its own** (`docs/specimen.html`), which the
-  workbench's specimen card grows into and which is in three acts. The
-  workbench now remembers the reader's palette, mode and finish for the tab.
 
 ### Changed
 

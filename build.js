@@ -263,7 +263,7 @@ function assertBundlerSafe(css) {
 // A static host serves exactly one directory. The docs page and the
 // stylesheets it loads live in two — docs/ and dist/ — so neither is
 // deployable alone: point a host at dist/ and there is no index.html, point it
-// at docs/ and all six <link> tags 404. The write step below flattens both
+// at docs/ and every <link> tag 404s. The write step below flattens both
 // into public/, which is the outputDirectory named in vercel.json.
 //
 // public/ is a build artifact, not source. It is gitignored and rebuilt from
@@ -280,8 +280,10 @@ function assertBundlerSafe(css) {
    rewrite is a blind regex, which is what assertDocsRewritten guards.
 
    Listed rather than globbed, so a scratch page left in docs/ is never
-   deployed by accident. */
-const DOCS_PAGES = ["index.html", "reference.html", "specimen.html", "openings.html"];
+   deployed by accident. The site is one page: the reference, the openings
+   and plate 14 live in it now, and vercel.json redirects their old
+   addresses to the anchors that replaced them. */
+const DOCS_PAGES = ["index.html"];
 const STYLESHEET_LINKS = /<link rel="stylesheet" href="\.\.\/dist\//g;
 const DIST_REFS = /\.\.\/dist\//g;
 const docsPages = DOCS_PAGES.map((page) => {
