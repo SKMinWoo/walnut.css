@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>walnut.css: theme a whole site from eight numbers</title>
-  <meta name="description" content="A CSS framework under 18 KB gzipped, with components, charts and dark mode built in. Set a hue and chroma for four colours and walnut derives the rest.">
+  <meta name="description" content="A CSS framework under 18 KB gzipped, with components, charts and dark mode built in. Set a hue and chroma for the ground and three colours, and walnut derives the rest.">
   <link rel="icon" type="image/svg+xml" href="favicon.svg">
   <link rel="alternate icon" href="favicon.ico">
 
@@ -29,10 +29,14 @@
         if (old.get("s")) parts.push("s=" + old.get("s").replace(/[^0-9.,-]/g, ""));
         if (parts.length) query = "?" + parts.join("&");
         to = old.get("open") ? "palette-" + old.get("open").replace(/[^a-z]/g, "") : "";
-      } else if (MOVED[hash]) to = MOVED[hash];
+      } else if (Object.prototype.hasOwnProperty.call(MOVED, hash)) to = MOVED[hash];
       if (to !== hash || query !== location.search) {
-        history.replaceState(null, "", location.pathname + query + (to ? "#" + to : ""));
-        root.setAttribute("data-moved", "");
+        // A path that starts "//" reads as another origin, and replaceState
+        // refuses it; the page is no worse for keeping the old address.
+        try {
+          history.replaceState(null, "", location.pathname + query + (to ? "#" + to : ""));
+          root.setAttribute("data-moved", "");
+        } catch (e) {}
       }
     })();
   </script>
@@ -134,15 +138,29 @@
     p { text-wrap: pretty; }
     pre { margin: 0; white-space: pre; overflow-x: auto; font-size: var(--wal-text-xs); line-height: 1.6; }
     .site-h3 { margin: 0; font-size: clamp(1.2rem, 2vw, 1.45rem); line-height: 1.1; }
-    .site-big { font-size: clamp(1.75rem, 3vw, 2.4rem); line-height: 1; margin: 0; }
+    .site-h3 code { font-size: .62em; font-weight: 500; vertical-align: .15em; }
+    /* The example pages' titles: styled as headings, but paragraphs, since
+       they belong to the examples and not to this page's outline. */
+    .site-big { font-family: var(--wal-font-display); font-stretch: 106%; font-weight: 720; letter-spacing: -0.01em; text-wrap: balance; font-size: clamp(1.75rem, 3vw, 2.4rem); line-height: 1; margin: 0; }
 
     /* ── Layout ── */
     .site-wrap { inline-size: min(100% - 2 * var(--site-gutter), 76rem); margin-inline: auto; }
-    .site-section { padding-block: clamp(3.5rem, 8vw, 6.5rem); }
+    /* A section out of view skips its rendering. Every rod, dial and
+       palette change rewrites custom properties on <html>, which every
+       element inherits, so this is what keeps a drag smooth: only the
+       sections on screen restyle. The script turns it on (.site-skim)
+       only after one full layout with the fonts in, which "auto"
+       remembers, so a skipped section keeps its real height and links
+       still land. */
+    .site-section { padding-block: clamp(3.5rem, 8vw, 6.5rem); contain-intrinsic-size: auto 1600px; }
+    .site-skim .site-section { content-visibility: auto; }
+    /* Until then, a scroll to the address jumps rather than glides, so none is left
+       heading for a place the layout has since moved. */
+    .site-js:not(.site-skim) { scroll-behavior: auto; }
     .site-section + .site-section { border-block-start: var(--wal-hairline) solid var(--wal-line-soft); }
     #main { overflow-x: clip; }
     .site-head { display: grid; gap: 1rem; max-inline-size: 48rem; margin-block-end: clamp(1.75rem, 3.5vw, 2.75rem); }
-    .site-head p { margin: 0; font-size: var(--wal-text-md); color: var(--wal-text-soft); max-inline-size: 58ch; }
+    .site-head p { margin: 0; font-size: var(--wal-text-md); color: var(--wal-text-soft); max-inline-size: 58ch; text-wrap: balance; }
     .site-actions { display: flex; flex-wrap: wrap; gap: .75rem; align-items: center; }
     .site-split { display: grid; grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); gap: clamp(1.5rem, 4vw, 3.5rem); align-items: start; }
     .site-split.is-even { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
@@ -158,7 +176,8 @@
     .site-spec { display: grid; gap: .6rem; margin: 0; font-size: var(--wal-text-sm); }
     .site-spec > div { display: grid; grid-template-columns: 6.5rem minmax(0, 1fr); gap: .75rem; padding-block-start: .6rem; border-block-start: var(--wal-hairline) solid var(--wal-line-soft); }
     .site-spec dt { color: var(--wal-text-muted); font-family: var(--wal-font-label); font-size: var(--wal-text-xs); letter-spacing: var(--wal-tracking-label); text-transform: uppercase; padding-block-start: .15rem; }
-    .site-spec dd { margin: 0; color: var(--wal-text-soft); display: flex; flex-wrap: wrap; gap: .4rem; align-items: center; }
+    .site-spec dd { margin: 0; color: var(--wal-text-soft); }
+    .site-spec dd > .wal-badge { margin-inline-end: .5rem; }
 
     /* Markup, folded away under each demo. */
     .site-code { border-block-start: var(--wal-hairline) solid var(--wal-line-soft); }
@@ -167,21 +186,35 @@
     .site-code > pre { margin-block-start: .6rem; }
     .site-codebox { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: .75rem; align-items: start; }
     .site-codebox pre { padding: .9rem 1rem; }
+    .site-codebox:has(#photo-css) { max-inline-size: 46rem; }
 
     /* A row of choices, one pressed. */
-    .site-seg { display: inline-flex; flex-wrap: wrap; border: var(--wal-border); border-radius: var(--wal-btn-radius, 3px); overflow: hidden; }
+    /* Each button draws the line to its left and above it, and the frame clips the outer ones, so a
+       row that wraps still reads as one control: rows fill the width and a line runs between them. */
+    .site-seg { display: inline-flex; flex-wrap: wrap; max-inline-size: 100%; border: var(--wal-border); border-radius: var(--wal-btn-radius, 3px); overflow: hidden; }
     .site-seg button {
-      display: inline-flex; align-items: center; gap: .45rem; min-block-size: 2.5rem;
+      flex: 1 1 auto; display: inline-flex; align-items: center; justify-content: center; gap: .45rem; min-block-size: 2.5rem;
       font: 600 var(--wal-text-sm) / 1 var(--wal-font-display); padding: .6rem 1rem; border: 0; cursor: pointer;
       background: transparent; color: var(--wal-text);
+      box-shadow: calc(-1 * var(--wal-hairline)) 0 0 var(--wal-line), 0 calc(-1 * var(--wal-hairline)) 0 var(--wal-line);
     }
-    .site-seg button + button { border-inline-start: var(--wal-border); }
+    /* Six inks as three by two, so no colour is left on a row of its own. */
+    .site-seg[data-ink-seg] { display: inline-grid; grid-template-columns: repeat(3, 1fr); }
+    .site-seg[data-ink-seg] button { padding-inline: .85rem; }
     .site-seg button:hover { background: var(--wal-bg-subtle); }
     .site-seg button[aria-pressed="true"] { background: var(--wal-text); color: var(--wal-bg); }
     .site-seg button > i { inline-size: .7rem; aspect-ratio: 1; border-radius: 50%; background: var(--c); }
-    .site-seg-row { display: flex; flex-wrap: wrap; align-items: center; gap: .6rem 1rem; font-size: var(--wal-text-sm); color: var(--wal-text-muted); }
+    .site-seg-row { display: flex; flex-wrap: wrap; align-items: end; gap: .9rem 1.25rem; font-size: var(--wal-text-sm); color: var(--wal-text-muted); }
+    /* A visible name above each row of choices, as the ink row has. */
+    .site-seg-field { display: grid; gap: .4rem; justify-items: start; }
 
     /* ── Nav ── */
+    /* Its edges line up with the page's column, the same sum .site-wrap uses. */
+    .site-nav { padding-inline: max(var(--site-gutter), (100% - 76rem) / 2); }
+    /* The scroll-spy group is the whole nav, brand included: at the top of the page the
+       brand's #top is current, so no link claims the hero. */
+    .site-nav { scroll-target-group: auto; }
+    .site-nav .wal-nav-links { scroll-target-group: none; }
     .site-nav .wal-nav-brand { flex-direction: row; align-items: center; gap: .55rem; font-stretch: 112%; font-weight: 800; text-decoration: none; }
     .site-nav .wal-nav-brand svg { inline-size: 1.6rem; block-size: 1.6rem; flex: none; }
     .site-nav .wal-nav-actions { display: flex; align-items: center; gap: .5rem; }
@@ -198,7 +231,29 @@
       /* The links take a row of their own, scrolled sideways if they must. */
       .site-nav .wal-nav-links { order: 3; flex: 1 0 100%; flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; }
       .site-nav .wal-nav-links a { flex: none; }
-      :root { scroll-padding-block-start: calc(var(--wal-nav-h) + 2.75rem); }
+      /* A jump lands just below the two rows (measured 86px). */
+      :root { scroll-padding-block-start: calc(var(--wal-nav-h) + 1.375rem); }
+    }
+    /* A row that scrolls sideways fades at an edge with more past it, so it says it scrolls.
+       The row's own scroll drives it; a row that fits has no timeline, so neither edge fades. */
+    @supports (animation-timeline: scroll()) {
+      .site-nav .wal-nav-links, .wal-tablist, .site-table-scroll, .site-photo-read-wrap {
+        mask-image: linear-gradient(to right, transparent, #000 var(--site-fade-start), #000 calc(100% - var(--site-fade-end)), transparent);
+        animation: site-edge-fade linear both; animation-timeline: scroll(self inline);
+      }
+    }
+    @property --site-fade-start { syntax: "<length>"; inherits: false; initial-value: 0px; }
+    @property --site-fade-end { syntax: "<length>"; inherits: false; initial-value: 0px; }
+    @keyframes site-edge-fade {
+      from { --site-fade-start: 0px; --site-fade-end: 2.5rem; }
+      8% { --site-fade-start: 2.5rem; }
+      92% { --site-fade-end: 2.5rem; }
+      to { --site-fade-start: 2.5rem; --site-fade-end: 0px; }
+    }
+    @media (max-width: 400px) {
+      /* Tighter buttons, so the brand and actions share a row on a 360px phone. */
+      .site-nav .wal-nav-actions { gap: .3rem; }
+      .site-nav .wal-nav-actions > .wal-btn { padding-inline: .6rem; }
     }
     @media (max-width: 560px) {
       .site-gh > span, .site-mode [data-m] > span:last-child { display: none; }
@@ -209,15 +264,34 @@
     @media (max-width: 440px) {
       .site-palette-label { position: absolute; width: 1px; height: 1px; margin: -1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
     }
-    /* Narrower still, the controls take a row of their own after all. */
-    @media (max-width: 380px) {
-      :root { scroll-padding-block-start: calc(var(--wal-nav-h) + 4.75rem); }
+    /* Narrower still, GitHub leaves the header (the footer links it), so the brand and
+       controls keep one row. */
+    @media (max-width: 352px) {
+      .site-gh { display: none; }
+    }
+    /* Touch-sized: the page's own controls are at least 44px tall. walnut's demos keep
+       their real sizes. */
+    @media (pointer: coarse), (max-width: 560px) {
+      .site-nav .wal-nav-actions > .wal-btn { min-block-size: 2.75rem; min-inline-size: 2.75rem; justify-content: center; }
+      .site-nav .wal-nav-links a { display: inline-flex; align-items: center; min-block-size: 2.75rem; }
+      .site-seg button, .site-door-head > button,
+      .wal-btn:is([data-copy], [data-copy-from], [data-copy-live], [data-reset], #photo-copy, #finish-page, #pull-all) { min-block-size: 2.75rem; }
+      /* Padding, not flex, so the summary keeps its disclosure triangle. */
+      .site-code > summary { padding-block: calc((2.75rem - 1lh) / 2); }
+      .site-foot nav a { display: inline-flex; align-items: center; min-block-size: 2.75rem; }
+    }
+    /* Touch-sized rows are taller (measured 113px). */
+    @media (max-width: 1100px) and (pointer: coarse), (max-width: 560px) {
+      :root { scroll-padding-block-start: calc(var(--wal-nav-h) + 3.125rem); }
+    }
+    /* Touch screens aren't told to drop a file. */
+    @media (hover: none) and (pointer: coarse) {
+      .site-drop-hint { display: none; }
     }
 
     /* ── Brass: anything you press, in the cabinet finish. Engraved ink and
        a lit top edge; it catches the light rather than lifting. Not inside
        a demo stage that wears another finish. ── */
-    .site-brass,
     [data-finish="cabinet"] :is(.wal-btn-primary, .site-mode):not(.site-finish-stage:not([data-finish="cabinet"]) *) {
       color: var(--site-brass-ink);
       background: var(--site-brushed);
@@ -225,14 +299,14 @@
       box-shadow: inset 0 1px 0 oklch(1 0 0 / .55), inset 0 -1px 0 oklch(0.3 0.05 60 / .2), 0 1px 2px oklch(0.2 0.03 50 / .3);
       text-shadow: 0 1px 0 oklch(1 0 0 / .35);
     }
-    :is(.site-brass, [data-finish="cabinet"] :is(.wal-btn-primary, .site-mode):not(.site-finish-stage:not([data-finish="cabinet"]) *)):hover:not(:disabled) {
+    [data-finish="cabinet"] :is(.wal-btn-primary, .site-mode):not(.site-finish-stage:not([data-finish="cabinet"]) *):hover:not(:disabled) {
       color: var(--site-brass-ink);
       background: linear-gradient(180deg, oklch(0.96 0.05 96), oklch(0.84 0.1 86) 52%, oklch(0.79 0.1 82));
       border-color: var(--site-brass-lo);
       transform: none;
       box-shadow: inset 0 1px 0 oklch(1 0 0 / .6), 0 10px 28px -12px light-dark(oklch(0.55 0.1 70 / .55), oklch(0.86 0.12 84 / .6));
     }
-    :is(.site-brass, [data-finish="cabinet"] :is(.wal-btn-primary, .site-mode):not(.site-finish-stage:not([data-finish="cabinet"]) *)):active:not(:disabled) {
+    [data-finish="cabinet"] :is(.wal-btn-primary, .site-mode):not(.site-finish-stage:not([data-finish="cabinet"]) *):active:not(:disabled) {
       translate: 0 1px;
       box-shadow: inset 0 2px 5px oklch(0.3 0.05 60 / .35);
     }
@@ -261,7 +335,7 @@
     /* ── Hero ── */
     .site-hero { padding-block-start: clamp(2.5rem, 7vh, 5rem); }
     .site-hero-grid { display: grid; grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); gap: 1.5rem clamp(1.5rem, 4vw, 4rem); align-items: end; margin-block-end: clamp(2rem, 5vh, 3.5rem); }
-    .site-lede { font-size: var(--wal-text-md); color: var(--wal-text-soft); margin: 0 0 1.4rem; max-inline-size: 44ch; }
+    .site-lede { font-size: var(--wal-text-md); color: var(--wal-text-soft); margin: 0 0 1.4rem; max-inline-size: 44ch; text-wrap: balance; }
     .site-facts { list-style: none; margin: 1.5rem 0 0; padding: 0; display: flex; flex-wrap: wrap; gap: .5rem 1.1rem; font-size: var(--wal-text-sm); color: var(--wal-text-soft); }
     .site-facts li { display: inline-flex; align-items: center; gap: .45rem; }
     .site-facts li::before { content: ""; inline-size: .6rem; aspect-ratio: 1; border-radius: 50%; background: var(--c); }
@@ -351,6 +425,21 @@
       inline-size: 10px; block-size: 20px; border-radius: 3px;
       background: var(--wal-text); border: 3px solid var(--wal-bg); cursor: ew-resize;
     }
+    /* A chroma rod draws its own track: the native one stays light grey in dark mode once
+       accent-color is set. The script writes --fill as the value moves. */
+    .site-rod input:not([data-track]) {
+      appearance: none; cursor: ew-resize; background: no-repeat center / 100% 6px
+        linear-gradient(to right, var(--wal-accent) var(--fill, 50%), var(--wal-line-input) 0);
+    }
+    .site-rod input:not([data-track])::-webkit-slider-thumb {
+      appearance: none; inline-size: 18px; block-size: 18px; border-radius: 50%;
+      background: var(--wal-accent); border: 3px solid var(--wal-bg); box-shadow: 0 0 0 1px var(--wal-line-input);
+    }
+    .site-rod input:not([data-track])::-moz-range-thumb {
+      inline-size: 12px; block-size: 12px; border-radius: 50%;
+      background: var(--wal-accent); border: 3px solid var(--wal-bg); box-shadow: 0 0 0 1px var(--wal-line-input);
+    }
+    .site-rod input:not([data-track])::-moz-range-track { background: transparent; }
     pre .k { color: var(--wal-text-muted); }
     pre b { font-weight: 500; color: var(--wal-accent-ink); }
 
@@ -410,7 +499,7 @@
     .site-drawer-name strong { font-family: var(--wal-font-display); font-stretch: 110%; font-weight: 760; font-size: clamp(1.15rem, 2vw, 1.5rem); line-height: 1.05; }
     .site-drawer-name small { color: var(--wal-text-muted); font-size: var(--wal-text-sm); line-height: 1.3; }
     .site-drawer-worn {
-      display: none; flex: none; padding: .3rem .55rem; border-radius: 2px;
+      display: none; justify-self: start; margin-block-start: .2rem; padding: .3rem .55rem; border-radius: 2px;
       font: 650 var(--wal-text-xs) / 1 var(--wal-font-body);
       color: var(--site-brass-ink); background: var(--site-brushed);
       box-shadow: inset 0 1px 0 oklch(1 0 0 / .55), 0 1px 2px oklch(0.2 0.03 50 / .3);
@@ -500,12 +589,12 @@
       border: var(--wal-hairline) solid var(--wal-line); border-radius: var(--wal-radius-lg);
       background: var(--wal-bg); color: var(--wal-text);
     }
-    .site-photo-room-top { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 1rem; align-items: center; }
+    .site-photo-room-top { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 1rem; align-items: stretch; }
     .site-photo-card { padding: 1.1rem; display: grid; gap: .7rem; align-content: start; }
     .site-photo-card h3 { margin: 0; font-size: 1.45rem; line-height: 1.05; }
     .site-photo-card p { margin: 0; font-size: var(--wal-text-sm); }
     .site-photo-results { display: grid; gap: 1.5rem; margin-block-start: clamp(2rem, 4vw, 3rem); }
-    .site-photo-msg { margin: 0; font-size: var(--wal-text-md); max-inline-size: 60ch; }
+    .site-photo-msg { margin: 0; font-size: var(--wal-text-md); max-inline-size: 60ch; text-wrap: balance; }
     .site-photo-found { margin: 0; display: grid; gap: .55rem; }
     .site-photo-found figcaption { font-size: var(--wal-text-sm); color: var(--wal-text-muted); }
     .site-photo-spectrum { display: flex; block-size: 2.5rem; overflow: hidden; border-radius: var(--wal-radius-sm); outline: 1px solid var(--wal-line); outline-offset: -1px; }
@@ -526,10 +615,10 @@
       display: inline-block; vertical-align: -.25em; inline-size: 1.9rem; block-size: 1.15rem; margin-inline-end: .5rem;
       border-radius: 2px; background: var(--c); box-shadow: inset 0 0 0 1px oklch(0 0 0 / .14);
     }
-    .site-photo-steps { margin: 0; padding-inline-start: 1.25rem; display: grid; gap: .4rem; font-size: var(--wal-text-sm); color: var(--wal-text-soft); max-inline-size: 70ch; }
+    .site-photo-steps { margin: 0; padding-inline-start: 1.25rem; list-style: decimal; display: grid; gap: .4rem; font-size: var(--wal-text-sm); color: var(--wal-text-soft); max-inline-size: 70ch; }
 
     /* ── Finishes, light and dark ── */
-    .site-finish-stage { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem; }
+    .site-finish-stage { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem; align-items: start; }
     .site-finish-stage .wal-card { display: grid; gap: .8rem; align-content: start; }
     .site-finish-stage .wal-card > :is(p, h3) { margin: 0; }
     .site-islands { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); border: var(--wal-hairline) solid var(--wal-line); border-radius: var(--wal-radius-lg); overflow: hidden; }
@@ -550,6 +639,9 @@
     /* Its links all point at this tab, so none of them is the one in view. */
     .site-nav-stage .wal-nav-links { scroll-target-group: none; }
     .site-nav-stage-body { display: grid; gap: 1.25rem; padding: clamp(1rem, 2.6vw, 1.5rem); }
+    /* Slides a card wide, not the stage wide, so the next one shows at the edge. */
+    .site-nav-stage .wal-carousel { grid-auto-columns: min(100%, 15rem); gap: .75rem; }
+    .site-nav-stage .wal-carousel > li { scroll-snap-align: start; }
     .site-slide { display: grid; gap: .6rem; padding: .75rem; border-radius: var(--wal-radius); background: var(--wal-surface); color: var(--wal-text); border: var(--wal-hairline) solid var(--wal-line); }
     .site-slide b { font-family: var(--wal-font-display); font-size: 1.1rem; }
     .site-slide small { color: var(--wal-text-muted); }
@@ -568,9 +660,14 @@
     .site-chart-top { display: flex; flex-wrap: wrap; justify-content: space-between; gap: .75rem 1rem; align-items: start; }
 
     /* Prints: walnut's .wal-duotone, matted and framed in walnut. */
-    .site-prints { display: grid; grid-template-columns: 1fr 1fr; gap: clamp(1.25rem, 3vw, 2rem); }
-    .site-print { margin: 0; display: grid; justify-items: center; gap: .8rem; }
-    .site-print:first-child { grid-row: span 2; }
+    /* The tall print's column is wider, so beside two squares it is about
+       2:3 rather than a narrow strip. */
+    .site-prints { display: grid; grid-template-columns: minmax(0, 1.45fr) minmax(0, 1fr); gap: clamp(1.25rem, 3vw, 2rem); }
+    .site-print { margin: 0; display: grid; align-content: start; justify-items: center; gap: .8rem; }
+    /* The tall print spans both rows and fills them, so its frame ends level
+       with the second square's: the photo grows to fit, not the frame. */
+    .site-print.is-tall { grid-row: span 2; grid-template-rows: minmax(0, 1fr) auto; align-content: stretch; }
+    .site-print.is-tall :is(.site-print-frame, .site-print-mat) { display: grid; }
     .site-print-frame {
       inline-size: 100%; padding: 12px; border-radius: 2px;
       background: var(--site-oiled);
@@ -578,9 +675,15 @@
     }
     .site-print-mat { padding: clamp(10px, 2vw, 20px); background: light-dark(oklch(0.975 0.004 90), oklch(0.85 0.006 90)); box-shadow: inset 0 1px 4px oklch(0.2 0.03 50 / .3); }
     .site-print-mat .wal-duotone { margin: 0; aspect-ratio: 1; }
-    .site-print:first-child .wal-duotone { aspect-ratio: 3 / 4; }
+    .site-print.is-tall .wal-duotone { aspect-ratio: auto; }
     .site-print .wal-duotone img { inline-size: 100%; block-size: 100%; object-fit: cover; }
-    .site-plaque { padding: .35rem .75rem; border-radius: 2px; font: 600 var(--wal-text-xs) / 1.2 var(--wal-font-body); }
+    /* The ink under each print: a caption, so nothing about it says press. */
+    .site-plaque {
+      display: inline-flex; align-items: center; gap: .45rem;
+      color: var(--wal-text-soft); font: 500 var(--wal-text-xs) / 1.2 var(--wal-font-label);
+      letter-spacing: var(--wal-tracking-label); text-transform: uppercase;
+    }
+    .site-plaque > i { inline-size: .55rem; aspect-ratio: 1; border-radius: 50%; background: var(--c); box-shadow: inset 0 0 0 1px oklch(0 0 0 / .12); }
     .site-duo { display: grid; grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); gap: clamp(1.5rem, 4vw, 3rem); align-items: start; }
 
     /* ── Motion ── */
@@ -589,21 +692,23 @@
     .site-chest-body { padding: .25rem 1.25rem 1.25rem; color: var(--wal-text-soft); font-size: var(--wal-text-sm); }
     .site-chest-body p { margin: 0; }
     .site-open-card {
-      display: grid; grid-template-columns: 8.5rem minmax(0, 1fr); gap: 1rem; align-items: center;
-      inline-size: min(100%, 27rem); padding: .75rem; text-align: start; cursor: pointer;
+      display: grid; grid-template-columns: 8.5rem minmax(0, 1fr) auto; gap: 1rem; align-items: center;
+      inline-size: min(100%, 34rem); padding: .75rem; text-align: start; cursor: pointer;
       font: inherit; color: var(--wal-text); background: var(--wal-surface);
       border: var(--wal-hairline) solid var(--wal-line); border-radius: var(--wal-radius);
       transition: border-color var(--wal-duration) var(--wal-ease), box-shadow var(--wal-duration) var(--wal-ease);
     }
     .site-open-card:hover { border-color: var(--wal-accent); box-shadow: var(--wal-shadow-sm); }
+    .site-open-card::after { content: "92" / ""; padding-inline-end: .5rem; font-size: 1.25rem; color: var(--wal-text-muted); transition: translate var(--wal-duration) var(--wal-ease), color var(--wal-duration) var(--wal-ease); }
+    .site-open-card:hover::after { translate: .25rem 0; color: var(--wal-accent-ink); }
     .site-open-card b { display: block; font-family: var(--wal-font-display); font-size: 1.15rem; }
     .site-open-card small { color: var(--wal-text-muted); font-size: var(--wal-text-sm); }
     .site-open-card .site-plate { inline-size: 100%; }
     .site-materials { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1rem; }
     .site-materials > div { display: grid; gap: .6rem; align-content: start; }
-    .site-materials h4 { margin: 0; font-family: var(--wal-font-display); font-size: 1.05rem; }
-    .site-materials h4 small { display: block; font-family: var(--wal-font-body); font-weight: 400; font-size: var(--wal-text-sm); color: var(--wal-text-muted); }
-    .site-mats { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: .7rem; justify-self: stretch; }
+    .site-materials h3 { margin: 0; font-family: var(--wal-font-display); font-size: 1.05rem; }
+    .site-materials h3 small { display: block; font-family: var(--wal-font-body); font-weight: 400; font-size: var(--wal-text-sm); color: var(--wal-text-muted); }
+    .site-mats { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: .7rem; align-content: start; justify-self: stretch; }
     .site-mat { display: grid; gap: .3rem; padding: .55rem; border-radius: var(--wal-radius); background: var(--wal-surface); border: var(--wal-hairline) solid var(--wal-line); }
     .site-mat i { display: block; aspect-ratio: 4 / 3; border-radius: var(--wal-radius-sm); background: var(--c); box-shadow: inset 0 0 0 1px oklch(0 0 0 / .1); }
     .site-mat b { font-size: var(--wal-text-sm); }
@@ -616,6 +721,7 @@
     /* A page, not a centred panel: block layout, and none of the window's
        centring, which current browsers apply to blocks too. */
     .site-room[open] { display: block; place-items: normal; }
+    .site-room .wal-plate:has(> :nth-child(4):last-child) { grid-template-columns: repeat(2, minmax(0, 1fr)); }
     .site-room-bar {
       position: sticky; top: 0; z-index: 2; display: flex; flex-wrap: wrap; align-items: center; gap: .5rem 1rem;
       padding: .75rem var(--site-gutter);
@@ -638,13 +744,13 @@
     .site-swaps h3 { margin: 0; font-size: 1.1rem; }
     .site-swaps p { grid-column: 1 / -1; margin: 0; color: var(--wal-text-soft); font-size: var(--wal-text-sm); }
     .site-swaps s { color: var(--wal-text-muted); }
-    .site-sheet { display: grid; gap: .6rem; padding: clamp(1.1rem, 2.6vw, 1.5rem); border: var(--wal-hairline) solid var(--wal-line); border-radius: var(--wal-radius); background: var(--wal-surface); color: var(--wal-text); }
+    .site-sheet { min-inline-size: 0; display: grid; gap: .6rem; padding: clamp(1.1rem, 2.6vw, 1.5rem); border: var(--wal-hairline) solid var(--wal-line); border-radius: var(--wal-radius); background: var(--wal-surface); color: var(--wal-text); }
     .site-sheet > :is(p, h3) { margin: 0; }
     .site-sheet.is-paper { border-radius: 2px; background: oklch(0.995 0.003 90); color: oklch(0.22 0.01 250); font-family: var(--wal-font-serif, Georgia, serif); box-shadow: 0 14px 30px -16px oklch(0.2 0.03 50 / .45); }
     .site-sheet.is-paper h3 { font-family: var(--wal-font-serif, Georgia, serif); font-weight: 700; font-size: 1.6rem; }
     .site-sheet-run { display: flex; justify-content: space-between; gap: 1rem; padding-block-end: .5rem; border-block-end: 1px solid oklch(0.85 0 0); font: 400 .72rem / 1.3 var(--wal-font-mono); color: oklch(0.45 0 0); }
-    .site-sheet-run.is-foot { padding-block: .5rem 0; border-block: 1px solid oklch(0.85 0 0) 0; border-block-end: 0; margin-block-start: .5rem; }
-    .site-sheet-url { font: 400 .8em var(--wal-font-mono); color: oklch(0.45 0 0); }
+    .site-sheet-run.is-foot { padding-block: .5rem 0; border-block: 1px solid oklch(0.85 0 0); border-block-end: 0; margin-block-start: .5rem; }
+    .site-sheet-url { font: 400 .8em var(--wal-font-mono); color: oklch(0.45 0 0); overflow-wrap: anywhere; }
     .site-sheet-cues { display: flex; gap: 4px; }
     .site-sheet-cues i { inline-size: 1.75rem; block-size: .7rem; background: var(--c); }
 
@@ -652,7 +758,7 @@
     .site-fit { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 1rem; }
     .site-fit > div { display: grid; gap: .8rem; align-content: start; }
     .site-fit h3 { margin: 0; font-size: 1.25rem; }
-    .site-fit ul { margin: 0; padding-inline-start: 1.15rem; display: grid; gap: .5rem; color: var(--wal-text-soft); }
+    .site-fit ul { margin: 0; padding-inline-start: 1.15rem; display: grid; gap: .5rem; color: var(--wal-text-soft); list-style: disc; }
     .site-fit .is-good { box-shadow: inset 0 3px 0 var(--wal-olive); }
     .site-floor { margin: 1.5rem 0 0; font-size: var(--wal-text-sm); color: var(--wal-text-muted); }
 
@@ -672,6 +778,7 @@
     .site-steps p { color: var(--wal-text-soft); }
     .site-table-scroll { overflow-x: auto; }
     .site-table-scroll code { white-space: nowrap; }
+    .site-table-scroll:focus-visible, .site-photo-read-wrap:focus-visible { outline: 2px solid var(--wal-accent); outline-offset: 2px; }
     .site-files { margin-block-start: clamp(2.5rem, 5vw, 3.5rem); display: grid; gap: .9rem; }
     .site-files h3 { margin: 0; font-size: 1.3rem; }
 
@@ -679,7 +786,14 @@
     .site-ref-search { display: grid; gap: .4rem; max-inline-size: 30rem; margin-block: clamp(2.5rem, 5vw, 3.5rem) 1rem; }
     .site-ref-search p { margin: 0; min-block-size: 1.4em; }
     .site-reference { border: var(--wal-hairline) solid var(--wal-line); border-radius: var(--wal-radius-lg); background: var(--wal-surface); color: var(--wal-text); }
-    .site-reference > summary { display: flex; flex-wrap: wrap; align-items: baseline; gap: .4rem 1rem; padding: 1.1rem 1.25rem; cursor: pointer; }
+    .site-reference > summary { position: relative; display: flex; flex-wrap: wrap; align-items: baseline; gap: .4rem 1rem; padding: 1.1rem 3.5rem 1.1rem 1.25rem; cursor: pointer; }
+    /* A flex summary has no marker of its own, so a chevron says it opens. */
+    .site-reference > summary::after {
+      content: ""; position: absolute; inset-inline-end: 1.5rem; inset-block-start: 50%; inline-size: .55rem; block-size: .55rem;
+      border: solid var(--wal-text-muted); border-width: 0 2px 2px 0; translate: 0 -75%; rotate: 45deg; transition: rotate .2s var(--wal-ease-glide), translate .2s var(--wal-ease-glide);
+    }
+    .site-reference[open] > summary::after { translate: 0 -25%; rotate: 225deg; }
+    .site-reference > summary:hover::after { border-color: var(--wal-text); }
     .site-reference > summary b { font-family: var(--wal-font-display); font-stretch: 108%; font-size: 1.35rem; }
     .site-reference > summary small { color: var(--wal-text-muted); font-size: var(--wal-text-sm); }
     .site-ref-body { display: grid; gap: 2.25rem; padding: .5rem 1.25rem 1.75rem; }
@@ -687,14 +801,19 @@
     .site-ref-item > :is(h3, p, ul) { margin: 0; }
     .site-ref-item h3 { font-size: 1.2rem; }
     .site-ref-item p, .site-ref-item ul { color: var(--wal-text-soft); font-size: var(--wal-text-sm); max-inline-size: 72ch; }
-    .site-ref-item ul { padding-inline-start: 1.15rem; display: grid; gap: .4rem; }
+    .site-ref-item ul { padding-inline-start: 1.15rem; display: grid; gap: .4rem; list-style: disc; }
+    /* walnut's reset takes list markers off; these lists keep theirs, in a quieter colour. */
+    :is(.site-photo-steps, .site-fit ul, .site-ref-item ul) > li::marker { color: var(--wal-text-muted); }
 
     .site-foot { padding-block: 3rem; border-block-start: var(--wal-border); }
     .site-foot .site-wrap { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 1rem; color: var(--wal-text-muted); font-size: var(--wal-text-sm); }
     .site-foot nav { display: flex; gap: 1.25rem; }
 
     /* ── Doors, the dialog and the popovers ── */
-    .site-door-head { display: flex; justify-content: space-between; align-items: center; gap: 1rem; }
+    .site-door-head { display: flex; flex-wrap: wrap; align-items: center; gap: .5rem 1rem; }
+    .site-door-head > button { margin-inline-start: auto; }
+    /* The page behind a modal doesn't scroll; the gutter is kept so nothing shifts. */
+    :root:has(dialog:modal) { overflow: hidden; scrollbar-gutter: stable; }
     .site-door-head h2 { font-size: clamp(1.6rem, 3vw, 2rem); }
     .site-door-in { display: grid; gap: 1.1rem; align-content: start; }
     .site-door-in > :is(p, h3) { margin: 0; }
@@ -717,11 +836,16 @@
     .site-dialog-in { display: grid; gap: 1rem; }
     .site-dialog-in > :is(h2, p) { margin: 0; }
     .site-dialog-in h2 { font-size: 1.6rem; }
-    .site-pop { display: grid; gap: .6rem; max-inline-size: 20rem; }
-    .site-pop > :is(h4, p) { margin: 0; }
+    /* Grid only while open: a display set on the closed popover would beat
+       the browser's display: none and leave it, invisible, over the page. */
+    .site-pop { gap: .6rem; max-inline-size: 20rem; }
+    .site-pop:popover-open { display: grid; }
+    .site-pop > p { margin: 0; }
+    .site-pop-title { font: 700 var(--wal-text-md) / 1.2 var(--wal-font-display); }
     .site-gatefold-art { display: grid; place-items: center; inline-size: 100%; block-size: 100%; background: radial-gradient(95% 80% at 50% 26%, var(--wal-surface), var(--wal-bg) 74%); }
     .site-gatefold-art svg { inline-size: 86%; }
-    .site-gatefold-notes { display: grid; gap: 1rem; align-content: start; padding: clamp(1.25rem, 3vw, 2rem); }
+    .site-gatefold-notes { display: grid; gap: 1rem; align-content: center; min-block-size: 100%; padding: clamp(1.25rem, 3vw, 2rem); }
+    .site-gatefold-notes > .site-actions { margin-block-start: .5rem; }
     .site-gatefold-notes > :is(h2, p) { margin: 0; }
 
     /* ── Reveals: each tile once, as it arrives ── */
@@ -732,26 +856,63 @@
 
     @media (max-width: 900px) {
       .site-hero-grid, .site-split, .site-split.is-even, .site-product, .site-post, .site-booking, .site-dash-charts,
-      .site-photo, .site-drawer-in, .site-duo, .site-act-grid, .site-kit, .site-fit { grid-template-columns: minmax(0, 1fr); }
-      .site-cues { grid-template-columns: repeat(auto-fill, minmax(9rem, 1fr)); }
+      .site-photo, .site-drawer-in, .site-duo, .site-act-grid, .site-kit { grid-template-columns: minmax(0, 1fr); }
       .site-chart-card, .site-chart-card.is-5 { grid-column: 1 / -1; }
       .site-mats { grid-template-columns: repeat(3, minmax(0, 1fr)); }
     }
+    @media (max-width: 700px) {
+      .site-fit { grid-template-columns: minmax(0, 1fr); }
+    }
+    /* Five cues stay in a row while each has 6.5rem; narrower, two to a row and the fifth across both. */
+    @media (max-width: 620px) {
+      .site-cues { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .site-cues > li:last-child { grid-column: 1 / -1; }
+    }
     @media (max-width: 560px) {
+      /* Closer cells, so a table's columns fit a phone. */
+      .site-table-scroll .wal-table :is(th, td) { padding-inline: .6rem; }
+      .site-ref-body { padding-inline: .9rem; }
+      .site-reference > summary { padding-inline-start: .9rem; }
+      /* A spec's number stays with its unit. */
+      .wal-plate dd { white-space: nowrap; }
       .site-rods, .site-picks, .site-finish-stage, .site-islands, .site-materials, .site-photo-room-top, .site-codebox { grid-template-columns: minmax(0, 1fr); }
       .site-metrics { grid-template-columns: minmax(0, 1fr); }
       .site-mats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
       .site-ramp-labels { display: none; }
-      .site-prints { grid-template-columns: minmax(0, 1fr); }
-      .site-print:first-child { grid-row: auto; }
-      .site-open-card { grid-template-columns: 6rem minmax(0, 1fr); }
+      /* On a phone: the tall print turns wide across the top, the squares
+         sit side by side under it. */
+      .site-prints { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+      .site-print.is-tall { grid-column: 1 / -1; grid-row: auto; grid-template-rows: auto auto; }
+      .site-print.is-tall .wal-duotone { aspect-ratio: 4 / 3; }
+      .site-print-frame { padding: 8px; }
+      .site-print-mat { padding: 8px; }
+      .site-open-card { grid-template-columns: 6rem minmax(0, 1fr) auto; }
       .site-spec > div { grid-template-columns: minmax(0, 1fr); gap: .3rem; }
       .site-schedule tbody th small { display: block; margin: .2rem 0 0 2.65rem; }
+    }
+
+    /* ── Focus, and forced colours ──
+       A segmented row clips its edges, so its ring sits inside the button.
+       A pressed pick already wears an outline, so focus wears a stronger
+       one. The full-page view fills the screen, so its ring sits inside. */
+    .site-seg button:focus-visible { outline-offset: -4px; }
+    :is(.site-photo-pick, .site-pick):focus-visible { outline: 3px solid var(--wal-accent); outline-offset: 4px; }
+    .site-room:focus-visible { outline-offset: -6px; }
+    @media (forced-colors: active) {
+      /* Shadows aren't drawn here, so each button keeps a border of its own. */
+      .site-seg { gap: 2px; border: 0; }
+      .site-seg button { border: 1px solid ButtonText; }
+      .site-seg button[aria-pressed="true"] { forced-color-adjust: none; background: Highlight; color: HighlightText; }
+      /* Colour is the content here: the swatches, ramps and dots stay. */
+      .site-ramp li, .site-sw, .site-dots > i, .site-seg button > i, .site-plaque > i, .site-rod input[data-track] { forced-color-adjust: none; }
+      .site-rod input:not([data-track]) { appearance: auto; background: none; }
     }
 
     @media print {
       .site-nav, .site-desk .wal-tablist, .site-actions, .site-ref-search, .site-code > summary { display: none; }
       .site-code > pre { display: block; }
+      /* Tiles that never scrolled into view still print. */
+      .site-js .site-reveal { opacity: 1; translate: none; transition: none; }
     }
   </style>
 </head>
@@ -831,13 +992,13 @@
       <div class="site-wrap site-hero-grid">
         <h1 id="top-h">Theme a whole site from eight numbers.</h1>
         <div>
-          <p class="site-lede">walnut.css is a CSS framework under 18 KB gzipped, with components, charts and dark mode built in. Set a hue and chroma for four colours and walnut derives the rest.</p>
+          <p class="site-lede">walnut.css is a CSS framework under 18&nbsp;KB gzipped, with components, charts and dark mode built in. Set a hue and chroma for the ground and three colours, and walnut derives the rest.</p>
           <div class="site-actions">
             <a class="wal-btn wal-btn-primary" href="#start">Get started</a>
             <button class="wal-btn wal-btn-secondary" type="button" data-roll>Random palette</button>
           </div>
           <ul class="site-facts" aria-label="At a glance">
-            <li data-cue="accent">Under 18 KB gzipped</li>
+            <li data-cue="accent">Under 18&nbsp;KB gzipped</li>
             <li data-cue="bloom">No build step</li>
             <li data-cue="gold">Light and dark</li>
             <li data-cue="olive">AA contrast</li>
@@ -856,7 +1017,7 @@
                 <figure class="site-plate"><svg viewBox="0 0 400 260" role="img" aria-label="A walnut sideboard with five coloured tambour doors, brass pulls and tapered legs"><use href="#sideboard"/></svg></figure>
                 <div class="site-info">
                   <p class="wal-eyebrow">Plate 14</p>
-                  <h3 class="site-big">Walnut sideboard</h3>
+                  <p class="site-big">Walnut sideboard</p>
                   <p class="site-soft">Tambour doors, brass pulls and tapered legs.</p>
                   <div class="site-badges"><span class="wal-badge wal-badge-olive">In stock</span><span class="wal-badge wal-badge-gold">Model 211</span></div>
                   <dl class="wal-plate">
@@ -865,7 +1026,7 @@
                     <div><dt>Height</dt><dd>72 cm</dd></div>
                   </dl>
                   <div class="site-actions">
-                    <button class="wal-btn wal-btn-primary" type="button" commandfor="demo-dialog" command="show-modal">Order a sample</button>
+                    <button class="wal-btn wal-btn-primary" type="button" commandfor="demo-dialog" command="show-modal">Reserve a sample</button>
                     <button class="wal-btn wal-btn-ghost" type="button" data-room-open>Open full page</button>
                   </div>
                 </div>
@@ -873,7 +1034,7 @@
             </section>
 
             <section data-tab="Dashboard" id="preview-dashboard">
-              <div class="site-dash-head"><h3 class="site-big">Shop overview</h3><span class="wal-badge wal-badge-cool">Example data</span></div>
+              <div class="site-dash-head"><p class="site-big">Shop overview</p><span class="wal-badge wal-badge-cool">Example data</span></div>
               <div class="site-metrics">
                 <div class="wal-metric" style="--wal-metric-color: var(--wal-olive)"><span class="wal-metric-value">7,140</span><span class="wal-metric-label">Visitors this month</span><span class="site-delta" data-cue="olive">Up 12%</span></div>
                 <div class="wal-metric" style="--wal-metric-color: var(--wal-olive)"><span class="wal-metric-value">312</span><span class="wal-metric-label">Orders</span><span class="site-delta" data-cue="olive">Up 4%</span></div>
@@ -903,7 +1064,7 @@
                 <figure class="wal-duotone" data-ink="accent"><img src="https://picsum.photos/id/1015/900/675" width="900" height="675" alt="A river valley between mountains" loading="lazy" decoding="async" referrerpolicy="no-referrer"></figure>
                 <div class="site-info">
                   <p class="wal-eyebrow">Restoration notes</p>
-                  <h3 class="site-big">Bringing back the colour of a 35mm print</h3>
+                  <p class="site-big">Bringing back the colour of a 35mm print</p>
                   <p class="site-byline">Ines Marlow, March 2026</p>
                   <p class="site-soft">The negative had faded to magenta. We rebuilt each reel's colour from the one frame that kept its blues.</p>
                   <div class="site-badges"><span class="wal-badge wal-badge-bloom">Film</span><span class="wal-badge wal-badge-cool">Archive</span></div>
@@ -915,7 +1076,7 @@
               <div class="site-booking">
                 <div class="site-info">
                   <p class="wal-eyebrow">Tonight, Screen 2, 21:15</p>
-                  <h3 class="site-big">The Long Field</h3>
+                  <p class="site-big">The Long Field</p>
                   <p class="site-soft">A restored 35mm print, followed by a Q&amp;A with the restorer.</p>
                   <dl class="wal-plate">
                     <div><dt>Runtime</dt><dd>112 min</dd></div>
@@ -928,7 +1089,7 @@
                   <div class="wal-field"><label class="wal-label" for="bf-seats">Seats</label><select class="wal-input" id="bf-seats"><option>1</option><option selected>2</option><option>3</option><option>4</option></select></div>
                   <label class="wal-label"><input class="wal-check" type="checkbox" checked> Send me the programme</label>
                   <button class="wal-btn wal-btn-primary" type="submit">Book seats</button>
-                  <p class="site-done" id="book-done" role="status" hidden></p>
+                  <p class="site-done" id="book-done" hidden></p>
                 </form>
               </div>
             </section>
@@ -945,52 +1106,52 @@
           <p>Everything is CSS. Optional scripts add tabs, dragging and scroll effects.</p>
         </div>
         <ul class="site-features">
-          <li class="site-reveal" style="--i: 0"><a href="#theming-your-palette">
+          <li class="site-reveal" style="--i: 0"><a href="#theming-your-palette" aria-labelledby="feat-1-h" aria-describedby="feat-1-p">
             <svg class="site-glyph" viewBox="0 0 44 32" aria-hidden="true"><circle cx="5" cy="16" r="4.2" style="fill: var(--wal-accent)"/><circle cx="13.5" cy="16" r="4.2" style="fill: var(--wal-bloom)"/><circle cx="22" cy="16" r="4.2" style="fill: var(--wal-gold)"/><circle cx="30.5" cy="16" r="4.2" style="fill: var(--wal-olive)"/><circle cx="39" cy="16" r="4.2" style="fill: var(--wal-cool)"/></svg>
-            <h3>Theming</h3>
-            <p>Set a hue and chroma for four colours. walnut derives the rest.</p>
+            <h3 id="feat-1-h">Theming</h3>
+            <p id="feat-1-p">Set a hue and chroma for the ground and three colours. walnut derives the rest.</p>
             <div class="site-badges"><span class="wal-badge wal-badge-olive">CSS only</span></div>
           </a></li>
-          <li class="site-reveal" style="--i: 1"><a href="#theming-light-and-dark">
+          <li class="site-reveal" style="--i: 1"><a href="#theming-light-and-dark" aria-labelledby="feat-2-h" aria-describedby="feat-2-p">
             <svg class="site-glyph" viewBox="0 0 44 32" aria-hidden="true"><rect x="2" y="4" width="20" height="24" rx="4" style="fill: var(--wal-surface-2)"/><rect x="22" y="4" width="20" height="24" rx="4" style="fill: var(--wal-text)"/><circle cx="12" cy="16" r="5" style="fill: var(--wal-accent)"/><circle cx="32" cy="16" r="5" style="fill: var(--wal-accent)"/></svg>
-            <h3>Light and dark</h3>
-            <p>Each token defines both modes. Any section can switch to the other.</p>
+            <h3 id="feat-2-h">Light and dark</h3>
+            <p id="feat-2-p">Each token defines both modes. Any section can switch to the other.</p>
             <div class="site-badges"><span class="wal-badge wal-badge-olive">CSS only</span></div>
           </a></li>
-          <li class="site-reveal" style="--i: 2"><a href="#components-any-colour">
+          <li class="site-reveal" style="--i: 2"><a href="#components-any-colour" aria-labelledby="feat-3-h" aria-describedby="feat-3-p">
             <svg class="site-glyph" viewBox="0 0 44 32" aria-hidden="true"><rect x="2" y="6" width="40" height="20" rx="10" style="fill: #f5d90a"/><text x="22" y="21" text-anchor="middle" font-size="12" font-weight="700" font-family="system-ui" style="fill: #3a3200">Aa</text></svg>
-            <h3>Any-colour labels</h3>
-            <p>Pass in any colour and walnut picks readable text for it.</p>
+            <h3 id="feat-3-h">Any-colour labels</h3>
+            <p id="feat-3-p">Pass in any colour and walnut picks readable text for it.</p>
             <div class="site-badges"><span class="wal-badge wal-badge-olive">CSS only</span></div>
           </a></li>
-          <li class="site-reveal" style="--i: 3"><a href="#components-basics">
+          <li class="site-reveal" style="--i: 3"><a href="#components-basics" aria-labelledby="feat-4-h" aria-describedby="feat-4-p">
             <svg class="site-glyph" viewBox="0 0 44 32" aria-hidden="true"><rect x="2" y="8" width="26" height="16" rx="5" style="fill: var(--wal-accent)"/><rect x="31" y="8" width="11" height="16" rx="5" style="fill: none; stroke: var(--wal-line-input); stroke-width: 2"/></svg>
-            <h3>Components</h3>
-            <p>Buttons, fields, cards, tabs, dialogs, popovers, menus, select and carousel.</p>
+            <h3 id="feat-4-h">Components</h3>
+            <p id="feat-4-p">Buttons, fields, cards, tabs, dialogs, popovers, menus, select and carousel.</p>
             <div class="site-badges"><span class="wal-badge wal-badge-olive">CSS only</span><span class="wal-badge wal-badge-gold">Optional script</span></div>
           </a></li>
-          <li class="site-reveal" style="--i: 4"><a href="#charts">
+          <li class="site-reveal" style="--i: 4"><a href="#charts" aria-labelledby="feat-5-h" aria-describedby="feat-5-p">
             <svg class="site-glyph" viewBox="0 0 44 32" aria-hidden="true"><rect x="4" y="14" width="7" height="14" rx="1" style="fill: var(--wal-accent)"/><rect x="14" y="8" width="7" height="20" rx="1" style="fill: var(--wal-bloom)"/><rect x="24" y="4" width="7" height="24" rx="1" style="fill: var(--wal-gold)"/><rect x="2" y="28" width="32" height="2.5" style="fill: var(--site-brass)"/></svg>
-            <h3>Charts</h3>
-            <p>Column and ring charts written as HTML lists. No charting library.</p>
+            <h3 id="feat-5-h">Charts</h3>
+            <p id="feat-5-p">A column chart written as an HTML list, and a ring chart set by two numbers. No charting library.</p>
             <div class="site-badges"><span class="wal-badge wal-badge-olive">CSS only</span></div>
           </a></li>
-          <li class="site-reveal" style="--i: 5"><a href="#charts-photos">
+          <li class="site-reveal" style="--i: 5"><a href="#charts-photos" aria-labelledby="feat-6-h" aria-describedby="feat-6-p">
             <svg class="site-glyph" viewBox="0 0 44 32" aria-hidden="true"><rect x="2" y="3" width="40" height="26" rx="4" style="fill: var(--wal-cool)"/><path d="M2 24 14 14l8 7 8-9 12 12v1a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4z" style="fill: var(--wal-bg)"/></svg>
-            <h3>Duotone photos</h3>
-            <p>Tint any photo with a palette colour using CSS.</p>
+            <h3 id="feat-6-h">Duotone photos</h3>
+            <p id="feat-6-p">Tint any photo with a palette colour using CSS.</p>
             <div class="site-badges"><span class="wal-badge wal-badge-olive">CSS only</span></div>
           </a></li>
-          <li class="site-reveal" style="--i: 6"><a href="#motion">
+          <li class="site-reveal" style="--i: 6"><a href="#motion" aria-labelledby="feat-7-h" aria-describedby="feat-7-p">
             <svg class="site-glyph" viewBox="0 0 44 32" aria-hidden="true"><rect x="4" y="3" width="36" height="8" rx="2" style="fill: var(--wal-surface-2)"/><rect x="8" y="12" width="36" height="8" rx="2" style="fill: var(--wal-accent-soft); stroke: var(--wal-accent)"/><rect x="4" y="21" width="36" height="8" rx="2" style="fill: var(--wal-surface-2)"/><rect x="22" y="15" width="10" height="2.5" rx="1.2" style="fill: var(--site-brass)"/></svg>
-            <h3>Motion</h3>
-            <p>Accordions, side panels and full-page views built on details and dialog.</p>
+            <h3 id="feat-7-h">Motion</h3>
+            <p id="feat-7-p">Accordions, side panels and full-page views built on details and dialog.</p>
             <div class="site-badges"><span class="wal-badge wal-badge-olive">CSS only</span><span class="wal-badge wal-badge-gold">Optional script</span></div>
           </a></li>
-          <li class="site-reveal" style="--i: 7"><a href="#browser-print">
+          <li class="site-reveal" style="--i: 7"><a href="#browser-print" aria-labelledby="feat-8-h" aria-describedby="feat-8-p">
             <svg class="site-glyph" viewBox="0 0 44 32" aria-hidden="true"><path d="M10 2h18l7 7v21H10z" style="fill: var(--wal-surface); stroke: var(--wal-line-input); stroke-width: 1.5"/><path d="M28 2v7h7" style="fill: none; stroke: var(--wal-line-input); stroke-width: 1.5"/><rect x="14" y="13" width="16" height="2" style="fill: var(--wal-text-muted)"/><rect x="14" y="18" width="12" height="2" style="fill: var(--wal-text-muted)"/><rect x="14" y="23" width="8" height="2" style="fill: var(--wal-accent)"/></svg>
-            <h3>Print styles</h3>
-            <p>Printed pages show link addresses and sheet numbers. Nothing to add.</p>
+            <h3 id="feat-8-h">Print styles</h3>
+            <p id="feat-8-p">Printed pages show link addresses and sheet numbers. Nothing to add.</p>
             <div class="site-badges"><span class="wal-badge wal-badge-olive">CSS only</span></div>
           </a></li>
         </ul>
@@ -1002,7 +1163,7 @@
       <div class="site-wrap">
         <div class="site-head">
           <h2 id="theming-h">Theming</h2>
-          <p>You set a hue and chroma for the ground, accent, gold and olive. Bloom and cool are calculated from the accent.</p>
+          <p>You set a hue and chroma for the ground, accent, gold and olive. Bloom and cool take their hue from the accent, and their chroma can be set too.</p>
           <div class="site-actions"><button class="wal-btn wal-btn-secondary wal-btn-sm" type="button" commandfor="how-colours" command="show-modal">How colours are derived</button></div>
         </div>
 
@@ -1024,7 +1185,7 @@
                 <div class="site-ramp-labels" aria-hidden="true"><span>bg</span><span>bg-subtle</span><span>surface</span><span>surface-2</span><span>line-soft</span><span>line</span><span>text-muted</span><span>text-soft</span><span>text</span></div>
               </div>
               <div class="site-split is-even">
-                <div class="site-codebox"><pre class="site-live" data-live-css aria-label="Your palette as CSS"></pre><button class="wal-btn wal-btn-secondary wal-btn-sm" type="button" data-copy-live>Copy</button></div>
+                <div class="site-codebox" role="group" aria-label="Your palette as CSS"><pre data-live-css></pre><button class="wal-btn wal-btn-secondary wal-btn-sm" type="button" data-copy-live aria-label="Copy palette CSS">Copy</button></div>
                 <div class="site-stack">
                   <p class="site-soft">Neutrals are the ground hue at nine lightness steps. Paste this block after walnut.css to use the palette. The number under each colour is its lowest text contrast in light and dark, and it updates as you edit.</p>
                   <div class="site-actions"><button class="wal-btn wal-btn-primary" type="button" commandfor="palette-panel" command="show-modal">Edit palette</button><button class="wal-btn wal-btn-secondary" type="button" data-roll>Random palette</button></div>
@@ -1036,28 +1197,28 @@
           <section data-tab="Shipped palettes" id="theming-shipped">
             <div class="site-stack">
               <div class="site-split">
-                <p class="site-soft">Five palettes ship with walnut. Add the theme file and put its class on the page or on a section. Prairie is this site's own. Open a drawer to see a palette's numbers and contrast, then use it on this page.</p>
+                <p class="site-soft">Five palettes ship with walnut. Add the theme file and put its class on the page or on a section. Prairie is this site's own. Open a palette below to see its numbers and contrast, then use it on this page.</p>
                 <pre>&lt;link rel="stylesheet" href="…/themes/forest.css"&gt;
 &lt;html class="wal-forest"&gt;</pre>
               </div>
               <div class="wal-chest site-chest" data-wal-material="walnut">
                 <details class="site-drawer wal-palette site-prairie" name="colourway" id="palette-prairie" data-room="site-prairie">
-                  <summary><span class="site-plate" aria-hidden="true"><svg viewBox="0 0 400 260"><use href="#sideboard"/></svg></span><span class="site-drawer-name"><strong>Prairie</strong><small>Made for this page</small></span><span class="site-drawer-worn">On this page</span></summary>
+                  <summary><span class="site-plate" aria-hidden="true"><svg viewBox="0 0 400 260"><use href="#sideboard"/></svg></span><span class="site-drawer-name"><strong>Prairie</strong><small>Made for this page</small><span class="site-drawer-worn">On this page</span></span></summary>
                 </details>
                 <details class="site-drawer wal-palette wal-forest" name="colourway" id="palette-forest" data-room="wal-forest">
-                  <summary><span class="site-plate" aria-hidden="true"><svg viewBox="0 0 400 260"><use href="#sideboard"/></svg></span><span class="site-drawer-name"><strong>Forest</strong><small>Fern and campfire copper</small></span><span class="site-drawer-worn">On this page</span></summary>
+                  <summary><span class="site-plate" aria-hidden="true"><svg viewBox="0 0 400 260"><use href="#sideboard"/></svg></span><span class="site-drawer-name"><strong>Forest</strong><small>Green, with a copper bloom</small><span class="site-drawer-worn">On this page</span></span></summary>
                 </details>
                 <details class="site-drawer wal-palette wal-bone" name="colourway" id="palette-bone" data-room="wal-bone">
-                  <summary><span class="site-plate" aria-hidden="true"><svg viewBox="0 0 400 260"><use href="#sideboard"/></svg></span><span class="site-drawer-name"><strong>Bone</strong><small>Washi tape and pressed flowers</small></span><span class="site-drawer-worn">On this page</span></summary>
+                  <summary><span class="site-plate" aria-hidden="true"><svg viewBox="0 0 400 260"><use href="#sideboard"/></svg></span><span class="site-drawer-name"><strong>Bone</strong><small>Blue on a warm, light ground</small><span class="site-drawer-worn">On this page</span></span></summary>
                 </details>
                 <details class="site-drawer wal-palette wal-cafe" name="colourway" id="palette-cafe" data-room="wal-cafe">
-                  <summary><span class="site-plate" aria-hidden="true"><svg viewBox="0 0 400 260"><use href="#sideboard"/></svg></span><span class="site-drawer-name"><strong>Café</strong><small>China blue and brass</small></span><span class="site-drawer-worn">On this page</span></summary>
+                  <summary><span class="site-plate" aria-hidden="true"><svg viewBox="0 0 400 260"><use href="#sideboard"/></svg></span><span class="site-drawer-name"><strong>Café</strong><small>Blue on a warm amber ground</small><span class="site-drawer-worn">On this page</span></span></summary>
                 </details>
                 <details class="site-drawer wal-palette wal-dusk" name="colourway" id="palette-dusk" data-room="wal-dusk">
-                  <summary><span class="site-plate" aria-hidden="true"><svg viewBox="0 0 400 260"><use href="#sideboard"/></svg></span><span class="site-drawer-name"><strong>Dusk</strong><small>Twilight and lantern glow</small></span><span class="site-drawer-worn">On this page</span></summary>
+                  <summary><span class="site-plate" aria-hidden="true"><svg viewBox="0 0 400 260"><use href="#sideboard"/></svg></span><span class="site-drawer-name"><strong>Dusk</strong><small>Violet on a violet-grey ground</small><span class="site-drawer-worn">On this page</span></span></summary>
                 </details>
                 <details class="site-drawer wal-palette wal-press" name="colourway" id="palette-press" data-room="wal-press">
-                  <summary><span class="site-plate" aria-hidden="true"><svg viewBox="0 0 400 260"><use href="#sideboard"/></svg></span><span class="site-drawer-name"><strong>Press</strong><small>Tomato on paper stock</small></span><span class="site-drawer-worn">On this page</span></summary>
+                  <summary><span class="site-plate" aria-hidden="true"><svg viewBox="0 0 400 260"><use href="#sideboard"/></svg></span><span class="site-drawer-name"><strong>Press</strong><small>Red-orange on a warm, light ground</small><span class="site-drawer-worn">On this page</span></span></summary>
                 </details>
               </div>
               <template id="drawer-in">
@@ -1075,7 +1236,7 @@
                     <p data-pass></p>
                     <div class="site-codebox">
                       <pre data-css></pre>
-                      <button class="wal-btn wal-btn-secondary wal-btn-sm" type="button" data-copy>Copy</button>
+                      <button class="wal-btn wal-btn-secondary wal-btn-sm" type="button" data-copy aria-label="Copy theme CSS">Copy</button>
                     </div>
                   </div>
                 </div>
@@ -1085,17 +1246,17 @@
 
           <section data-tab="From a photo" id="theming-photo">
             <div class="site-stack">
-              <p class="site-soft">Choose a photo or use your own. Its colours become walnut's numbers, adjusted so every text colour passes AA in light and dark, ready to paste. The photo is read in this tab and never uploaded.</p>
+              <p class="site-soft">Choose a photo or use your own. Its colours become walnut's numbers, ready to paste, with lightness adjusted until the text pairs pass AA where they can. The photo is read in this tab and never uploaded.</p>
               <div class="site-photo">
                 <div class="site-photo-in">
                   <div class="site-photo-picks" role="group" aria-label="Read a palette from">
-                    <button class="site-photo-pick" type="button" aria-pressed="false"><img crossorigin="anonymous" src="https://picsum.photos/id/110/480/360" alt="A field at sunset" width="480" height="360" loading="lazy" decoding="async"></button>
-                    <button class="site-photo-pick" type="button" aria-pressed="false"><img crossorigin="anonymous" src="https://picsum.photos/id/1039/480/360" alt="A waterfall in a green gorge" width="480" height="360" loading="lazy" decoding="async"></button>
-                    <button class="site-photo-pick" type="button" aria-pressed="false"><img crossorigin="anonymous" src="https://picsum.photos/id/1080/480/360" alt="Strawberries on a dark table" width="480" height="360" loading="lazy" decoding="async"></button>
-                    <button class="site-photo-pick" type="button" aria-pressed="false"><img crossorigin="anonymous" src="https://picsum.photos/id/1015/480/360" alt="A river valley between mountains" width="480" height="360" loading="lazy" decoding="async"></button>
+                    <button class="site-photo-pick" type="button" aria-pressed="false"><img crossorigin="anonymous" src="https://picsum.photos/id/110/480/360" alt="A field at sunset" width="480" height="360" loading="lazy" decoding="async" referrerpolicy="no-referrer"></button>
+                    <button class="site-photo-pick" type="button" aria-pressed="false"><img crossorigin="anonymous" src="https://picsum.photos/id/1039/480/360" alt="A waterfall in a green gorge" width="480" height="360" loading="lazy" decoding="async" referrerpolicy="no-referrer"></button>
+                    <button class="site-photo-pick" type="button" aria-pressed="false"><img crossorigin="anonymous" src="https://picsum.photos/id/1080/480/360" alt="Strawberries on a dark table" width="480" height="360" loading="lazy" decoding="async" referrerpolicy="no-referrer"></button>
+                    <button class="site-photo-pick" type="button" aria-pressed="false"><img crossorigin="anonymous" src="https://picsum.photos/id/1015/480/360" alt="A river valley between mountains" width="480" height="360" loading="lazy" decoding="async" referrerpolicy="no-referrer"></button>
                   </div>
                   <label class="wal-btn wal-btn-secondary site-photo-own">Use your own photo<input type="file" accept="image/*" id="photo-file"></label>
-                  <p class="site-muted">Or drop one anywhere on this tab.</p>
+                  <p class="site-muted site-drop-hint">Or drop one anywhere on this tab.</p>
                 </div>
                 <div class="site-photo-room wal-palette" id="photo-room" role="group" aria-label="The photo's palette, on stock walnut components">
                   <div class="site-photo-room-top">
@@ -1118,7 +1279,7 @@
                   <div class="site-photo-spectrum" id="photo-spectrum" role="img" aria-label="The photo's colours"></div>
                   <figcaption>The photo's colours in hue order, each as wide as its share of the photo. A brass bar marks the ones used.</figcaption>
                 </figure>
-                <div class="site-photo-read-wrap">
+                <div class="site-photo-read-wrap" tabindex="0" role="region" aria-label="The photo's colours">
                   <table class="site-photo-read">
                     <thead><tr><th scope="col">Colour</th><th scope="col">Hue</th><th scope="col">Chroma</th><th scope="col">Light</th><th scope="col">Dark</th><th scope="col">As text, light / dark</th><th scope="col">Text on it, light / dark</th></tr></thead>
                     <tbody id="photo-read"></tbody>
@@ -1126,13 +1287,13 @@
                 </div>
                 <div class="site-codebox">
                   <pre id="photo-css"></pre>
-                  <button class="wal-btn wal-btn-primary wal-btn-sm" type="button" id="photo-copy">Copy CSS</button>
+                  <button class="wal-btn wal-btn-secondary wal-btn-sm" type="button" id="photo-copy">Copy CSS</button>
                 </div>
                 <div class="site-stack">
                   <h3 class="site-h3">How a photo becomes a palette</h3>
                   <ol class="site-photo-steps">
                     <li>The photo is read at 72 pixels across, each pixel as an oklch colour.</li>
-                    <li>Pixels are grouped by hue, 10° to a group. Greys and very light or dark pixels set the ground's faint tint.</li>
+                    <li>Pixels are grouped by hue, 10° to a group, leaving out greys, very light or dark pixels, and groups under 0.4% of the photo. The ground's faint tint is the average of every pixel.</li>
                     <li>The strongest group becomes the accent. Up to four more are taken in order of strength, each at least 28° from any already taken, and the rest are filled in around the accent. The nearest to the accent becomes bloom, the furthest cool, and of the other two the one nearer yellow is gold.</li>
                     <li>Each colour is kept inside sRGB and every text pair is measured. A colour that fails is made less vivid, or its lightness moves the least amount that passes.</li>
                   </ol>
@@ -1144,18 +1305,24 @@
           <section data-tab="Finishes" id="theming-finishes">
             <div class="site-stack">
               <div class="site-seg-row">
-                <div class="site-seg" role="group" aria-label="Finish" data-finish-seg>
-                  <button type="button" value="cabinet" aria-pressed="true">Cabinet</button>
-                  <button type="button" value="poster" aria-pressed="false">Poster</button>
-                  <button type="button" value="catalogue" aria-pressed="false">Catalogue</button>
-                  <button type="button" value="soft" aria-pressed="false">Soft</button>
+                <div class="site-seg-field">
+                  <span class="site-muted" id="finish-label">Finish</span>
+                  <div class="site-seg" role="group" aria-labelledby="finish-label" data-finish-seg>
+                    <button type="button" value="cabinet" aria-pressed="true">Cabinet</button>
+                    <button type="button" value="poster" aria-pressed="false">Poster</button>
+                    <button type="button" value="catalogue" aria-pressed="false">Catalogue</button>
+                    <button type="button" value="soft" aria-pressed="false">Soft</button>
+                  </div>
                 </div>
-                <div class="site-seg" role="group" aria-label="Corners" data-corner-seg>
-                  <button type="button" value="" aria-pressed="true">Round</button>
-                  <button type="button" value="squircle" aria-pressed="false">Squircle</button>
-                  <button type="button" value="bevel" aria-pressed="false">Bevel</button>
+                <div class="site-seg-field">
+                  <span class="site-muted" id="corner-label">Corners</span>
+                  <div class="site-seg" role="group" aria-labelledby="corner-label" data-corner-seg>
+                    <button type="button" value="" aria-pressed="true">Round</button>
+                    <button type="button" value="squircle" aria-pressed="false">Squircle</button>
+                    <button type="button" value="bevel" aria-pressed="false">Bevel</button>
+                  </div>
                 </div>
-                <button class="wal-btn wal-btn-ghost wal-btn-sm" type="button" id="finish-page">Apply to whole page</button>
+                <button class="wal-btn wal-btn-secondary wal-btn-sm" type="button" id="finish-page">Apply to whole page</button>
               </div>
               <div class="site-stage site-finish-stage" id="finish-stage" data-finish="cabinet">
                 <div class="wal-card">
@@ -1189,7 +1356,7 @@
                 <div class="site-island wal-dark"><b>Dark</b><div class="wal-card"><h3>Tonight</h3><p>Same markup as its neighbour.</p><div class="site-actions"><button class="wal-btn wal-btn-primary wal-btn-sm" type="button">Book</button><span class="wal-badge wal-badge-gold">38 seats</span></div></div></div>
               </div>
               <div class="site-split is-even">
-                <pre class="site-live">--wal-bg: light-dark(
+                <pre>--wal-bg: light-dark(
   oklch(93% …),  <span class="k">/* light */</span>
   oklch(16% …)   <span class="k">/* dark */</span>
 );
@@ -1209,7 +1376,7 @@
       <div class="site-wrap">
         <div class="site-head">
           <h2 id="components-h">Components</h2>
-          <p>Each component is one class on standard HTML. None of them knows which palette, finish or mode it is in.</p>
+          <p>Each component is one class on standard HTML. None of them depends on which palette, finish or mode is in use.</p>
         </div>
 
         <div class="wal-tabs" id="components-tabs" data-label="Components">
@@ -1228,7 +1395,7 @@
                 <h3>Card and metric <code>.wal-card</code> <code>.wal-metric</code></h3>
                 <div class="wal-card">
                   <div class="wal-metric" style="--wal-metric-color: var(--wal-olive)"><span class="wal-metric-value">640</span><span class="wal-metric-label">Orders shipped this week</span></div>
-                  <p>A card flips its text to suit its own surface, so it reads the same on any ground.</p>
+                  <p>A card chooses light or dark text to suit its own surface, so it stays readable on any background.</p>
                 </div>
               </div>
               <div>
@@ -1278,7 +1445,9 @@
               </div>
             </div>
             <details class="site-code"><summary>Markup</summary><pre>&lt;button commandfor="reserve" command="show-modal"&gt;Open&lt;/button&gt;
-&lt;dialog id="reserve" class="wal-dialog" closedby="any"&gt;…&lt;/dialog&gt;
+&lt;dialog id="reserve" class="wal-dialog" closedby="any" aria-labelledby="reserve-h"&gt;
+  &lt;h2 id="reserve-h"&gt;Reserve Plate 14?&lt;/h2&gt;…
+&lt;/dialog&gt;
 
 &lt;button popovertarget="more"&gt;More&lt;/button&gt;
 &lt;div id="more" popover class="wal-menu"&gt;…&lt;/div&gt;
@@ -1308,17 +1477,17 @@
                     </select>
                     <span class="wal-hint">Changes the palette of this box only.</span>
                   </div>
-                  <ul class="wal-carousel" aria-label="Colourways">
-                    <li><div class="site-slide wal-palette wal-cafe"><span class="site-plate" aria-hidden="true"><svg viewBox="0 0 400 260"><use href="#sideboard"/></svg></span><b>Café</b><small>China blue and brass</small></div></li>
-                    <li><div class="site-slide wal-palette wal-forest"><span class="site-plate" aria-hidden="true"><svg viewBox="0 0 400 260"><use href="#sideboard"/></svg></span><b>Forest</b><small>Fern and campfire copper</small></div></li>
-                    <li><div class="site-slide wal-palette wal-dusk"><span class="site-plate" aria-hidden="true"><svg viewBox="0 0 400 260"><use href="#sideboard"/></svg></span><b>Dusk</b><small>Twilight and lantern glow</small></div></li>
-                    <li><div class="site-slide wal-palette wal-bone"><span class="site-plate" aria-hidden="true"><svg viewBox="0 0 400 260"><use href="#sideboard"/></svg></span><b>Bone</b><small>Washi tape and pressed flowers</small></div></li>
-                    <li><div class="site-slide wal-palette wal-press"><span class="site-plate" aria-hidden="true"><svg viewBox="0 0 400 260"><use href="#sideboard"/></svg></span><b>Press</b><small>Tomato on paper stock</small></div></li>
+                  <ul class="wal-carousel" aria-label="Colourways" tabindex="0">
+                    <li><div class="site-slide wal-palette wal-cafe"><span class="site-plate" aria-hidden="true"><svg viewBox="0 0 400 260"><use href="#sideboard"/></svg></span><b>Café</b><small>Blue on a warm amber ground</small></div></li>
+                    <li><div class="site-slide wal-palette wal-forest"><span class="site-plate" aria-hidden="true"><svg viewBox="0 0 400 260"><use href="#sideboard"/></svg></span><b>Forest</b><small>Green, with a copper bloom</small></div></li>
+                    <li><div class="site-slide wal-palette wal-dusk"><span class="site-plate" aria-hidden="true"><svg viewBox="0 0 400 260"><use href="#sideboard"/></svg></span><b>Dusk</b><small>Violet on a violet-grey ground</small></div></li>
+                    <li><div class="site-slide wal-palette wal-bone"><span class="site-plate" aria-hidden="true"><svg viewBox="0 0 400 260"><use href="#sideboard"/></svg></span><b>Bone</b><small>Blue on a warm, light ground</small></div></li>
+                    <li><div class="site-slide wal-palette wal-press"><span class="site-plate" aria-hidden="true"><svg viewBox="0 0 400 260"><use href="#sideboard"/></svg></span><b>Press</b><small>Red-orange on a warm, light ground</small></div></li>
                   </ul>
                 </div>
               </div>
               <div class="site-stack">
-                <p class="site-soft">Nav, tabs, select and carousel are native elements styled by walnut, so keyboard and screen reader support comes from the browser.</p>
+                <p class="site-soft">Nav, select and carousel are native elements styled by walnut, so keyboard and screen reader support comes from the browser. Tabs follow the ARIA tabs pattern, built by walnut-tabs.js.</p>
                 <dl class="site-spec">
                   <div><dt>Ships in</dt><dd><span class="wal-badge wal-badge-olive">CSS only</span>walnut-scroll.css adds the carousel's dots and arrows.</dd></div>
                   <div><dt>Tabs</dt><dd><span class="wal-badge wal-badge-gold">Optional script</span>walnut-tabs.js turns sections into tabs, with arrow keys and a link for each tab. Without it the sections stack.</dd></div>
@@ -1388,7 +1557,7 @@
       <div class="site-wrap">
         <div class="site-head">
           <h2 id="charts-h">Charts and photos</h2>
-          <p>Charts are HTML lists styled by walnut. Photos are tinted with CSS. Both update when the palette or mode changes.</p>
+          <p>Charts are plain HTML styled by walnut. Photos are tinted with CSS. Both update when the palette or mode changes.</p>
         </div>
         <div class="site-charts">
           <div class="site-panel site-chart-card">
@@ -1432,22 +1601,22 @@
           <div class="site-panel site-chart-card is-12" id="charts-photos">
             <div class="site-duo">
               <div class="site-prints">
-                <figure class="site-print">
-                  <div class="site-print-frame"><div class="site-print-mat"><div class="wal-duotone wal-reveal-develop" data-ink="accent"><img src="https://picsum.photos/id/110/900/1200" width="900" height="1200" alt="A field at sunset with a line of trees" loading="lazy" decoding="async" referrerpolicy="no-referrer"></div></div></div>
-                  <figcaption class="site-plaque site-brass">Accent</figcaption>
+                <figure class="site-print is-tall">
+                  <div class="site-print-frame"><div class="site-print-mat"><div class="wal-duotone wal-reveal-develop" data-ink="accent"><img src="https://picsum.photos/id/110/720/1080" width="720" height="1080" alt="A field at sunset with a line of trees" loading="lazy" decoding="async" referrerpolicy="no-referrer"></div></div></div>
+                  <figcaption class="site-plaque" data-cue="accent"><i aria-hidden="true"></i><span>Accent</span></figcaption>
                 </figure>
                 <figure class="site-print">
-                  <div class="site-print-frame"><div class="site-print-mat"><div class="wal-duotone wal-reveal-develop" data-ink="cool"><img src="https://picsum.photos/id/416/700/700" width="700" height="700" alt="Hills under morning mist" loading="lazy" decoding="async" referrerpolicy="no-referrer"></div></div></div>
-                  <figcaption class="site-plaque site-brass">Cool</figcaption>
+                  <div class="site-print-frame"><div class="site-print-mat"><div class="wal-duotone wal-reveal-develop" data-ink="cool"><img src="https://picsum.photos/id/416/480/480" width="480" height="480" alt="Hills under morning mist" loading="lazy" decoding="async" referrerpolicy="no-referrer"></div></div></div>
+                  <figcaption class="site-plaque" data-cue="cool"><i aria-hidden="true"></i><span>Cool</span></figcaption>
                 </figure>
                 <figure class="site-print">
-                  <div class="site-print-frame"><div class="site-print-mat"><div class="wal-duotone wal-reveal-develop" data-ink="olive"><img src="https://picsum.photos/id/177/700/700" width="700" height="700" alt="A walker in a misty canyon" loading="lazy" decoding="async" referrerpolicy="no-referrer"></div></div></div>
-                  <figcaption class="site-plaque site-brass">Olive</figcaption>
+                  <div class="site-print-frame"><div class="site-print-mat"><div class="wal-duotone wal-reveal-develop" data-ink="olive"><img src="https://picsum.photos/id/177/480/480" width="480" height="480" alt="A walker in a misty canyon" loading="lazy" decoding="async" referrerpolicy="no-referrer"></div></div></div>
+                  <figcaption class="site-plaque" data-cue="olive"><i aria-hidden="true"></i><span>Olive</span></figcaption>
                 </figure>
               </div>
               <div class="site-stack">
                 <h3 class="site-h3">Duotone photos</h3>
-                <p class="site-soft">Tints a photo with one palette colour using CSS blend modes. In forced colours mode the original photo shows.</p>
+                <p class="site-soft">Tints a photo with one palette colour using CSS blend modes. In forced colours mode the photo shows in greyscale.</p>
                 <span class="site-muted" id="ink-label">Ink for every print</span>
                 <div class="site-seg" role="group" aria-labelledby="ink-label" data-ink-seg>
                   <button type="button" value="" aria-pressed="true">Mixed</button>
@@ -1489,10 +1658,13 @@
                   <details name="faq"><summary>Can I choose the door colours?</summary><div class="site-chest-body"><p>Yes. Each tambour door is lacquered to order, in any of the six colourways.</p></div></details>
                   <details name="faq"><summary>How do I look after oiled walnut?</summary><div class="site-chest-body"><p>Wipe it with a dry cloth. Oil it again once a year, or when the wood looks dry.</p></div></details>
                 </div>
-                <div class="site-seg" role="group" aria-label="Material" data-material-seg="faq">
-                  <button type="button" value="walnut" aria-pressed="true">Walnut</button>
-                  <button type="button" value="brass" aria-pressed="false">Brass</button>
-                  <button type="button" value="stone" aria-pressed="false">Stone</button>
+                <div class="site-seg-field">
+                  <span class="site-muted" id="material-label">Material</span>
+                  <div class="site-seg" role="group" aria-labelledby="material-label" data-material-seg="faq">
+                    <button type="button" value="walnut" aria-pressed="true">Walnut</button>
+                    <button type="button" value="brass" aria-pressed="false">Brass</button>
+                    <button type="button" value="stone" aria-pressed="false">Stone</button>
+                  </div>
                 </div>
               </div>
               <div class="site-stack">
@@ -1531,10 +1703,10 @@
                 </dl>
                 <details class="site-code"><summary>Markup</summary><pre>&lt;button commandfor="basket" command="show-modal"&gt;Basket&lt;/button&gt;
 
-&lt;dialog id="basket" class="wal-door" closedby="any"&gt;
+&lt;dialog id="basket" class="wal-door" closedby="any" aria-labelledby="basket-h"&gt;
   &lt;button class="wal-door-pull" commandfor="basket"
           command="close" aria-label="Close"&gt;&lt;/button&gt;
-  &lt;div class="wal-door-body"&gt;…&lt;/div&gt;
+  &lt;div class="wal-door-body"&gt;&lt;h2 id="basket-h"&gt;Your basket&lt;/h2&gt;…&lt;/div&gt;
 &lt;/dialog&gt;</pre></details>
               </div>
             </div>
@@ -1545,7 +1717,7 @@
               <div class="site-stage site-demo">
                 <button class="site-open-card wal-palette wal-forest" type="button" commandfor="gatefold" command="show-modal">
                   <span class="site-plate" data-wal-art aria-hidden="true"><svg viewBox="0 0 400 260"><use href="#sideboard"/></svg></span>
-                  <span><b>Forest</b><small>Fern and campfire copper</small></span>
+                  <span><b>Forest</b><small>Green, with a copper bloom</small></span>
                 </button>
                 <p class="site-muted">Close it with the button, Escape or clicking outside.</p>
               </div>
@@ -1560,10 +1732,10 @@
   &lt;span data-wal-art&gt;…&lt;/span&gt; Forest
 &lt;/button&gt;
 
-&lt;dialog id="forest" class="wal-window" data-wal-open="gatefold" closedby="any"&gt;
+&lt;dialog id="forest" class="wal-window" data-wal-open="gatefold" closedby="any" aria-labelledby="forest-h"&gt;
   &lt;div class="wal-gatefold-spread"&gt;
     &lt;figure class="wal-gatefold-cover"&gt;…&lt;/figure&gt;
-    &lt;div class="wal-gatefold-notes"&gt;…&lt;/div&gt;
+    &lt;div class="wal-gatefold-notes"&gt;&lt;h2 id="forest-h"&gt;Forest&lt;/h2&gt;…&lt;/div&gt;
   &lt;/div&gt;
 &lt;/dialog&gt;</pre></details>
               </div>
@@ -1586,7 +1758,7 @@
                   <div><dt>Use it for</dt><dd>Product pages, collections, case studies.</dd></div>
                   <div><dt>Ships in</dt><dd><span class="wal-badge wal-badge-gold">walnut-recolour.js</span><span class="wal-badge wal-badge-gold">walnut-acts.js for the acts</span></dd></div>
                 </dl>
-                <details class="site-code"><summary>Markup</summary><pre>&lt;dialog class="wal-window wal-palette wal-cafe" data-wal-acts&gt;
+                <details class="site-code"><summary>Markup</summary><pre>&lt;dialog class="wal-window wal-palette wal-cafe" data-wal-acts aria-label="Plate 14"&gt;
   &lt;section data-act="wal-cafe"&gt;…&lt;/section&gt;
   &lt;section data-act="wal-dusk"&gt;…&lt;/section&gt;
   &lt;section data-act="wal-forest"&gt;…&lt;/section&gt;
@@ -1600,17 +1772,17 @@ walnut.recolour(page, () =&gt; room.showModal(), { from: card });</pre></details
           <section data-tab="Materials" id="motion-materials">
             <div class="site-stack">
               <div class="site-materials">
-                <div><h4>Walnut <small>Heavy, lands with a small knock. 1050 ms</small></h4><div class="wal-chest" data-wal-material="walnut"><details><summary>Drawer</summary><div class="site-chest-body"><p>Slow to start, then settles against its stop.</p></div></details></div></div>
-                <div><h4>Brass <small>Quick, with a springy bounce. 480 ms</small></h4><div class="wal-chest" data-wal-material="brass"><details><summary>Drawer</summary><div class="site-chest-body"><p>Reaches its stop fast and bounces three times.</p></div></details></div></div>
-                <div><h4>Stone <small>Slow, with no bounce. 1200 ms</small></h4><div class="wal-chest" data-wal-material="stone"><details><summary>Drawer</summary><div class="site-chest-body"><p>Grinds to a stop with no bounce at all.</p></div></details></div></div>
+                <div><h3>Walnut <small>Opens in 1050&nbsp;ms, closes in 800&nbsp;ms</small></h3><div class="wal-chest" data-wal-material="walnut"><details><summary>Walnut drawer</summary><div class="site-chest-body"><p>Starts slowly and ends with a small bounce.</p></div></details></div></div>
+                <div><h3>Brass <small>Opens in 480&nbsp;ms, closes in 380&nbsp;ms</small></h3><div class="wal-chest" data-wal-material="brass"><details><summary>Brass drawer</summary><div class="site-chest-body"><p>Opens fast and bounces three times.</p></div></details></div></div>
+                <div><h3>Stone <small>Opens in 1200&nbsp;ms, closes in 1000&nbsp;ms</small></h3><div class="wal-chest" data-wal-material="stone"><details><summary>Stone drawer</summary><div class="site-chest-body"><p>Opens slowly and stops with no bounce.</p></div></details></div></div>
               </div>
-              <div class="site-actions"><button class="wal-btn wal-btn-primary" type="button" id="pull-all">Open all three</button></div>
+              <div class="site-actions"><button class="wal-btn wal-btn-primary" type="button" id="pull-all">Open all three drawers</button></div>
               <div class="site-split is-even">
                 <pre>&lt;html data-motion="materials"&gt;
 
 <span class="k">/* or one part, and everything inside it */</span>
 &lt;div class="wal-chest" data-wal-material="stone"&gt;…&lt;/div&gt;</pre>
-                <p class="site-soft">Set it on the page, and drawers, doors and windows move like walnut while menus, pickers and charts move like brass. Or set one material on one part. With reduced motion turned on, everything opens at once.</p>
+                <p class="site-soft">Set it on the page, and drawers, doors and windows use the walnut timing while menus, pickers and charts use the brass timing. Or set one material on one part. With reduced motion turned on, everything opens at once.</p>
               </div>
             </div>
           </section>
@@ -1618,7 +1790,27 @@ walnut.recolour(page, () =&gt; room.showModal(), { from: card });</pre></details
           <section data-tab="Shuffle" id="motion-shuffle">
             <div class="site-split">
               <div class="site-stage site-demo">
-                <div class="site-mats-top"><b>Materials</b><span id="mat-count">12 of 12</span></div>
+                <div class="site-mats-top"><b>Materials</b><span id="mat-count" role="status">12 of 12</span></div>
+                <div class="site-seg-row">
+                  <div class="site-seg-field">
+                    <span class="site-muted" id="show-label">Show</span>
+                    <div class="site-seg" role="group" aria-labelledby="show-label" data-mat-filter>
+                      <button type="button" value="" aria-pressed="true">All</button>
+                      <button type="button" value="Wood" aria-pressed="false">Wood</button>
+                      <button type="button" value="Stone" aria-pressed="false">Stone</button>
+                      <button type="button" value="Metal" aria-pressed="false">Metal</button>
+                      <button type="button" value="Cloth" aria-pressed="false">Cloth</button>
+                    </div>
+                  </div>
+                  <div class="site-seg-field">
+                    <span class="site-muted" id="sort-label">Sort</span>
+                    <div class="site-seg" role="group" aria-labelledby="sort-label" data-mat-sort>
+                      <button type="button" value="name" aria-pressed="true">By name</button>
+                      <button type="button" value="light" aria-pressed="false">Light to dark</button>
+                      <button type="button" value="hue" aria-pressed="false">By hue</button>
+                    </div>
+                  </div>
+                </div>
                 <ul class="site-mats wal-shuffle" id="mat-grid">
                   <li class="site-mat" data-kind="Wood" data-l=".42" data-h="52"><i style="--c: oklch(42% .055 52)"></i><b>Walnut</b><small>Wood, lightness 42</small></li>
                   <li class="site-mat" data-kind="Wood" data-l=".56" data-h="60"><i style="--c: oklch(56% .085 60)"></i><b>Teak</b><small>Wood, lightness 56</small></li>
@@ -1633,18 +1825,6 @@ walnut.recolour(page, () =&gt; room.showModal(), { from: card });</pre></details
                   <li class="site-mat" data-kind="Cloth" data-l=".55" data-h="200"><i style="--c: oklch(55% .08 200)"></i><b>Teal bouclé</b><small>Cloth, lightness 55</small></li>
                   <li class="site-mat" data-kind="Cloth" data-l=".5" data-h="50"><i style="--c: oklch(50% .11 50)"></i><b>Cognac leather</b><small>Cloth, lightness 50</small></li>
                 </ul>
-                <div class="site-seg" role="group" aria-label="Show" data-mat-filter>
-                  <button type="button" value="" aria-pressed="true">All</button>
-                  <button type="button" value="Wood" aria-pressed="false">Wood</button>
-                  <button type="button" value="Stone" aria-pressed="false">Stone</button>
-                  <button type="button" value="Metal" aria-pressed="false">Metal</button>
-                  <button type="button" value="Cloth" aria-pressed="false">Cloth</button>
-                </div>
-                <div class="site-seg" role="group" aria-label="Sort" data-mat-sort>
-                  <button type="button" value="name" aria-pressed="true">By name</button>
-                  <button type="button" value="light" aria-pressed="false">Light to dark</button>
-                  <button type="button" value="hue" aria-pressed="false">By hue</button>
-                </div>
               </div>
               <div class="site-stack">
                 <h3 class="site-h3">Shuffle <code>.wal-shuffle</code></h3>
@@ -1675,7 +1855,7 @@ walnut.shuffle(materials, () =&gt; showOnly("Wood"));</pre></details>
             <li><h3>Sticky header shadow</h3><span class="wal-badge wal-badge-olive">CSS only</span><p><s>.is-scrolled</s> is now a scroll-driven animation, as on this page's header. Chrome, Edge and Safari 26.</p></li>
             <li><h3>Active nav link</h3><span class="wal-badge wal-badge-cool">Chrome and Edge</span><p><s>.is-active</s> is now <code>scroll-target-group</code> in walnut-scroll.css. This page sets the class itself in other browsers.</p></li>
             <li><h3>Dismissible tip</h3><span class="wal-badge wal-badge-cool">Chrome and Edge</span><p><s>.is-dismissed</s> is now <code>interestfor</code> with <code>popover="hint"</code>.</p></li>
-            <li><h3>Open menu</h3><span class="wal-badge wal-badge-olive">CSS only</span><p><s>.is-open</s> is now a dialog opened with <code>commandfor</code>. This page opens it from a script in browsers without commandfor.</p></li>
+            <li><h3>Open menu</h3><span class="wal-badge wal-badge-gold">Optional script</span><p><s>.is-open</s> is now a dialog opened with <code>commandfor</code>. This page opens it from a script in browsers without commandfor.</p></li>
           </ul>
           <div class="site-stack" id="browser-print">
             <h3 class="site-h3">Print styles</h3>
@@ -1684,20 +1864,20 @@ walnut.shuffle(materials, () =&gt; showOnly("Wood"));</pre></details>
                 <div class="site-sheet wal-palette wal-forest">
                   <p class="wal-eyebrow">Colourway</p>
                   <h3 class="site-big">Forest</h3>
-                  <p class="site-soft">Fern and campfire copper. The theme file is in <a href="https://github.com/SKMinWoo/walnut.css">the walnut repository</a>.</p>
+                  <p class="site-soft">Green, with a copper bloom. The theme file is in <a href="https://github.com/SKMinWoo/walnut.css">the walnut repository</a>.</p>
                   <div class="site-actions"><button class="wal-btn wal-btn-primary wal-btn-sm" type="button" data-wal-palette="wal-forest">Use Forest</button></div>
                 </div>
               </section>
               <section data-tab="On paper" id="print-paper">
                 <div class="site-sheet is-paper wal-palette wal-forest wal-light">
                   <h3>Forest</h3>
-                  <p>Fern and campfire copper. The theme file is in the walnut repository <span class="site-sheet-url">(https://github.com/SKMinWoo/walnut.css)</span>.</p>
+                  <p>Green, with a copper bloom. The theme file is in the walnut repository <span class="site-sheet-url">(https://github.com/SKMinWoo/walnut.css)</span>.</p>
                   <div class="site-sheet-cues" aria-hidden="true"><i data-cue="accent"></i><i data-cue="bloom"></i><i data-cue="gold"></i><i data-cue="olive"></i><i data-cue="cool"></i></div>
                   <div class="site-sheet-run is-foot"><span>Sheet 1 of 2</span></div>
                 </div>
               </section>
             </div>
-            <p class="site-soft">On paper, walnut drops the nav and side panels, prints in light mode, writes the address after each outside link and numbers each sheet. Every tab and drawer prints open, and charts and duotones keep their colour.</p>
+            <p class="site-soft">On paper, walnut drops the nav and side panels, prints in light mode, writes the address after each outside link and numbers each sheet. Every tab and accordion prints open, and charts and duotones keep their colour.</p>
             <div class="site-actions"><button class="wal-btn wal-btn-secondary wal-btn-sm" type="button" id="print-btn">Print this page</button></div>
           </div>
         </div>
@@ -1738,31 +1918,31 @@ walnut.shuffle(materials, () =&gt; showOnly("Wood"));</pre></details>
       <div class="site-wrap">
         <div class="site-head">
           <h2 id="start-h">Get started</h2>
-          <p>One stylesheet, under 18 KB gzipped. No build step.</p>
+          <p>One stylesheet, under 18&nbsp;KB gzipped. No build step.</p>
         </div>
         <ol class="site-steps">
           <li>
             <h3>Add the stylesheet</h3>
             <div class="wal-tabs" id="install-tabs" data-label="Install options">
               <section data-tab="CDN" id="install-cdn">
-                <div class="site-codebox"><pre id="code-cdn">&lt;link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/SKMinWoo/walnut.css@v0.4.0/dist/walnut.min.css"&gt;</pre><button class="wal-btn wal-btn-secondary wal-btn-sm" type="button" data-copy-from="code-cdn">Copy</button></div>
+                <div class="site-codebox"><pre id="code-cdn">&lt;link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/SKMinWoo/walnut.css@v0.4.0/dist/walnut.min.css"&gt;</pre><button class="wal-btn wal-btn-secondary wal-btn-sm" type="button" data-copy-from="code-cdn" aria-label="Copy CDN link tag">Copy</button></div>
               </section>
               <section data-tab="Download" id="install-download">
                 <div class="site-codebox"><pre id="code-dl"><span class="k"># copy dist/ from the release into your project</span>
-&lt;link rel="stylesheet" href="/dist/walnut.min.css"&gt;</pre><button class="wal-btn wal-btn-secondary wal-btn-sm" type="button" data-copy-from="code-dl">Copy</button></div>
+&lt;link rel="stylesheet" href="/dist/walnut.min.css"&gt;</pre><button class="wal-btn wal-btn-secondary wal-btn-sm" type="button" data-copy-from="code-dl" aria-label="Copy download link tag">Copy</button></div>
               </section>
               <section data-tab="With a palette" id="install-palette">
                 <div class="site-codebox"><pre id="code-pal">&lt;link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/SKMinWoo/walnut.css@v0.4.0/dist/walnut.min.css"&gt;
 &lt;link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/SKMinWoo/walnut.css@v0.4.0/dist/themes/forest.css"&gt;
 
-&lt;html class="wal-forest" data-finish="catalogue"&gt;</pre><button class="wal-btn wal-btn-secondary wal-btn-sm" type="button" data-copy-from="code-pal">Copy</button></div>
+&lt;html class="wal-forest" data-finish="catalogue"&gt;</pre><button class="wal-btn wal-btn-secondary wal-btn-sm" type="button" data-copy-from="code-pal" aria-label="Copy palette example">Copy</button></div>
               </section>
             </div>
           </li>
           <li>
             <h3>Set your colours</h3>
             <p>Put a palette class on the html element, or paste your eight numbers after walnut.css. This is the palette on this page right now.</p>
-            <div class="site-codebox"><pre data-live-css aria-label="This page's palette as CSS"></pre><button class="wal-btn wal-btn-secondary wal-btn-sm" type="button" data-copy-live>Copy</button></div>
+            <div class="site-codebox" role="group" aria-label="This page's palette as CSS"><pre data-live-css></pre><button class="wal-btn wal-btn-secondary wal-btn-sm" type="button" data-copy-live aria-label="Copy this page's palette CSS">Copy</button></div>
             <div class="site-actions"><button class="wal-btn wal-btn-secondary wal-btn-sm" type="button" commandfor="palette-panel" command="show-modal">Edit palette</button></div>
           </li>
           <li>
@@ -1771,14 +1951,14 @@ walnut.shuffle(materials, () =&gt; showOnly("Wood"));</pre></details>
             <div class="site-codebox"><pre id="code-html">&lt;div class="wal-card"&gt;
   &lt;h3&gt;Walnut sideboard&lt;/h3&gt;
   &lt;span class="wal-badge wal-badge-olive"&gt;In stock&lt;/span&gt;
-  &lt;button class="wal-btn wal-btn-primary"&gt;Order a sample&lt;/button&gt;
-&lt;/div&gt;</pre><button class="wal-btn wal-btn-secondary wal-btn-sm" type="button" data-copy-from="code-html">Copy</button></div>
+  &lt;button class="wal-btn wal-btn-primary"&gt;Reserve a sample&lt;/button&gt;
+&lt;/div&gt;</pre><button class="wal-btn wal-btn-secondary wal-btn-sm" type="button" data-copy-from="code-html" aria-label="Copy class example">Copy</button></div>
           </li>
         </ol>
 
         <div class="site-files">
           <h3>Optional files</h3>
-          <div class="site-table-scroll">
+          <div class="site-table-scroll" tabindex="0" role="region" aria-label="Optional files">
             <table class="wal-table">
               <thead><tr><th scope="col">Add</th><th scope="col">For</th></tr></thead>
               <tbody>
@@ -1803,13 +1983,13 @@ walnut.shuffle(materials, () =&gt; showOnly("Wood"));</pre></details>
           <div class="site-ref-body">
             <div class="site-ref-item" id="reference-tokens">
               <h3>Tokens you can set</h3>
-              <div class="site-table-scroll"><table class="wal-table">
+              <div class="site-table-scroll" tabindex="0" role="region" aria-label="Tokens you can set"><table class="wal-table">
                 <thead><tr><th scope="col">Token</th><th scope="col">Controls</th></tr></thead>
                 <tbody>
                   <tr><td><code>--wal-hue</code>, <code>--wal-chroma</code></td><td>The ground: every neutral</td></tr>
                   <tr><td><code>--wal-&lt;cue&gt;-hue</code>, <code>-chroma</code></td><td>Each of the five colours</td></tr>
                   <tr><td><code>--wal-&lt;cue&gt;-ink</code></td><td>The colour as text, not as a fill</td></tr>
-                  <tr><td><code>--wal-&lt;cue&gt;-soft</code>, <code>-fg</code></td><td>A wash of the colour, and text on the colour</td></tr>
+                  <tr><td><code>--wal-&lt;cue&gt;-soft</code>, <code>-fg</code></td><td>A pale tint of the colour, and text on the colour</td></tr>
                   <tr><td><code>--wal-cue-1</code> to <code>--wal-cue-5</code></td><td>The five colours by position, for looping over them</td></tr>
                   <tr><td><code>--wal-l-*-light</code>, <code>-dark</code></td><td>The lightness of each surface, in each mode</td></tr>
                   <tr><td><code>--wal-cx-*</code></td><td>Each surface's chroma, as a fraction of the ground's</td></tr>
@@ -1824,23 +2004,23 @@ walnut.shuffle(materials, () =&gt; showOnly("Wood"));</pre></details>
             <div class="site-ref-item" id="reference-forms">
               <h3>Fills and text use different colours</h3>
               <p>A colour that works as a fill is often too light to read as text. Each colour comes in four forms.</p>
-              <div class="site-table-scroll"><table class="wal-table">
+              <div class="site-table-scroll" tabindex="0" role="region" aria-label="Colour forms"><table class="wal-table">
                 <thead><tr><th scope="col">Token</th><th scope="col">Use</th><th scope="col">Example</th></tr></thead>
                 <tbody>
                   <tr><td><code>--wal-gold</code></td><td>The colour as a fill</td><td><span class="wal-badge" style="background: var(--wal-gold); min-inline-size: 3rem; min-block-size: 1.3em" aria-hidden="true"></span></td></tr>
                   <tr><td><code>--wal-gold-ink</code></td><td>The colour as text</td><td><span class="wal-color-gold">gold text</span></td></tr>
-                  <tr><td><code>--wal-gold-soft</code></td><td>A wash, for behind text</td><td><span class="wal-badge wal-badge-gold">soft</span></td></tr>
+                  <tr><td><code>--wal-gold-soft</code></td><td>A pale tint, for behind text</td><td><span class="wal-badge wal-badge-gold">soft</span></td></tr>
                   <tr><td><code>--wal-gold-fg</code></td><td>Text on the fill</td><td><span class="wal-badge" style="background: var(--wal-gold); color: var(--wal-gold-fg)">on gold</span></td></tr>
                 </tbody>
               </table></div>
             </div>
             <div class="site-ref-item" id="reference-gamut">
               <h3>Lower the chroma when you move a hue</h3>
-              <p>Screens can't show every hue equally vivid: each has a limit, called the gamut. At 62% lightness a chroma of 0.17 is inside the gamut for terracotta but outside it from green to blue, and the browser shows a duller, shifted colour without warning. CSS can't find that limit, so when you move a hue far from its default, lower its chroma too. The palette editor and the photo tool do this for you.</p>
+              <p>Each hue has a limit on how vivid a screen can show it, called the gamut, and past it the browser shows a duller, shifted colour without warning. At 62% lightness a chroma of 0.17 fits reds and violets but not yellows or blues, so when you move a hue far from its default, lower its chroma too. Random palette and the photo tool do this for you. The sliders don't.</p>
             </div>
             <div class="site-ref-item" id="reference-layers">
               <h3>Your CSS wins</h3>
-              <p>walnut puts everything in cascade layers, and CSS that isn't in a layer beats every layer whatever its specificity. So an ordinary rule of yours overrides walnut with no <code>!important</code>. It only replaces the properties it sets: override <code>flex-direction</code> and walnut's <code>gap</code> still applies. <code>!important</code> reverses layer order, so walnut's reduced-motion rules still win, on purpose.</p>
+              <p>walnut puts everything in cascade layers, and CSS outside a layer beats every layer whatever its specificity, so your own rules override walnut without <code>!important</code>. A rule replaces only the properties it sets, and walnut's reduced-motion rules use <code>!important</code> so they still win.</p>
               <pre>@layer reset, tokens, base, layout, components, finish, utilities, cinema;
 
 <span class="k">/* not in a layer: beats all of the above */</span>
@@ -1864,7 +2044,7 @@ walnut.shuffle(materials, () =&gt; showOnly("Wood"));</pre></details>
             <div class="site-ref-item" id="reference-support">
               <h3>Browser support</h3>
               <p><code>light-dark()</code> sets the floor: Chrome and Edge 123, Safari 17.5, Firefox 120. Newer features are added where the browser has them.</p>
-              <div class="site-table-scroll"><table class="wal-table">
+              <div class="site-table-scroll" tabindex="0" role="region" aria-label="Browser support"><table class="wal-table">
                 <thead><tr><th scope="col">Feature</th><th scope="col">Needs</th><th scope="col">Without it</th></tr></thead>
                 <tbody>
                   <tr><td>Text on each colour (<code>-fg</code> tokens)</td><td>Relative colour syntax</td><td>Firefox 120 to 127 gets a fixed value</td></tr>
@@ -1873,6 +2053,7 @@ walnut.shuffle(materials, () =&gt; showOnly("Wood"));</pre></details>
                   <tr><td>Page-to-page transitions</td><td>Cross-document view transitions: Chrome 126, Safari 18.2</td><td>A link just navigates</td></tr>
                   <tr><td>Recolour from the button</td><td>View transition types: Chrome 125, Safari 18.2</td><td>The colours fade across instead</td></tr>
                   <tr><td>Scroll reveals, sticky header shadow</td><td>Scroll-driven animations: Chrome 115, Safari 26</td><td>The content is simply there</td></tr>
+                  <tr><td>Menus that open by their button</td><td>Anchor positioning from a popover's button: Chrome 133, Safari 26</td><td>The menu opens in the middle of the screen</td></tr>
                 </tbody>
               </table></div>
               <p>Chrome and Edge have the newest parts today. Each falls back to something that still works:</p>
@@ -1906,35 +2087,35 @@ walnut.shuffle(materials, () =&gt; showOnly("Wood"));</pre></details>
     <button class="wal-door-pull" type="button" commandfor="palette-panel" command="close" aria-label="Close"></button>
     <div class="wal-door-body">
       <div class="site-door-in">
-        <div class="site-door-head"><h2 id="palette-panel-h">Palette</h2></div>
+        <div class="site-door-head"><h2 id="palette-panel-h">Palette</h2><button class="wal-btn wal-btn-ghost wal-btn-sm" type="button" commandfor="palette-panel" command="close">Close</button></div>
         <p class="site-soft">Changes apply to the whole page, in light and dark.</p>
         <div class="site-rods">
-          <div class="site-rodset">
-            <strong>Ground</strong>
-            <div class="site-rod"><label for="r-hue">Hue</label><output></output>
+          <div class="site-rodset" role="group" aria-labelledby="rods-ground">
+            <strong id="rods-ground">Ground</strong>
+            <div class="site-rod"><label for="r-hue"><span class="wal-sr-only">Ground </span>Hue</label><output></output>
               <input type="range" id="r-hue" data-prop="--wal-hue" data-track="hue" min="0" max="360" step="0.5" style="--l: .62; --c: calc(var(--wal-chroma) * 4 + .02)"></div>
-            <div class="site-rod"><label for="r-chroma">Chroma</label><output></output>
+            <div class="site-rod"><label for="r-chroma"><span class="wal-sr-only">Ground </span>Chroma</label><output></output>
               <input type="range" id="r-chroma" data-prop="--wal-chroma" min="0" max="0.06" step="0.001"></div>
           </div>
-          <div class="site-rodset">
-            <strong>Accent</strong>
-            <div class="site-rod"><label for="r-accent">Hue</label><output></output>
+          <div class="site-rodset" role="group" aria-labelledby="rods-accent">
+            <strong id="rods-accent">Accent</strong>
+            <div class="site-rod"><label for="r-accent"><span class="wal-sr-only">Accent </span>Hue</label><output></output>
               <input type="range" id="r-accent" data-prop="--wal-accent-hue" data-track="hue" min="0" max="360" step="1" style="--l: .62; --c: var(--wal-accent-chroma)"></div>
-            <div class="site-rod"><label for="r-accent-c">Chroma</label><output></output>
+            <div class="site-rod"><label for="r-accent-c"><span class="wal-sr-only">Accent </span>Chroma</label><output></output>
               <input type="range" id="r-accent-c" data-prop="--wal-accent-chroma" min="0" max="0.25" step="0.005"></div>
           </div>
-          <div class="site-rodset">
-            <strong>Gold</strong>
-            <div class="site-rod"><label for="r-gold">Hue</label><output></output>
+          <div class="site-rodset" role="group" aria-labelledby="rods-gold">
+            <strong id="rods-gold">Gold</strong>
+            <div class="site-rod"><label for="r-gold"><span class="wal-sr-only">Gold </span>Hue</label><output></output>
               <input type="range" id="r-gold" data-prop="--wal-gold-hue" data-track="hue" min="0" max="360" step="1" style="--l: .7; --c: var(--wal-gold-chroma)"></div>
-            <div class="site-rod"><label for="r-gold-c">Chroma</label><output></output>
+            <div class="site-rod"><label for="r-gold-c"><span class="wal-sr-only">Gold </span>Chroma</label><output></output>
               <input type="range" id="r-gold-c" data-prop="--wal-gold-chroma" min="0" max="0.2" step="0.005"></div>
           </div>
-          <div class="site-rodset">
-            <strong>Olive</strong>
-            <div class="site-rod"><label for="r-olive">Hue</label><output></output>
+          <div class="site-rodset" role="group" aria-labelledby="rods-olive">
+            <strong id="rods-olive">Olive</strong>
+            <div class="site-rod"><label for="r-olive"><span class="wal-sr-only">Olive </span>Hue</label><output></output>
               <input type="range" id="r-olive" data-prop="--wal-olive-hue" data-track="hue" min="0" max="360" step="1" style="--l: .6; --c: var(--wal-olive-chroma)"></div>
-            <div class="site-rod"><label for="r-olive-c">Chroma</label><output></output>
+            <div class="site-rod"><label for="r-olive-c"><span class="wal-sr-only">Olive </span>Chroma</label><output></output>
               <input type="range" id="r-olive-c" data-prop="--wal-olive-chroma" min="0" max="0.2" step="0.005"></div>
           </div>
         </div>
@@ -1943,7 +2124,7 @@ walnut.shuffle(materials, () =&gt; showOnly("Wood"));</pre></details>
           <button class="wal-btn wal-btn-primary wal-btn-sm" type="button" data-roll>Random palette</button>
           <button class="wal-btn wal-btn-secondary wal-btn-sm" type="button" data-copy-live>Copy CSS</button>
           <button class="wal-btn wal-btn-secondary wal-btn-sm" type="button" data-copy-link>Copy link</button>
-          <button class="wal-btn wal-btn-ghost wal-btn-sm" type="button" data-reset>Reset</button>
+          <button class="wal-btn wal-btn-ghost wal-btn-sm" type="button" data-reset aria-label="Reset palette">Reset</button>
         </div>
         <h3>Shipped palettes</h3>
         <div class="site-picks">
@@ -1963,7 +2144,7 @@ walnut.shuffle(materials, () =&gt; showOnly("Wood"));</pre></details>
     <button class="wal-door-pull" type="button" commandfor="how-colours" command="close" aria-label="Close"></button>
     <div class="wal-door-body">
       <div class="site-door-in">
-        <div class="site-door-head"><h2 id="how-colours-h">How colours are derived</h2></div>
+        <div class="site-door-head"><h2 id="how-colours-h">How colours are derived</h2><button class="wal-btn wal-btn-ghost wal-btn-sm" type="button" commandfor="how-colours" command="close">Close</button></div>
         <p class="site-soft">You set three colours and walnut makes five. Drag the accent round the wheel: bloom and cool follow it.</p>
         <div class="site-dial" id="dial" role="img" aria-label="The five colours on the colour wheel. Bloom and cool follow the accent unless a palette sets them.">
           <span class="site-arc site-arc-bloom"></span>
@@ -1999,13 +2180,13 @@ walnut.shuffle(materials, () =&gt; showOnly("Wood"));</pre></details>
     <button class="wal-door-pull" type="button" commandfor="basket" command="close" aria-label="Close"></button>
     <div class="wal-door-body">
       <div class="site-door-in">
-        <div class="site-door-head"><h2 id="basket-h">Your basket</h2><span class="wal-badge wal-badge-cool">Example</span></div>
+        <div class="site-door-head"><h2 id="basket-h">Your basket</h2><span class="wal-badge wal-badge-cool">Example</span><button class="wal-btn wal-btn-ghost wal-btn-sm" type="button" commandfor="basket" command="close">Close</button></div>
         <ul class="site-basket">
           <li><span class="site-plate" aria-hidden="true"><svg viewBox="0 0 400 260"><use href="#sideboard"/></svg></span><span>Walnut sideboard<span>Plate 14, sample swatch</span></span><b>£12</b></li>
           <li><span class="site-plate" aria-hidden="true"><svg viewBox="0 0 60 45"><rect x="13" y="19" width="34" height="7" rx="3.5" fill="url(#brassh)"/></svg></span><span>Brass pull<span>Set of five</span></span><b>£40</b></li>
         </ul>
         <p class="site-total"><span>Subtotal</span><span>£52</span></p>
-        <div class="site-actions"><button class="wal-btn wal-btn-primary" type="button" commandfor="basket" command="close">Check out</button></div>
+        <div class="site-actions"><button class="wal-btn wal-btn-primary" type="button" commandfor="basket" command="close">Close basket</button></div>
         <p class="site-muted">An example basket. Nothing is sold here.</p>
       </div>
     </div>
@@ -2032,19 +2213,19 @@ walnut.shuffle(materials, () =&gt; showOnly("Wood"));</pre></details>
       <p>We'll hold it for 48 hours. You won't be charged.</p>
       <div class="site-actions">
         <button class="wal-btn wal-btn-secondary" type="button" commandfor="demo-dialog" command="close">Not now</button>
-        <button class="wal-btn wal-btn-primary" type="button" commandfor="demo-dialog" command="close">Reserve</button>
+        <button class="wal-btn wal-btn-primary" type="button" commandfor="demo-dialog" command="close">Reserve sample</button>
       </div>
     </div>
   </dialog>
 
   <div class="wal-dialog site-pop" id="demo-pop" popover>
-    <h4>Native popover</h4>
+    <p class="site-pop-title">Native popover</p>
     <p>No JavaScript. Escape or clicking outside closes it.</p>
   </div>
 
   <div class="wal-menu" id="more-menu" popover>
     <button type="button" data-copy-live>Copy the palette</button>
-    <button type="button" data-copy-link>Share this palette</button>
+    <button type="button" data-copy-link>Copy link to this palette</button>
     <button type="button" commandfor="how-colours" command="show-modal">How colours are derived</button>
   </div>
 
@@ -2077,7 +2258,7 @@ walnut.shuffle(materials, () =&gt; showOnly("Wood"));</pre></details>
       <div class="site-wrap site-act-grid">
         <div class="site-stack">
           <span class="site-act-num" aria-hidden="true">II</span>
-          <p class="wal-eyebrow">Twilight, Dusk palette</p>
+          <p class="wal-eyebrow">Dusk palette</p>
           <h2 id="act-2-h">Tambour, in quarter-sawn walnut</h2>
           <p class="site-soft">Same markup as the section above. The palette changed when this section reached the middle of the screen.</p>
           <div class="wal-metric" style="--wal-metric-color: var(--wal-gold)"><span class="wal-metric-value">38</span><span class="wal-metric-label">Slats per door</span></div>
@@ -2091,7 +2272,7 @@ walnut.shuffle(materials, () =&gt; showOnly("Wood"));</pre></details>
       <div class="site-wrap site-act-grid">
         <div class="site-stack">
           <span class="site-act-num" aria-hidden="true">III</span>
-          <p class="wal-eyebrow">Firelight, Forest palette</p>
+          <p class="wal-eyebrow">Forest palette</p>
           <h2 id="act-3-h">Tapered, turned by hand</h2>
           <p class="site-soft">Add walnut-acts.js and a data-act attribute to each section. Scrolling back up reverses the changes.</p>
           <dl class="wal-plate">
@@ -2115,7 +2296,6 @@ walnut.shuffle(materials, () =&gt; showOnly("Wood"));</pre></details>
        window.walnut whole. -->
   <script type="module">
     const root = document.documentElement;
-    root.classList.add("site-js");
     const walnut = window.walnut ?? {};
     const reduce = matchMedia("(prefers-reduced-motion: reduce)");
     // View transitions with types: the lamp behind the mode button.
@@ -2124,7 +2304,8 @@ walnut.shuffle(materials, () =&gt; showOnly("Wood"));</pre></details>
     const $$ = (sel, el = document) => [...el.querySelectorAll(sel)];
     const deg = (h) => ((h % 360) + 360) % 360;
     const num = (cs, prop) => parseFloat(cs.getPropertyValue(prop));
-    const announce = (text) => { $("announce").textContent = text; };
+    // Emptied first, so the same words twice in a row are still a change.
+    const announce = (text) => { const el = $("announce"); el.textContent = ""; requestAnimationFrame(() => { el.textContent = text; }); };
 
     /* The numbers a palette is made of. The first eight are the ones a
        reader sets; bloom and cool chroma ride along so a rolled palette
@@ -2283,6 +2464,7 @@ walnut.shuffle(materials, () =&gt; showOnly("Wood"));</pre></details>
         const v = num(cs, el.dataset.prop);
         if (Number.isNaN(v)) continue;
         if (el !== dragging) el.value = isChroma(el.dataset.prop) ? v : deg(v);
+        el.style.setProperty("--fill", `${((el.value - el.min) / (el.max - el.min)) * 100}%`);
         el.parentElement.querySelector("output").textContent = fmt(el.dataset.prop, v);
       }
       const css = liveCss(cs);
@@ -2342,6 +2524,9 @@ walnut.shuffle(materials, () =&gt; showOnly("Wood"));</pre></details>
     const keyOf = (room) => (room === HOUSE ? "prairie" : room.slice(4));
     const roomFor = (key) => ROOMS.find((r) => keyOf(r) === key) ?? null;
     const address = (search, hash = location.hash) => location.pathname + (search ? "?" + search : "") + hash;
+    // replaceState throws on a path that starts "//", which reads as another
+    // origin. The page still works there; only the address stops following.
+    const setAddress = (url) => { try { history.replaceState(history.state, "", url); } catch {} };
     // Where the palette is going, not where it is: during a tween the
     // computed rods are still on their way, so a written rod wins.
     function share() {
@@ -2354,13 +2539,18 @@ walnut.shuffle(materials, () =&gt; showOnly("Wood"));</pre></details>
         const target = (p) => parseFloat(root.style.getPropertyValue(p) || cs.getPropertyValue(p));
         q.set("s", RODS.map((p) => (isChroma(p) ? target(p).toFixed(3) : deg(target(p)).toFixed(1))).join(","));
       }
-      history.replaceState(history.state, "", address(q.toString().replace(/%2C/g, ",")));
+      setAddress(address(q.toString().replace(/%2C/g, ",")));
     }
+    // Only plain decimals, as share() writes them: Number() alone would also
+    // take "", "0x1f" and "1e308".
+    const DECIMAL = /^-?\d{1,4}(\.\d{1,4})?$/;
+    // Each half is used if it reads, so a mistyped palette name keeps the numbers, and
+    // mistyped numbers keep the palette.
     function fromLink() {
       const q = new URLSearchParams(location.search);
-      const room = q.has("p") ? roomFor(q.get("p")) : HOUSE;
-      const v = q.has("s") ? q.get("s").split(",").map(Number) : null;
-      if (!room || (v && (v.length !== RODS.length || !v.every(Number.isFinite)))) return;
+      const room = roomFor((q.get("p") ?? "").trim().toLowerCase().replace(/^wal-/, "")) ?? HOUSE;
+      const s = q.get("s")?.split(",");
+      const v = s?.length === RODS.length && s.every((x) => DECIMAL.test(x)) ? s.map(Number) : null;
       enter(room);
       if (v) RODS.forEach((p, i) => root.style.setProperty(p, String(isChroma(p) ? Math.min(0.4, Math.max(0, v[i])) : deg(v[i]))));
     }
@@ -2474,6 +2664,7 @@ walnut.shuffle(materials, () =&gt; showOnly("Wood"));</pre></details>
       const next = NEXT[pref];
       const from = scheme(), to = schemeIf(next);
       pref = next;
+      announce(`Colour mode: ${SAY[pref]}.`);
       try { pref === "auto" ? localStorage.removeItem("walnut-mode") : localStorage.setItem("walnut-mode", pref); } catch {}
       const flip = () => { setTheme(pref); syncMode(); paint(); };
       if (from === to || !typed || reduce.matches) return flip();
@@ -2531,13 +2722,17 @@ walnut.shuffle(materials, () =&gt; showOnly("Wood"));</pre></details>
     dial.addEventListener("pointercancel", release);
 
     /* ── Copying ── */
+    const copied = new WeakMap(); // button → the timer that puts its label back
     const copy = async (text, button) => {
       try {
         await navigator.clipboard.writeText(text);
         if (button && !button.closest("[popover]")) {
-          const was = button.textContent;
+          // The label from before the first press, so a second press inside
+          // the 1.6 s doesn't take "Copied" as the one to go back to.
+          button.dataset.label ??= button.textContent;
           button.textContent = "Copied";
-          setTimeout(() => { button.textContent = was; }, 1600);
+          clearTimeout(copied.get(button));
+          copied.set(button, setTimeout(() => { button.textContent = button.dataset.label; }, 1600));
         }
         announce("Copied.");
       } catch {
@@ -2548,7 +2743,14 @@ walnut.shuffle(materials, () =&gt; showOnly("Wood"));</pre></details>
       const b = e.target.closest("[data-copy-live], [data-copy-link], [data-copy-from], [data-copy]");
       if (!b) return;
       b.closest("[popover]")?.hidePopover();
-      if (b.matches("[data-copy-live]")) copy((b.parentElement.querySelector("[data-live-css]") ?? lives[0]).textContent, b);
+      if (b.matches("[data-copy-live]")) {
+        // Just after load the colours are still animating in, so the numbers are copied where they land.
+        const moving = root.getAnimations().filter((a) => a.effect?.getComputedTiming().endTime < Infinity);
+        Promise.allSettled(moving.map((a) => a.finished)).then(() => {
+          if (moving.length) paint();
+          copy((b.parentElement.querySelector("[data-live-css]") ?? lives[0]).textContent, b);
+        });
+      }
       else if (b.matches("[data-copy-link]")) { share(); copy(location.href, b); }
       else if (b.matches("[data-copy-from]")) copy($(b.dataset.copyFrom).textContent, b);
       else copy(b.parentElement.querySelector("[data-css]").textContent, b);
@@ -2561,15 +2763,15 @@ walnut.shuffle(materials, () =&gt; showOnly("Wood"));</pre></details>
        every text pair. Filled once, before any drawer is pulled, so each
        slides out at its full height. */
     const ABOUT = {
-      "site-prairie": "This site's own. A cool limestone ground kept close to grey, so the five colours carry it: brick leads, with apricot, ochre, prairie grass and sky.",
-      "wal-forest": "A mossy forest floor at dawn: fern on leaf litter, warmed by campfire copper. Its dark mode goes deeper than walnut's own.",
-      "wal-bone": "Sunlit linen and Japanese stationery. Light first: it keeps a page light when the system is dark, unless the reader chooses dark.",
-      "wal-cafe": "A coffee shop at golden hour: china blue against a warm amber room, with brass and a walnut counter.",
-      "wal-dusk": "A mountain sunset going to twilight: violet on a dusky ground, with afterglow and lantern light. In dark mode the colours are lit from below.",
-      "wal-press": "A 1960s parts catalogue on paper stock. Light first, like Bone: tomato leads, with goldenrod, olive and an Adriatic blue.",
+      "site-prairie": "This site's palette. A cool grey ground, so the colours stand out: a red-orange accent with apricot, ochre, green and blue.",
+      "wal-forest": "A green accent with a copper bloom, on a green-tinted ground. Its dark mode is darker than walnut's own.",
+      "wal-bone": "A blue accent on a warm, light ground. It keeps a page light when the system is dark, unless the reader chooses dark.",
+      "wal-cafe": "A blue accent on a warm amber ground, with a brass-coloured gold.",
+      "wal-dusk": "A violet accent on a violet-grey ground, with a magenta bloom, orange gold and a blue cool.",
+      "wal-press": "A red-orange accent on a warm paper ground, with goldenrod, olive and blue. It keeps a page light, like Bone.",
     };
     const ROLES = {
-      ground: "surfaces and text", accent: "links, main button", bloom: "washes, highlights",
+      ground: "surfaces and text", accent: "links, main button", bloom: "pale tints, highlights",
       gold: "rules, markers", olive: "tags, quiet states", cool: "the contrast colour",
     };
     // Prairie is this site's own, so on your site it is these numbers, as
@@ -2617,7 +2819,7 @@ walnut.shuffle(materials, () =&gt; showOnly("Wood"));</pre></details>
     drawers.forEach(fillDrawer);
 
     // The drawer that is out is in the address, so a link opens it.
-    const keep = (hash) => history.replaceState(history.state, "", location.pathname + location.search + hash);
+    const keep = (hash) => setAddress(location.pathname + location.search + hash);
     for (const d of drawers) {
       d.addEventListener("toggle", () => {
         if (d.open && location.hash !== `#${d.id}`) keep(`#${d.id}`);
@@ -2834,7 +3036,7 @@ walnut.shuffle(materials, () =&gt; showOnly("Wood"));</pre></details>
 
     function usePhoto(img, from, instant) {
       try { reading = paletteOf(img); }
-      catch { photoMsg.textContent = "That photo can't be read here: its server doesn't share its pixels. Try another, or one of your own."; return; }
+      catch { photoMsg.textContent = "That photo can't be read here because its server doesn't allow it. Try another, or use your own."; return; }
       const change = { rods: reading.rods };
       if (!walnut.recolour) { for (const [p, v] of Object.entries(reading.rods)) photoRoom.style.setProperty(p, v); showPhoto(reading); }
       else if (instant) walnut.recolour.apply(photoRoom, change);
@@ -2853,14 +3055,24 @@ walnut.shuffle(materials, () =&gt; showOnly("Wood"));</pre></details>
     const opening = () => { if (reading) return; picks[0].setAttribute("aria-pressed", "true"); usePhoto(first, picks[0], true); };
     if (first.complete && first.naturalWidth) opening(); else first.addEventListener("load", opening, { once: true });
 
+    // The photo never leaves the browser: it is read from a local blob URL.
+    const MAX_PHOTO = 25 * 1024 * 1024;
     function useFile(file) {
-      if (!file || !file.type.startsWith("image/")) return;
+      if (!file) return;
+      if (!file.type.startsWith("image/")) { photoMsg.textContent = "That file isn't an image. Try a JPEG, PNG or WebP."; return; }
+      if (file.size > MAX_PHOTO) { photoMsg.textContent = "That photo is over 25 MB. Try a smaller one."; return; }
       const img = new Image();
       const url = URL.createObjectURL(file);
       img.onload = () => {
-        for (const o of picks) o.setAttribute("aria-pressed", "false");
-        usePhoto(img, $("photo-file").parentElement);
+        try {
+          if (!img.naturalWidth || !img.naturalHeight) { photoMsg.textContent = "That image is empty. Try another photo."; return; }
+          for (const o of picks) o.setAttribute("aria-pressed", "false");
+          usePhoto(img, $("photo-file").parentElement);
+        } finally { URL.revokeObjectURL(url); }
+      };
+      img.onerror = () => {
         URL.revokeObjectURL(url);
+        photoMsg.textContent = "This browser can't open that image. Try a JPEG, PNG or WebP.";
       };
       img.src = url;
     }
@@ -2894,6 +3106,7 @@ walnut.shuffle(materials, () =&gt; showOnly("Wood"));</pre></details>
       const done = $("book-done");
       done.textContent = `${n} ${n === 1 ? "seat" : "seats"} held. Demo only, nothing was sent.`;
       done.hidden = false;
+      announce(done.textContent);
     });
 
     /* ── Charts: a new value moves the columns and turns the ring ── */
@@ -2924,7 +3137,9 @@ walnut.shuffle(materials, () =&gt; showOnly("Wood"));</pre></details>
       prints.forEach((f, i) => {
         const ink = v || inks[i];
         f.dataset.ink = ink;
-        f.closest(".site-print").querySelector(".site-plaque").textContent = title(ink);
+        const plaque = f.closest(".site-print").querySelector(".site-plaque");
+        plaque.dataset.cue = ink;
+        plaque.querySelector("span").textContent = title(ink);
       });
     });
 
@@ -2933,7 +3148,7 @@ walnut.shuffle(materials, () =&gt; showOnly("Wood"));</pre></details>
 
     const pulls = $$(".site-materials details");
     const pullAll = $("pull-all");
-    const pullLabel = () => { pullAll.textContent = pulls.every((d) => d.open) ? "Close all three" : "Open all three"; };
+    const pullLabel = () => { pullAll.textContent = pulls.every((d) => d.open) ? "Close all three drawers" : "Open all three drawers"; };
     pullAll.addEventListener("click", () => {
       const open = !pulls.every((d) => d.open);
       for (const d of pulls) d.open = open;
@@ -2953,8 +3168,23 @@ walnut.shuffle(materials, () =&gt; showOnly("Wood"));</pre></details>
       let shown = 0;
       for (const li of mats) { li.hidden = Boolean(kind) && li.dataset.kind !== kind; if (!li.hidden) shown++; }
       $("mat-count").textContent = `${shown} of ${mats.length}`;
+      hold();
     }
-    const shuffle = () => (walnut.shuffle ? walnut.shuffle(grid, arrange) : arrange());
+    // The grid keeps the height of all twelve, so a filter never moves what's below it. Only
+    // while the grid fits on screen: taller than that, nothing below is in view to move. It's
+    // measured before a shuffle starts, since inside one the layout read can be stale.
+    let full = 0;
+    const hold = () => { grid.style.minBlockSize = full && full < innerHeight ? `${full}px` : ""; };
+    function measureFull() {
+      const out = mats.filter((li) => li.hidden);
+      grid.style.minBlockSize = "";
+      for (const li of out) li.hidden = false;
+      full = grid.offsetHeight;
+      for (const li of out) li.hidden = true;
+      hold();
+    }
+    addEventListener("resize", measureFull);
+    const shuffle = () => { measureFull(); return walnut.shuffle ? walnut.shuffle(grid, arrange) : arrange(); };
     seg("[data-mat-filter]", (v) => { kind = v; shuffle(); });
     seg("[data-mat-sort]", (v) => { order = v; shuffle(); });
     arrange();
@@ -2977,8 +3207,11 @@ walnut.shuffle(materials, () =&gt; showOnly("Wood"));</pre></details>
     for (const b of $$("[data-room-close]")) b.addEventListener("click", () => closeRoom(b));
     room.addEventListener("cancel", (e) => { e.preventDefault(); closeRoom(roomFrom); });
     room.addEventListener("close", () => {
-      if (history.state?.site === "room") history.back();
-      roomFrom?.focus({ preventScroll: true });
+      // Going back re-applies the address, and with it the browser focuses the section it
+      // names, so the card takes focus back once that's done.
+      const refocus = () => requestAnimationFrame(() => roomFrom?.focus({ preventScroll: true }));
+      if (history.state?.site === "room") { addEventListener("popstate", refocus, { once: true }); history.back(); }
+      else refocus();
     });
     addEventListener("popstate", () => { if (room.open && history.state?.site !== "room") closeRoom(roomFrom); });
 
@@ -3022,7 +3255,36 @@ walnut.shuffle(materials, () =&gt; showOnly("Wood"));</pre></details>
       sections.forEach((s) => seen.observe(s));
     }
 
-    /* ── Reveals: once, as each tile arrives ── */
+    // On a phone the links scroll sideways; once the page stops, the current one is brought into view.
+    const linkRow = $$(".site-nav .wal-nav-links")[0];
+    const current = CSS.supports("selector(:target-current)") ? "a:target-current" : "a.is-active";
+    // :target-current settles a frame or two after the scroll ends, so it's read then.
+    addEventListener("scrollend", () => requestAnimationFrame(() => requestAnimationFrame(() => {
+      const a = linkRow.scrollWidth > linkRow.clientWidth && linkRow.querySelector(current);
+      if (!a) return;
+      const start = a.offsetLeft - linkRow.offsetLeft, end = start + a.offsetWidth;
+      if (start >= linkRow.scrollLeft && end <= linkRow.scrollLeft + linkRow.clientWidth) return;
+      linkRow.scrollTo({ left: start - 16, behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "instant" : "smooth" });
+    })));
+
+    /* ── Reveals: once, as each tile arrives ──
+       The tiles hide only here, beside the observer that shows them, so a
+       script that stops early leaves them in plain view. */
+    root.classList.add("site-js");
+    // Once the fonts are in, two frames: the first lays every section out at
+    // its final size, which is remembered before the second turns skipping
+    // on. A section skipped before the fonts arrive would keep its old
+    // height and move whatever a link scrolled to.
+    // Skipping can change the height of sections above the address, and a browser that
+    // looked for it while its tab was hidden may not look again, so the page lands on it
+    // once more, unless the reader has started scrolling.
+    let touched = false;
+    for (const t of ["wheel", "touchstart", "keydown", "pointerdown"]) addEventListener(t, () => { touched = true; }, { once: true, passive: true, capture: true });
+    document.fonts.ready.then(() => requestAnimationFrame(() => requestAnimationFrame(() => {
+      root.classList.add("site-skim");
+      const target = !touched && location.hash.length > 1 && document.getElementById(decodeURIComponent(location.hash.slice(1)));
+      if (target && target.checkVisibility()) target.scrollIntoView({ behavior: "instant" });
+    })));
     const reveal = new IntersectionObserver((entries) => {
       for (const entry of entries) if (entry.isIntersecting) { entry.target.classList.add("is-in"); reveal.unobserve(entry.target); }
     }, { rootMargin: "0px 0px -12% 0px" });
@@ -3043,6 +3305,11 @@ walnut.shuffle(materials, () =&gt; showOnly("Wood"));</pre></details>
       }
       if (q) reference.open = true;
       $("ref-count").textContent = q ? `${hits} of ${refItems.length} sections match.` : "";
+    });
+    reference.addEventListener("toggle", () => {
+      if (reference.open || !refQ.value) return;
+      refQ.value = "";
+      refQ.dispatchEvent(new Event("input"));
     });
     // /reference redirects to #reference: a link to it opens it, so it lands
     // on the reference rather than on a shut summary at the foot of the page.
