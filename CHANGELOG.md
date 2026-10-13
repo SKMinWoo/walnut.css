@@ -168,6 +168,24 @@ the platform can now draw with no script.
   the script the sections stack under their names (index panels stay
   cards, so what is made for the card keeps its contrast), and print shows
   every panel. Types in `walnut-tabs.d.ts`, export `walnut.css/tabs`.
+- **Depth.** `walnut-depth.js`, the fifth optional script, puts a light
+  over the page so that a window held up off it casts a real shadow: sharp
+  where it touches, further off, softer and paler the higher it goes. The
+  gatefold's cover is picked up off the card, carried, and held over the
+  page, and the notes cast their own shadow as they turn on the spine,
+  sharp along it and soft at the far edge; closing sets the cover down on
+  the card. Drawn with three.js into one canvas under the window, at half
+  resolution, only on the frames something moves and once when it lands,
+  and worked out exactly per shape in the shader rather than through a
+  shadow map. three.js is fetched at idle, only on a page with a window to
+  light, never under reduced motion or Save-Data, from `data-three`, an
+  import map's `three` or a pinned jsDelivr URL (an optional peer
+  dependency in a bundled app). Without it, or without WebGL, the window
+  keeps its CSS shadow; with it, `<html data-wal-depth>` stands that shadow
+  down. `--wal-depth-ink` is the shadow's colour, `--wal-elevation` how
+  high a window is held, and `walnut.depth.styles` lights a movement of
+  your own. Types in `walnut-depth.d.ts`, export `walnut.css/depth`. The
+  build checks that the docs' CSP allows the pinned three.js URL.
 - **`window.walnut` is typed as `WalnutGlobal`**, an interface each
   script's types add to, so `walnut.css/motion` and `walnut.css/tabs` can
   both be imported.

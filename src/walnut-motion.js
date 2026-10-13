@@ -113,8 +113,11 @@
       const { duration, ease, glide } = timing(dialog, "open");
       const T = pace(a, b, duration);
       art.style.visibility = "hidden";
+      // The spread's shadow grows as it lifts, unless walnut-depth.js is
+      // casting it instead, and there is none here to grow.
+      const shade = getComputedStyle(spread).filter;
       const anims = [
-        spread.animate([{ filter: "drop-shadow(0 0 0 transparent)" }, { filter: getComputedStyle(spread).filter }], { duration: T, easing: glide }),
+        ...(shade === "none" ? [] : [spread.animate([{ filter: "drop-shadow(0 0 0 transparent)" }, { filter: shade }], { duration: T, easing: glide })]),
         cover.animate([over(cover, a, b, art), home], { duration: T * 0.9, easing: glide }),
         notes.animate([{ transform: turn }, { transform: "none" }],
           { duration: T * 1.05, delay: T * 0.42, easing: ease, fill: "backwards" }),

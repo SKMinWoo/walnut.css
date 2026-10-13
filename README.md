@@ -252,7 +252,7 @@ That includes bloom and cool: inside a `.wal-palette` they follow the accent in 
 | **Duotone** | **`.wal-duotone`** | **Any photo printed in one of the palette's cues and paper; `data-ink` picks the cue. [Details](#duotone)** |
 | **Plan chest** | **`.wal-chest`** | **Drawers in the flow of the page, made of `<details>`; each slides out of its slot. [Details](#plan-chest)** |
 | **Sliding door** | **`.wal-door`** | **A side panel on its track, made of a `<dialog>`; no script. [Details](#sliding-door)** |
-| **Window** | **`.wal-window`** | **A page inside the page; opens as a gatefold from the card that opened it. [Details](#window-and-gatefold)** |
+| **Window** | **`.wal-window`** | **A page inside the page; opens as a gatefold from the card that opened it, and with `walnut-depth.js` is held over the page in a light of its own. [Details](#window-and-gatefold), [depth](#depth)** |
 | **Chart** | **`.wal-chart` `.wal-ring` `.wal-key`** | **Columns on a brass rail, a ring in a brass bezel, and their key, in the five cues. [Details](#chart)** |
 | Tint | `.wal-tint` | Any colour you give it, as ink, wash, fill and text on the fill, legible in both modes. [Details](#tint) |
 | Select | `.wal-select` | A `<select>` whose options can show a swatch or an icon. [Details](#menu-select-and-carousel) |
@@ -377,6 +377,38 @@ A side panel that runs in on a track from the right and throws its shadow across
 A page inside the page. `.wal-window` is the room it opens in, the whole viewport; on its own it opens like `.wal-dialog`, its panel (`.wal-window-panel`) rising the last few pixels into place. With `data-wal-open="gatefold"` and `walnut-motion.js` it opens like a gatefold sleeve: the cover travels out of the card's picture (`[data-wal-art]`, or the whole button), and the notes unfold beside it on the spine. Closing plays it back, and the cover goes home to the card. The window's own buttons drive it; from script, `walnut.open(dialog, button)` and `walnut.open.close(dialog)`. A window that a link or Back opens has no press to travel from: `walnut.open(dialog, card, { instant: true })` opens it in place, and closing still takes the cover home to that card. A close asked for while the window is still opening (Back pressed early, say) waits for it to land. A card whose picture is not drawn (`display: none` in a print or compact layout, say) has nowhere to travel from, so the window opens and closes in place.
 
 The cover's shape is `--wal-cover-ratio`, `10 / 11` unless you set it on the window or anywhere above it, and it needn't be the shape of the card's picture. The cover is never stretched: it leaves at one scale, cropped to the picture's shape, and the crop opens out as it lands. `--wal-cover-focus` says which part of the cover the picture is, read the way `object-position` is (`50% 50%` unless you set it; `50% 0%` for a screenshot whose top is the picture). The Gatefold tab on [the docs' home page](docs/index.html#motion-gatefold) opens Forest this way. The notes are the cover's size and scroll inside it. On a phone the spread stacks and the notes fold down. Without the script, or under reduced motion, the window simply opens.
+
+### Depth
+
+```html
+<script src="walnut-motion.js" defer></script>
+<script src="walnut-depth.js" defer></script>
+```
+
+A light over the page, so a thing lifted off it casts the shadow a held thing does: sharp where it touches, then further off, softer and paler the higher it goes. The gatefold is what it lights. The cover is picked up off the card, carried up a little past where it will be held and lowered into the hand, and the notes cast their own shadow as they turn on the spine and lie down beside it, sharp along the spine and soft at the far edge. Closing carries the cover back and sets it down on the card.
+
+The shadow is drawn with [three.js](https://threejs.org), in one canvas laid under the window while it is open. It is drawn on the frames where something moves and once when it lands, so a window held open costs nothing, and at half the screen's resolution, since a shadow has no detail to lose. It is not a shadow map: each shape's shadow is worked out exactly in the shader, as a box blurred by how high each of its edges is held, which is what keeps a touching edge sharp and lets a raised one go soft.
+
+three.js is about 130 KB gzipped from a bundler and 190 KB as the whole library from a CDN, so it is never on the page's critical path. It is fetched once the page is idle, and only on a page with a window to light; never under reduced motion or Save-Data, where the window keeps its CSS shadow. It comes from `data-three` on the script if you give one, else from your import map's `three` (or your bundler's: it is an optional peer dependency), else from jsDelivr, pinned:
+
+```html
+<script src="walnut-depth.js" data-three="/vendor/three.module.min.js" defer></script>
+```
+
+Until it arrives, and wherever there is no WebGL, the window keeps the CSS shadow it has always had. Once the light is on, `<html>` carries `data-wal-depth` and that shadow stands down, so the two are never drawn together; if the GPU drops the context, the CSS shadow comes back.
+
+| Token | |
+|-------|-|
+| `--wal-depth-ink` | The shadow's colour: the ground rod near black, so it darkens what it falls on rather than greying it. Its alpha is the darkest the shadow gets, right under a thing that touches. |
+| `--wal-elevation` | How high a window is held: 60px at `1`. Catalogue's `0.35` holds it low; `0` casts nothing, as in print. |
+
+A movement of your own (`walnut.open.styles.mine`) is lit by naming what it lifts, from `0` on the page to `1` held. It is asked on every frame the window moves, so the lift can follow the movement; the shape is read from the element's own transform and `inset()` clip-path:
+
+```js
+walnut.depth.styles.mine = (dialog) => [{ el: dialog.querySelector(".card"), lift: 1 }];
+```
+
+`walnut.depth.light` is the light (which way the shadows fall, and how soft they grow), and `walnut.depth.ready()` fetches three.js now rather than at idle, resolving to whether the light is on.
 
 ### Tint
 
@@ -568,7 +600,7 @@ Acts can also play inside something that scrolls on its own, such as a full-scre
 </dialog>
 ```
 
-`walnut-acts.js` is optional, one of four small scripts walnut ships: CSS has no way for a section to hand its palette to `<html>`. It wakes only when an act's edge crosses the middle of the window, so scrolling within an act costs nothing. The full-page view on [the docs' home page](docs/index.html#motion-full-page) is a window in three acts.
+`walnut-acts.js` is optional, one of five small scripts walnut ships: CSS has no way for a section to hand its palette to `<html>`. It wakes only when an act's edge crosses the middle of the window, so scrolling within an act costs nothing. The full-page view on [the docs' home page](docs/index.html#motion-full-page) is a window in three acts.
 
 ### From the swatch
 
