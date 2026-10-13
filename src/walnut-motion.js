@@ -310,16 +310,34 @@
      so the rest of the page stays live and a second list can shuffle at the
      same time; on the document where it cannot. Returns the transition, or
      nothing when the change was simply made. */
+  let shuffled = 0;
   walnut.shuffle = (list, change) => {
     const start = list.startViewTransition?.bind(list) ?? document.startViewTransition?.bind(document);
     if (reduce.matches || !start) { change(); return; }
     list.classList.add("is-shuffling");
-    const t = start(change);
+    // A browser that can only run it on the document may be one that can't
+    // name each item from the element (match-element, Chrome 137), where
+    // every item would share one name and the transition would fail. So
+    // there each item gets a name of its own, before and after the change.
+    const named = new Set();
+    const name = () => {
+      if (list.startViewTransition) return;
+      for (const el of list.children) {
+        if (el.style.viewTransitionName) continue;
+        el.style.viewTransitionName = `wal-shuffle-${++shuffled}`;
+        named.add(el);
+      }
+    };
+    name();
+    const t = start(async () => { await change(); name(); });
     // A transition the browser skips (another one started, or it could not
     // picture the list) still makes the change; only the movement is lost,
     // which is not the page's error to report.
     t.ready.catch(() => {});
-    t.finished.finally(() => list.classList.remove("is-shuffling"));
+    t.finished.finally(() => {
+      list.classList.remove("is-shuffling");
+      for (const el of named) el.style.viewTransitionName = "";
+    });
     return t;
   };
 })();

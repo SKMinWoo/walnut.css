@@ -39,6 +39,7 @@
   const walnut = (window.walnut ??= {});
   const reduce = matchMedia("(prefers-reduced-motion: reduce)");
   const shows = new WeakMap(); // a box → its show(panel)
+  const FOCUSABLE = 'a[href], button, input, select, textarea, summary, iframe, [contenteditable], [tabindex]:not([tabindex="-1"])';
   let made = 0;
 
   const slug = (s) => s.toLowerCase().replace(/&/g, "and").replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
@@ -117,8 +118,10 @@
         tab.setAttribute("aria-selected", String(on));
         tab.tabIndex = on ? 0 : -1;
         // A hidden panel keeps its box under until-found, so it would still
-        // take focus from Tab.
-        panels[j].tabIndex = on ? 0 : -1;
+        // take focus from Tab. The chosen one is a Tab stop only when nothing
+        // in it is, as the ARIA tabs pattern advises; otherwise Tab would stop
+        // on the panel and then straight away on its first control.
+        panels[j].tabIndex = on && !panels[j].querySelector(FOCUSABLE) ? 0 : -1;
         // The attribute, not the property: a browser without until-found
         // would turn the property into a plain hidden="", which print
         // cannot undo.

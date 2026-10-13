@@ -7,6 +7,7 @@
  * first byte is written, so a failing guard leaves dist/ and public/ exactly
  * as the last good build left them rather than half-rewritten.
  */
+const crypto = require("crypto");
 const fs = require("fs");
 const path = require("path");
 
@@ -81,6 +82,13 @@ const minified = bundle
   // with no error anywhere. Nothing in src/ is written that way. If a selector
   // ever needs it, spell it `.a *:hover`, which survives.
   .replace(/\s*([{}:;,>])\s*/g, "$1")
+  // ...except after a property whose value is a dashed ident. A browser that
+  // doesn't know the property (anchor-scope before Chrome 131) re-reads the
+  // failed declaration as a nested rule, and `anchor-scope:--wal-carousel`
+  // reads as a selector with the old `:--state` syntax, which Chrome 125-130
+  // reports as a console error on every page. With the space it's no selector
+  // at all. The rule after it was never lost either way; only the error was.
+  .replace(/([;{][a-z][a-z-]*):--/g, "$1: --")
   // Remove trailing semicolons before closing braces
   .replace(/;}/g, "}")
   // Remove empty rules
@@ -258,6 +266,47 @@ function assertBundlerSafe(css) {
   }
 }
 
+/**
+ * Guard the Content-Security-Policy in vercel.json against the pages it covers.
+ *
+ * The policy lets the page's inline scripts run by their hash, so any edit to
+ * one changes what the policy must say. A stale hash fails closed in the
+ * worst way: the deployed page loads with its script blocked, and nothing in
+ * the build would have noticed. So on a local build the hashes are rewritten
+ * into vercel.json (the change shows up in git, to be committed with the
+ * page), and on Vercel or CI a mismatch fails the build, since what deploys
+ * must be what was committed.
+ *
+ * The hash is of the script's text as the browser parses it, and the HTML
+ * parser turns CRLF into LF first, so a Windows checkout hashes the same.
+ *
+ * @param {string} config  vercel.json exactly as read from disk
+ * @param {string[]} pages  each deployed page's HTML
+ * @returns {string | null}  vercel.json with the hashes corrected, or null if they were right
+ * @throws on Vercel or CI when the hashes are stale, or when no policy is found
+ */
+function syncCspHashes(config, pages) {
+  const want = [...new Set(pages.flatMap((html) =>
+    [...html.matchAll(/<script(?![^>]*\ssrc=)[^>]*>([^]*?)<\/script>/g)].map((m) =>
+      `'sha256-${crypto.createHash("sha256").update(m[1].replace(/\r\n?/g, "\n")).digest("base64")}'`)))];
+  const header = JSON.parse(config).headers?.flatMap((h) => h.headers).find((h) => h.key === "Content-Security-Policy");
+  const scriptSrc = header?.value.match(/(?:^|;\s*)script-src ([^;]*)/);
+  if (!scriptSrc) throw new Error("vercel.json: no Content-Security-Policy with a script-src directive to check.");
+  const have = scriptSrc[1].split(/\s+/).filter((t) => t.startsWith("'sha256-"));
+  if (have.length === want.length && want.every((h) => have.includes(h))) return null;
+
+  if (process.env.VERCEL || process.env.CI) {
+    throw new Error(
+      `vercel.json's script-src does not match the inline scripts in docs/.\n` +
+        `  Deployed like this, the browser would refuse to run them. Run the build\n` +
+        `  locally, which rewrites the hashes, and commit vercel.json.`
+    );
+  }
+  const kept = scriptSrc[1].split(/\s+/).filter((t) => t && !t.startsWith("'sha256-"));
+  const value = header.value.replace(scriptSrc[0], () => scriptSrc[0].replace(scriptSrc[1], () => [...kept, ...want].join(" ")));
+  return config.replace(JSON.stringify(header.value), () => JSON.stringify(value));
+}
+
 // ─── Assemble the deployable site (in memory) ───
 //
 // A static host serves exactly one directory. The docs page and the
@@ -285,10 +334,33 @@ function assertBundlerSafe(css) {
    addresses to the anchors that replaced them. */
 const DOCS_PAGES = ["index.html"];
 const STYLESHEET_LINKS = /<link rel="stylesheet" href="\.\.\/dist\//g;
-const DIST_REFS = /\.\.\/dist\//g;
+
+/* Two more changes on the way to public/.
+
+   The page links walnut.min.css there, not walnut.css: it is the file the
+   README says to install and the one the page's "under 18 KB" is measured
+   on, so the site runs on what it ships, at a third of the bytes.
+
+   Each dist/ URL also carries a hash of the file it names (?v=…). vercel.json
+   lets dist/ be cached for ten minutes and served stale for a day, while the
+   page itself is always fresh, so without it a returning reader could run a
+   new page against the last deploy's scripts. */
+const hashOf = (text) => crypto.createHash("sha256").update(text).digest("hex").slice(0, 10);
+const PUBLISHED = {
+  "walnut.css": ["walnut.min.css", minified],
+  ...Object.fromEntries(Object.entries({ ...sheets, ...scripts }).map(([file, text]) => [file, [file, text]])),
+  ...Object.fromEntries(Object.entries(themeCss).map(([theme, css]) => [`themes/${theme}.css`, [`themes/${theme}.css`, css]])),
+};
+function publish(page, html) {
+  return html.replace(/\b(href|src)="\.\.\/dist\/([^"?#]+)"/g, (_, attr, file) => {
+    if (!PUBLISHED[file]) throw new Error(`docs/${page} links ../dist/${file}, which this build does not make.`);
+    const [name, text] = PUBLISHED[file];
+    return `${attr}="dist/${name}?v=${hashOf(text)}"`;
+  });
+}
 const docsPages = DOCS_PAGES.map((page) => {
   const html = fs.readFileSync(path.join(DOCS, page), "utf8");
-  return { page, html, site: html.replace(DIST_REFS, "dist/") };
+  return { page, html, site: publish(page, html) };
 });
 
 // ─── Guards — all of them, before anything is written ───
@@ -300,6 +372,8 @@ assertVersionStamped({
   ...Object.fromEntries(docsPages.map(({ page, html }) =>
     [`docs/${page}`, [...html.matchAll(/<span data-version>([^<]*)<\/span>/g)].map((m) => m[1])])),
 });
+const VERCEL_JSON = path.join(__dirname, "vercel.json");
+const vercelFixed = syncCspHashes(fs.readFileSync(VERCEL_JSON, "utf8"), docsPages.map(({ site }) => site));
 
 // ─── Write ───
 fs.mkdirSync(path.join(DIST, "themes"), { recursive: true });
@@ -328,6 +402,7 @@ if (fs.existsSync(path.join(DOCS, "favicon.svg"))) {
 if (fs.existsSync(path.join(DOCS, "favicon.ico"))) {
   fs.copyFileSync(path.join(DOCS, "favicon.ico"), path.join(PUBLIC, "favicon.ico"));
 }
+if (vercelFixed) fs.writeFileSync(VERCEL_JSON, vercelFixed);
 
 // ─── Report sizes ───
 const fullSize = Buffer.byteLength(bundle, "utf8");
@@ -338,4 +413,5 @@ console.log(`  dist/walnut.css         ${(fullSize / 1024).toFixed(1)} KB`);
 console.log(`  dist/walnut.min.css     ${(minSize / 1024).toFixed(1)} KB`);
 for (const [file, txt] of Object.entries({ ...sheets, ...scripts })) console.log(`  dist/${file.padEnd(18)} ${(Buffer.byteLength(txt, "utf8") / 1024).toFixed(1)} KB`);
 console.log(`  themes:                 ${THEMES.join(", ")}`);
+if (vercelFixed) console.log(`\n  vercel.json: the CSP's script hashes were out of date and have been\n  rewritten to match docs/. Commit vercel.json with the page.`);
 console.log();

@@ -3529,6 +3529,16 @@ html::-webkit-scrollbar-thumb:hover { background: var(--wal-accent); }
     }
   }
 
+  /* The menu anchors to the button that opened it, which needs
+     position-area and a popover that knows its button (Chrome 133,
+     Safari 26). Without position-area, inset: auto would leave it where it
+     sits in the page, often off screen, so it opens in the middle of the
+     screen, as a popover does by default. Chrome 129 to 132 have
+     position-area but not the button link, and CSS can't tell them apart. */
+  @supports not (position-area: block-end) {
+    .wal-menu { inset: 0; margin: auto; }
+  }
+
   .wal-menu:popover-open {
     display: grid;
     opacity: 1;
@@ -5034,7 +5044,9 @@ html::-webkit-scrollbar-thumb:hover { background: var(--wal-accent); }
      transition catches them. An item that stays travels; one that leaves
      shrinks and fades; one that arrives grows in once the others are on
      their way. A browser without scoped transitions runs it on the
-     document, and without any, the change simply happens. */
+     document, with the names given by the script, since it may not know
+     match-element either. Without any transitions, the change simply
+     happens. */
   .wal-shuffle.is-shuffling > * {
     view-transition-name: match-element;
     view-transition-class: wal-shuffle;
