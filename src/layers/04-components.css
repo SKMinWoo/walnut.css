@@ -2067,12 +2067,6 @@
     }
   }
 
-  /* walnut-depth.js casts the spread's shadow from a light over the page,
-     and says so on <html>. This one stands down, so the two are never drawn
-     together; without the script, or without WebGL, it stays. */
-  :root[data-wal-depth] .wal-gatefold-spread { filter: none; }
-  :root[data-wal-depth] .wal-window:not([data-wal-open]) > .wal-window-panel { box-shadow: none; }
-
   /* Each half moves as a transform on its own layer. Kept on that layer while
      the window is open: dropped the moment the notes land, their page would
      be painted again in that frame, and the landing is the frame where a

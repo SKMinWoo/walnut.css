@@ -39,10 +39,6 @@
       "types": "./dist/walnut-tabs.d.ts",
       "default": "./dist/walnut-tabs.js"
     },
-    "./depth": {
-      "types": "./dist/walnut-depth.d.ts",
-      "default": "./dist/walnut-depth.js"
-    },
     "./themes/*.css": "./dist/themes/*.css",
     "./themes/*": "./dist/themes/*.css",
     "./src/*": "./src/*",
@@ -59,14 +55,6 @@
     "build": "node build.js",
     "dev": "node build.js && npx serve public",
     "prepublishOnly": "node build.js"
-  },
-  "peerDependencies": {
-    "three": ">=0.163.0"
-  },
-  "peerDependenciesMeta": {
-    "three": {
-      "optional": true
-    }
   },
   "devDependencies": {}
 }
