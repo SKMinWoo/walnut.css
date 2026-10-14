@@ -1103,7 +1103,7 @@
       <div class="site-wrap">
         <div class="site-head">
           <h2 id="features-h">What's included</h2>
-          <p>Everything is CSS. Optional scripts add tabs, dragging, shadows and scroll effects.</p>
+          <p>Everything is CSS. Optional scripts add tabs, dragging and scroll effects.</p>
         </div>
         <ul class="site-features">
           <li class="site-reveal" style="--i: 0"><a href="#theming-your-palette" aria-labelledby="feat-1-h" aria-describedby="feat-1-p">
@@ -1723,11 +1723,11 @@
               </div>
               <div class="site-stack">
                 <h3 class="site-h3">Gatefold <code>data-wal-open="gatefold"</code></h3>
-                <p class="site-soft">Opens from the card into a two-page spread, a picture and its details. On phones the pages stack. The notes fold out from behind the cover. With walnut-depth.js the cover is lifted off the card and held over the page, and its shadow is cast by a light: sharp where it touches, softer the higher it goes.</p>
+                <p class="site-soft">Opens from the card into a two-page spread, a picture and its details. On phones the pages stack. The notes fold out from behind the cover.</p>
                 <dl class="site-spec">
                   <div><dt>Use it for</dt><dd>Product details, case studies.</dd></div>
                   <div><dt>Ships in</dt><dd><span class="wal-badge wal-badge-gold">walnut-motion.js</span>Without it the window opens with a short fade.</dd></div>
-                  <div><dt>Shadow</dt><dd><span class="wal-badge wal-badge-gold">walnut-depth.js</span>Drawn with three.js, fetched when the page is idle. Without it the window keeps a CSS shadow.</dd></div>
+                  <div><dt>Shadow</dt><dd>A CSS drop shadow under the spread. With walnut-motion.js it grows as the spread lifts off the card.</dd></div>
                 </dl>
                 <details class="site-code"><summary>Markup</summary><pre>&lt;button commandfor="forest" command="show-modal"&gt;
   &lt;span data-wal-art&gt;…&lt;/span&gt; Forest
@@ -1967,7 +1967,6 @@ walnut.shuffle(materials, () =&gt; showOnly("Wood"));</pre></details>
                 <tr><td><code>walnut-tabs.js</code></td><td>Tabs from plain sections with a <code>data-tab</code> label, with arrow keys and a link to each tab.</td></tr>
                 <tr><td><code>walnut-recolour.js</code></td><td>Palette buttons that recolour the page, opening out from the button pressed.</td></tr>
                 <tr><td><code>walnut-motion.js</code></td><td>Side panels you drag closed by the handle, windows that open as a gatefold, and lists that shuffle.</td></tr>
-                <tr><td><code>walnut-depth.js</code></td><td>Shadows cast by a light over the page, for a window held up off it. Fetches three.js when the page is idle.</td></tr>
                 <tr><td><code>walnut-acts.js</code></td><td>A page, or a full-page view, that changes palette section by section as you scroll.</td></tr>
                 <tr><td><code>walnut-scroll.css</code></td><td>Carousel dots and a nav that highlights the section in view, with no script. Chrome and Edge.</td></tr>
               </tbody>
@@ -2039,7 +2038,6 @@ walnut.shuffle(materials, () =&gt; showOnly("Wood"));</pre></details>
                 <li>Doors and windows are dialogs, so <code>commandfor</code> and <code>closedby</code> open and close them with no script, and focus, Escape and find-in-page come from the browser.</li>
                 <li><code>data-wal-open</code> picks how a window opens. <code>data-motion</code> on the page, or <code>data-wal-material</code> on a part, picks how things move.</li>
                 <li>walnut-motion.js is optional. Without it every window still opens.</li>
-                <li>walnut-depth.js lights a window as it moves. Your own movement casts with <code>walnut.depth.styles.mine = (dialog) =&gt; [{ el, lift }]</code>, where <code>lift</code> runs from 0 on the page to 1 held.</li>
                 <li>Your own movement: <code>walnut.open.styles.mine = { open(dialog, from) {…}, close(dialog, from) {…} }</code>, then <code>data-wal-open="mine"</code>.</li>
                 <li>From a script: <code>walnut.open(dialog, button)</code> and <code>walnut.open.close(dialog)</code>.</li>
               </ul>
@@ -2293,7 +2291,6 @@ walnut.shuffle(materials, () =&gt; showOnly("Wood"));</pre></details>
 
   <script src="../dist/walnut-recolour.js" defer></script>
   <script src="../dist/walnut-motion.js" defer></script>
-  <script src="../dist/walnut-depth.js" defer></script>
   <script src="../dist/walnut-tabs.js" defer></script>
   <script src="../dist/walnut-acts.js" defer></script>
   <!-- A module, so it runs after the deferred scripts above and finds

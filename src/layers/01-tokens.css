@@ -532,12 +532,6 @@
   --wal-shadow-ink-sm: light-dark(oklch(50% 0.03 var(--wal-hue) / 0.12), oklch(10% 0.02 var(--wal-hue) / 0.30));
   --wal-shadow-ink-lg: light-dark(oklch(50% 0.03 var(--wal-hue) / 0.22), oklch(8%  0.02 var(--wal-hue) / 0.55));
 
-  /* The shadow walnut-depth.js casts. Darker than the inks above, since it
-     is the whole shadow and not one of a stack, and the ground rod near
-     black, so it darkens what it falls on rather than greying it. Its
-     alpha is the darkest it gets, right under a thing that touches. */
-  --wal-depth-ink: light-dark(oklch(22% 0.04 var(--wal-hue) / 0.58), oklch(6% 0.02 var(--wal-hue) / 0.7));
-
   /* ── Foregrounds ON a cue ──
      Plain fallback; the nested @supports below replaces these with a computed
      contrast pick. Kept as a real value so a browser without relative colour
