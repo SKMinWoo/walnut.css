@@ -1930,8 +1930,8 @@
     display: none;
     place-items: center;
     transition:
-      display var(--wal-duration-slow) allow-discrete,
-      overlay var(--wal-duration-slow) allow-discrete;
+      display var(--wal-duration) allow-discrete,
+      overlay var(--wal-duration) allow-discrete;
 
     &[open] { display: grid; }
 
@@ -2028,6 +2028,7 @@
     inline-size: min(60rem, 100%, calc((100dvh - 3rem) * 2 * var(--wal-cover-ratio, 10 / 11)));
     perspective: 1800px;
     filter: drop-shadow(0 1.6rem 1.8rem var(--wal-shadow-ink-lg));
+    will-change: filter;
   }
 
   /* The cover lies over the notes, which fold out from behind it. */
@@ -2072,7 +2073,7 @@
      stutter shows. */
   @media (prefers-reduced-motion: no-preference) {
     .wal-window[open] :is(.wal-gatefold-cover, .wal-gatefold-notes) {
-      will-change: transform;
+      will-change: transform, clip-path;
     }
   }
 

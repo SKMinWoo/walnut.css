@@ -71,7 +71,7 @@
       --wal-cx-ink-light, --wal-cx-ink-dark,
       --wal-radius, --wal-radius-sm, --wal-radius-lg,
       --wal-elevation, --wal-wash, --wal-line-boost;
-    transition-duration: var(--wal-retune-duration, 0.4s);
+    transition-duration: var(--wal-retune-duration, 0.3s);
     /* Symmetric, unlike --wal-ease. Expo-out suits a thing arriving; a rod
        being turned from one setting to another should start and stop like a
        dial under a hand. */
@@ -362,7 +362,7 @@
   :root:active-view-transition-type(wal-swatch)::view-transition-new(wal-recolour) {
     mask-image: radial-gradient(circle at var(--wal-recolour-x, 50%) var(--wal-recolour-y, 50%),
                                 #000 calc(var(--wal-spread) - 96px), transparent var(--wal-spread));
-    animation: wal-spread var(--wal-recolour-duration, 760ms) cubic-bezier(0.5, 0, 0.2, 1) both;
+    animation: wal-spread var(--wal-recolour-duration, 340ms) var(--wal-ease, cubic-bezier(0.16, 1, 0.3, 1)) both;
   }
   @keyframes wal-spread { to { --wal-spread: var(--wal-recolour-r, 150vmax); } }
 
@@ -435,26 +435,26 @@
      the reset makes every opening instant. */
   [data-wal-material="walnut"],
   :where(:is([data-motion="materials"], [data-motion="materials"] *):is(.wal-chest, .wal-door, .wal-window):not([data-wal-material] *)) {
-    --wal-open-duration:  520ms;
+    --wal-open-duration:  360ms;
     --wal-open-ease:      var(--wal-ease-walnut);
-    --wal-close-duration: 380ms;
+    --wal-close-duration: 260ms;
     --wal-close-ease:     var(--wal-ease-walnut-shut);
   }
 
   [data-wal-material="brass"],
   :where(:is([data-motion="materials"], [data-motion="materials"] *):is(.wal-menu, .wal-select, .wal-chart, .wal-ring):not([data-wal-material] *)),
   :where([data-wal-material="brass"] *:is(.wal-menu, .wal-select)) {
-    --wal-open-duration:  320ms;
+    --wal-open-duration:  240ms;
     --wal-open-ease:      var(--wal-ease-brass);
-    --wal-close-duration: 240ms;
+    --wal-close-duration: 180ms;
     --wal-close-ease:     var(--wal-ease-brass);
   }
 
   [data-wal-material="stone"],
   :where([data-wal-material="stone"] *:is(.wal-menu, .wal-select)) {
-    --wal-open-duration:  600ms;
+    --wal-open-duration:  420ms;
     --wal-open-ease:      var(--wal-ease-stone);
-    --wal-close-duration: 450ms;
+    --wal-close-duration: 300ms;
     --wal-close-ease:     var(--wal-ease-stone);
   }
 
@@ -462,9 +462,9 @@
      which an ancestor's material would not reach by inheritance; these
      carry it down to them. */
   :where([data-wal-material="walnut"] *:is(.wal-menu, .wal-select)) {
-    --wal-open-duration:  520ms;
+    --wal-open-duration:  360ms;
     --wal-open-ease:      var(--wal-ease-walnut);
-    --wal-close-duration: 380ms;
+    --wal-close-duration: 260ms;
     --wal-close-ease:     var(--wal-ease-walnut-shut);
   }
 
