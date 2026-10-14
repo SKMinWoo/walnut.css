@@ -50,11 +50,11 @@
   // An element's own value for a token, so a material set on it, or on
   // anything around it, is the one used.
   const token = (el, name, fallback) => getComputedStyle(el).getPropertyValue(name).trim() || fallback;
-  const ms = (value) => (value.endsWith("ms") ? parseFloat(value) : parseFloat(value) * 1000) || 620;
+  const ms = (value) => (value.endsWith("ms") ? parseFloat(value) : parseFloat(value) * 1000) || 280;
   const timing = (el, way) => ({
-    duration: ms(token(el, `--wal-${way}-duration`, "620ms")),
-    ease: token(el, `--wal-${way}-ease`, way === "open" ? "cubic-bezier(.5, 0, .2, 1)" : "cubic-bezier(.2, 0, 0, 1)"),
-    glide: token(el, "--wal-ease-glide", "cubic-bezier(.5, 0, .2, 1)"),
+    duration: ms(token(el, `--wal-${way}-duration`, way === "open" ? "280ms" : "200ms")),
+    ease: token(el, `--wal-${way}-ease`, way === "open" ? "cubic-bezier(.16, 1, .3, 1)" : "cubic-bezier(.2, 0, 0, 1)"),
+    glide: token(el, "--wal-ease-glide", "cubic-bezier(.16, 1, .3, 1)"),
     settle: token(el, "--wal-ease-settle", "cubic-bezier(.2, 0, 0, 1)"),
   });
 
@@ -122,12 +122,12 @@
       // it off and there is none to grow.
       const shade = getComputedStyle(spread).filter;
       const anims = [
-        ...(shade === "none" ? [] : [spread.animate([{ filter: "drop-shadow(0 0 0 transparent)" }, { filter: shade }], { duration: T, easing: glide })]),
-        cover.animate([over(cover, a, b, art), home], { duration: T * 0.9, easing: glide }),
+        ...(shade === "none" ? [] : [spread.animate([{ filter: "drop-shadow(0 0 0 transparent)" }, { filter: shade }], { duration: T * 0.85, easing: glide })]),
+        cover.animate([over(cover, a, b, art), home], { duration: T * 0.85, easing: glide }),
         notes.animate([{ transform: turn }, { transform: "none" }],
-          { duration: T * 1.05, delay: T * 0.42, easing: ease, fill: "backwards" }),
+          { duration: T * 0.75, delay: T * 0.18, easing: ease, fill: "backwards" }),
         notes.animate([{ opacity: 1 }, { opacity: 0 }],
-          { pseudoElement: "::after", duration: T * 1.05, delay: T * 0.42, easing: ease, fill: "backwards" }),
+          { pseudoElement: "::after", duration: T * 0.75, delay: T * 0.18, easing: ease, fill: "backwards" }),
       ];
       await settled(anims);
     },
@@ -140,14 +140,14 @@
       const T = pace(cover.getBoundingClientRect(), art.getBoundingClientRect(), duration);
       const fold = [
         notes.animate([{ transform: "none" }, { transform: turn }],
-          { duration: T * 0.62, easing: "cubic-bezier(.45, 0, .7, .4)", fill: "forwards" }),
-        notes.animate([{ opacity: 0 }, { opacity: 1 }], { pseudoElement: "::after", duration: T * 0.62, fill: "forwards" }),
+          { duration: T * 0.48, easing: "cubic-bezier(.45, 0, .7, .4)", fill: "forwards" }),
+        notes.animate([{ opacity: 0 }, { opacity: 1 }], { pseudoElement: "::after", duration: T * 0.48, fill: "forwards" }),
       ];
-      await new Promise((r) => setTimeout(r, T * 0.38));
+      await new Promise((r) => setTimeout(r, T * 0.16));
       // Measured now, not before: the page may have scrolled under the window.
       const a = art.getBoundingClientRect(), b = cover.getBoundingClientRect();
       const back = cover.animate([home, over(cover, a, b, art)],
-        { duration: T * 0.78, easing: settle, fill: "forwards" });
+        { duration: T * 0.62, easing: settle, fill: "forwards" });
       await settled([...fold, back]);
       return () => {
         art.style.visibility = "";
