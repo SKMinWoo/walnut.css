@@ -273,7 +273,7 @@
     const from = outOf(door, t);
     const at = (p) => (t.axis === "x" ? p.clientX : p.clientY) * t.sign;
     const start = at(e);
-    let held = false, out = from, last = { out, time: e.timeStamp }, speed = 0;
+    let held = false, out = from, last = { out, time: e.timeStamp }, speed = 0, lastRatio = -1;
     pull.setPointerCapture(e.pointerId);
 
     const move = (p) => {
@@ -284,7 +284,11 @@
       // It runs freely toward shut, and only grudgingly further open.
       out = Math.min(d < 0 ? d / 4 : d, t.size);
       door.style.translate = t.axis === "x" ? `${out * t.sign}px 0` : `0 ${out * t.sign}px`;
-      door.style.setProperty("--wal-door-out", Math.max(0, out / t.size).toFixed(3));
+      const outRatio = Math.max(0, out / t.size);
+      if (Math.abs(outRatio - lastRatio) > 0.015) {
+        door.style.setProperty("--wal-door-out", outRatio.toFixed(2));
+        lastRatio = outRatio;
+      }
       const dt = p.timeStamp - last.time;
       if (dt > 0) speed = 0.6 * ((out - last.out) / dt) + 0.4 * speed;
       last = { out, time: p.timeStamp };

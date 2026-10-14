@@ -9,8 +9,8 @@
     top: 0;
     z-index: 100;
     background: color-mix(in oklch, var(--wal-bg) 80%, transparent);
-    -webkit-backdrop-filter: blur(18px);
-    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
     /* min-height, not height, and allowed to wrap. At narrow widths the links
        drop to a second row instead of overlapping the brand and running off
        the page — which is what a fixed height plus nowrap did. Nothing is
@@ -241,8 +241,7 @@
        animated, the base layer's :focus-visible ring and a finish switch's
        radius and tracking. */
     transition-property:
-      background-color, border-color, color, box-shadow, transform, opacity,
-      outline-color, outline-offset, outline-width, border-radius, letter-spacing;
+      background-color, border-color, color, box-shadow, transform, opacity;
     transition-duration: var(--wal-duration);
     transition-timing-function: var(--wal-ease);
     line-height: 1.2;
@@ -739,7 +738,7 @@
         padding: var(--wal-space-sm) 0;
         border-bottom: var(--wal-hairline) solid var(--wal-line-soft);
         /* On the link, not on :hover, so the indent eases back out as well. */
-        transition: padding var(--wal-duration) var(--wal-ease);
+        transition: padding var(--wal-duration) var(--wal-ease), color var(--wal-duration) var(--wal-ease);
 
         &:hover {
           color: var(--wal-accent-ink);

@@ -175,12 +175,17 @@
 }
 
 
-/* ─── .wal-section ───────────────────────────────
-   Top-level page section with generous vertical
-   rhythm and a subtle top border.  Mirrors the
-   cinematic specimen style: quiet separation
-   between scenes.
+/* ─── .wal-contain ──────────────────────────────
+   Opt-in rendering isolation and off-screen skipping
+   for long pages. Uses content-visibility: auto so the
+   browser skips layout and paint of offscreen scenes
+   until scrolled near the viewport.
    ────────────────────────────────────────────── */
+.wal-contain {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 600px;
+}
+
 .wal-section {
   padding-block: var(--wal-space-3xl);
   border-top: var(--wal-border);
