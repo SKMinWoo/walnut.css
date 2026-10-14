@@ -2018,7 +2018,8 @@
      one scale cropped to the picture, and the crop opens as it lands.
      --wal-cover-focus (50% 50%, read as object-position is) says which part
      of the cover the picture is. The notes are the cover's size and scroll
-     inside it. On a phone the spread stacks and the notes fold down. */
+     inside it, and fold out from behind the cover. On a phone the spread
+     stacks and the notes fold down from behind it. */
   /* --wal-cover-ratio is read with its default rather than declared here,
      so it can be set on the dialog, or anywhere above it. */
   .wal-gatefold-spread {
@@ -2030,7 +2031,10 @@
     filter: drop-shadow(0 1.6rem 1.8rem var(--wal-shadow-ink-lg));
   }
 
+  /* The cover lies over the notes, which fold out from behind it. */
   .wal-gatefold-cover {
+    position: relative;
+    z-index: 1;
     margin: 0;
     aspect-ratio: var(--wal-cover-ratio, 10 / 11);
     transform-origin: 0 0;
@@ -2062,6 +2066,12 @@
       background: linear-gradient(90deg, oklch(0.15 0.02 60 / 0.55), oklch(0.15 0.02 60 / 0.12) 45%, oklch(1 0 0 / 0.1));
     }
   }
+
+  /* walnut-depth.js casts the spread's shadow from a light over the page,
+     and says so on <html>. This one stands down, so the two are never drawn
+     together; without the script, or without WebGL, it stays. */
+  :root[data-wal-depth] .wal-gatefold-spread { filter: none; }
+  :root[data-wal-depth] .wal-window:not([data-wal-open]) > .wal-window-panel { box-shadow: none; }
 
   /* Each half moves as a transform on its own layer. Kept on that layer while
      the window is open: dropped the moment the notes land, their page would

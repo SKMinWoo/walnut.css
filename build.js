@@ -100,14 +100,14 @@ const minified = bundle
 // file). Copied with a banner rather than minified: each is a few hundred
 // bytes of code under its own explanation, and a minifier is one more thing
 // that can quietly ship different code.
-const SCRIPTS = ["walnut-acts.js", "walnut-recolour.js", "walnut-motion.js", "walnut-tabs.js"];
+const SCRIPTS = ["walnut-acts.js", "walnut-recolour.js", "walnut-motion.js", "walnut-tabs.js", "walnut-depth.js"];
 const scripts = Object.fromEntries(SCRIPTS.map((file) => [file,
   `/*! walnut.css v${VERSION} · ${file.replace(/^walnut-|\.js$/g, "")} | MIT License | github.com/SKMinWoo/walnut.css */\n` +
   fs.readFileSync(path.join(SRC, file), "utf8")]));
 
 // Their types, for a TypeScript app. Copied as written: a declaration file
 // carries no code to stamp.
-const TYPINGS = ["walnut-motion.d.ts", "walnut-tabs.d.ts"];
+const TYPINGS = ["walnut-motion.d.ts", "walnut-tabs.d.ts", "walnut-depth.d.ts"];
 const typings = Object.fromEntries(TYPINGS.map((file) => [file, fs.readFileSync(path.join(SRC, file), "utf8")]));
 
 // ─── Companion stylesheets ───
@@ -307,6 +307,28 @@ function syncCspHashes(config, pages) {
   return config.replace(JSON.stringify(header.value), () => JSON.stringify(value));
 }
 
+/**
+ * Guard the one script the docs fetch from another origin. walnut-depth.js
+ * fetches three.js from a pinned jsDelivr URL, and the policy above lets
+ * exactly that path through; bump one without the other and the deployed
+ * page quietly keeps its CSS shadow, with nothing in the build to say so.
+ *
+ * @param {string} script  src/walnut-depth.js exactly as read from disk
+ * @param {string} config  vercel.json exactly as read from disk
+ * @throws when the script's three.js URL is not one the policy allows
+ */
+function assertCspAllowsThree(script, config) {
+  const url = /const CDN = "([^"]+)"/.exec(script)?.[1];
+  const header = JSON.parse(config).headers?.flatMap((h) => h.headers).find((h) => h.key === "Content-Security-Policy");
+  const sources = header?.value.match(/(?:^|;\s*)script-src ([^;]*)/)?.[1].split(/\s+/) ?? [];
+  if (!url || !sources.some((s) => s.startsWith("https://") && (s.endsWith("/") ? url.startsWith(s) : url === s))) {
+    throw new Error(
+      `vercel.json's script-src does not allow ${url ?? "the three.js URL (no CDN constant found)"}\n` +
+        `  from src/walnut-depth.js. Deployed like this, the docs would never load three.js.`
+    );
+  }
+}
+
 // ─── Assemble the deployable site (in memory) ───
 //
 // A static host serves exactly one directory. The docs page and the
@@ -373,6 +395,7 @@ assertVersionStamped({
     [`docs/${page}`, [...html.matchAll(/<span data-version>([^<]*)<\/span>/g)].map((m) => m[1])])),
 });
 const VERCEL_JSON = path.join(__dirname, "vercel.json");
+assertCspAllowsThree(fs.readFileSync(path.join(SRC, "walnut-depth.js"), "utf8"), fs.readFileSync(VERCEL_JSON, "utf8"));
 const vercelFixed = syncCspHashes(fs.readFileSync(VERCEL_JSON, "utf8"), docsPages.map(({ site }) => site));
 
 // ─── Write ───
