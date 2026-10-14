@@ -255,10 +255,11 @@
      close are separate so a material (06-cinema.css, Materials) can give
      the two directions different weights; a drawer pulled out and a drawer
      pushed shut do not land the same way. */
-  --wal-open-duration:  340ms;
+  --wal-open-duration:  280ms;
   --wal-open-ease:      var(--wal-ease-glide);
-  --wal-close-duration: 240ms;
+  --wal-close-duration: 200ms;
   --wal-close-ease:     var(--wal-ease-settle);
+  --wal-recolour-duration: 340ms;
 
   /* How each material comes to a stop. Not drawn by eye: each is a small
      model of the thing, sampled into linear() stops.
