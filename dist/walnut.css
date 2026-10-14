@@ -362,8 +362,8 @@ table {
 
   /* ── Motion ── */
   --wal-ease:          cubic-bezier(0.16, 1, 0.3, 1);
-  --wal-duration:      0.2s;
-  --wal-duration-slow: 0.4s;
+  --wal-duration:      0.16s;
+  --wal-duration-slow: 0.28s;
 
   /* Things on runners. Glide is a drawer on ball-bearing runners: a little
      resistance, a long run, and it comes to rest without a bump. Settle is a
@@ -376,9 +376,9 @@ table {
      close are separate so a material (06-cinema.css, Materials) can give
      the two directions different weights; a drawer pulled out and a drawer
      pushed shut do not land the same way. */
-  --wal-open-duration:  620ms;
+  --wal-open-duration:  340ms;
   --wal-open-ease:      var(--wal-ease-glide);
-  --wal-close-duration: 620ms;
+  --wal-close-duration: 240ms;
   --wal-close-ease:     var(--wal-ease-settle);
 
   /* How each material comes to a stop. Not drawn by eye: each is a small
@@ -829,12 +829,25 @@ body {
   color: var(--wal-text);
   font-family: var(--wal-font-body);
   font-size: var(--wal-text-base);
+  position: relative;
+}
 
-  /* Warm light wash — three cues lighting the ground from off-screen, so it
-     never reads as flat. Scaled by --wal-wash rather than declared outright:
-     a finish that wants printed paper sets --wal-wash: 0 and the gradients
-     collapse to transparent, with no rule here to override and no second
-     `background-image` to keep in sync. */
+/* Warm light wash — three cues lighting the ground from off-screen, so it
+   never reads as flat. Scaled by --wal-wash rather than declared outright:
+   a finish that wants printed paper sets --wal-wash: 0 and the gradients
+   collapse to transparent, with no rule here to override and no second
+   `background-image` to keep in sync.
+
+   Rendered on an accelerated fixed underlay pseudo-element (::after at z-index: -2)
+   rather than background-attachment: fixed on body, so the browser composites the wash
+   on its own GPU layer, scrolling the document requires zero background repaint, and it
+   never collides with ::before components such as .wal-desk. */
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -2;
+  pointer-events: none;
   background-image:
     radial-gradient(60% 45% at 12% 0%,
       color-mix(in oklch, var(--wal-gold) calc(10% * var(--wal-wash)), transparent), transparent 70%),
@@ -842,7 +855,7 @@ body {
       color-mix(in oklch, var(--wal-olive) calc(10% * var(--wal-wash)), transparent), transparent 72%),
     radial-gradient(70% 60% at 80% 100%,
       color-mix(in oklch, var(--wal-bloom) calc(8% * var(--wal-wash)), transparent), transparent 70%);
-  background-attachment: fixed;
+  transform: translateZ(0);
 }
 
 /* ─── Headings ─── */
@@ -1187,12 +1200,17 @@ html::-webkit-scrollbar-thumb:hover { background: var(--wal-accent); }
 }
 
 
-/* ─── .wal-section ───────────────────────────────
-   Top-level page section with generous vertical
-   rhythm and a subtle top border.  Mirrors the
-   cinematic specimen style: quiet separation
-   between scenes.
+/* ─── .wal-contain ──────────────────────────────
+   Opt-in rendering isolation and off-screen skipping
+   for long pages. Uses content-visibility: auto so the
+   browser skips layout and paint of offscreen scenes
+   until scrolled near the viewport.
    ────────────────────────────────────────────── */
+.wal-contain {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 600px;
+}
+
 .wal-section {
   padding-block: var(--wal-space-3xl);
   border-top: var(--wal-border);
@@ -1219,8 +1237,8 @@ html::-webkit-scrollbar-thumb:hover { background: var(--wal-accent); }
     top: 0;
     z-index: 100;
     background: color-mix(in oklch, var(--wal-bg) 80%, transparent);
-    -webkit-backdrop-filter: blur(18px);
-    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
     /* min-height, not height, and allowed to wrap. At narrow widths the links
        drop to a second row instead of overlapping the brand and running off
        the page — which is what a fixed height plus nowrap did. Nothing is
@@ -1451,8 +1469,7 @@ html::-webkit-scrollbar-thumb:hover { background: var(--wal-accent); }
        animated, the base layer's :focus-visible ring and a finish switch's
        radius and tracking. */
     transition-property:
-      background-color, border-color, color, box-shadow, transform, opacity,
-      outline-color, outline-offset, outline-width, border-radius, letter-spacing;
+      background-color, border-color, color, box-shadow, transform, opacity;
     transition-duration: var(--wal-duration);
     transition-timing-function: var(--wal-ease);
     line-height: 1.2;
@@ -1949,7 +1966,7 @@ html::-webkit-scrollbar-thumb:hover { background: var(--wal-accent); }
         padding: var(--wal-space-sm) 0;
         border-bottom: var(--wal-hairline) solid var(--wal-line-soft);
         /* On the link, not on :hover, so the indent eases back out as well. */
-        transition: padding var(--wal-duration) var(--wal-ease);
+        transition: padding var(--wal-duration) var(--wal-ease), color var(--wal-duration) var(--wal-ease);
 
         &:hover {
           color: var(--wal-accent-ink);
@@ -4742,7 +4759,7 @@ html::-webkit-scrollbar-thumb:hover { background: var(--wal-accent); }
       --wal-cx-ink-light, --wal-cx-ink-dark,
       --wal-radius, --wal-radius-sm, --wal-radius-lg,
       --wal-elevation, --wal-wash, --wal-line-boost;
-    transition-duration: var(--wal-retune-duration, 0.8s);
+    transition-duration: var(--wal-retune-duration, 0.4s);
     /* Symmetric, unlike --wal-ease. Expo-out suits a thing arriving; a rod
        being turned from one setting to another should start and stop like a
        dial under a hand. */
@@ -4840,6 +4857,7 @@ html::-webkit-scrollbar-thumb:hover { background: var(--wal-accent); }
   .wal-reveal-left,
   .wal-reveal-right,
   .wal-reveal-scale {
+    will-change: transform, opacity;
     animation-timing-function: var(--wal-ease);
     animation-fill-mode: both;
     /* Use view timeline for scroll-driven animations */
@@ -4877,6 +4895,8 @@ html::-webkit-scrollbar-thumb:hover { background: var(--wal-accent); }
      tied to scrolling, so scrolling back up takes the print back to paper. */
   @keyframes wal-develop { from { filter: grayscale(1) contrast(1.08) brightness(7); } }
   .wal-reveal-develop img {
+    will-change: filter;
+    transform: translateZ(0);
     animation: wal-develop linear both;
     animation-timeline: view();
     animation-range: entry 0% cover 50%;
@@ -5103,26 +5123,26 @@ html::-webkit-scrollbar-thumb:hover { background: var(--wal-accent); }
      the reset makes every opening instant. */
   [data-wal-material="walnut"],
   :where(:is([data-motion="materials"], [data-motion="materials"] *):is(.wal-chest, .wal-door, .wal-window):not([data-wal-material] *)) {
-    --wal-open-duration:  1050ms;
+    --wal-open-duration:  520ms;
     --wal-open-ease:      var(--wal-ease-walnut);
-    --wal-close-duration: 800ms;
+    --wal-close-duration: 380ms;
     --wal-close-ease:     var(--wal-ease-walnut-shut);
   }
 
   [data-wal-material="brass"],
   :where(:is([data-motion="materials"], [data-motion="materials"] *):is(.wal-menu, .wal-select, .wal-chart, .wal-ring):not([data-wal-material] *)),
   :where([data-wal-material="brass"] *:is(.wal-menu, .wal-select)) {
-    --wal-open-duration:  480ms;
+    --wal-open-duration:  320ms;
     --wal-open-ease:      var(--wal-ease-brass);
-    --wal-close-duration: 380ms;
+    --wal-close-duration: 240ms;
     --wal-close-ease:     var(--wal-ease-brass);
   }
 
   [data-wal-material="stone"],
   :where([data-wal-material="stone"] *:is(.wal-menu, .wal-select)) {
-    --wal-open-duration:  1200ms;
+    --wal-open-duration:  600ms;
     --wal-open-ease:      var(--wal-ease-stone);
-    --wal-close-duration: 1000ms;
+    --wal-close-duration: 450ms;
     --wal-close-ease:     var(--wal-ease-stone);
   }
 
@@ -5130,9 +5150,9 @@ html::-webkit-scrollbar-thumb:hover { background: var(--wal-accent); }
      which an ancestor's material would not reach by inheritance; these
      carry it down to them. */
   :where([data-wal-material="walnut"] *:is(.wal-menu, .wal-select)) {
-    --wal-open-duration:  1050ms;
+    --wal-open-duration:  520ms;
     --wal-open-ease:      var(--wal-ease-walnut);
-    --wal-close-duration: 800ms;
+    --wal-close-duration: 380ms;
     --wal-close-ease:     var(--wal-ease-walnut-shut);
   }
 

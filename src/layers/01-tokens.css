@@ -241,8 +241,8 @@
 
   /* ── Motion ── */
   --wal-ease:          cubic-bezier(0.16, 1, 0.3, 1);
-  --wal-duration:      0.2s;
-  --wal-duration-slow: 0.4s;
+  --wal-duration:      0.16s;
+  --wal-duration-slow: 0.28s;
 
   /* Things on runners. Glide is a drawer on ball-bearing runners: a little
      resistance, a long run, and it comes to rest without a bump. Settle is a
@@ -255,9 +255,9 @@
      close are separate so a material (06-cinema.css, Materials) can give
      the two directions different weights; a drawer pulled out and a drawer
      pushed shut do not land the same way. */
-  --wal-open-duration:  620ms;
+  --wal-open-duration:  340ms;
   --wal-open-ease:      var(--wal-ease-glide);
-  --wal-close-duration: 620ms;
+  --wal-close-duration: 240ms;
   --wal-close-ease:     var(--wal-ease-settle);
 
   /* How each material comes to a stop. Not drawn by eye: each is a small

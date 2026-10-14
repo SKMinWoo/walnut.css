@@ -2442,7 +2442,7 @@ walnut.shuffle(materials, () =&gt; showOnly("Wood"));</pre></details>
       return [":root {", ...shown.map(line), "}"].join("\n");
     }
 
-    function paint() {
+    function paint(full = true) {
       const cs = getComputedStyle(root);
       const lead = num(cs, "--wal-accent-hue");
       const offset = getComputedStyle(bare);
@@ -2455,11 +2455,13 @@ walnut.shuffle(materials, () =&gt; showOnly("Wood"));</pre></details>
         const pinned = apart(num(cs, p), lead + num(offset, p)) > 0.05;
         document.querySelector(`[data-from="${cue}"]`).textContent = pinned ? "Set by the palette" : `Accent + ${step}°`;
       }
-      const score = measure(fromStyle(cs));
-      for (const el of $$("[data-ratio]")) {
-        const low = score.worst(el.dataset.ratio);
-        el.textContent = Number.isFinite(low) ? `${r1(low)}:1` : "";
-        el.classList.toggle("is-low", low < AA);
+      if (full) {
+        const score = measure(fromStyle(cs));
+        for (const el of $$("[data-ratio]")) {
+          const low = score.worst(el.dataset.ratio);
+          el.textContent = Number.isFinite(low) ? `${r1(low)}:1` : "";
+          el.classList.toggle("is-low", low < AA);
+        }
       }
       for (const el of rods) {
         const v = num(cs, el.dataset.prop);
@@ -2468,8 +2470,10 @@ walnut.shuffle(materials, () =&gt; showOnly("Wood"));</pre></details>
         el.style.setProperty("--fill", `${((el.value - el.min) / (el.max - el.min)) * 100}%`);
         el.parentElement.querySelector("output").textContent = fmt(el.dataset.prop, v);
       }
-      const css = liveCss(cs);
-      for (const pre of lives) pre.innerHTML = css;
+      if (full) {
+        const css = liveCss(cs);
+        for (const pre of lives) pre.innerHTML = css;
+      }
       $("hub").textContent = Math.round(deg(lead)) + "°";
       $("arc-bloom").textContent = "+" + Math.round(deg(num(cs, "--wal-bloom-hue") - lead)) + "°";
       $("arc-cool").textContent = "+" + Math.round(deg(num(cs, "--wal-cool-hue") - lead)) + "°";
@@ -2481,9 +2485,13 @@ walnut.shuffle(materials, () =&gt; showOnly("Wood"));</pre></details>
       if (following) return;
       following = true;
       const frame = () => {
-        paint();
-        if (root.getAnimations().some((x) => x.playState === "running" || x.pending)) requestAnimationFrame(frame);
-        else following = false;
+        const isRunning = root.getAnimations().some((x) => x.playState === "running" || x.pending);
+        paint(!isRunning);
+        if (isRunning) requestAnimationFrame(frame);
+        else {
+          following = false;
+          paint(true);
+        }
       };
       requestAnimationFrame(frame);
     }
