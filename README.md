@@ -410,15 +410,6 @@ walnut.depth.styles.mine = (dialog) => [{ el: dialog.querySelector(".card"), lif
 
 `walnut.depth.light` is the light (which way the shadows fall, and how soft they grow), and `walnut.depth.ready()` fetches three.js now rather than at idle, resolving to whether the light is on.
 
-#### The window
-
-```html
-<html data-wal-light="window">
-```
-
-The light the shadows fall from can come in through a window. Four panes of it lie across the page from above, running the way the shadows run, fanning out and softening the further they fall from the sill: the sun by day, and by night the moon. It is fixed to the screen, like the desk, so the papers pass through it as they scroll, and it falls on the desk's grain where there is one.
-
-three.js draws where the light falls once, for the window's shape, as a small image (`--wal-light-mask`), and again only when that shape changes; never on a scroll. The light itself is a colour, `--wal-light-ink`, so a palette, a mode or an act re-lights it with nothing drawn again, and a finish that turns `--wal-wash` down dims it. It lies under everything and only lightens: by day the sun lifts a pale ground under dark ink, which raises every contrast, and by night the moon is too faint to lower one. It holds still, so it is lit under reduced motion too; print and forced colours leave it out.
 
 ### Tint
 

@@ -351,13 +351,6 @@ table {
   --wal-elevation:    1;
   --wal-wash:         1;
 
-  /* The light through the window walnut-depth.js draws (data-wal-light):
-     the sun by day, warm and strong enough to read on a pale ground, and
-     by night the moon, cool and faint enough that no pale ink on the dark
-     ground loses its contrast. A finish that turns the wash down dims it. */
-  --wal-light-ink: light-dark(oklch(99.5% 0.05 88 / calc(0.9 * var(--wal-wash))),
-                              oklch(80% 0.04 250 / calc(0.07 * var(--wal-wash))));
-
   /* ── Spacing scale ── */
   --wal-space-xs:     0.25rem;
   --wal-space-sm:     0.5rem;
@@ -2763,28 +2756,6 @@ html::-webkit-scrollbar-thumb:hover { background: var(--wal-accent); }
 
   @media print {
     .wal-desk::before { display: none; }
-  }
-
-  /* The window. With walnut-depth.js and <html data-wal-light="window">,
-     light from a window above the page lies across it, fixed to the screen
-     like the desk, so the papers pass through it as they scroll. The script
-     draws where it falls (--wal-light-mask) and CSS colours it
-     (--wal-light-ink). It lies under everything and only lightens: by day
-     the sun lifts a pale ground under dark ink, which raises every
-     contrast; by night the moon is too faint to lower one. Until the mask
-     is drawn the layer is empty, since a missing mask would hide nothing. */
-  :root[data-wal-light]::after {
-    content: "";
-    position: fixed;
-    inset: 0;
-    z-index: -1;
-    pointer-events: none;
-    background: var(--wal-light-ink);
-    mask: var(--wal-light-mask, linear-gradient(transparent 0 0)) 0 0 / 100% 100% no-repeat;
-  }
-
-  @media print, (forced-colors: active) {
-    :root[data-wal-light]::after { display: none; }
   }
 
   /* ═══ 32. Stock ═══

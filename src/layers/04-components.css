@@ -1542,28 +1542,6 @@
     .wal-desk::before { display: none; }
   }
 
-  /* The window. With walnut-depth.js and <html data-wal-light="window">,
-     light from a window above the page lies across it, fixed to the screen
-     like the desk, so the papers pass through it as they scroll. The script
-     draws where it falls (--wal-light-mask) and CSS colours it
-     (--wal-light-ink). It lies under everything and only lightens: by day
-     the sun lifts a pale ground under dark ink, which raises every
-     contrast; by night the moon is too faint to lower one. Until the mask
-     is drawn the layer is empty, since a missing mask would hide nothing. */
-  :root[data-wal-light]::after {
-    content: "";
-    position: fixed;
-    inset: 0;
-    z-index: -1;
-    pointer-events: none;
-    background: var(--wal-light-ink);
-    mask: var(--wal-light-mask, linear-gradient(transparent 0 0)) 0 0 / 100% 100% no-repeat;
-  }
-
-  @media print, (forced-colors: active) {
-    :root[data-wal-light]::after { display: none; }
-  }
-
   /* ═══ 32. Stock ═══
      What the papers are printed on. A finish may give their stock a tooth —
      --wal-tooth, a grey texture multiplied into each paper's own colour, so

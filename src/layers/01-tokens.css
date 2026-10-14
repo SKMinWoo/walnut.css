@@ -230,13 +230,6 @@
   --wal-elevation:    1;
   --wal-wash:         1;
 
-  /* The light through the window walnut-depth.js draws (data-wal-light):
-     the sun by day, warm and strong enough to read on a pale ground, and
-     by night the moon, cool and faint enough that no pale ink on the dark
-     ground loses its contrast. A finish that turns the wash down dims it. */
-  --wal-light-ink: light-dark(oklch(99.5% 0.05 88 / calc(0.9 * var(--wal-wash))),
-                              oklch(80% 0.04 250 / calc(0.07 * var(--wal-wash))));
-
   /* ── Spacing scale ── */
   --wal-space-xs:     0.25rem;
   --wal-space-sm:     0.5rem;

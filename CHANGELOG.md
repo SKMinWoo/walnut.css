@@ -189,14 +189,6 @@ the platform can now draw with no script.
   high a window is held, and `walnut.depth.styles` lights a movement of
   your own. Types in `walnut-depth.d.ts`, export `walnut.css/depth`. The
   build checks that the docs' CSP allows the pinned three.js URL.
-- **The window.** `<html data-wal-light="window">` lets the light in
-  through a window: four panes of it lie across the page from above,
-  fanning out and softening as they fall, the sun by day and the moon by
-  night. three.js draws the panes once per window shape as a mask
-  (`--wal-light-mask`); CSS colours it (`--wal-light-ink`, dimmed by
-  `--wal-wash`) and lays it under everything, fixed to the screen like the
-  desk. It only lightens, so no text pair's contrast falls, and it costs
-  nothing to scroll. The docs' home page is lit this way.
 - **`window.walnut` is typed as `WalnutGlobal`**, an interface each
   script's types add to, so `walnut.css/motion` and `walnut.css/tabs` can
   both be imported.
