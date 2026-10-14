@@ -21,9 +21,10 @@ export interface WalnutDepthPart {
 export type WalnutDepthStyle = (dialog: HTMLDialogElement) => WalnutDepthPart[];
 
 export interface WalnutDepth {
-  /** By data-wal-open name. gatefold is built in; add your own here. */
+  /** By data-wal-open name. gatefold is built in, and window, for a
+      .wal-window with no data-wal-open; add your own here. */
   styles: Record<string, WalnutDepthStyle>;
-  /** The light. Change it before a window opens. */
+  /** The light. Change it before the light comes on (ready()). */
   light: {
     /** How far a shadow falls to the right, per px of height (0.1). */
     x: number;

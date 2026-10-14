@@ -5,11 +5,12 @@
    held thing does: sharp where it touches, then further off, softer and
    paler the higher it goes, as more of the room's light gets in under it.
 
-   The gatefold is what it lights. Loaded beside walnut-motion.js, the
-   cover is picked up off the card, carried up past where it will be held
-   and lowered into the hand, and the notes cast their own shadow as they
-   turn on the spine and lie down beside it. Closing carries the cover back
-   and sets it down on the card. Nothing to call:
+   The gatefold is what it lights first. Loaded beside walnut-motion.js,
+   the cover is picked up off the card, carried up past where it will be
+   held and lowered into the hand, and the notes cast their own shadow as
+   they swing out from behind it and lie down beside it. Closing carries
+   the cover back and sets it down on the card. A plain .wal-window's
+   panel is held in the same light. Nothing to call:
 
        <script src="walnut-motion.js" defer></script>
        <script src="walnut-depth.js" defer></script>
@@ -46,8 +47,12 @@
 
    It is asked on every frame the window moves, so the lift can follow the
    movement. The shape is read from the element's own transform and inset()
-   clip-path, its box from the layout. walnut.depth.ready() fetches three.js
-   now rather than at idle, and resolves to whether the light is on.
+   clip-path, its box from the layout, seen through its parent's
+   perspective. walnut.depth.ready() fetches three.js now rather than at
+   idle, and resolves to whether the light is on.
+
+   With <html data-wal-light="window"> the light comes in through a window,
+   and lies across the page (The window, below).
    ───────────────────────────────────────────────────────────────────────── */
 (() => {
   const walnut = (window.walnut ??= {});
@@ -83,8 +88,12 @@
       const lift = p == null ? 1 : arc(dialog.classList.contains("is-closing") ? 1 - p : p);
       return [{ el: cover, lift }, { el: notes, lift }];
     },
+    // A window with no movement of its own: its panel, held, rising the
+    // last few pixels into place as it fades in.
+    window: (dialog) => [...dialog.querySelectorAll(":scope > .wal-window-panel")].map((el) => ({ el })),
   };
-  const lit = (d) => d instanceof HTMLDialogElement && Object.hasOwn(styles, d.dataset.walOpen ?? "");
+  const styleOf = (d) => d.dataset.walOpen ?? (d.classList.contains("wal-window") ? "window" : "");
+  const lit = (d) => d instanceof HTMLDialogElement && Object.hasOwn(styles, styleOf(d));
 
   /* ── A shape, in three dimensions ──
      The part of the element that is drawn, as a corner and two edges in
@@ -137,6 +146,17 @@
     return n === stage ? [x - stage.scrollLeft, y - stage.scrollTop] : null;
   }
 
+  // The perspective an element's children are drawn through, if any: its
+  // distance, and its vanishing point in the window's visible area.
+  function perspective(parent, stage) {
+    const cs = parent && getComputedStyle(parent);
+    if (!cs || cs.perspective === "none") return null;
+    const at = place(parent, stage);
+    if (!at) return null;
+    const [x, y] = cs.perspectiveOrigin.split(" ");
+    return { d: parseFloat(cs.perspective), x: at[0] + len(x, parent.offsetWidth), y: at[1] + len(y, parent.offsetHeight) };
+  }
+
   const smooth = (a, b, x) => { const t = Math.min(1, Math.max(0, (x - a) / (b - a))); return t * t * (3 - 2 * t); };
 
   function shape(el, lift, stage, held) {
@@ -146,12 +166,27 @@
     const m = matrix(cs, w, h);
     const [ct, cr, cb, cl, round] = clip(cs, w, h);
     const z = held * lift;
+    // Seen through its parent's perspective, a part turned toward you looms
+    // and one turned away shrinks; its shadow keeps to where it is seen.
+    const view = perspective(el.parentElement, stage);
+    // A part turned back past where it is held (the notes, folded behind
+    // the cover) sinks toward the page as it goes, but never through it.
     const pt = (x, y) => {
-      const p = m.transformPoint(new DOMPoint(x, y));
-      return [p.x / p.w + at[0], p.y / p.w + at[1], p.z / p.w + z];
+      const p = m.transformPoint(new DOMPoint(x, y)), dz = p.z / p.w;
+      let X = p.x / p.w + at[0], Y = p.y / p.w + at[1];
+      if (view && dz < view.d) {
+        const k = view.d / (view.d - dz);
+        X = view.x + (X - view.x) * k; Y = view.y + (Y - view.y) * k;
+      }
+      return [X, Y, dz >= 0 ? z + dz : z * Math.exp(dz / Math.max(z, 1))];
     };
-    const o = pt(cl, ct), a = pt(w - cr, ct), b = pt(cl, h - cb);
-    const u = [a[0] - o[0], a[1] - o[1], a[2] - o[2]], v = [b[0] - o[0], b[1] - o[1], b[2] - o[2]];
+    // Through a perspective the four corners are no longer a parallelogram:
+    // this is the one that fits them best, its error split between the near
+    // edge and the far one.
+    const c = [pt(cl, ct), pt(w - cr, ct), pt(cl, h - cb), pt(w - cr, h - cb)];
+    const u = [0, 1, 2].map((i) => (c[1][i] - c[0][i] + c[3][i] - c[2][i]) / 2);
+    const v = [0, 1, 2].map((i) => (c[2][i] - c[0][i] + c[3][i] - c[1][i]) / 2);
+    const o = [0, 1, 2].map((i) => (c[0][i] + c[1][i] + c[2][i] + c[3][i]) / 4 - (u[i] + v[i]) / 2);
     const size = Math.hypot(...u) * Math.hypot(...v);
     if (!size) return null;
     // Set down on the page, a thing's shadow is the page's own CSS shadow
@@ -273,7 +308,7 @@
 
     const elevation = parseFloat(getComputedStyle(d).getPropertyValue("--wal-elevation"));
     const held = HELD * (Number.isFinite(elevation) ? Math.max(0, elevation) : 1);
-    const parts = held > 0 ? styles[d.dataset.walOpen]?.(d) ?? [] : [];
+    const parts = held > 0 ? styles[styleOf(d)]?.(d) ?? [] : [];
     drawn = [];
     let n = 0;
     for (const { el, lift = 1 } of parts) {
@@ -331,6 +366,104 @@
     stage = null;
   }
 
+  /* ── The window ──
+     With data-wal-light="window" on <html>, the light the shadows fall from
+     comes in through a window above the page: four panes of it lie across
+     the page, running the way the shadows run, fanning out and softening
+     the further they fall from the sill, and fading as they go.
+
+     It is drawn once for the window's shape, small, since it is all soft
+     edges, and handed to CSS as a mask (--wal-light-mask). The light itself
+     is a colour (--wal-light-ink: the sun by day, the moon by night), so a
+     palette, a mode or an act changes nothing here. The script draws it
+     again only when the window's shape changes, never on a scroll. */
+  const PANES = /* glsl */ `
+    uniform vec2 uSize, uDir;
+    varying vec2 vAt;
+    vec2 erf(vec2 x) {
+      vec2 s = sign(x), a = abs(x);
+      x = 1.0 + (0.278393 + (0.230389 + 0.078108 * (a * a)) * a) * a;
+      x *= x;
+      return s - s / (x * x);
+    }
+    float strip(vec2 d, vec2 s) {
+      vec2 e = erf(d / s * 0.70710678);
+      return clamp(0.5 * (e.x + e.y), 0.0, 1.0);
+    }
+    void main() {
+      vec2 d = uDir, e = vec2(-d.y, d.x);
+      // From the sill: v along the light, u across it, narrowed as the
+      // panes fan out so a pane is the same shape in u all the way down.
+      vec2 q = vAt - vec2(uSize.x * 0.34, -uSize.y * 0.16);
+      float v = dot(q, d), far = max(v, 0.0);
+      float fan = 1.0 + far / (uSize.y * 1.8);
+      float u = dot(q, e) / fan;
+      float soft = 2.0 + 0.035 * far;
+      float w = uSize.x * 0.13, h = uSize.y * 0.36, bar = min(w, h) * 0.13;
+      float light = 0.0;
+      for (int i = 0; i < 2; i++) {
+        float u0 = i == 0 ? -w - bar * 0.5 : bar * 0.5;
+        float across = strip(vec2(u - u0, u0 + w - u), vec2(soft / fan));
+        for (int j = 0; j < 2; j++) {
+          float v0 = float(j) * (h + bar * 2.5);
+          light += across * strip(vec2(v - v0, v0 + h - v), vec2(soft));
+        }
+      }
+      light *= exp(-far / (uSize.y * 1.5));
+      gl_FragColor = vec4(1.0, 1.0, 1.0, clamp(light, 0.0, 1.0));
+    }`;
+
+  let T, panes, sheet, mask = "", shone = "", shining = null;
+  // The mask, as an image the page's CSS can read. Kept off <html>'s own
+  // style, which a page may be writing rods into.
+  function shine() {
+    const W = innerWidth, H = innerHeight;
+    const key = `${Math.round(W / 40)}:${Math.round((W / H) * 12)}`;
+    if (!root.hasAttribute("data-wal-light") || !renderer || key === shone) return shining ?? Promise.resolve();
+    shone = key;
+    const w = Math.max(1, Math.round(W / 4)), h = Math.max(1, Math.round(H / 4));
+    if (!panes) {
+      const target = new T.WebGLRenderTarget(w, h);
+      const uniforms = { uSize: { value: new T.Vector2() }, uDir: { value: new T.Vector2() } };
+      const quad = new T.Mesh(new T.PlaneGeometry(2, 2), new T.ShaderMaterial({
+        uniforms, vertexShader: VERTEX, fragmentShader: PANES,
+        blending: T.NoBlending, depthTest: false, depthWrite: false,
+      }));
+      quad.frustumCulled = false;
+      panes = { target, uniforms, scene: new T.Scene().add(quad) };
+    }
+    panes.target.setSize(w, h);
+    panes.uniforms.uSize.value.set(W, H);
+    panes.uniforms.uDir.value.set(light.x, light.y).normalize();
+    renderer.setRenderTarget(panes.target);
+    renderer.render(panes.scene, camera);
+    renderer.setRenderTarget(null);
+    const px = new Uint8Array(w * h * 4);
+    renderer.readRenderTargetPixels(panes.target, 0, 0, w, h, px);
+    // GL counts rows from the bottom.
+    const image = new ImageData(w, h);
+    for (let y = 0; y < h; y++) image.data.set(px.subarray((h - 1 - y) * w * 4, (h - y) * w * 4), y * w * 4);
+    const out = document.createElement("canvas");
+    out.width = w; out.height = h;
+    out.getContext("2d").putImageData(image, 0, 0);
+    return (shining = new Promise((done) => out.toBlob((blob) => {
+      const old = mask;
+      mask = URL.createObjectURL(blob);
+      sheet ??= new CSSStyleSheet();
+      sheet.replaceSync(`:root { --wal-light-mask: url("${mask}"); }`);
+      if (!document.adoptedStyleSheets.includes(sheet)) document.adoptedStyleSheets = [...document.adoptedStyleSheets, sheet];
+      // The old one is let go once the new one has been fetched.
+      if (old) setTimeout(() => URL.revokeObjectURL(old), 2000);
+      done();
+    }, "image/png")));
+  }
+  let resizing;
+  addEventListener("resize", () => {
+    if (!renderer || !root.hasAttribute("data-wal-light")) return;
+    clearTimeout(resizing);
+    resizing = setTimeout(shine, 250);
+  }, { passive: true });
+
   /* ── three.js, when it is wanted ── */
   const load = () =>
     given ? import(/* webpackIgnore: true */ /* @vite-ignore */ given)
@@ -340,7 +473,7 @@
     removeEventListener("pointerover", opens);
     removeEventListener("focusin", opens);
     return (three ??= (async () => {
-      const THREE = await load();
+      const THREE = (T = await load());
       canvas = document.createElement("canvas");
       canvas.setAttribute("aria-hidden", "true");
       canvas.dataset.walPrint = "skip";
@@ -378,6 +511,7 @@
         if (stage) leave();
         three = Promise.resolve(false);
       });
+      await shine();
       root.dataset.walDepth = "";
       const open = [...document.querySelectorAll("dialog[open]")].findLast(lit);
       if (open) enter(open);
@@ -393,10 +527,16 @@
       else if (renderer && root.hasAttribute("data-wal-depth")) enter(d);
     }
   }).observe(document, { subtree: true, attributes: true, attributeFilter: ["open", "data-wal-moving"] });
+  // The window put in, or taken out, after the page has loaded.
+  new MutationObserver(() => {
+    if (!root.hasAttribute("data-wal-light")) return void (shone = "");
+    if (renderer) shine(); else if (!navigator.connection?.saveData) ready();
+  }).observe(root, { attributes: true, attributeFilter: ["data-wal-light"] });
 
   /* Fetched at idle, so the first opening is lit, and sooner when a hand
-     goes to a button that opens a window. Not at all where the movement is
-     not played, or the reader is saving data. */
+     goes to a button that opens a window. Not at all where the reader is
+     saving data, and not for the movement where it is not played; the
+     window's light holds still, so it is lit under reduced motion too. */
   const wanted = () => !reduce.matches && !navigator.connection?.saveData;
   const opens = (e) => {
     const b = e.target instanceof Element && e.target.closest("[commandfor]");
@@ -405,7 +545,8 @@
   addEventListener("pointerover", opens, { passive: true });
   addEventListener("focusin", opens);
   const idle = () => {
-    if (wanted() && [...document.querySelectorAll("dialog[data-wal-open]")].some(lit)) ready();
+    if (navigator.connection?.saveData) return;
+    if (root.hasAttribute("data-wal-light") || (wanted() && [...document.querySelectorAll("dialog[data-wal-open]")].some(lit))) ready();
   };
   const later = () => (window.requestIdleCallback ? requestIdleCallback(idle, { timeout: 4000 }) : setTimeout(idle, 1500));
   if (document.readyState === "complete") later();

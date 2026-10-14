@@ -1542,6 +1542,28 @@
     .wal-desk::before { display: none; }
   }
 
+  /* The window. With walnut-depth.js and <html data-wal-light="window">,
+     light from a window above the page lies across it, fixed to the screen
+     like the desk, so the papers pass through it as they scroll. The script
+     draws where it falls (--wal-light-mask) and CSS colours it
+     (--wal-light-ink). It lies under everything and only lightens: by day
+     the sun lifts a pale ground under dark ink, which raises every
+     contrast; by night the moon is too faint to lower one. Until the mask
+     is drawn the layer is empty, since a missing mask would hide nothing. */
+  :root[data-wal-light]::after {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    background: var(--wal-light-ink);
+    mask: var(--wal-light-mask, linear-gradient(transparent 0 0)) 0 0 / 100% 100% no-repeat;
+  }
+
+  @media print, (forced-colors: active) {
+    :root[data-wal-light]::after { display: none; }
+  }
+
   /* ═══ 32. Stock ═══
      What the papers are printed on. A finish may give their stock a tooth —
      --wal-tooth, a grey texture multiplied into each paper's own colour, so
@@ -2018,7 +2040,8 @@
      one scale cropped to the picture, and the crop opens as it lands.
      --wal-cover-focus (50% 50%, read as object-position is) says which part
      of the cover the picture is. The notes are the cover's size and scroll
-     inside it. On a phone the spread stacks and the notes fold down. */
+     inside it, and fold out from behind the cover. On a phone the spread
+     stacks and the notes fold down from behind it. */
   /* --wal-cover-ratio is read with its default rather than declared here,
      so it can be set on the dialog, or anywhere above it. */
   .wal-gatefold-spread {
@@ -2030,7 +2053,10 @@
     filter: drop-shadow(0 1.6rem 1.8rem var(--wal-shadow-ink-lg));
   }
 
+  /* The cover lies over the notes, which fold out from behind it. */
   .wal-gatefold-cover {
+    position: relative;
+    z-index: 1;
     margin: 0;
     aspect-ratio: var(--wal-cover-ratio, 10 / 11);
     transform-origin: 0 0;
@@ -2067,6 +2093,7 @@
      and says so on <html>. This one stands down, so the two are never drawn
      together; without the script, or without WebGL, it stays. */
   :root[data-wal-depth] .wal-gatefold-spread { filter: none; }
+  :root[data-wal-depth] .wal-window:not([data-wal-open]) > .wal-window-panel { box-shadow: none; }
 
   /* Each half moves as a transform on its own layer. Kept on that layer while
      the window is open: dropped the moment the notes land, their page would

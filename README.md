@@ -374,9 +374,9 @@ A side panel that runs in on a track from the right and throws its shadow across
 <script src="walnut-motion.js" defer></script>
 ```
 
-A page inside the page. `.wal-window` is the room it opens in, the whole viewport; on its own it opens like `.wal-dialog`, its panel (`.wal-window-panel`) rising the last few pixels into place. With `data-wal-open="gatefold"` and `walnut-motion.js` it opens like a gatefold sleeve: the cover travels out of the card's picture (`[data-wal-art]`, or the whole button), and the notes unfold beside it on the spine. Closing plays it back, and the cover goes home to the card. The window's own buttons drive it; from script, `walnut.open(dialog, button)` and `walnut.open.close(dialog)`. A window that a link or Back opens has no press to travel from: `walnut.open(dialog, card, { instant: true })` opens it in place, and closing still takes the cover home to that card. A close asked for while the window is still opening (Back pressed early, say) waits for it to land. A card whose picture is not drawn (`display: none` in a print or compact layout, say) has nowhere to travel from, so the window opens and closes in place.
+A page inside the page. `.wal-window` is the room it opens in, the whole viewport; on its own it opens like `.wal-dialog`, its panel (`.wal-window-panel`) rising the last few pixels into place. With `data-wal-open="gatefold"` and `walnut-motion.js` it opens like a gatefold sleeve: the cover travels out of the card's picture (`[data-wal-art]`, or the whole button), and the notes fold out from behind it on the spine, coming round its edge to lie flat beside it. Closing plays it back, and the cover goes home to the card. The window's own buttons drive it; from script, `walnut.open(dialog, button)` and `walnut.open.close(dialog)`. A window that a link or Back opens has no press to travel from: `walnut.open(dialog, card, { instant: true })` opens it in place, and closing still takes the cover home to that card. A close asked for while the window is still opening (Back pressed early, say) waits for it to land. A card whose picture is not drawn (`display: none` in a print or compact layout, say) has nowhere to travel from, so the window opens and closes in place.
 
-The cover's shape is `--wal-cover-ratio`, `10 / 11` unless you set it on the window or anywhere above it, and it needn't be the shape of the card's picture. The cover is never stretched: it leaves at one scale, cropped to the picture's shape, and the crop opens out as it lands. `--wal-cover-focus` says which part of the cover the picture is, read the way `object-position` is (`50% 50%` unless you set it; `50% 0%` for a screenshot whose top is the picture). The Gatefold tab on [the docs' home page](docs/index.html#motion-gatefold) opens Forest this way. The notes are the cover's size and scroll inside it. On a phone the spread stacks and the notes fold down. Without the script, or under reduced motion, the window simply opens.
+The cover's shape is `--wal-cover-ratio`, `10 / 11` unless you set it on the window or anywhere above it, and it needn't be the shape of the card's picture. The cover is never stretched: it leaves at one scale, cropped to the picture's shape, and the crop opens out as it lands. `--wal-cover-focus` says which part of the cover the picture is, read the way `object-position` is (`50% 50%` unless you set it; `50% 0%` for a screenshot whose top is the picture). The Gatefold tab on [the docs' home page](docs/index.html#motion-gatefold) opens Forest this way. The notes are the cover's size and scroll inside it. On a phone the spread stacks and the notes fold down from behind the cover. Without the script, or under reduced motion, the window simply opens.
 
 ### Depth
 
@@ -385,7 +385,7 @@ The cover's shape is `--wal-cover-ratio`, `10 / 11` unless you set it on the win
 <script src="walnut-depth.js" defer></script>
 ```
 
-A light over the page, so a thing lifted off it casts the shadow a held thing does: sharp where it touches, then further off, softer and paler the higher it goes. The gatefold is what it lights. The cover is picked up off the card, carried up a little past where it will be held and lowered into the hand, and the notes cast their own shadow as they turn on the spine and lie down beside it, sharp along the spine and soft at the far edge. Closing carries the cover back and sets it down on the card.
+A light over the page, so a thing lifted off it casts the shadow a held thing does: sharp where it touches, then further off, softer and paler the higher it goes. The gatefold is what it lights first. The cover is picked up off the card, carried up a little past where it will be held and lowered into the hand, and the notes cast their own shadow as they swing out from behind it and lie down beside it: tight while they are still low behind the cover, soft along the far edge as it comes up. Closing carries the cover back and sets it down on the card. A plain `.wal-window`'s panel is held in the same light.
 
 The shadow is drawn with [three.js](https://threejs.org), in one canvas laid under the window while it is open. It is drawn on the frames where something moves and once when it lands, so a window held open costs nothing, and at half the screen's resolution, since a shadow has no detail to lose. It is not a shadow map: each shape's shadow is worked out exactly in the shader, as a box blurred by how high each of its edges is held, which is what keeps a touching edge sharp and lets a raised one go soft.
 
@@ -409,6 +409,16 @@ walnut.depth.styles.mine = (dialog) => [{ el: dialog.querySelector(".card"), lif
 ```
 
 `walnut.depth.light` is the light (which way the shadows fall, and how soft they grow), and `walnut.depth.ready()` fetches three.js now rather than at idle, resolving to whether the light is on.
+
+#### The window
+
+```html
+<html data-wal-light="window">
+```
+
+The light the shadows fall from can come in through a window. Four panes of it lie across the page from above, running the way the shadows run, fanning out and softening the further they fall from the sill: the sun by day, and by night the moon. It is fixed to the screen, like the desk, so the papers pass through it as they scroll, and it falls on the desk's grain where there is one.
+
+three.js draws where the light falls once, for the window's shape, as a small image (`--wal-light-mask`), and again only when that shape changes; never on a scroll. The light itself is a colour, `--wal-light-ink`, so a palette, a mode or an act re-lights it with nothing drawn again, and a finish that turns `--wal-wash` down dims it. It lies under everything and only lightens: by day the sun lifts a pale ground under dark ink, which raises every contrast, and by night the moon is too faint to lower one. It holds still, so it is lit under reduced motion too; print and forced colours leave it out.
 
 ### Tint
 

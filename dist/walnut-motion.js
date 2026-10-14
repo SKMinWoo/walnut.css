@@ -6,8 +6,8 @@
 
    The gatefold. A .wal-window marked data-wal-open="gatefold" opens out of
    the button that opened it: the cover travels from the card's picture and
-   the notes unfold beside it on the spine, and on closing the notes fold
-   back and the cover goes home to the card. Nothing to call; the window's
+   the notes fold out from behind it on the spine, and on closing the notes
+   fold back behind it and the cover goes home to the card. Nothing to call; the window's
    own buttons do it:
 
        <button commandfor="dusk" command="show-modal">
@@ -74,12 +74,16 @@
 
   /* ── Gatefold ──
      The cover travels from the card's picture at one scale, cropped to the
-     picture's shape until it lands (over, below). The notes turn on the spine from lying over the cover to
-     lying flat beside it. Past the halfway turn their back faces you and is
-     not drawn, so they appear as they come round. The notes land on the
-     material's curve, since they come down on the table; the cover glides
-     out and settles home whatever it is made of, being in flight both ways. */
+     picture's shape until it lands (over, below). The notes are folded
+     behind the cover, and swing out from behind it on the spine to lie flat
+     beside it: while they are behind it the cover hides them, and they come
+     round its edge face first, from further away than the page. Closing
+     folds them back behind it. The notes land on the material's curve,
+     since they come down on the table; the cover glides out and settles
+     home whatever it is made of, being in flight both ways. */
   const stacked = (spread) => getComputedStyle(spread).gridTemplateColumns.trim().split(/\s+/).length === 1;
+  // Folded behind the cover: turned half round on the spine, the far way.
+  const behind = (spread) => (stacked(spread) ? "rotateX(-180deg)" : "rotateY(180deg)");
   /* The cover as it sits over the card's picture, a: never stretched, so
      at one scale, just large enough to cover the picture, and cropped to
      it. --wal-cover-focus says which part of the cover the picture is, as
@@ -110,7 +114,7 @@
       const a = art.getBoundingClientRect();
       dialog.showModal();
       const b = cover.getBoundingClientRect();
-      const turn = stacked(spread) ? "rotateX(180deg)" : "rotateY(-180deg)";
+      const turn = behind(spread);
       const { duration, ease, glide } = timing(dialog, "open");
       const T = pace(a, b, duration);
       art.style.visibility = "hidden";
@@ -131,7 +135,7 @@
       const { art, cover, notes, spread } = parts(dialog, from);
       // Hidden already, unless the window opened in place.
       art.style.visibility = "hidden";
-      const turn = stacked(spread) ? "rotateX(180deg)" : "rotateY(-180deg)";
+      const turn = behind(spread);
       const { duration, settle } = timing(dialog, "close");
       const T = pace(cover.getBoundingClientRect(), art.getBoundingClientRect(), duration);
       const fold = [
