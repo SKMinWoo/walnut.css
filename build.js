@@ -411,9 +411,9 @@ for (const [theme, css] of Object.entries(themeCss)) {
 }
 for (const { page, site } of docsPages) fs.writeFileSync(path.join(PUBLIC, page), site);
 /* The page's own files: the mark, as the tab and home-screen icons; the card
-   a link preview shows; the finder; and the palette's exports. og.png and apple-touch-icon.png are
+   a link preview shows; the finder; the palette's exports; and the desk. og.png and apple-touch-icon.png are
    rendered by scripts/og/render.mjs and committed. */
-for (const asset of ["favicon.svg", "favicon.ico", "apple-touch-icon.png", "og.png", "site-find.js", "site-export.js"]) {
+for (const asset of ["favicon.svg", "favicon.ico", "apple-touch-icon.png", "og.png", "site-find.js", "site-export.js", "site-desk.js"]) {
   if (fs.existsSync(path.join(DOCS, asset))) fs.copyFileSync(path.join(DOCS, asset), path.join(PUBLIC, asset));
 }
 if (vercelFixed) fs.writeFileSync(VERCEL_JSON, vercelFixed);

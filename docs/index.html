@@ -199,6 +199,48 @@
     .site-code > summary { padding-block: .7rem .2rem; cursor: pointer; font: 500 var(--wal-text-xs) / 1.3 var(--wal-font-label); letter-spacing: var(--wal-tracking-label); text-transform: uppercase; color: var(--wal-text-muted); }
     .site-code > summary:hover { color: var(--wal-text); }
     .site-code > pre { margin-block-start: .6rem; }
+    /* The mixing desk (site-desk.js): a walnut rail of brass knobs under the
+       hero's facts, one per hue rod, and a jewel lamp for the gamut. */
+    .site-console {
+      display: flex; flex-wrap: wrap; align-items: flex-start; gap: 1rem 1.25rem; margin-block-start: 1.6rem;
+      padding: 1rem 1.25rem .85rem; border-radius: 10px; background: var(--site-oiled);
+      box-shadow: inset 0 1px 0 oklch(1 0 0 / .18), 0 10px 24px -14px oklch(0.2 0.03 50 / .6);
+    }
+    .site-knob-unit, .site-lamp-unit { display: grid; justify-items: center; gap: .3rem; }
+    .site-knob { position: relative; inline-size: 3.6rem; aspect-ratio: 1; border-radius: 50%; cursor: grab; touch-action: none; }
+    .site-knob.is-turning { cursor: grabbing; }
+    .site-knob:focus-visible { outline: 2px solid var(--site-brass-hi); outline-offset: 3px; }
+    /* The ring: the hue wheel at this colour's own lightness and chroma. */
+    .site-knob-ring {
+      position: absolute; inset: 0; border-radius: 50%;
+      background: conic-gradient(in oklch longer hue, oklch(var(--kl) var(--kc) 0), oklch(var(--kl) var(--kc) 359.9));
+      mask: radial-gradient(circle, transparent 58%, #000 59%);
+    }
+    .site-knob-cap {
+      position: absolute; inset: 18%; border-radius: 50%; rotate: calc(var(--deg, 0) * 1deg);
+      background: radial-gradient(circle at 35% 30%, var(--site-brass-hi), var(--site-brass) 45%, var(--site-brass-lo));
+      box-shadow: 0 2px 4px oklch(0.2 0.03 50 / .55), inset 0 -2px 3px oklch(0.4 0.06 70 / .5);
+    }
+    .site-knob-cap i { position: absolute; inset-inline-start: calc(50% - 1.5px); inset-block-start: 8%; inline-size: 3px; block-size: 32%; border-radius: 2px; background: var(--site-brass-ink); }
+    .site-knob-label { font: 500 .62rem / 1 var(--wal-font-label); letter-spacing: .14em; text-transform: uppercase; color: oklch(0.93 0.03 80); }
+    .site-knob-value { font: 500 .7rem / 1 var(--wal-font-label); color: var(--site-brass-hi); font-variant-numeric: tabular-nums; }
+    .site-lamp-unit { margin-inline-start: auto; }
+    /* The gamut lamp: a dark jewel that lights amber when a colour clips. */
+    .site-gamut {
+      inline-size: 1.4rem; aspect-ratio: 1; margin-block: 1.1rem 1.1rem; border-radius: 50%;
+      background: radial-gradient(circle at 40% 35%, oklch(0.45 0.05 60), oklch(0.25 0.04 50));
+      box-shadow: 0 0 0 3px var(--site-brass-lo), inset 0 1px 2px oklch(0 0 0 / .5);
+    }
+    .site-gamut.is-lit {
+      background: radial-gradient(circle at 40% 35%, oklch(0.97 0.08 95), oklch(0.8 0.17 70) 55%, oklch(0.62 0.18 50));
+      box-shadow: 0 0 0 3px var(--site-brass-lo), 0 0 14px 3px oklch(0.8 0.17 70 / .7);
+    }
+    @media (max-width: 760px) {
+      .site-console { justify-content: space-between; }
+      .site-lamp-unit { flex-basis: 100%; margin-inline-start: 0; grid-auto-flow: column; justify-content: start; align-items: center; gap: .6rem; }
+      .site-gamut { margin-block: 0; }
+    }
+
     /* The palette's exports (site-export.js), under each palette code box. */
     .site-exports { display: flex; flex-wrap: wrap; align-items: center; gap: .25rem .5rem; margin-block-start: .5rem; grid-column: 1 / -1; }
     .site-exports-label { font: 500 var(--wal-text-xs) / 1.3 var(--wal-font-label); letter-spacing: var(--wal-tracking-label); text-transform: uppercase; color: var(--wal-text-muted); margin-inline-end: .25rem; }
@@ -955,7 +997,7 @@
     }
 
     @media print {
-      .site-nav, .site-desk .wal-tablist, .site-actions, .site-ref-search, .site-code > summary, .site-code-copy, .site-find, .site-exports { display: none; }
+      .site-nav, .site-desk .wal-tablist, .site-actions, .site-ref-search, .site-code > summary, .site-code-copy, .site-find, .site-exports, .site-console { display: none; }
       .site-code > pre { display: block; }
       /* Tiles that never scrolled into view still print. */
       .site-js .site-reveal { opacity: 1; translate: none; transition: none; }
@@ -2351,6 +2393,7 @@ walnut.shuffle(materials, () =&gt; showOnly("Wood"));</pre></details>
   <script src="../dist/walnut-acts.js" defer></script>
   <script src="site-find.js" defer></script>
   <script src="site-export.js" defer></script>
+  <script src="site-desk.js" defer></script>
   <!-- A module, so it runs after the deferred scripts above and finds
        window.walnut whole. -->
   <script type="module">

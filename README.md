@@ -766,7 +766,9 @@ by `npm run build`. ⌘K (or `/`) finds any section, tab or reference entry on i
 and every Markup drawer has a Copy button. Beside each palette's CSS, the palette exports as W3C design
 tokens (DTCG JSON, every derived colour in light and dark, read back from the page), as a Tailwind v4
 `@theme` block that points Tailwind's colours at walnut's tokens, or as a `.css` file
-(`docs/site-export.js`).
+(`docs/site-export.js`). Under the hero, the mixing desk turns the four hue rods as brass knobs and
+lights a lamp when any colour falls outside sRGB in either mode (`docs/site-desk.js`). Rive versions
+of the mark and the desk are specified in `design/rive/SPEC.md`.
 
 The mark is `docs/favicon.svg`: a walnut split by its ground rod, holding a pair of braces. The
 nav draws it in the page's own cues, so it changes with the palette. `scripts/og/render.mjs`
