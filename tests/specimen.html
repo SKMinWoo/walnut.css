@@ -1,0 +1,44 @@
+<!doctype html>
+<!-- The stills' specimen: one of most things walnut draws, on one screen.
+     tests/stills.mjs sets the palette class, data-theme and data-finish on
+     <html> and photographs it. System fonts only, so it renders the same
+     with no network. -->
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <link rel="stylesheet" href="../dist/walnut.css">
+  <link rel="stylesheet" href="../dist/themes/press.css">
+  <link rel="stylesheet" href="../dist/themes/cafe.css">
+  <link rel="stylesheet" href="../dist/themes/forest.css">
+  <link rel="stylesheet" href="../dist/themes/dusk.css">
+  <link rel="stylesheet" href="../dist/themes/bone.css">
+  <style>
+    :root { --wal-font-display: system-ui, sans-serif; --wal-font-body: system-ui, sans-serif; --wal-font-label: ui-monospace, monospace; --wal-font-typewriter: ui-monospace, monospace; }
+    body { margin: 0; padding: 28px; }
+    .grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 20px; }
+    *, *::before, *::after { animation: none !important; transition: none !important; }
+  </style>
+</head>
+<body>
+  <nav class="wal-nav" aria-label="Specimen"><a class="wal-nav-brand" href="#">Plate 14</a><div class="wal-nav-links"><a href="#">Catalogue</a><a href="#">Finishes</a><a href="#">Orders</a></div></nav>
+  <div class="wal-section-head" style="margin-block: 24px 20px"><span class="wal-index">14</span><h1>Walnut sideboard</h1><p>Tambour doors, brass pulls and tapered legs.</p></div>
+  <div class="grid">
+    <div class="wal-card">
+      <div class="wal-metric"><span class="wal-metric-value">640</span><span class="wal-metric-label">Orders shipped</span></div>
+      <p><span class="wal-badge wal-badge-accent">Accent</span> <span class="wal-badge wal-badge-bloom">Bloom</span> <span class="wal-badge wal-badge-gold">Gold</span> <span class="wal-badge wal-badge-olive">Olive</span> <span class="wal-badge wal-badge-cool">Cool</span></p>
+      <p><button class="wal-btn wal-btn-primary">Primary</button> <button class="wal-btn wal-btn-secondary">Secondary</button> <button class="wal-btn wal-btn-ghost">Ghost</button></p>
+    </div>
+    <div class="wal-card">
+      <dl class="wal-plate"><div><dt>Width</dt><dd>180 cm</dd></div><div><dt>Depth</dt><dd>46 cm</dd></div><div><dt>Height</dt><dd>78 cm</dd></div></dl>
+      <div class="wal-field" style="margin-top: 16px"><label class="wal-label" for="n">Name</label><input class="wal-input" id="n" value="Holm &amp; Varde"><span class="wal-hint">Printed on the delivery note.</span></div>
+    </div>
+    <div class="wal-card">
+      <ol class="wal-script"><li></li><li></li><li></li><li></li><li></li></ol>
+      <div class="wal-note" style="margin-top: 16px"><strong>Oiled, not lacquered</strong><p>The finish is rubbed in by hand, three coats.</p></div>
+      <p><span class="wal-chip">Walnut</span> <span class="wal-chip">Brass</span> <span class="wal-caption">Model 211</span></p>
+    </div>
+  </div>
+  <table class="wal-table" style="margin-top: 20px"><thead><tr><th>Part</th><th>Material</th><th>Qty</th></tr></thead>
+    <tbody><tr><td>Door</td><td>Quarter-sawn walnut</td><td>5</td></tr><tr><td>Pull</td><td>Brass</td><td>5</td></tr><tr><td>Leg</td><td>Turned walnut</td><td>4</td></tr></tbody></table>
+</body>
+</html>

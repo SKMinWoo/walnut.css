@@ -740,6 +740,25 @@ import "walnut.css";                       // in the bundle
 // <link rel="stylesheet" href="/walnut-scroll.css">, copied from walnut.css/scroll
 ```
 
+## Checks
+
+`npm run build` refuses to write anything if:
+- a palette sets a token a finish owns;
+- the bundle would not parse in Lightning CSS;
+- the docs' links were not rewritten;
+- the versions disagree;
+- the CSP's script hashes are stale (on CI; locally they are rewritten).
+
+`npm test` is the contrast audit (`tests/contrast.mjs`). It loads every shipped palette and the
+default script into a real browser and measures 300 text pairs as painted, in light and dark. The
+pairs are text and muted text on the ground and on a card, and each cue as text on the ground, on a
+card and on its own wash, plus the text set on it. Every one must clear 4.5:1.
+
+`npm run stills` photographs `tests/specimen.html` in every palette × mode × finish (24 stills,
+into `tests/stills/`). CI runs all three on every push and pull request and keeps the stills as an
+artifact. Publishing a GitHub release tagged `vX.Y.Z` publishes that commit to npm with provenance
+(`.github/workflows/release.yml`, which needs an `NPM_TOKEN` secret).
+
 ## The site
 
 [walnut-css.vercel.app](https://walnut-css.vercel.app) is `docs/index.html`, built into `public/`

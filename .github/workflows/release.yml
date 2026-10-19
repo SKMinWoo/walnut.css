@@ -1,0 +1,31 @@
+# Publishing a GitHub release tagged vX.Y.Z publishes the same commit to npm,
+# with provenance, so the package links back to the exact source and build.
+# Needs an NPM_TOKEN repository secret (an npm automation token).
+name: Release
+
+on:
+  release:
+    types: [published]
+
+permissions:
+  contents: read
+  id-token: write # npm provenance
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          registry-url: https://registry.npmjs.org
+      - run: npm ci
+      - run: npx playwright-core install --with-deps chromium
+      - name: The tag is the version
+        run: test "v$(node -p 'require("./package.json").version')" = "${{ github.event.release.tag_name }}"
+      - run: npm run build
+      - run: npm test
+      - run: npm publish --provenance --access public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

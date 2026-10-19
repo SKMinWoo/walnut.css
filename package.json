@@ -53,8 +53,12 @@
   ],
   "scripts": {
     "build": "node build.js",
+    "test": "node tests/contrast.mjs",
+    "stills": "node tests/stills.mjs",
     "dev": "node build.js && npx serve public",
     "prepublishOnly": "node build.js"
   },
-  "devDependencies": {}
+  "devDependencies": {
+    "playwright-core": "1.63.0"
+  }
 }

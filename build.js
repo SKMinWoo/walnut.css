@@ -148,8 +148,22 @@ const themeCss = Object.fromEntries(
  * @throws naming each palette and the finish-owned token(s) it declares
  */
 function assertPalettesLeaveFinishTokens(finishCss, palettes) {
-  // TODO(you): decide what a finish owns, find any palette that declares it,
-  // and throw. Returning without a check keeps the build passing meanwhile.
+  // What a finish owns: every custom property 07-finish.css declares, in any
+  // of its rules. Comments are stripped first, since they quote tokens
+  // (this layer's header lists the ones a palette must leave alone).
+  const declared = (css) =>
+    new Set([...css.replace(/\/\*[^]*?\*\//g, "").matchAll(/(--wal-[\w-]+)\s*:/g)].map((m) => m[1]));
+  const owned = declared(finishCss);
+  const clashes = Object.entries(palettes)
+    .map(([theme, css]) => [theme, [...declared(css)].filter((t) => owned.has(t))])
+    .filter(([, tokens]) => tokens.length);
+  if (clashes.length) {
+    throw new Error(
+      "A palette sets a token that a finish owns, so it would override every finish it is paired with:\n" +
+        clashes.map(([theme, tokens]) => `  src/themes/${theme}.css: ${tokens.join(", ")}`).join("\n") +
+        "\n  Move the value into a finish in src/layers/07-finish.css, or drop it."
+    );
+  }
 }
 
 /**

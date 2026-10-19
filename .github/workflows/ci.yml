@@ -1,0 +1,36 @@
+# Every push and pull request: build (with all of build.js's guards, and the
+# CSP hashes checked rather than rewritten, since CI is set), then the
+# contrast audit, then the stills, kept as an artifact to look through.
+name: CI
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npx playwright-core install --with-deps chromium
+      - name: Build
+        run: npm run build
+      - name: dist/ is committed as built
+        run: git diff --exit-code -- dist/
+      - name: Contrast audit
+        run: npm test
+      - name: Stills
+        run: npm run stills
+      - uses: actions/upload-artifact@v4
+        with:
+          name: stills
+          path: tests/stills/
