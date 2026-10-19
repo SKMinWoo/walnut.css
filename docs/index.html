@@ -328,6 +328,17 @@
       from { clip-path: circle(0 at var(--lamp-x) var(--lamp-y)); }
       to { clip-path: circle(var(--lamp-r) at var(--lamp-x) var(--lamp-y)); }
     }
+    /* The circle is drawn in the transition's own space, which on a phone
+       showing its URL bar starts under the bar, not where the page does.
+       So a pixel at the switch's centre is pictured on its own while the
+       lamp runs, and the script centres the circle wherever the browser
+       puts it. */
+    .site-mode { position: relative; }
+    .site-lamp-wick { position: absolute; inset: 50% auto auto 50%; inline-size: 1px; block-size: 1px; pointer-events: none; }
+    :root:active-view-transition-type(lamp) .site-lamp-wick { view-transition-name: site-lamp-wick; }
+    :root:active-view-transition-type(lamp)::view-transition-group(site-lamp-wick),
+    :root:active-view-transition-type(lamp)::view-transition-old(site-lamp-wick),
+    :root:active-view-transition-type(lamp)::view-transition-new(site-lamp-wick) { animation: none; }
     /* The new room appears in its final colours, not replaying ninety
        colour transitions inside the circle. */
     :root:active-view-transition-type(lamp),
@@ -981,6 +992,7 @@
         <span data-m="auto"><svg class="site-icon" viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="6.2" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M8 1.8a6.2 6.2 0 0 1 0 12.4z" fill="currentColor"/></svg><span>Auto</span></span>
         <span data-m="light"><svg class="site-icon" viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="3.2" fill="currentColor"/><g stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M8 1v1.6M8 13.4V15M1 8h1.6M13.4 8H15M3 3l1.1 1.1M11.9 11.9 13 13M3 13l1.1-1.1M11.9 4.1 13 3"/></g></svg><span>Light</span></span>
         <span data-m="dark"><svg class="site-icon" viewBox="0 0 16 16" aria-hidden="true"><path d="M13.6 10.2A6 6 0 0 1 5.8 2.4a6 6 0 1 0 7.8 7.8z" fill="currentColor"/></svg><span>Dark</span></span>
+        <i class="site-lamp-wick" aria-hidden="true"></i>
       </button>
       <a class="wal-btn wal-btn-ghost wal-btn-sm site-gh" href="https://github.com/SKMinWoo/walnut.css" aria-label="walnut.css on GitHub">
         <svg class="site-icon" viewBox="0 0 16 16" aria-hidden="true"><path d="M5.5 4 1.5 8l4 4M10.5 4l4 4-4 4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg><span>GitHub</span>
@@ -2703,7 +2715,16 @@ walnut.shuffle(materials, () =&gt; showOnly("Wood"));</pre></details>
       root.style.setProperty("--lamp-r", `${Math.hypot(Math.max(x, innerWidth - x), Math.max(y, innerHeight - y))}px`);
       const unpin = pinNav();
       const t = document.startViewTransition({ update: flip, types: ["lamp", to === "dark" ? "lamp-down" : "lamp-up"] });
-      t.ready.catch(() => {});
+      // Where the browser pictured the wick is the circle's true centre.
+      t.ready.then(() => {
+        const at = getComputedStyle(root, "::view-transition-group(site-lamp-wick)").transform;
+        if (!at || at === "none") return;
+        const m = new DOMMatrixReadOnly(at), room = getComputedStyle(root, "::view-transition");
+        const wx = m.m41 + 0.5, wy = m.m42 + 0.5, w = parseFloat(room.width) || innerWidth, h = parseFloat(room.height) || innerHeight;
+        root.style.setProperty("--lamp-x", `${wx}px`);
+        root.style.setProperty("--lamp-y", `${wy}px`);
+        root.style.setProperty("--lamp-r", `${Math.hypot(Math.max(wx, w - wx), Math.max(wy, h - wy))}px`);
+      }).catch(() => {});
       t.finished.finally(() => { unpin(); paint(true); });
     });
     systemDark.addEventListener("change", paint);
