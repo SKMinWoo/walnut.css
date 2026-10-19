@@ -7,6 +7,21 @@
   <meta name="description" content="A CSS framework under 18 KB gzipped, with components, charts and dark mode built in. Set a hue and chroma for the ground and three colours, and walnut derives the rest.">
   <link rel="icon" type="image/svg+xml" href="favicon.svg">
   <link rel="alternate icon" href="favicon.ico">
+  <link rel="apple-touch-icon" href="apple-touch-icon.png">
+  <link rel="canonical" href="https://walnut-css.vercel.app/">
+  <meta name="theme-color" content="#f2f2f2" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#090e11" media="(prefers-color-scheme: dark)">
+  <!-- The link preview: scripts/og/og.html, rendered to og.png. -->
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="walnut.css">
+  <meta property="og:url" content="https://walnut-css.vercel.app/">
+  <meta property="og:title" content="walnut.css: theme a whole site from eight numbers">
+  <meta property="og:description" content="A CSS framework under 18 KB gzipped, with components, charts and dark mode built in. Set a ground and three colours; walnut derives the rest in oklch.">
+  <meta property="og:image" content="https://walnut-css.vercel.app/og.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="walnut.css: theme a whole site from eight numbers. A walnut sideboard with five tambour doors in the colour script.">
+  <meta name="twitter:card" content="summary_large_image">
 
   <script>
     /* Before the first paint: the reader's chosen mode, and old addresses.
@@ -184,6 +199,20 @@
     .site-code > summary { padding-block: .7rem .2rem; cursor: pointer; font: 500 var(--wal-text-xs) / 1.3 var(--wal-font-label); letter-spacing: var(--wal-tracking-label); text-transform: uppercase; color: var(--wal-text-muted); }
     .site-code > summary:hover { color: var(--wal-text); }
     .site-code > pre { margin-block-start: .6rem; }
+    /* The finder (site-find.js): walnut's dialog, pinned near the top. */
+    .site-find { inline-size: min(36rem, 92vw); margin-block-start: 12vh; padding: .75rem; }
+    .site-find-form .wal-input { inline-size: 100%; font-size: 1.05rem; }
+    .site-find-list { list-style: none; margin: .5rem 0 0; padding: 0; max-block-size: 50vh; overflow: auto; }
+    .site-find-list li { display: flex; justify-content: space-between; gap: 1rem; padding: .6rem .75rem; border-radius: var(--wal-radius-sm, 4px); cursor: pointer; }
+    .site-find-list li[aria-selected="true"] { background: var(--wal-accent-soft); }
+    .site-find-list li:hover { background: var(--wal-surface-2); }
+    .site-find-where, .site-find-foot, .site-find-none { color: var(--wal-text-muted); font: 500 var(--wal-text-xs) / 1.3 var(--wal-font-label); letter-spacing: var(--wal-tracking-label); text-transform: uppercase; }
+    .site-find-foot { margin: .6rem .25rem 0; }
+    .site-find-foot kbd, .site-find-btn kbd { font: inherit; font-size: .72rem; padding: .05rem .3rem; border: var(--wal-hairline) solid var(--wal-line); border-radius: 3px; }
+    .site-find-btn kbd { margin-inline-start: .35rem; color: var(--wal-text-muted); }
+    @media (max-width: 760px) { .site-find-btn kbd, .site-find-btn span { display: none; } }
+    .site-code { position: relative; }
+    .site-code-copy { position: absolute; inset-block-start: 3.1rem; inset-inline-end: .6rem; }
     .site-codebox { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: .75rem; align-items: start; }
     .site-codebox pre { padding: .9rem 1rem; }
     .site-codebox:has(#photo-css) { max-inline-size: 46rem; }
@@ -923,7 +952,7 @@
     }
 
     @media print {
-      .site-nav, .site-desk .wal-tablist, .site-actions, .site-ref-search, .site-code > summary { display: none; }
+      .site-nav, .site-desk .wal-tablist, .site-actions, .site-ref-search, .site-code > summary, .site-code-copy, .site-find { display: none; }
       .site-code > pre { display: block; }
       /* Tiles that never scrolled into view still print. */
       .site-js .site-reveal { opacity: 1; translate: none; transition: none; }
@@ -972,7 +1001,16 @@
 
   <nav class="wal-nav site-nav" aria-label="walnut.css">
     <a class="wal-nav-brand" href="#top">
-      <svg viewBox="0 0 26 26" aria-hidden="true"><rect x="1" y="3" width="24" height="20" rx="4" style="fill: var(--site-walnut)"/><rect x="1" y="3" width="24" height="4" rx="2" style="fill: var(--site-walnut-hi)"/><rect x="8" y="13" width="10" height="3" rx="1.5" fill="url(#brassh)"/></svg>
+      <!-- The mark, the favicon's: a walnut split by its ground rod, holding a
+           pair of braces. Here its dots and braces wear the page's own cues,
+           so the mark changes with the palette like everything under it. -->
+      <svg class="site-mark" viewBox="30 22 196 214" aria-hidden="true">
+        <path d="M128 32C152 32 216 72 216 142c0 54-40 84-88 84s-88-30-88-84C40 72 104 32 128 32z" style="fill: var(--site-walnut); stroke: var(--site-walnut-lo)" stroke-width="8"/>
+        <path d="M128 40v178" style="stroke: var(--wal-surface)" stroke-width="12" stroke-linecap="round"/>
+        <path d="M106 62c-24 2-32 22-32 40 0 14-8 22-20 26 12 4 20 12 20 26 0 18 8 38 32 40M150 62c24 2 32 22 32 40 0 14 8 22 20 26-12 4-20 12-20 26 0 18-8 38-32 40" fill="none" style="stroke: var(--wal-gold)" stroke-width="16" stroke-linecap="round" stroke-linejoin="round"/>
+        <circle cx="128" cy="36" r="13" style="fill: var(--wal-accent)"/>
+        <circle cx="128" cy="222" r="11" style="fill: var(--wal-cool)"/>
+      </svg>
       walnut.css
     </a>
     <div class="wal-nav-links">
@@ -2308,6 +2346,7 @@ walnut.shuffle(materials, () =&gt; showOnly("Wood"));</pre></details>
   <script src="../dist/walnut-motion.js" defer></script>
   <script src="../dist/walnut-tabs.js" defer></script>
   <script src="../dist/walnut-acts.js" defer></script>
+  <script src="site-find.js" defer></script>
   <!-- A module, so it runs after the deferred scripts above and finds
        window.walnut whole. -->
   <script type="module">
@@ -2791,8 +2830,20 @@ walnut.shuffle(materials, () =&gt; showOnly("Wood"));</pre></details>
         window.prompt("Copy:", text);
       }
     };
+    // Every Markup drawer gets a Copy button of its own, once it is opened:
+    // made here rather than written into each, since without this script
+    // there is nothing to press it with.
+    for (const pre of $$(".site-code > pre")) {
+      const b = document.createElement("button");
+      b.type = "button";
+      b.className = "wal-btn wal-btn-secondary wal-btn-sm site-code-copy";
+      b.dataset.copyCode = "";
+      b.textContent = "Copy";
+      b.setAttribute("aria-label", "Copy this markup");
+      pre.after(b);
+    }
     document.addEventListener("click", (e) => {
-      const b = e.target.closest("[data-copy-live], [data-copy-link], [data-copy-from], [data-copy]");
+      const b = e.target.closest("[data-copy-live], [data-copy-link], [data-copy-from], [data-copy-code], [data-copy]");
       if (!b) return;
       b.closest("[popover]")?.hidePopover();
       if (b.matches("[data-copy-live]")) {
@@ -2805,6 +2856,7 @@ walnut.shuffle(materials, () =&gt; showOnly("Wood"));</pre></details>
       }
       else if (b.matches("[data-copy-link]")) { share(); copy(location.href, b); }
       else if (b.matches("[data-copy-from]")) copy($(b.dataset.copyFrom).textContent, b);
+      else if (b.matches("[data-copy-code]")) copy(b.previousElementSibling.textContent, b);
       else copy(b.parentElement.querySelector("[data-css]").textContent, b);
     });
 

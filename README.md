@@ -3,10 +3,12 @@
 # 🌰 walnut.css
 
 **A cinematic CSS framework you theme by writing a colour script.**<br>
-One ground rod. Five cues. Zero JavaScript.
+One ground rod. Five cues. No JavaScript in the core.
 
 [![License: MIT](https://img.shields.io/badge/license-MIT-E5A62E?style=flat-square)](LICENSE)
-![CSS Only](https://img.shields.io/badge/javascript-zero-2D2418?style=flat-square)
+![CSS core](https://img.shields.io/badge/core-CSS_only-2D2418?style=flat-square)
+![Size](https://img.shields.io/badge/min%2Bgzip-under_18_KB-7A5230?style=flat-square)
+![Browsers](https://img.shields.io/badge/browsers-Chrome_123_%7C_Safari_17.5_%7C_Firefox_120-1F6E9C?style=flat-square)
 ![Modern CSS](https://img.shields.io/badge/modern_css-oklch_%7C_light--dark()_%7C_@layer-D9432F?style=flat-square)
 
 [Demo](https://walnut-css.vercel.app) · [Colour script](#the-colour-script) · [Three axes](#three-axes) · [Install](#install)
@@ -17,7 +19,7 @@ One ground rod. Five cues. Zero JavaScript.
 
 ## What is this?
 
-walnut.css is a CSS framework built entirely on modern platform APIs — no JavaScript, no build step, no preprocessor. What makes it different from other drop-in stylesheets is **how you theme it**.
+walnut.css is a CSS framework built entirely on modern platform APIs — no build step, no preprocessor, and no JavaScript in the core. Four small companion scripts are optional: tabs, scroll-linked acts, the recolour transition and the scripted openings. What makes it different from other drop-in stylesheets is **how you theme it**.
 
 A film's colour script is the sequence of colours that carries its emotional arc — fixed by intent, not derived from a formula. walnut borrows the term literally. Theming it means writing one:
 
@@ -737,6 +739,17 @@ walnut.css parses in Lightning CSS, which Next.js (Turbopack), Vite, Parcel and 
 import "walnut.css";                       // in the bundle
 // <link rel="stylesheet" href="/walnut-scroll.css">, copied from walnut.css/scroll
 ```
+
+## The site
+
+[walnut-css.vercel.app](https://walnut-css.vercel.app) is `docs/index.html`, built into `public/`
+by `npm run build`. ⌘K (or `/`) finds any section, tab or reference entry on it (`docs/site-find.js`),
+and every Markup drawer has a Copy button.
+
+The mark is `docs/favicon.svg`: a walnut split by its ground rod, holding a pair of braces. The
+nav draws it in the page's own cues, so it changes with the palette. `scripts/og/render.mjs`
+renders the link-preview card (`scripts/og/og.html` → `docs/og.png`) and the home-screen icon; both
+are committed, and the build only copies them.
 
 ## License
 

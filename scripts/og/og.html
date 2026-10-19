@@ -1,0 +1,51 @@
+<!doctype html>
+<html class="wal-light" data-theme="light">
+<head>
+<meta charset="utf-8">
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,100..900&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../../dist/walnut.min.css">
+<style>
+  html, body { margin: 0; }
+  body { width: 1200px; height: 630px; overflow: hidden; background: var(--wal-bg); color: var(--wal-text); font-family: Archivo, sans-serif; position: relative; }
+  .card { position: absolute; inset: 0; padding: 56px 72px 90px; display: grid; grid-template-columns: 1fr 300px; gap: 40px; }
+  .brand { display: flex; align-items: center; gap: 18px; font: 800 44px/1 Archivo; font-stretch: 112%; letter-spacing: -.01em; }
+  .brand svg { width: 64px; height: 70px; }
+  h1 { margin: 40px 0 0; font: 900 68px/.94 Archivo; font-stretch: 125%; letter-spacing: -.035em; }
+  p { margin: 22px 0 0; font: 400 25px/1.35 Archivo; color: var(--wal-text-muted); max-width: 30ch; }
+  .label { font: 500 15px DM Mono, monospace; letter-spacing: .14em; text-transform: uppercase; color: var(--wal-text-muted); }
+  .board { align-self: end; }
+  .doors { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; height: 330px; padding: 12px; border-radius: 10px;
+           background: linear-gradient(180deg, oklch(0.53 0.062 60), oklch(0.42 0.055 52) 26%, oklch(0.32 0.042 46)); }
+  .doors i { border-radius: 3px; background: repeating-linear-gradient(90deg, color-mix(in oklch, var(--c) 100%, black 0%) 0 7px, color-mix(in oklch, var(--c) 82%, black) 7px 8px); position: relative; }
+  .doors i::after { content: ""; position: absolute; left: 50%; top: 42%; width: 6px; height: 46px; margin-left: -3px; border-radius: 3px; background: linear-gradient(90deg, #b88a3c, #f2d28a, #a8792f); }
+  .legs { display: flex; justify-content: space-between; padding: 0 26px; }
+  .legs b { width: 10px; height: 34px; background: oklch(0.32 0.042 46); clip-path: polygon(0 0, 100% 0, 75% 100%, 25% 100%); }
+  .foot { position: absolute; left: 72px; bottom: 44px; }
+</style>
+</head>
+<body>
+  <div class="card">
+    <div>
+      <div class="brand">
+        <svg viewBox="30 22 196 214" aria-hidden="true">
+          <path d="M128 32C152 32 216 72 216 142c0 54-40 84-88 84s-88-30-88-84C40 72 104 32 128 32z" fill="oklch(0.42 0.055 52)" stroke="oklch(0.32 0.042 46)" stroke-width="8"/>
+          <path d="M128 40v178" stroke="var(--wal-surface)" stroke-width="12" stroke-linecap="round"/>
+          <path d="M106 62c-24 2-32 22-32 40 0 14-8 22-20 26 12 4 20 12 20 26 0 18 8 38 32 40M150 62c24 2 32 22 32 40 0 14 8 22 20 26-12 4-20 12-20 26 0 18-8 38-32 40" fill="none" stroke="var(--wal-gold)" stroke-width="16" stroke-linecap="round" stroke-linejoin="round"/>
+          <circle cx="128" cy="36" r="13" fill="var(--wal-accent)"/>
+          <circle cx="128" cy="222" r="11" fill="var(--wal-cool)"/>
+        </svg>
+        walnut.css
+      </div>
+      <h1>Theme a whole site from eight numbers.</h1>
+      <p>A CSS framework under 18&nbsp;KB. Components, charts and dark mode, all derived in oklch.</p>
+    </div>
+    <div class="board">
+      <div class="doors">
+        <i style="--c: var(--wal-accent)"></i><i style="--c: var(--wal-bloom)"></i><i style="--c: var(--wal-gold)"></i><i style="--c: var(--wal-olive)"></i><i style="--c: var(--wal-cool)"></i>
+      </div>
+      <div class="legs"><b></b><b></b></div>
+    </div>
+  </div>
+  <div class="foot label">walnut-css.vercel.app · MIT</div>
+</body>
+</html>
