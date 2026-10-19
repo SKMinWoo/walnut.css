@@ -319,6 +319,16 @@ the platform can now draw with no script.
 
 ### Fixed
 
+- **The gatefold's notes fold out from under the cover.** They used to
+  start turning while the cover was still in flight from the card, on a
+  hinge where the cover would land, so the page swung open on its own
+  beside empty air. Now the cover is brought forth and lands first, and a
+  beat later the notes come round its edge; closing folds them back behind
+  it before it goes home. The moment they come round is read off the
+  material's own curve. The opening takes about 630ms at the default
+  280ms, up from 260ms.
+- **The docs' open cards show an arrow, not "92".** The `\2192` in their
+  `::after` had lost its backslash.
 - **`.wal-nav-brand` is no longer underlined.** It took the underline every
   link in running text has; the nav's own links never did.
 - **In-page links land below the nav.** The nav is sticky, so a link to
