@@ -327,6 +327,22 @@ the platform can now draw with no script.
   it before it goes home. The moment they come round is read off the
   material's own curve. The opening takes about 630ms at the default
   280ms, up from 260ms.
+- **The gatefold closes as smoothly as it opens.** The notes fold away over
+  1.3× the close duration (was 0.6×). A beat after they're gone, the cover
+  eases out of its place and into the card's on the glide curve, instead
+  of leaving at full speed. Its shadow shrinks with it, and the backdrop's
+  dim lifts over the whole close rather than in its first 160ms. About
+  530ms at the default 200ms. A movement in `walnut.open.styles` can say
+  how long its close takes with `span(dialog, from)`; walnut-motion.js
+  passes that to the backdrop as `--wal-closing`.
+- **Index tabs file like a folder's.** There's no gap between them now:
+  each tucks 0.375rem under the one before it, with a hairline edge and a
+  soft shadow on the tab beneath, and the chosen one comes to the front.
+  Their side padding narrows below about 520px (`min(1.1rem, 3.4vw)`), so
+  a row that nearly fits does fit, instead of leaving its last tab half
+  off the edge. The docs' four example tabs fit from 360px up. The docs'
+  scroll fade at a row's edge is eased too, so where a row does scroll it
+  dissolves, not bands.
 - **The docs' open cards show an arrow, not "92".** The `\2192` in their
   `::after` had lost its backslash.
 - **`.wal-nav-brand` is no longer underlined.** It took the underline every

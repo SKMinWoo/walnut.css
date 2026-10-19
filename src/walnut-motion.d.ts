@@ -25,6 +25,12 @@ export interface WalnutOpenStyle {
   open(dialog: HTMLDialogElement, from: Element): unknown;
   /** May return a function, run once the dialog has closed. */
   close(dialog: HTMLDialogElement, from: Element): unknown;
+  /**
+   * How long `close` will take, in ms, asked just before it starts. The
+   * backdrop's dim lifts over that long; without it, over 0.8 of the
+   * window's --wal-close-duration.
+   */
+  span?(dialog: HTMLDialogElement, from: Element): number;
 }
 
 export interface WalnutMotion {
