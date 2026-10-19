@@ -238,7 +238,10 @@
        The row's own scroll drives it; a row that fits has no timeline, so neither edge fades. */
     @supports (animation-timeline: scroll()) {
       .site-nav .wal-nav-links, .wal-tablist, .site-table-scroll, .site-photo-read-wrap {
-        mask-image: linear-gradient(to right, transparent, #000 var(--site-fade-start), #000 calc(100% - var(--site-fade-end)), transparent);
+        /* Eased, not a straight ramp, so the edge dissolves rather than showing as a band. */
+        mask-image: linear-gradient(to right,
+          transparent, rgb(0 0 0 / .16) calc(var(--site-fade-start) * .25), rgb(0 0 0 / .5) calc(var(--site-fade-start) * .5), rgb(0 0 0 / .84) calc(var(--site-fade-start) * .75), #000 var(--site-fade-start),
+          #000 calc(100% - var(--site-fade-end)), rgb(0 0 0 / .84) calc(100% - var(--site-fade-end) * .75), rgb(0 0 0 / .5) calc(100% - var(--site-fade-end) * .5), rgb(0 0 0 / .16) calc(100% - var(--site-fade-end) * .25), transparent);
         animation: site-edge-fade linear both; animation-timeline: scroll(self inline);
       }
     }

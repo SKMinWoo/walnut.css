@@ -1956,9 +1956,13 @@
       transition-duration: var(--wal-open-duration);
     }
 
+    /* walnut-motion.js sets --wal-closing to the length of its movement, so
+       the dim lifts over the whole of it rather than before it is done,
+       evenly, as the cover glides home. */
     &.is-closing::backdrop {
       opacity: 0;
-      transition-duration: calc(var(--wal-close-duration) * 0.8);
+      transition-duration: var(--wal-closing, calc(var(--wal-close-duration) * 0.8));
+      transition-timing-function: var(--wal-ease-glide);
     }
   }
 
@@ -2777,20 +2781,45 @@
 
   @keyframes wal-tab-in { from { opacity: 0; translate: 0 0.375rem; } }
 
-  /* Index: card tabs. The others sit lower, their feet behind the panel,
-     and the chosen one rises to meet it. Its bar is the brass top edge. */
+  /* Index: card tabs, filed like a folder's. The others sit lower, their
+     feet behind the panel, and the chosen one rises to meet it. Its bar is
+     the brass top edge. Each tab tucks a little under the one before it
+     and throws a soft shadow on the one after; the chosen one comes to the
+     front. The shadow falls both ways, so only the one cast on a tab
+     underneath shows, whichever way the text runs. */
   :is(.wal-tabs[data-style="index"] > .wal-tablist, .wal-tablist[data-style="index"]) {
     align-items: flex-end;
-    gap: 0.375rem;
+    gap: 0;
     padding-inline: 0.625rem;
     box-shadow: none;
+    /* The tabs' stacking stays inside the row, so their feet still go
+       behind the panel below. */
+    isolation: isolate;
 
     [role="tab"] {
-      padding: 0.75rem 1.1rem 0.7rem;
+      /* Its edge, top and sides, as a card's catches the light, and the
+         shadow it throws on its neighbours. */
+      --wal-tab-edge: inset 0 1px 0 var(--wal-line-soft), inset 1px 0 0 var(--wal-line-soft), inset -1px 0 0 var(--wal-line-soft);
+      --wal-tab-cast: -0.35rem 0 0.6rem -0.25rem var(--wal-shadow-ink), 0.35rem 0 0.6rem -0.25rem var(--wal-shadow-ink);
+      /* Narrower on a phone, so a row that nearly fits does fit, rather
+         than leaving its last tab half off the edge. */
+      padding: 0.75rem min(1.1rem, 3.4vw) 0.7rem;
       border-radius: var(--wal-radius) var(--wal-radius) 0 0;
       background: var(--wal-surface-2);
-      box-shadow: inset 0 -0.75rem 0.875rem -0.875rem var(--wal-shadow-ink);
+      box-shadow: var(--wal-tab-edge), inset 0 -0.75rem 0.875rem -0.875rem var(--wal-shadow-ink), var(--wal-tab-cast);
       translate: 0 0.5rem;
+
+      & + [role="tab"] { margin-inline-start: -0.375rem; }
+      /* Left alone, a later tab paints over an earlier one; a folder's go
+         the other way. Eight is more than a row of these holds. */
+      &:nth-child(1) { z-index: 8; }
+      &:nth-child(2) { z-index: 7; }
+      &:nth-child(3) { z-index: 6; }
+      &:nth-child(4) { z-index: 5; }
+      &:nth-child(5) { z-index: 4; }
+      &:nth-child(6) { z-index: 3; }
+      &:nth-child(7) { z-index: 2; }
+      &:nth-child(8) { z-index: 1; }
       transition:
         color            var(--wal-duration) var(--wal-ease),
         background-color var(--wal-duration) var(--wal-ease),
@@ -2799,9 +2828,10 @@
       &:hover { background: color-mix(in oklch, var(--wal-surface-2) 60%, var(--wal-surface)); }
 
       &[aria-selected="true"] {
+        z-index: 9;
         translate: 0 0;
         background: var(--wal-surface);
-        box-shadow: none;
+        box-shadow: var(--wal-tab-edge), var(--wal-tab-cast);
       }
 
       &::after {

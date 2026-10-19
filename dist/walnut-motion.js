@@ -124,6 +124,17 @@
     notes: dialog.querySelector(".wal-gatefold-notes"),
     spread: dialog.querySelector(".wal-gatefold-spread"),
   });
+  /* Closing is the opening run back, a little quicker: the notes fold away
+     behind the cover, and a beat after they are gone it shrinks home to the
+     card, easing out of its place and into the card's. In ms, at the
+     material's close duration. */
+  const TUCK = "cubic-bezier(.45, 0, .7, .4)";
+  function closing(dialog, from) {
+    const { art, cover } = parts(dialog, from);
+    const T = pace(cover.getBoundingClientRect(), art.getBoundingClientRect(), timing(dialog, "close").duration);
+    const fold = T * 1.3, leave = onEdge(TUCK) * fold + T * 0.1, back = T * 1.6;
+    return { fold, leave, back, total: leave + back };
+  }
   const gatefold = {
     async open(dialog, from) {
       const { art, cover, notes, spread } = parts(dialog, from);
@@ -149,29 +160,35 @@
       ];
       await settled(anims);
     },
+    // How long closing takes, so the dim behind the window can lift over
+    // the whole of it.
+    span: (dialog, from) => closing(dialog, from).total,
     async close(dialog, from) {
       const { art, cover, notes, spread } = parts(dialog, from);
       // Hidden already, unless the window opened in place.
       art.style.visibility = "hidden";
       const turn = behind(spread);
-      const { duration, settle } = timing(dialog, "close");
-      const T = pace(cover.getBoundingClientRect(), art.getBoundingClientRect(), duration);
-      const tuck = "cubic-bezier(.45, 0, .7, .4)";
-      const fold = [
+      const { glide } = timing(dialog, "close");
+      const { fold, leave, back } = closing(dialog, from);
+      const folding = [
         notes.animate([{ transform: "none" }, { transform: turn }],
-          { duration: T * 0.6, easing: tuck, fill: "forwards" }),
-        notes.animate([{ opacity: 0 }, { opacity: 1 }], { pseudoElement: "::after", duration: T * 0.6, fill: "forwards" }),
+          { duration: fold, easing: TUCK, fill: "forwards" }),
+        notes.animate([{ opacity: 0 }, { opacity: 1 }], { pseudoElement: "::after", duration: fold, fill: "forwards" }),
       ];
-      // The cover leaves once the notes have gone behind it.
-      await new Promise((r) => setTimeout(r, onEdge(tuck) * T * 0.6));
+      // The cover leaves a beat after the notes have gone behind it.
+      await new Promise((r) => setTimeout(r, leave));
       // Measured now, not before: the page may have scrolled under the window.
       const a = art.getBoundingClientRect(), b = cover.getBoundingClientRect();
-      const back = cover.animate([home, over(cover, a, b, art)],
-        { duration: T * 0.7, easing: settle, fill: "forwards" });
-      await settled([...fold, back]);
+      const shade = getComputedStyle(spread).filter;
+      const going = [
+        cover.animate([home, over(cover, a, b, art)], { duration: back, easing: glide, fill: "forwards" }),
+        // The shadow shrinks with it, as it grew when it lifted.
+        ...(shade === "none" ? [] : [spread.animate([{ filter: shade }, { filter: "drop-shadow(0 0 0 transparent)" }], { duration: back, easing: glide, fill: "forwards" })]),
+      ];
+      await settled([...folding, ...going]);
       return () => {
         art.style.visibility = "";
-        [cover, notes].forEach((el) => el.getAnimations().forEach((x) => x.cancel()));
+        [cover, notes, spread].forEach((el) => el.getAnimations().forEach((x) => x.cancel()));
       };
     },
   };
@@ -218,6 +235,9 @@
     if (!style || reduce.matches || !drawn(from)) return dialog.close();
     busy.add(dialog);
     dialog.dataset.walMoving = "";
+    // Set before .is-closing, so the backdrop's transition starts with it.
+    const span = style.span?.(dialog, from);
+    if (span) dialog.style.setProperty("--wal-closing", `${Math.round(span)}ms`);
     dialog.classList.add("is-closing");
     Promise.resolve(style.close(dialog, from)).then((after) => {
       dialog.close();
@@ -226,7 +246,11 @@
       // transition would otherwise keep it painted for its whole length.
       getComputedStyle(dialog).display;
       if (typeof after === "function") after();
-    }).finally(() => { dialog.classList.remove("is-closing"); landed(dialog); });
+    }).finally(() => {
+      dialog.classList.remove("is-closing");
+      dialog.style.removeProperty("--wal-closing");
+      landed(dialog);
+    });
   }
 
   const ours = (d) => d instanceof HTMLDialogElement && d.dataset.walOpen in STYLES;
@@ -254,7 +278,7 @@
     if (!ours(e.target) || busy.has(e.target)) return;
     const from = sources.get(e.target);
     if (from) artOf(from).style.removeProperty("visibility");
-    e.target.querySelectorAll(".wal-window-panel, .wal-gatefold-cover, .wal-gatefold-notes")
+    e.target.querySelectorAll(".wal-window-panel, .wal-gatefold-spread, .wal-gatefold-cover, .wal-gatefold-notes")
       .forEach((el) => el.getAnimations().forEach((x) => x.cancel()));
   }, true);
 
