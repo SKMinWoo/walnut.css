@@ -2668,6 +2668,22 @@ walnut.shuffle(materials, () =&gt; showOnly("Wood"));</pre></details>
     };
     const setTheme = (p) => (p === "auto" ? root.removeAttribute("data-theme") : root.setAttribute("data-theme", p));
     const schemeIf = (p) => { setTheme(p); const s = scheme(); setTheme(pref); return s; };
+    /* While the lamp runs, the page is two pictures. On a phone whose URL
+       bar has just slid back in, Chrome keeps the stuck nav on screen by
+       nudging it down, but layout still puts it at the very top, under the
+       bar, and the pictures are drawn from layout: the nav vanishes until
+       the lamp is out. So for those frames it is pinned as page content,
+       at the top of what is on screen (the visual viewport, not layout's
+       idea of it), which the pictures place like the rest. Zoomed in, a
+       stuck nav sits at layout's top, so it stays there. */
+    const nav = document.querySelector(".site-nav");
+    function pinNav() {
+      const vv = window.visualViewport;
+      const top = vv && vv.scale <= 1 ? vv.pageTop : scrollY;
+      nav.style.position = "relative";
+      nav.style.top = `${Math.max(0, top - (nav.getBoundingClientRect().top + scrollY))}px`;
+      return () => { nav.style.removeProperty("position"); nav.style.removeProperty("top"); };
+    }
     function syncMode() {
       modeBtn.dataset.pref = pref;
       modeBtn.setAttribute("aria-label", `Colour mode: ${SAY[pref]}. Switch to ${SAY[NEXT[pref]]}`);
@@ -2685,9 +2701,10 @@ walnut.shuffle(materials, () =&gt; showOnly("Wood"));</pre></details>
       root.style.setProperty("--lamp-x", `${x}px`);
       root.style.setProperty("--lamp-y", `${y}px`);
       root.style.setProperty("--lamp-r", `${Math.hypot(Math.max(x, innerWidth - x), Math.max(y, innerHeight - y))}px`);
+      const unpin = pinNav();
       const t = document.startViewTransition({ update: flip, types: ["lamp", to === "dark" ? "lamp-down" : "lamp-up"] });
       t.ready.catch(() => {});
-      t.finished.finally(() => paint(true));
+      t.finished.finally(() => { unpin(); paint(true); });
     });
     systemDark.addEventListener("change", paint);
 
