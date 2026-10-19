@@ -75,13 +75,29 @@
   /* ── Gatefold ──
      The cover travels from the card's picture at one scale, cropped to the
      picture's shape until it lands (over, below). The notes are folded
-     behind the cover, and swing out from behind it on the spine to lie flat
-     beside it: while they are behind it the cover hides them, and they come
-     round its edge face first, from further away than the page. Closing
-     folds them back behind it. The notes land on the material's curve,
-     since they come down on the table; the cover glides out and settles
-     home whatever it is made of, being in flight both ways. */
+     behind the cover, hinged on its edge, and only once the cover has
+     landed do they swing out from behind it to lie flat beside it: while
+     they are behind it the cover hides them, and they come round its edge
+     face first, from further away than the page. Their hinge is where the
+     cover lands, so a page that showed while the cover was still in flight
+     would turn on nothing. Closing is the same the other way: the notes
+     fold back behind the cover, and only then does it go home. The notes
+     land on the material's curve, since they come down on the table; the
+     cover glides out and settles home whatever it is made of, being in
+     flight both ways. */
   const stacked = (spread) => getComputedStyle(spread).gridTemplateColumns.trim().split(/\s+/).length === 1;
+  /* How far through a fold, 0 to 1, the notes are on edge: the turn is
+     half done, and the page comes round the cover or goes behind it. Read
+     off the fold's own curve, since a material's curve gets there early or
+     late; the first half of the turn, behind the cover, is never seen. */
+  function onEdge(easing) {
+    const probe = new Animation(new KeyframeEffect(null, null, { duration: 100, easing }));
+    for (let t = 0; t <= 100; t++) {
+      probe.currentTime = t;
+      if (probe.effect.getComputedTiming().progress >= 0.5) return t / 100;
+    }
+    return 0.5;
+  }
   // Folded behind the cover: turned half round on the spine, the far way.
   const behind = (spread) => (stacked(spread) ? "rotateX(-180deg)" : "rotateY(180deg)");
   /* The cover as it sits over the card's picture, a: never stretched, so
@@ -118,16 +134,18 @@
       const { duration, ease, glide } = timing(dialog, "open");
       const T = pace(a, b, duration);
       art.style.visibility = "hidden";
+      // The cover is brought forth first; a beat after it lands, the notes
+      // come round its edge. Their turn starts earlier, unseen behind it.
+      const lift = T * 1.2, beat = T * 0.15, unfold = T * 1.4;
+      const fold = { duration: unfold, delay: Math.max(0, lift + beat - onEdge(ease) * unfold), easing: ease, fill: "backwards" };
       // The spread's shadow grows as it lifts, unless the page has taken
       // it off and there is none to grow.
       const shade = getComputedStyle(spread).filter;
       const anims = [
-        ...(shade === "none" ? [] : [spread.animate([{ filter: "drop-shadow(0 0 0 transparent)" }, { filter: shade }], { duration: T * 0.85, easing: glide })]),
-        cover.animate([over(cover, a, b, art), home], { duration: T * 0.85, easing: glide }),
-        notes.animate([{ transform: turn }, { transform: "none" }],
-          { duration: T * 0.75, delay: T * 0.18, easing: ease, fill: "backwards" }),
-        notes.animate([{ opacity: 1 }, { opacity: 0 }],
-          { pseudoElement: "::after", duration: T * 0.75, delay: T * 0.18, easing: ease, fill: "backwards" }),
+        ...(shade === "none" ? [] : [spread.animate([{ filter: "drop-shadow(0 0 0 transparent)" }, { filter: shade }], { duration: lift, easing: glide })]),
+        cover.animate([over(cover, a, b, art), home], { duration: lift, easing: glide }),
+        notes.animate([{ transform: turn }, { transform: "none" }], fold),
+        notes.animate([{ opacity: 1 }, { opacity: 0 }], { ...fold, pseudoElement: "::after" }),
       ];
       await settled(anims);
     },
@@ -138,16 +156,18 @@
       const turn = behind(spread);
       const { duration, settle } = timing(dialog, "close");
       const T = pace(cover.getBoundingClientRect(), art.getBoundingClientRect(), duration);
+      const tuck = "cubic-bezier(.45, 0, .7, .4)";
       const fold = [
         notes.animate([{ transform: "none" }, { transform: turn }],
-          { duration: T * 0.48, easing: "cubic-bezier(.45, 0, .7, .4)", fill: "forwards" }),
-        notes.animate([{ opacity: 0 }, { opacity: 1 }], { pseudoElement: "::after", duration: T * 0.48, fill: "forwards" }),
+          { duration: T * 0.6, easing: tuck, fill: "forwards" }),
+        notes.animate([{ opacity: 0 }, { opacity: 1 }], { pseudoElement: "::after", duration: T * 0.6, fill: "forwards" }),
       ];
-      await new Promise((r) => setTimeout(r, T * 0.16));
+      // The cover leaves once the notes have gone behind it.
+      await new Promise((r) => setTimeout(r, onEdge(tuck) * T * 0.6));
       // Measured now, not before: the page may have scrolled under the window.
       const a = art.getBoundingClientRect(), b = cover.getBoundingClientRect();
       const back = cover.animate([home, over(cover, a, b, art)],
-        { duration: T * 0.62, easing: settle, fill: "forwards" });
+        { duration: T * 0.7, easing: settle, fill: "forwards" });
       await settled([...fold, back]);
       return () => {
         art.style.visibility = "";
