@@ -744,7 +744,10 @@ import "walnut.css";                       // in the bundle
 
 [walnut-css.vercel.app](https://walnut-css.vercel.app) is `docs/index.html`, built into `public/`
 by `npm run build`. ⌘K (or `/`) finds any section, tab or reference entry on it (`docs/site-find.js`),
-and every Markup drawer has a Copy button.
+and every Markup drawer has a Copy button. Beside each palette's CSS, the palette exports as W3C design
+tokens (DTCG JSON, every derived colour in light and dark, read back from the page), as a Tailwind v4
+`@theme` block that points Tailwind's colours at walnut's tokens, or as a `.css` file
+(`docs/site-export.js`).
 
 The mark is `docs/favicon.svg`: a walnut split by its ground rod, holding a pair of braces. The
 nav draws it in the page's own cues, so it changes with the palette. `scripts/og/render.mjs`
