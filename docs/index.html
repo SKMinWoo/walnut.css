@@ -928,6 +928,56 @@
       /* Tiles that never scrolled into view still print. */
       .site-js .site-reveal { opacity: 1; translate: none; transition: none; }
     }
+    /* ── Eras ──
+       Each card is drawn in its own era: its face, its corners and its
+       colours, light and dark. The worn set's texture is one overlay on the
+       page, on body::before because walnut's wash is body::after. */
+    .site-eras { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 10.5rem), 1fr)); gap: .9rem; }
+    .site-era {
+      display: grid; gap: .55rem; align-content: start; justify-items: start; min-block-size: 9.5rem; padding: 1rem;
+      border: var(--wal-hairline) solid color-mix(in oklch, var(--era-accent) 35%, var(--wal-line));
+      border-radius: var(--era-radius); background: var(--era-ground); color: var(--wal-text);
+      text-align: start; cursor: pointer; font: inherit;
+      transition: translate .2s ease, outline-color .2s ease;
+      outline: 2px solid transparent; outline-offset: 3px;
+    }
+    .site-era[data-shadow="hard"] { box-shadow: 3px 3px 0 0 color-mix(in oklch, var(--wal-text) 45%, transparent); }
+    .site-era[data-shadow="glow"] { box-shadow: 0 0 22px -6px color-mix(in oklch, var(--era-accent) 70%, transparent); }
+    .site-era[data-shadow="soft"] { box-shadow: var(--wal-shadow-sm); }
+    .site-era:hover { translate: 0 -2px; }
+    .site-era:focus-visible, .site-era[aria-pressed="true"] { outline-color: var(--era-accent); }
+    .site-era-year { font: 500 var(--wal-text-xs) / 1 var(--wal-font-label); letter-spacing: var(--wal-tracking-label); color: var(--wal-text-muted); }
+    .site-era-name { font: 400 1.45rem / 1.05 var(--era-font); color: var(--wal-text); }
+    .site-era-chips { display: flex; gap: .3rem; }
+    .site-era-chips > i { inline-size: .85rem; aspect-ratio: 1; border-radius: 50%; background: var(--c); }
+    .site-era-parts { margin-block-start: auto; font-size: var(--wal-text-xs); color: var(--wal-text-muted); }
+    .site-brief { display: grid; gap: .45rem; max-inline-size: 40rem; }
+    .site-brief-row { display: flex; flex-wrap: wrap; gap: .6rem; }
+    .site-brief-row > .wal-input { flex: 1 1 14rem; }
+    .site-brief[aria-busy="true"] .wal-btn { cursor: progress; }
+    .site-worn { display: grid; gap: .8rem; }
+    .site-worn > p { margin: 0; }
+    .site-worn-head { display: flex; flex-wrap: wrap; align-items: baseline; gap: .5rem 1rem; }
+    .site-worn-head > h3 { margin: 0; }
+    .site-trace { margin: .6rem 0 0; padding-inline-start: 1.25rem; display: grid; gap: .3rem; font-size: var(--wal-text-sm); color: var(--wal-text-soft); }
+    .site-trace code { font-family: var(--wal-font-label); color: var(--wal-text); }
+    .site-trace .is-refused { color: var(--wal-text-muted); }
+    .site-trace .is-refused code { text-decoration: line-through; }
+    @media (prefers-reduced-motion: reduce) { .site-era:hover { translate: none; } }
+    @media screen {
+      :root:is([data-texture="grain"], [data-texture="halftone"], [data-texture="scanlines"]) body::before {
+        content: ""; position: fixed; inset: 0; z-index: 300; pointer-events: none;
+      }
+      :root[data-texture="grain"] body::before {
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+        opacity: .16; mix-blend-mode: overlay;
+      }
+      :root[data-texture="halftone"] body::before {
+        background-image: radial-gradient(circle, color-mix(in oklch, var(--wal-text) 24%, transparent) 1px, transparent 1.7px);
+        background-size: 7px 7px; opacity: .45;
+      }
+      :root[data-texture="scanlines"] body::before { background-image: repeating-linear-gradient(to bottom, rgb(0 0 0 / .22) 0 1px, transparent 1px 3px); }
+    }
   </style>
 </head>
 <body>
@@ -1361,6 +1411,46 @@
 :root { --wal-corner-shape: squircle; }</pre>
               </div>
               <p class="site-muted">Squircle and bevel corners show in Chrome and Edge. Other browsers keep round corners.</p>
+            </div>
+          </section>
+
+          <section data-tab="Eras" id="theming-eras">
+            <div class="site-stack">
+              <p class="site-soft">An era is a whole look from parts made to work together: hue rods, a display, label and body face, corners, a shadow and a texture. Wear one on this page, retouch its colours, and copy it as CSS to paste after walnut.css. Every era passes AA in light and dark before it is offered.</p>
+              <div class="site-eras" id="eras" role="group" aria-label="Eras"></div>
+              <p class="site-muted" id="eras-nojs">The eras are worn with JavaScript. The CSS for each is the same tokens shown in Your palette and Finishes.</p>
+              <form class="site-brief" id="brief-form">
+                <label class="wal-label" for="brief">Or describe one</label>
+                <div class="site-brief-row">
+                  <input class="wal-input" id="brief" name="brief" type="text" autocomplete="off" minlength="3" maxlength="120" placeholder="a 1960s mission control" required aria-describedby="brief-hint brief-status">
+                  <button class="wal-btn wal-btn-primary" type="submit">Dress the page</button>
+                </div>
+                <span class="wal-hint" id="brief-hint">Asking which director is on set…</span>
+                <span class="site-muted" id="brief-status" role="status"></span>
+              </form>
+              <div class="site-worn site-panel" id="worn" hidden>
+                <div class="site-worn-head">
+                  <h3 id="worn-name"></h3>
+                  <span class="wal-badge" id="worn-by"></span>
+                </div>
+                <p class="site-soft" id="worn-note"></p>
+                <p class="site-muted" id="worn-parts"></p>
+                <p class="site-muted" id="worn-fallback" hidden></p>
+                <p class="site-muted" id="worn-score"></p>
+                <div class="site-actions">
+                  <button class="wal-btn wal-btn-secondary wal-btn-sm" type="button" data-copy-link>Copy link</button>
+                  <button class="wal-btn wal-btn-secondary wal-btn-sm" type="button" commandfor="palette-panel" command="show-modal">Retouch colours</button>
+                  <button class="wal-btn wal-btn-ghost wal-btn-sm" type="button" id="worn-off">Take it off</button>
+                </div>
+                <details class="site-code" id="worn-trace-wrap" hidden>
+                  <summary>How it was dressed</summary>
+                  <ol class="site-trace" id="worn-trace"></ol>
+                </details>
+                <div class="site-codebox">
+                  <pre id="worn-css"></pre>
+                  <button class="wal-btn wal-btn-secondary wal-btn-sm" type="button" data-copy-from="worn-css">Copy CSS</button>
+                </div>
+              </div>
             </div>
           </section>
 
@@ -3389,5 +3479,6 @@ walnut.shuffle(materials, () =&gt; showOnly("Wood"));</pre></details>
       if (target) { walnut.tabs?.show(target); requestAnimationFrame(() => target.scrollIntoView()); }
     }
   </script>
+  <script type="module" src="eras.mjs"></script>
 </body>
 </html>
