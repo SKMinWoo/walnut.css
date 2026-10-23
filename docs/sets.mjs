@@ -1,21 +1,20 @@
 /* ═══════════════════════════════════════════════════
-   ERAS · a whole look from vetted parts
+   VIBES · a palette with the type and shape to match
    ───────────────────────────────────────────────────
    A "set" is the whole look of a page as a handful of choices: walnut's hue
    rods for colour, three type roles, a corner, a shadow and a texture.
-   Nothing in a set is free-form CSS, so whoever chose it — a reader, an era
-   card, the rules director or the AI art director — the page can only be
-   dressed in parts that were made to work together. walnut derives every
-   tint, ink and hover from the rods.
+   Nothing in a set is free-form CSS, so whoever chose it — a reader, a vibe
+   card, the rules or the Gemini agent — the page can only be given parts
+   that were made to work together. walnut derives every tint, ink and hover
+   from the rods.
 
-   Shared, and pure: the docs page imports it to wear a set, and the art
-   director's function (api/art-director.mjs) imports it to check what the
-   model proposes. One file, so the browser and the server can never disagree
+   Shared, and pure: the docs page imports it to apply a set, and the vibe
+   function (api/vibe.mjs) imports it to check what the model proposes. One file, so the browser and the server can never disagree
    about what a set is or whether it reads.
 ═══════════════════════════════════════════════════ */
 
 /* ── The parts ──
-   Roles are narrow on purpose. Display faces carry the era but only set
+   Roles are narrow on purpose. Display faces carry the vibe but only set
    headings; body text is always one of three proven reading faces; labels
    are the small voice, so nothing that only works large is offered there.
    `google` is the family as Google Fonts names it; null is a system face. */
@@ -58,8 +57,8 @@ export const SHADOWS = {
 };
 export const TEXTURES = ["none", "grain", "halftone", "scanlines"];
 
-/* Paint chips: hue names the director is shown, and the colour words the
-   rules director understands. */
+/* Paint chips: hue names the model is shown, and the colour words the
+   rules understand. */
 export const CHIPS = [
   { name: "Flamingo", hue: 350 }, { name: "Cherry", hue: 15 }, { name: "Tomato", hue: 31 },
   { name: "Tangerine", hue: 55 }, { name: "Mustard", hue: 85 }, { name: "Chartreuse", hue: 110 },
@@ -67,45 +66,46 @@ export const CHIPS = [
   { name: "Adriatic", hue: 240 }, { name: "Cobalt", hue: 265 }, { name: "Plum", hue: 315 },
 ];
 
-/* ── The eras ──
-   Hand-dressed sets, one card each. Mid-century is walnut's own default
-   script and type. Every era must pass checkSet (test/sets.test.mjs).
-   `tags` are the words the rules director matches a brief against. */
-export const ERAS = [
-  { era: "deco", name: "Art Deco", year: "'25",
-    tags: ["deco", "art deco", "1920s", "20s", "gatsby", "jazz", "roaring", "speakeasy", "gold", "chrysler"],
+/* ── The vibes ──
+   Hand-made sets, one card each. Mid-century is walnut's own default script
+   and type. Every vibe must pass checkSet (test/sets.test.mjs). `mood` is the
+   card's one line; `tags` are the words the rules match a description against,
+   decades included, since people describe a look by when it was. */
+export const VIBES = [
+  { vibe: "deco", name: "Art Deco", mood: "Gilded and geometric",
+    tags: ["deco", "art deco", "1920s", "20s", "gatsby", "jazz", "roaring", "speakeasy", "gold", "chrysler", "glamorous", "luxury"],
     // A copper bloom: at the accent's +27° it is a teal that misses AA under white text.
     hues: { ground: 95, accent: 165, gold: 85, bloom: 45 },
     display: "poiret", label: "dm-mono", body: "inter", corners: "square", shadow: "hard", texture: "none" },
-  { era: "noir", name: "Noir", year: "'47",
-    tags: ["noir", "film noir", "1940s", "40s", "detective", "crime", "rain", "hardboiled", "mystery", "black and white"],
+  { vibe: "noir", name: "Noir", mood: "Moody and cinematic",
+    tags: ["noir", "film noir", "1940s", "40s", "detective", "crime", "rain", "hardboiled", "mystery", "black and white", "moody", "dark"],
     hues: { ground: 250, accent: 15, gold: 60 },
     display: "playfair", label: "courier", body: "georgia", corners: "square", shadow: "soft", texture: "grain" },
-  { era: "midcentury", name: "Mid-century", year: "'56",
-    tags: ["mid-century", "midcentury", "1950s", "50s", "eames", "atomic", "diner", "modern"],
+  { vibe: "midcentury", name: "Mid-century", mood: "Warm and modern",
+    tags: ["mid-century", "midcentury", "1950s", "50s", "eames", "atomic", "diner", "modern", "warm", "cosy", "cozy"],
     hues: { ground: 55, accent: 25, gold: 85 },
     display: "jost", label: "dm-mono", body: "inter", corners: "round", shadow: "soft", texture: "none" },
-  { era: "mod", name: "Mod", year: "'66",
-    tags: ["mod", "1960s", "60s", "sixties", "op art", "psychedelic", "pop art", "swinging", "space age", "beatles"],
+  { vibe: "mod", name: "Mod", mood: "Bold and playful",
+    tags: ["mod", "1960s", "60s", "sixties", "op art", "psychedelic", "pop art", "swinging", "space age", "playful", "bold"],
     hues: { ground: 300, accent: 340, gold: 55 },
     display: "righteous", label: "dm-mono", body: "inter", corners: "pill", shadow: "none", texture: "halftone" },
-  { era: "disco", name: "Disco", year: "'77",
-    tags: ["disco", "1970s", "70s", "seventies", "funk", "groovy", "roller", "boogie", "saturday night"],
+  { vibe: "disco", name: "Disco", mood: "Glowing and groovy",
+    tags: ["disco", "1970s", "70s", "seventies", "funk", "groovy", "roller", "boogie", "saturday night", "party", "glowing"],
     hues: { ground: 45, accent: 25, gold: 75 },
     display: "shrikhand", label: "dm-mono", body: "inter", corners: "round", shadow: "glow", texture: "none" },
-  { era: "arcade", name: "Arcade", year: "'84",
-    tags: ["arcade", "1980s", "80s", "eighties", "neon", "synthwave", "retro game", "8-bit", "pixel", "crt", "vhs"],
+  { vibe: "arcade", name: "Arcade", mood: "Neon and pixelated",
+    tags: ["arcade", "1980s", "80s", "eighties", "neon", "synthwave", "retro game", "8-bit", "pixel", "crt", "vhs", "gaming"],
     hues: { ground: 285, accent: 320, gold: 95, cool: 195 },
     display: "vt323", label: "dm-mono", body: "inter", corners: "square", shadow: "glow", texture: "scanlines" },
-  { era: "web", name: "Web", year: "'97",
-    tags: ["web 1.0", "1990s", "90s", "nineties", "geocities", "netscape", "dial-up", "early internet", "windows 95"],
+  { vibe: "web", name: "Early web", mood: "Plain and nostalgic",
+    tags: ["web 1.0", "early web", "1990s", "90s", "nineties", "geocities", "netscape", "dial-up", "early internet", "windows 95", "nostalgic"],
     hues: { ground: 230, accent: 255, gold: 60 },
     display: "times", label: "verdana", body: "verdana", corners: "square", shadow: "hard", texture: "none" },
 ];
 
-export const findEra = (id) => ERAS.find((e) => e.era === id);
-/** An era as a set to wear: named with its year, without the card's bookkeeping. */
-export const eraSet = ({ tags, year, ...set }) => ({ ...set, name: `${set.name} ${year}` });
+export const findVibe = (id) => VIBES.find((v) => v.vibe === id);
+/** A vibe as a set to apply, without the card's bookkeeping. */
+export const vibeSet = ({ tags, mood, ...set }) => set;
 
 /* ── walnut's stock ramp ──
    Mirrored from src/layers/01-tokens.css so the server can measure a set
@@ -196,8 +196,8 @@ export function measure(set, aa = 4.5) {
 }
 
 /* ── The guard ──
-   What any director — a reader's link, the rules or the model — must satisfy
-   before a set is worn or shown. Enforced in code, after the fact: the
+   What any source — a reader's link, the rules or the model — must satisfy
+   before a set is applied or shown. Enforced in code, after the fact: the
    model's prompt asks for the same things, but a prompt is a request, not a
    control.
 
@@ -211,7 +211,7 @@ export const NAME_MAX = 40;
 export const NOTE_MAX = 160;
 const HUES = ["ground", "accent", "gold", "olive", "cool", "bloom"];
 const REQUIRED_HUES = ["ground", "accent", "gold"];
-const KEYS = ["name", "era", "hues", "display", "label", "body", "corners", "shadow", "texture"];
+const KEYS = ["name", "vibe", "hues", "display", "label", "body", "corners", "shadow", "texture"];
 
 /* Deliberately short: the name and note come from a model or a template, so
    this is a backstop, not a moderation system. Whole words for the short ones
@@ -244,8 +244,8 @@ export function checkSet(args) {
   for (const k of Object.keys(rest)) if (!KEYS.includes(k)) problems.push(`${k}: not a part of a set`);
   const name = plain(rest.name, NAME_MAX, "name", problems);
   const note = rawNote === undefined ? undefined : plain(rawNote, NOTE_MAX, "note", problems);
-  const era = rest.era === undefined ? undefined : findEra(rest.era)?.era;
-  if (rest.era !== undefined && !era) problems.push("era: not one of the eras");
+  const vibe = rest.vibe === undefined ? undefined : findVibe(rest.vibe)?.vibe;
+  if (rest.vibe !== undefined && !vibe) problems.push("vibe: not one of the vibes");
 
   const hues = {};
   const given = rest.hues && typeof rest.hues === "object" ? rest.hues : {};
@@ -261,7 +261,7 @@ export function checkSet(args) {
     return rest[k];
   };
   const set = {
-    name, ...(era ? { era } : {}), hues,
+    name, ...(vibe ? { vibe } : {}), hues,
     display: pick("display", DISPLAY), label: pick("label", LABEL), body: pick("body", BODY),
     corners: pick("corners", CORNERS), shadow: pick("shadow", SHADOWS),
     texture: TEXTURES.includes(rest.texture) ? rest.texture : (problems.push(`texture: one of ${TEXTURES.join(", ")}`), null),
@@ -276,7 +276,7 @@ export function checkSet(args) {
   return problems.length ? { ok: false, problems } : { ok: true, set, note, score };
 }
 
-/* ── Wearing a set ──
+/* ── Applying a set ──
    What a set writes: custom properties for the rods, the type, the corners
    and the shadow, and the texture as an attribute. */
 export function varsOf(set) {
@@ -294,8 +294,8 @@ export function varsOf(set) {
   if (SHADOWS[set.shadow]) [v["--wal-shadow-sm"], v["--wal-shadow"], v["--wal-shadow-lg"]] = SHADOWS[set.shadow];
   return v;
 }
-/** Every property varsOf can write: what taking a set off removes. */
-export const SET_VARS = Object.keys(varsOf({ ...eraSet(ERAS[0]), hues: { ground: 0, accent: 0, gold: 0, bloom: 0, cool: 0 }, shadow: "hard" }));
+/** Every property varsOf can write: what removing a set clears. */
+export const SET_VARS = Object.keys(varsOf({ ...vibeSet(VIBES[0]), hues: { ground: 0, accent: 0, gold: 0, bloom: 0, cool: 0 }, shadow: "hard" }));
 
 /** The Google Fonts stylesheet a set needs, or null when it uses only system faces. */
 export function fontsHref(set) {
@@ -324,15 +324,19 @@ export function swatchesOf(set) {
   return out;
 }
 
-/** The set as CSS to paste after walnut.css. */
-export function cssOf(set) {
+/**
+ * The set as a stylesheet to load after walnut.css. `vars` defaults to the
+ * set's own; the page passes the ones on screen, so colours edited after the
+ * vibe was applied are what gets copied. It is unlayered, so it beats
+ * walnut's layered defaults without !important.
+ */
+export function cssOf(set, vars = varsOf(set)) {
   const href = fontsHref(set);
-  const vars = varsOf(set);
   const width = Math.max(...Object.keys(vars).map((k) => k.length)) + 2;
   const lines = Object.entries(vars).map(([k, v]) => `  ${k}:${" ".repeat(width - k.length)}${v};`);
-  const out = [];
+  const out = [`/* ${set.name}: a walnut.css vibe. Load it after walnut.css. */`, ""];
   if (href) out.push(`@import url("${href}");`, "");
-  out.push(`/* ${set.name} */`, ":root {", ...lines, "}");
+  out.push(":root {", ...lines, "}");
   if (set.texture !== "none") {
     out.push("", "@media screen {", "  body::before {", '    content: ""; position: fixed; inset: 0; z-index: 300; pointer-events: none;',
       `    ${TEXTURE_CSS[set.texture]}`, "  }", "}");
@@ -340,8 +344,11 @@ export function cssOf(set) {
   return out.join("\n");
 }
 
+/** A file name for the set, from its name: "Teal Mod" is walnut-teal-mod.css. */
+export const fileOf = (set) => `walnut-${set.name.toLowerCase().normalize("NFKD").replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "") || "vibe"}.css`;
+
 /* ── Links ──
-   A set travels in the address as base64url JSON, so a directed set can be
+   A set travels in the address as base64url JSON, so a described set can be
    shared with no database. Whatever comes back in is untrusted and goes
    through checkSet like anything else. */
 const toB64 = (s) => btoa(String.fromCharCode(...new TextEncoder().encode(s))).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
@@ -355,17 +362,17 @@ export function decodeLook(text) {
 /* ── Briefs ── */
 export const BRIEF_MIN = 3;
 export const BRIEF_MAX = 120;
-/** A brief as a director sees it: one line, no control characters or angle brackets, capped. Null when too short. */
+/** A description as the rules and the model see it: one line, no control characters or angle brackets, capped. Null when too short. */
 export function cleanBrief(raw) {
   if (typeof raw !== "string") return null;
   const brief = raw.replace(/[\u0000-\u001f\u007f<>]/g, " ").replace(/\s+/g, " ").trim().slice(0, BRIEF_MAX);
   return brief.length >= BRIEF_MIN ? brief : null;
 }
 
-/* ── The rules director ──
-   What dresses a brief with no model: find the era it names, find the colour
-   it asks for, and dress the set from the era cards. Same brief in, same set
-   out, every time. */
+/* ── The rules ──
+   What answers a description with no model: find the vibe it names, find
+   the colour it asks for, and build the set from the vibe cards. Same words
+   in, same set out, every time. */
 const COLOUR_WORDS = {
   red: 15, crimson: 15, cherry: 15, scarlet: 20, tomato: 31, orange: 55, tangerine: 55, amber: 70,
   yellow: 85, mustard: 85, gold: 85, lime: 110, chartreuse: 110, green: 135, avocado: 135, olive: 120,
@@ -373,28 +380,28 @@ const COLOUR_WORDS = {
   navy: 250, cobalt: 265, indigo: 275, violet: 290, purple: 300, lavender: 300, plum: 315,
   magenta: 330, pink: 350, flamingo: 350, rose: 355,
 };
-// FNV-1a: a stable choice when a brief names no era at all.
+// FNV-1a: a stable choice when a description names no vibe at all.
 const hash = (text) => { let h = 0x811c9dc5; for (let i = 0; i < text.length; i++) h = Math.imul(h ^ text.charCodeAt(i), 0x01000193) >>> 0; return h; };
 const title = (w) => w.charAt(0).toUpperCase() + w.slice(1);
 // Whole word or phrase, so "mod" does not fire inside "modern".
 const mentions = (text, phrase) => new RegExp(`(^|[^a-z0-9])${phrase.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}([^a-z0-9]|$)`).test(text);
 
-export function rulesDirector(brief) {
+export function matchVibe(brief) {
   const text = brief.toLowerCase();
-  // The era whose tags the brief mentions most; longer tags count for more,
+  // The vibe whose tags the words mention most; longer tags count for more,
   // so "art deco" outweighs a stray "gold".
   let best = null;
-  for (const era of ERAS) {
-    const score = era.tags.filter((t) => mentions(text, t)).reduce((n, t) => n + t.length, 0);
-    if (score > 0 && (!best || score > best.score)) best = { era, score };
+  for (const vibe of VIBES) {
+    const score = vibe.tags.filter((t) => mentions(text, t)).reduce((n, t) => n + t.length, 0);
+    if (score > 0 && (!best || score > best.score)) best = { vibe, score };
   }
-  const era = best?.era ?? ERAS[hash(text) % ERAS.length];
-  const base = eraSet(era);
+  const vibe = best?.vibe ?? VIBES[hash(text) % VIBES.length];
+  const base = vibeSet(vibe);
   const word = Object.keys(COLOUR_WORDS).find((w) => mentions(text, w));
-  const tinted = word && { ...base, name: `${title(word)} ${era.name}`, hues: { ...base.hues, accent: COLOUR_WORDS[word] } };
-  // A colour word only counts if the era still reads with it.
+  const tinted = word && { ...base, name: `${title(word)} ${vibe.name}`, hues: { ...base.hues, accent: COLOUR_WORDS[word] } };
+  // A colour word only counts if the vibe still reads with it.
   const set = tinted && measure(tinted).fails.length === 0 ? tinted : base;
   const chip = set === tinted ? (CHIPS.find((c) => c.hue === COLOUR_WORDS[word])?.name ?? title(word)).toLowerCase() : null;
-  const why = best ? `The ${era.name} ${era.year} set, from the era cards` : `The brief names no era this director knows, so the ${era.name} ${era.year} set stands in`;
+  const why = best ? `Matched to the ${vibe.name} vibe` : `No vibe matched those words, so ${vibe.name} stands in`;
   return { set, note: `${why}${chip ? `, with a ${chip} accent` : ""}.` };
 }

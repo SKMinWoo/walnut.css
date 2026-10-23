@@ -335,9 +335,9 @@ function syncCspHashes(config, pages) {
 const DOCS_PAGES = ["index.html"];
 /* Modules the page loads from beside itself, by a relative path that works
    off disk and in public/ alike, so they are copied as they are. sets.mjs is
-   also imported by the art director's function (api/), which Vercel bundles
+   also imported by the vibe function (api/vibe.mjs), which Vercel bundles
    from the repo, not from public/. */
-const DOCS_MODULES = ["sets.mjs", "eras.mjs"];
+const DOCS_MODULES = ["sets.mjs", "vibes.mjs"];
 const STYLESHEET_LINKS = /<link rel="stylesheet" href="\.\.\/dist\//g;
 
 /* Two more changes on the way to public/.

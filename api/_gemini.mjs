@@ -6,7 +6,7 @@
    Plain fetch rather than an SDK: one endpoint, one request shape, no
    dependency in a repo that has none. Every transport or API failure is
    thrown as GeminiUnavailable, so the caller can fall back to the rules
-   director and say so.
+   and say so.
 
    The leading underscore keeps Vercel from serving this file as a function. */
 
@@ -32,7 +32,7 @@ const RETRY_DELAYS_MS = [700, 2000];
    signatures, which another model need not accept. GEMINI_FALLBACK_MODELS
    overrides the list (comma-separated), and "none" turns it off. */
 const FALLBACK_MODELS = ["gemini-3.6-flash", "gemini-3.5-flash", "gemini-3.7-flash", "gemini-3.8-flash", "gemini-3.1-flash-lite"];
-/** The cascade stops trying new models after this, so a reader never waits long for the rules director. */
+/** The cascade stops trying new models after this, so a reader never waits long for the rules. */
 const CASCADE_BUDGET_MS = 20_000;
 
 const isTransientStatus = (status) => status === 408 || status === 429 || status >= 500;
