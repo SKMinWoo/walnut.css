@@ -160,15 +160,28 @@ function apply(entry, from, opts = {}) {
     if (current === entry) { pending = false; refreshExport(); }
   };
   show();
-  if (!opts.instant) {
-    const { pass, all } = checkSet(entry.set).score;
-    announce(`${entry.set.name} applied. ${pass} of ${all} text pairs pass AA in light and dark.`);
-    // The panel opens below the cards, often below the fold: bring its
-    // heading and buttons up, once, without moving a reader who can see them.
-    if (first) panel.querySelector(".site-actions").scrollIntoView({ block: "nearest", behavior: reduce.matches ? "auto" : "smooth" });
+  if (opts.instant) { change(); root.dispatchEvent(new CustomEvent("wal-recolour", { bubbles: true })); return; }
+  const { pass, all } = checkSet(entry.set).score;
+  announce(`${entry.set.name} applied. ${pass} of ${all} text pairs pass AA in light and dark.`);
+  const recolour = () => {
+    // A newer press may have come in while the page scrolled.
+    if (current !== entry) return;
+    if (walnut.recolour) walnut.recolour(root, change, { from });
+    else { change(); root.dispatchEvent(new CustomEvent("wal-recolour", { bubbles: true })); }
+  };
+  // The panel opens below the cards, often below the fold: bring its
+  // buttons up, once, then recolour. Not both at once: a view transition
+  // freezes the page it captures, and a smooth scroll stops dead in it.
+  const actions = panel.querySelector(".site-actions");
+  if (!first || actions.getBoundingClientRect().bottom <= innerHeight || reduce.matches) {
+    if (first) actions.scrollIntoView({ block: "nearest" });
+    return recolour();
   }
-  if (walnut.recolour && !opts.instant) walnut.recolour(root, change, { from });
-  else { change(); root.dispatchEvent(new CustomEvent("wal-recolour", { bubbles: true })); }
+  let done = false;
+  const once = () => { if (!done) { done = true; recolour(); } };
+  addEventListener("scrollend", once, { once: true });
+  setTimeout(once, 700); // where scrollend is missing, or nothing moved
+  actions.scrollIntoView({ block: "nearest", behavior: "smooth" });
 }
 
 function remove(from) {

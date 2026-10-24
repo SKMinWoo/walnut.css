@@ -162,6 +162,8 @@
     .site-head { display: grid; gap: 1rem; max-inline-size: 48rem; margin-block-end: clamp(1.75rem, 3.5vw, 2.75rem); }
     .site-head p { margin: 0; font-size: var(--wal-text-md); color: var(--wal-text-soft); max-inline-size: 58ch; text-wrap: balance; }
     .site-actions { display: flex; flex-wrap: wrap; gap: .75rem; align-items: center; }
+    /* A vibe's fonts can reflow the panel after it scrolls into view; leave headroom. */
+    #vibe-panel .site-actions { scroll-margin-block-end: 1.5rem; }
     .site-split { display: grid; grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); gap: clamp(1.5rem, 4vw, 3.5rem); align-items: start; }
     .site-split.is-even { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
     .site-stack { display: grid; gap: 1rem; align-content: start; min-inline-size: 0; }
