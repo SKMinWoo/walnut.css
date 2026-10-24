@@ -162,6 +162,8 @@
     .site-head { display: grid; gap: 1rem; max-inline-size: 48rem; margin-block-end: clamp(1.75rem, 3.5vw, 2.75rem); }
     .site-head p { margin: 0; font-size: var(--wal-text-md); color: var(--wal-text-soft); max-inline-size: 58ch; text-wrap: balance; }
     .site-actions { display: flex; flex-wrap: wrap; gap: .75rem; align-items: center; }
+    /* A vibe's fonts can reflow the panel after it scrolls into view; leave headroom. */
+    #vibe-panel .site-actions { scroll-margin-block-end: 1.5rem; }
     .site-split { display: grid; grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); gap: clamp(1.5rem, 4vw, 3.5rem); align-items: start; }
     .site-split.is-even { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
     .site-stack { display: grid; gap: 1rem; align-content: start; min-inline-size: 0; }
@@ -186,7 +188,7 @@
     .site-code > pre { margin-block-start: .6rem; }
     .site-codebox { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: .75rem; align-items: start; }
     .site-codebox pre { padding: .9rem 1rem; }
-    .site-codebox:has(#photo-css) { max-inline-size: 46rem; }
+    .site-codebox:is(:has(#photo-css), :has(#vibe-css), :has(#vibe-use)) { max-inline-size: 46rem; }
 
     /* A row of choices, one pressed. */
     /* Each button draws the line to its left and above it, and the frame clips the outer ones, so a
@@ -278,7 +280,7 @@
       .site-nav .wal-nav-actions > .wal-btn { min-block-size: 2.75rem; min-inline-size: 2.75rem; justify-content: center; }
       .site-nav .wal-nav-links a { display: inline-flex; align-items: center; min-block-size: 2.75rem; }
       .site-seg button, .site-door-head > button,
-      .wal-btn:is([data-copy], [data-copy-from], [data-copy-live], [data-reset], #photo-copy, #finish-page, #pull-all) { min-block-size: 2.75rem; }
+      .wal-btn:is([data-copy], [data-copy-from], [data-copy-live], [data-copy-link], [data-reset], [commandfor="palette-panel"], #photo-copy, #finish-page, #pull-all, #vibe-download, #vibe-off) { min-block-size: 2.75rem; }
       /* Padding, not flex, so the summary keeps its disclosure triangle. */
       .site-code > summary { padding-block: calc((2.75rem - 1lh) / 2); }
       .site-foot nav a { display: inline-flex; align-items: center; min-block-size: 2.75rem; }
@@ -920,6 +922,11 @@
       /* Colour is the content here: the swatches, ramps and dots stay. */
       .site-ramp li, .site-sw, .site-dots > i, .site-seg button > i, .site-plaque > i, .site-rod input[data-track] { forced-color-adjust: none; }
       .site-rod input:not([data-track]) { appearance: auto; background: none; }
+      .site-vibe { border: 1px solid ButtonText; }
+      .site-vibe[aria-pressed="true"] { border: 3px solid Highlight; }
+      .site-vibe[aria-pressed="true"]::after { forced-color-adjust: none; background: Highlight; color: HighlightText; }
+      .site-vibe-chips > i { forced-color-adjust: none; }
+      :root[data-texture] body::before { display: none; }
     }
 
     @media print {
@@ -927,6 +934,67 @@
       .site-code > pre { display: block; }
       /* Tiles that never scrolled into view still print. */
       .site-js .site-reveal { opacity: 1; translate: none; transition: none; }
+    }
+    /* ── From a vibe ──
+       Each card is drawn in its own vibe: its face, its corners and its
+       colours, light and dark. The applied set's texture is one overlay on
+       the page, on body::before because walnut's wash is body::after. */
+    .site-vibes { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 10.5rem), 1fr)); gap: .9rem; }
+    .site-vibe {
+      display: grid; gap: .55rem; align-content: start; justify-items: start; min-block-size: 9.5rem; padding: 1rem;
+      border: var(--wal-hairline) solid color-mix(in oklch, var(--vibe-accent) 35%, var(--wal-line));
+      border-radius: var(--vibe-radius); background: var(--vibe-ground); color: var(--wal-text);
+      position: relative; text-align: start; cursor: pointer; font: inherit;
+      transition: translate .2s ease, border-color .2s ease;
+    }
+    .site-vibe[data-shadow="hard"] { box-shadow: 3px 3px 0 0 color-mix(in oklch, var(--wal-text) 45%, transparent); }
+    .site-vibe[data-shadow="glow"] { box-shadow: 0 0 22px -6px color-mix(in oklch, var(--vibe-accent) 70%, transparent); }
+    .site-vibe[data-shadow="soft"] { box-shadow: var(--wal-shadow-sm); }
+    .site-vibe:hover { translate: 0 -2px; }
+    /* Two different marks, so a pressed card with focus shows both: the
+       ring is focus, the accent border and the check are pressed. */
+    .site-vibe:focus-visible { outline: 3px solid var(--wal-accent); outline-offset: 4px; }
+    .site-vibe[aria-pressed="true"] { border-color: var(--vibe-accent); }
+    .site-vibe[aria-pressed="true"]::after {
+      content: "\2713" / ""; position: absolute; inset-block-start: .6rem; inset-inline-end: .6rem;
+      display: grid; place-items: center; inline-size: 1.35rem; aspect-ratio: 1; border-radius: 50%;
+      background: var(--vibe-accent); color: var(--vibe-ground); font: 700 .75rem / 1 var(--wal-font-body);
+    }
+    /* Two lines kept for the mood, so the names line up across a row. */
+    .site-vibe-mood { min-block-size: 2lh; padding-inline-end: 1.6rem; font: 500 var(--wal-text-xs) / 1.25 var(--wal-font-label); letter-spacing: var(--wal-tracking-label); color: var(--wal-text-muted); }
+    .site-vibe-name { font: 400 1.45rem / 1.05 var(--vibe-font); color: var(--wal-text); }
+    .site-vibe-chips { display: flex; gap: .3rem; }
+    .site-vibe-chips > i { inline-size: .85rem; aspect-ratio: 1; border-radius: 50%; background: var(--c); }
+    .site-vibe-parts { margin-block-start: auto; font-size: var(--wal-text-xs); color: var(--wal-text-muted); }
+    .site-brief { display: grid; gap: .45rem; max-inline-size: 40rem; }
+    .site-brief-row { display: flex; flex-wrap: wrap; gap: .6rem; }
+    .site-brief-row > .wal-input { flex: 1 1 14rem; }
+    .site-brief[aria-busy="true"] .wal-btn { cursor: progress; }
+    .site-vibe-panel { display: grid; gap: .8rem; }
+    .site-vibe-panel > p { margin: 0; }
+    .site-vibe-panel-head { display: flex; flex-wrap: wrap; align-items: baseline; gap: .5rem 1rem; }
+    .site-vibe-panel-head > h3 { margin: 0; }
+    .site-trace { margin: .6rem 0 0; padding-inline-start: 1.25rem; display: grid; gap: .3rem; font-size: var(--wal-text-sm); color: var(--wal-text-soft); }
+    .site-trace code { font-family: var(--wal-font-label); color: var(--wal-text); }
+    .site-trace .is-refused { color: var(--wal-text-muted); }
+    .site-trace .is-refused code { text-decoration: line-through; }
+    .site-vibe-use { display: grid; gap: .6rem; }
+    .site-vibe-use > h4 { margin: 0; font: 600 var(--wal-text-sm) / 1.3 var(--wal-font-body); }
+    .site-vibe-use ol { margin: 0; padding-inline-start: 1.25rem; list-style: decimal; display: grid; gap: .25rem; font-size: var(--wal-text-sm); color: var(--wal-text-soft); }
+    @media (prefers-reduced-motion: reduce) { .site-vibe:hover { translate: none; } }
+    @media screen {
+      :root:is([data-texture="grain"], [data-texture="halftone"], [data-texture="scanlines"]) body::before {
+        content: ""; position: fixed; inset: 0; z-index: 300; pointer-events: none;
+      }
+      :root[data-texture="grain"] body::before {
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+        opacity: .16; mix-blend-mode: overlay;
+      }
+      :root[data-texture="halftone"] body::before {
+        background-image: radial-gradient(circle, color-mix(in oklch, var(--wal-text) 16%, transparent) 1px, transparent 1.7px);
+        background-size: 7px 7px; opacity: .35;
+      }
+      :root[data-texture="scanlines"] body::before { background-image: repeating-linear-gradient(to bottom, rgb(0 0 0 / .12) 0 1px, transparent 1px 3px); }
     }
   </style>
 </head>
@@ -1312,6 +1380,58 @@
                     <li>The strongest group becomes the accent. Up to four more are taken in order of strength, each at least 28° from any already taken, and the rest are filled in around the accent. The nearest to the accent becomes bloom, the furthest cool, and of the other two the one nearer yellow is gold.</li>
                     <li>Each colour is kept inside sRGB and every text pair is measured. A colour that fails is made less vivid, or its lightness moves the least amount that passes.</li>
                   </ol>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <section data-tab="From a vibe" id="theming-vibes">
+            <div class="site-stack">
+              <p class="site-soft">Pick a vibe and walnut sets a palette, fonts, corners, a shadow and a texture that suit it. Use it on this page, edit its colours, then copy the CSS or download it as a file to load after walnut.css. Every vibe passes AA in light and dark before it is offered.</p>
+              <div class="site-vibes" id="vibes" role="group" aria-label="Vibes"></div>
+              <p class="site-muted" id="vibes-nojs">Vibes are applied with JavaScript. Each is the same tokens shown in Your palette and Finishes.</p>
+              <form class="site-brief" id="brief-form">
+                <label class="wal-label" for="brief">Or describe a vibe</label>
+                <div class="site-brief-row">
+                  <input class="wal-input" id="brief" name="brief" type="text" autocomplete="off" minlength="3" maxlength="120" placeholder="a 1960s mission control, in teal" required aria-describedby="brief-hint brief-status">
+                  <button class="wal-btn wal-btn-primary" type="submit">Make a palette</button>
+                </div>
+                <span class="wal-hint" id="brief-hint">Checking what can answer…</span>
+                <span class="site-muted" id="brief-status" role="status"></span>
+              </form>
+              <div class="site-vibe-panel site-panel" id="vibe-panel" hidden>
+                <div class="site-vibe-panel-head">
+                  <h3 id="vibe-name"></h3>
+                  <span class="wal-badge" id="vibe-by"></span>
+                </div>
+                <p class="site-muted" id="vibe-score"></p>
+                <p class="site-soft" id="vibe-note" hidden></p>
+                <p class="site-muted" id="vibe-parts"></p>
+                <p class="site-muted" id="vibe-fallback" hidden></p>
+                <div class="site-actions">
+                  <button class="wal-btn wal-btn-primary wal-btn-sm" type="button" id="vibe-download">Download CSS</button>
+                  <button class="wal-btn wal-btn-secondary wal-btn-sm" type="button" data-copy-link>Copy link</button>
+                  <button class="wal-btn wal-btn-ghost wal-btn-sm" type="button" commandfor="palette-panel" command="show-modal">Edit palette</button>
+                  <button class="wal-btn wal-btn-ghost wal-btn-sm" type="button" id="vibe-off">Remove from this page</button>
+                </div>
+                <details class="site-code" id="vibe-trace-wrap" hidden>
+                  <summary>How it was picked</summary>
+                  <ol class="site-trace" id="vibe-trace"></ol>
+                </details>
+                <div class="site-vibe-use">
+                  <h4>Use it on your site</h4>
+                  <ol>
+                    <li>Download <code id="vibe-file">walnut-vibe.css</code>, or copy the CSS below into a file of your own.</li>
+                    <li>Load it after walnut.css, so its tokens win. Nothing else changes: every walnut component reads them.</li>
+                  </ol>
+                  <div class="site-codebox">
+                    <pre id="vibe-use" tabindex="0" role="region" aria-label="The two link tags"></pre>
+                    <button class="wal-btn wal-btn-secondary wal-btn-sm" type="button" data-copy-from="vibe-use" aria-label="Copy the two link tags">Copy</button>
+                  </div>
+                </div>
+                <div class="site-codebox">
+                  <pre id="vibe-css" tabindex="0" role="region" aria-label="The vibe's CSS"></pre>
+                  <button class="wal-btn wal-btn-secondary wal-btn-sm" type="button" data-copy-from="vibe-css" aria-label="Copy the vibe's CSS">Copy</button>
                 </div>
               </div>
             </div>
@@ -2138,7 +2258,7 @@ walnut.shuffle(materials, () =&gt; showOnly("Wood"));</pre></details>
         <p class="site-muted">Bloom follows the accent at +27° and cool at +209°, unless a palette sets them.</p>
         <div class="site-actions">
           <button class="wal-btn wal-btn-primary wal-btn-sm" type="button" data-roll>Random palette</button>
-          <button class="wal-btn wal-btn-secondary wal-btn-sm" type="button" data-copy-live>Copy CSS</button>
+          <button class="wal-btn wal-btn-secondary wal-btn-sm" type="button" data-copy-live>Copy palette CSS</button>
           <button class="wal-btn wal-btn-secondary wal-btn-sm" type="button" data-copy-link>Copy link</button>
           <button class="wal-btn wal-btn-ghost wal-btn-sm" type="button" data-reset aria-label="Reset palette">Reset</button>
         </div>
@@ -3389,5 +3509,6 @@ walnut.shuffle(materials, () =&gt; showOnly("Wood"));</pre></details>
       if (target) { walnut.tabs?.show(target); requestAnimationFrame(() => target.scrollIntoView()); }
     }
   </script>
+  <script type="module" src="vibes.mjs"></script>
 </body>
 </html>

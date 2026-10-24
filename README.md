@@ -215,6 +215,19 @@ To scope a whole script to a subtree, add `.wal-palette`:
 
 That includes bloom and cool: inside a `.wal-palette` they follow the accent in effect there, even under a palette that stated its own. Set them on the same element to pin them. A `data-finish` on a subtree re-derives only what a finish owns — rules and shadows — never a colour.
 
+### Theming by vibe
+
+The [docs](https://walnut-css.vercel.app/#theming-vibes) can theme a site by vibe. A vibe is the tokens above, chosen together: hue rods, display, label and body faces, `--wal-radius` and its kin, a shadow and a texture. Each one passes AA in light and dark before it is offered. Pick one, edit its colours if you like, and download it:
+
+```html
+<link rel="stylesheet" href="walnut.min.css">
+<link rel="stylesheet" href="walnut-noir.css"> <!-- after walnut, so its tokens win -->
+```
+
+The file is plain custom properties on `:root`, plus a Google Fonts `@import` for its faces. Nothing else in walnut changes: every component reads the same tokens.
+
+You can also describe a vibe ("a 1960s mission control, in teal"). With `GEMINI_API_KEY` set on the deployment (see `.env.example`), a Gemini agent in `api/vibe.mjs` picks from the same vetted parts through tool calls. It cannot write CSS, and code checks every pick, contrast included, before it counts. Without a key, rules match the words to a vibe, or say they can't. The limits are in code: 8 descriptions per visitor an hour, a model budget per day, and a 15 s deadline before the rules take over.
+
 ---
 
 ## Components
