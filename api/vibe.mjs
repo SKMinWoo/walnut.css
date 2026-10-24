@@ -6,14 +6,16 @@
    It cannot write CSS: it picks a typeface id, a corner, a shadow, a texture
    and hue rods, and every pick is checked in code (docs/sets.mjs, checkSet)
    before it counts. A refused set goes back to the model with the reasons;
-   after three, or with no key or budget, the rules match it to a vibe.
+   after three, past its deadline, or with no key or budget, the rules match
+   it to a vibe, and say so when they can't.
 
    The description is the only reader text the model sees, quoted as data
    and capped in length. Nothing is stored: the set comes back to the page,
    and a link to it carries the set itself.
 
    GET answers whether the model or the rules will answer, so the page never
-   promises a model that is not configured.
+   promises a model that is not configured. Cached briefly at the edge: it
+   only changes when the key does.
 ═══════════════════════════════════════════════════ */
 
 import { BODY, CHIPS, CORNERS, DISPLAY, LABEL, NAME_MAX, NOTE_MAX, SHADOWS, TEXTURES, VIBES, checkSet, cleanBrief, matchVibe } from "../docs/sets.mjs";
@@ -96,12 +98,13 @@ async function traced(trace, tool, fn, describe) {
 
 const said = (r) => (r.ok ? { detail: "passes every check" } : { detail: r.problems.slice(0, 2).join("; "), refused: true });
 
-async function modelPick(brief, trace) {
+async function modelPick(brief, trace, deadlineMs) {
   let accepted = null;
   let attempts = 0;
   const tools = [
     {
-      declaration: { name: "list_parts", description: "The vetted parts a set may use, with example sets.", parameters: { type: "object", properties: {} } },
+      // No parameters at all: Gemini rejects an object schema with no properties.
+      declaration: { name: "list_parts", description: "The vetted parts a set may use, with example sets." },
       run: async () => traced(trace, "list_parts", () => ({ response: partsList() }), () => ({ detail: "read the parts rack" })),
     },
     {
@@ -131,6 +134,7 @@ async function modelPick(brief, trace) {
     tools,
     maxTurns: 8,
     temperature: 0.9,
+    deadlineMs,
     // Retries and fallback models are shown, not hidden: the trace is the record.
     onNote: (detail) => trace.push({ tool: "gemini", detail, ms: 0 }),
   });
@@ -138,14 +142,15 @@ async function modelPick(brief, trace) {
 }
 
 /**
- * A set for a description. The model runs only when `modelAllowed`; whatever
- * happens a checked set comes back, and `by` says honestly what made it.
+ * A set for a description. The model runs only when `modelAllowed`; past
+ * that, the rules answer with a checked set or a refusal, and `by` says
+ * honestly what made it. `busy` says the hour's model budget is what stopped it.
  */
-export async function describeVibe(brief, modelAllowed) {
+export async function describeVibe(brief, modelAllowed, { busy = false, deadlineMs } = {}) {
   const trace = [];
   if (modelAllowed) {
     try {
-      const r = await modelPick(brief, trace);
+      const r = await modelPick(brief, trace, deadlineMs);
       if (r) return { set: r.set, note: r.note, by: "gemini", trace };
       trace.push({ tool: "fallback", detail: "the model did not deliver a set that passed its checks", ms: 0, refused: true });
     } catch (e) {
@@ -153,21 +158,23 @@ export async function describeVibe(brief, modelAllowed) {
     }
   } else {
     // Say which it was: "no key" and "budget spent" have different fixes.
-    const why = geminiConfigured() ? "today's model budget is spent" : "no model key is configured";
+    const why = !geminiConfigured() ? "no model key is configured" : busy ? "this hour's model budget is spent" : "today's model budget is spent";
     trace.push({ tool: "setup", detail: `${why}; the rules will answer`, ms: 0 });
   }
-  const proposal = await traced(trace, "match_vibe", () => matchVibe(brief), (p) => ({ detail: `matched “${p.set.name}”` }));
+  const proposal = await traced(trace, "match_vibe", () => matchVibe(brief),
+    (p) => (p.set ? { detail: `matched “${p.set.name}”` } : { detail: "no vibe in those words", refused: true }));
+  if (!proposal.set) return { refusal: proposal.refusal, by: "rules", trace };
   // The rules only assemble vibe cards, but they answer to the same checks.
   const checked = checkSet({ ...proposal.set, note: proposal.note });
   if (!checked.ok) throw new Error(`the rules produced an invalid set: ${checked.problems.join("; ")}`);
   return { set: checked.set, note: checked.note, by: "rules", trace };
 }
 
-const json = (body, status = 200) =>
-  new Response(JSON.stringify(body), { status, headers: { "Content-Type": "application/json", "Cache-Control": "no-store" } });
+const json = (body, status = 200, cache = "no-store") =>
+  new Response(JSON.stringify(body), { status, headers: { "Content-Type": "application/json", "Cache-Control": cache } });
 
 export function GET() {
-  return json({ by: geminiConfigured() ? "gemini" : "rules" });
+  return json({ by: geminiConfigured() ? "gemini" : "rules" }, 200, "public, max-age=0, s-maxage=300");
 }
 
 export async function POST(request) {
@@ -189,13 +196,17 @@ export async function POST(request) {
   const who = visitorOf(request);
   const used = usage(who, now);
   if (used.visitor >= PER_VISITOR_HOURLY) return json({ error: "That's a lot of palettes for one hour. Pick a vibe above, or come back later." }, 429);
-  if (used.all >= ALL_HOURLY) return json({ error: "Lots of people are describing vibes this hour. Pick one above, or come back later." }, 429);
-
-  const modelAllowed = geminiConfigured() && used.model < MODEL_DAILY;
+  // Past the hour's cap the model rests, but the rules cost nothing to ask.
+  const busy = used.all >= ALL_HOURLY;
+  const modelAllowed = geminiConfigured() && !busy && used.model < MODEL_DAILY;
   runs.push({ at: now, who, model: modelAllowed });
   try {
-    return json(await describeVibe(brief, modelAllowed));
-  } catch {
+    const r = await describeVibe(brief, modelAllowed, { busy });
+    if (r.refusal) return json({ error: r.refusal, trace: r.trace }, 422);
+    return json(r);
+  } catch (e) {
+    // The reader gets a plain sentence; the log gets the reason.
+    console.error("POST /api/vibe failed:", e);
     return json({ error: "That one couldn't be made. Pick a vibe above." }, 500);
   }
 }

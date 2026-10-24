@@ -1,8 +1,8 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
-import { VIBES, RAMP, CAP, OFFSET, checkSet, cssOf, decodeLook, encodeLook, fileOf, matchVibe, varsOf, vibeSet } from "../docs/sets.mjs";
-import { describeVibe } from "../api/vibe.mjs";
+import { VIBES, RAMP, CAP, OFFSET, checkSet, cssOf, decodeLook, encodeLook, fileOf, hasBlockedWord, matchVibe, varsOf, vibeSet } from "../docs/sets.mjs";
+import { POST, describeVibe } from "../api/vibe.mjs";
 
 const tokens = readFileSync(new URL("../src/layers/01-tokens.css", import.meta.url), "utf8");
 const stock = tokens.slice(tokens.indexOf("═══ THE DEFAULT SCRIPT ═══"));
@@ -109,4 +109,69 @@ test("the export is a file to load after walnut.css, with the colours on screen"
   assert.equal(fileOf(set), "walnut-noir.css");
   assert.equal(fileOf({ name: "Teal Mid-century" }), "walnut-teal-mid-century.css");
   assert.equal(fileOf({ name: "Café Noir" }), "walnut-cafe-noir.css");
+});
+
+test("a part must be the part's name, not something that contains it", () => {
+  const set = vibeSet(VIBES[0]);
+  for (const k of ["display", "label", "body", "corners", "shadow"]) {
+    const r = checkSet({ ...set, [k]: [set[k]] });
+    assert.ok(!r.ok, k);
+  }
+});
+
+test("the wording guard reads digits as letters and short words whole", () => {
+  for (const bad of ["Sh1t Show", "Wank Club", "F4ggot", "Nazi Chic"]) assert.ok(hasBlockedWord(bad), bad);
+  for (const fine of ["Swank Lounge", "Cocktail Hour", "Scunthorpe Seaside", "1970s Disco", "Teal 50s Diner"]) assert.ok(!hasBlockedWord(fine), fine);
+});
+
+test("the rules refuse a description that names no vibe, rather than guess", () => {
+  const r = matchVibe("quarterly earnings report");
+  assert.equal(r.set, null);
+  assert.match(r.refusal, /don't know that vibe/);
+  // Words reviewers tried, which used to fall through to a guess.
+  assert.equal(matchVibe("cyberpunk hacker terminal").set.vibe, "arcade");
+  assert.equal(matchVibe("calm minimalist bakery").set.vibe, "midcentury");
+  assert.equal(matchVibe("a rainy night in the city").set.vibe, "noir");
+});
+
+test("a model that runs past its deadline is cancelled, and the rules answer", async () => {
+  const saved = { key: process.env.GEMINI_API_KEY, fallbacks: process.env.GEMINI_FALLBACK_MODELS, fetch: globalThis.fetch };
+  process.env.GEMINI_API_KEY = "test-key";
+  process.env.GEMINI_FALLBACK_MODELS = "none";
+  // A model that never answers: the request ends only when it is aborted.
+  globalThis.fetch = (_url, { signal }) => new Promise((_, reject) => signal.addEventListener("abort", () => reject(signal.reason)));
+  try {
+    const started = Date.now();
+    const r = await describeVibe("art deco hotel lobby", true, { deadlineMs: 60 });
+    assert.ok(Date.now() - started < 2000);
+    assert.equal(r.by, "rules");
+    assert.equal(r.set.vibe, "deco");
+    assert.match(r.trace.find((t) => t.tool === "fallback").detail, /deadline/);
+  } finally {
+    globalThis.fetch = saved.fetch;
+    for (const [k, v] of [["GEMINI_API_KEY", saved.key], ["GEMINI_FALLBACK_MODELS", saved.fallbacks]]) {
+      if (v === undefined) delete process.env[k]; else process.env[k] = v;
+    }
+  }
+});
+
+test("POST /api/vibe turns away other sites and oversized bodies, and says when the rules can't help", async () => {
+  const before = process.env.GEMINI_API_KEY;
+  delete process.env.GEMINI_API_KEY;
+  const ask = (body, headers = {}) => POST(new Request("https://walnut.test/api/vibe", {
+    method: "POST", body, headers: { "Content-Type": "application/json", "x-real-ip": "203.0.113.9", ...headers },
+  }));
+  try {
+    assert.equal((await ask(JSON.stringify({ brief: "noir" }), { Origin: "https://elsewhere.test" })).status, 403);
+    assert.equal((await ask("x".repeat(3000), { "Content-Length": "3000" })).status, 413);
+    assert.equal((await ask("{not json")).status, 400);
+    const refused = await ask(JSON.stringify({ brief: "quarterly earnings report" }), { Origin: "https://walnut.test" });
+    assert.equal(refused.status, 422);
+    assert.match((await refused.json()).error, /don't know that vibe/);
+    const ok = await ask(JSON.stringify({ brief: "moody noir" }), { Origin: "https://walnut.test" });
+    assert.equal(ok.status, 200);
+    assert.equal((await ok.json()).set.vibe, "noir");
+  } finally {
+    if (before !== undefined) process.env.GEMINI_API_KEY = before;
+  }
 });

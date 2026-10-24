@@ -278,7 +278,7 @@
       .site-nav .wal-nav-actions > .wal-btn { min-block-size: 2.75rem; min-inline-size: 2.75rem; justify-content: center; }
       .site-nav .wal-nav-links a { display: inline-flex; align-items: center; min-block-size: 2.75rem; }
       .site-seg button, .site-door-head > button,
-      .wal-btn:is([data-copy], [data-copy-from], [data-copy-live], [data-reset], #photo-copy, #finish-page, #pull-all) { min-block-size: 2.75rem; }
+      .wal-btn:is([data-copy], [data-copy-from], [data-copy-live], [data-copy-link], [data-reset], [commandfor="palette-panel"], #photo-copy, #finish-page, #pull-all, #vibe-download, #vibe-off) { min-block-size: 2.75rem; }
       /* Padding, not flex, so the summary keeps its disclosure triangle. */
       .site-code > summary { padding-block: calc((2.75rem - 1lh) / 2); }
       .site-foot nav a { display: inline-flex; align-items: center; min-block-size: 2.75rem; }
@@ -920,6 +920,11 @@
       /* Colour is the content here: the swatches, ramps and dots stay. */
       .site-ramp li, .site-sw, .site-dots > i, .site-seg button > i, .site-plaque > i, .site-rod input[data-track] { forced-color-adjust: none; }
       .site-rod input:not([data-track]) { appearance: auto; background: none; }
+      .site-vibe { border: 1px solid ButtonText; }
+      .site-vibe[aria-pressed="true"] { border: 3px solid Highlight; }
+      .site-vibe[aria-pressed="true"]::after { forced-color-adjust: none; background: Highlight; color: HighlightText; }
+      .site-vibe-chips > i { forced-color-adjust: none; }
+      :root[data-texture] body::before { display: none; }
     }
 
     @media print {
@@ -937,16 +942,24 @@
       display: grid; gap: .55rem; align-content: start; justify-items: start; min-block-size: 9.5rem; padding: 1rem;
       border: var(--wal-hairline) solid color-mix(in oklch, var(--vibe-accent) 35%, var(--wal-line));
       border-radius: var(--vibe-radius); background: var(--vibe-ground); color: var(--wal-text);
-      text-align: start; cursor: pointer; font: inherit;
-      transition: translate .2s ease, outline-color .2s ease;
-      outline: 2px solid transparent; outline-offset: 3px;
+      position: relative; text-align: start; cursor: pointer; font: inherit;
+      transition: translate .2s ease, border-color .2s ease;
     }
     .site-vibe[data-shadow="hard"] { box-shadow: 3px 3px 0 0 color-mix(in oklch, var(--wal-text) 45%, transparent); }
     .site-vibe[data-shadow="glow"] { box-shadow: 0 0 22px -6px color-mix(in oklch, var(--vibe-accent) 70%, transparent); }
     .site-vibe[data-shadow="soft"] { box-shadow: var(--wal-shadow-sm); }
     .site-vibe:hover { translate: 0 -2px; }
-    .site-vibe:focus-visible, .site-vibe[aria-pressed="true"] { outline-color: var(--vibe-accent); }
-    .site-vibe-mood { font: 500 var(--wal-text-xs) / 1 var(--wal-font-label); letter-spacing: var(--wal-tracking-label); color: var(--wal-text-muted); }
+    /* Two different marks, so a pressed card with focus shows both: the
+       ring is focus, the accent border and the check are pressed. */
+    .site-vibe:focus-visible { outline: 3px solid var(--wal-accent); outline-offset: 4px; }
+    .site-vibe[aria-pressed="true"] { border-color: var(--vibe-accent); }
+    .site-vibe[aria-pressed="true"]::after {
+      content: "\2713" / ""; position: absolute; inset-block-start: .6rem; inset-inline-end: .6rem;
+      display: grid; place-items: center; inline-size: 1.35rem; aspect-ratio: 1; border-radius: 50%;
+      background: var(--vibe-accent); color: var(--vibe-ground); font: 700 .75rem / 1 var(--wal-font-body);
+    }
+    /* Two lines kept for the mood, so the names line up across a row. */
+    .site-vibe-mood { min-block-size: 2lh; padding-inline-end: 1.6rem; font: 500 var(--wal-text-xs) / 1.25 var(--wal-font-label); letter-spacing: var(--wal-tracking-label); color: var(--wal-text-muted); }
     .site-vibe-name { font: 400 1.45rem / 1.05 var(--vibe-font); color: var(--wal-text); }
     .site-vibe-chips { display: flex; gap: .3rem; }
     .site-vibe-chips > i { inline-size: .85rem; aspect-ratio: 1; border-radius: 50%; background: var(--c); }
@@ -976,10 +989,10 @@
         opacity: .16; mix-blend-mode: overlay;
       }
       :root[data-texture="halftone"] body::before {
-        background-image: radial-gradient(circle, color-mix(in oklch, var(--wal-text) 24%, transparent) 1px, transparent 1.7px);
-        background-size: 7px 7px; opacity: .45;
+        background-image: radial-gradient(circle, color-mix(in oklch, var(--wal-text) 16%, transparent) 1px, transparent 1.7px);
+        background-size: 7px 7px; opacity: .35;
       }
-      :root[data-texture="scanlines"] body::before { background-image: repeating-linear-gradient(to bottom, rgb(0 0 0 / .22) 0 1px, transparent 1px 3px); }
+      :root[data-texture="scanlines"] body::before { background-image: repeating-linear-gradient(to bottom, rgb(0 0 0 / .12) 0 1px, transparent 1px 3px); }
     }
   </style>
 </head>
@@ -1389,16 +1402,15 @@
                   <h3 id="vibe-name"></h3>
                   <span class="wal-badge" id="vibe-by"></span>
                 </div>
-                <p class="site-soft" id="vibe-note"></p>
+                <p class="site-muted" id="vibe-score"></p>
+                <p class="site-soft" id="vibe-note" hidden></p>
                 <p class="site-muted" id="vibe-parts"></p>
                 <p class="site-muted" id="vibe-fallback" hidden></p>
-                <p class="site-muted" id="vibe-score"></p>
                 <div class="site-actions">
                   <button class="wal-btn wal-btn-primary wal-btn-sm" type="button" id="vibe-download">Download CSS</button>
-                  <button class="wal-btn wal-btn-secondary wal-btn-sm" type="button" data-copy-from="vibe-css">Copy CSS</button>
                   <button class="wal-btn wal-btn-secondary wal-btn-sm" type="button" data-copy-link>Copy link</button>
                   <button class="wal-btn wal-btn-ghost wal-btn-sm" type="button" commandfor="palette-panel" command="show-modal">Edit palette</button>
-                  <button class="wal-btn wal-btn-ghost wal-btn-sm" type="button" id="vibe-off">Remove from page</button>
+                  <button class="wal-btn wal-btn-ghost wal-btn-sm" type="button" id="vibe-off">Remove from this page</button>
                 </div>
                 <details class="site-code" id="vibe-trace-wrap" hidden>
                   <summary>How it was picked</summary>
@@ -1411,12 +1423,12 @@
                     <li>Load it after walnut.css, so its tokens win. Nothing else changes: every walnut component reads them.</li>
                   </ol>
                   <div class="site-codebox">
-                    <pre id="vibe-use"></pre>
+                    <pre id="vibe-use" tabindex="0" role="region" aria-label="The two link tags"></pre>
                     <button class="wal-btn wal-btn-secondary wal-btn-sm" type="button" data-copy-from="vibe-use" aria-label="Copy the two link tags">Copy</button>
                   </div>
                 </div>
                 <div class="site-codebox">
-                  <pre id="vibe-css"></pre>
+                  <pre id="vibe-css" tabindex="0" role="region" aria-label="The vibe's CSS"></pre>
                   <button class="wal-btn wal-btn-secondary wal-btn-sm" type="button" data-copy-from="vibe-css" aria-label="Copy the vibe's CSS">Copy</button>
                 </div>
               </div>
@@ -2244,7 +2256,7 @@ walnut.shuffle(materials, () =&gt; showOnly("Wood"));</pre></details>
         <p class="site-muted">Bloom follows the accent at +27° and cool at +209°, unless a palette sets them.</p>
         <div class="site-actions">
           <button class="wal-btn wal-btn-primary wal-btn-sm" type="button" data-roll>Random palette</button>
-          <button class="wal-btn wal-btn-secondary wal-btn-sm" type="button" data-copy-live>Copy CSS</button>
+          <button class="wal-btn wal-btn-secondary wal-btn-sm" type="button" data-copy-live>Copy palette CSS</button>
           <button class="wal-btn wal-btn-secondary wal-btn-sm" type="button" data-copy-link>Copy link</button>
           <button class="wal-btn wal-btn-ghost wal-btn-sm" type="button" data-reset aria-label="Reset palette">Reset</button>
         </div>

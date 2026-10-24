@@ -34,6 +34,10 @@ const RETRY_DELAYS_MS = [700, 2000];
 const FALLBACK_MODELS = ["gemini-3.6-flash", "gemini-3.5-flash", "gemini-3.7-flash", "gemini-3.8-flash", "gemini-3.1-flash-lite"];
 /** The cascade stops trying new models after this, so a reader never waits long for the rules. */
 const CASCADE_BUDGET_MS = 20_000;
+/* The whole run, every turn and retry included: past it the request is
+   cancelled and the caller falls back. Inside a 30 s function limit, with
+   room left for the rules to answer. */
+export const DEADLINE_MS = 15_000;
 
 const isTransientStatus = (status) => status === 408 || status === 429 || status >= 500;
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
@@ -50,9 +54,8 @@ function fallbackModels(primary) {
 const geminiKey = () => process.env.GEMINI_API_KEY || process.env.GOOGLE_GENERATIVE_AI_API_KEY || process.env.GOOGLE_API_KEY || undefined;
 export const geminiConfigured = () => Boolean(geminiKey());
 
-async function generate(model, key, system, tools, contents, temperature) {
-  const ctrl = new AbortController();
-  const timer = setTimeout(() => ctrl.abort(), TURN_TIMEOUT_MS);
+async function generate(model, key, system, tools, contents, temperature, deadline) {
+  const turn = AbortSignal.timeout(TURN_TIMEOUT_MS);
   try {
     const res = await fetch(`${ENDPOINT}/${encodeURIComponent(model)}:generateContent`, {
       method: "POST",
@@ -64,7 +67,7 @@ async function generate(model, key, system, tools, contents, temperature) {
         toolConfig: { functionCallingConfig: { mode: "AUTO" } },
         generationConfig: { temperature, maxOutputTokens: 1024 },
       }),
-      signal: ctrl.signal,
+      signal: AbortSignal.any([turn, deadline.signal]),
     });
     // Status only: the body can echo request details, and none of it belongs in a public trace.
     if (!res.ok) throw new GeminiUnavailable(`Gemini returned HTTP ${res.status}`, isTransientStatus(res.status), res.status);
@@ -73,18 +76,18 @@ async function generate(model, key, system, tools, contents, temperature) {
     return { role: "model", parts: content.parts };
   } catch (e) {
     if (e instanceof GeminiUnavailable) throw e;
-    throw ctrl.signal.aborted ? new GeminiUnavailable("Gemini timed out") : new GeminiUnavailable("Gemini could not be reached", true);
-  } finally {
-    clearTimeout(timer);
+    if (deadline.signal.aborted) throw new GeminiUnavailable(`Gemini ran past its ${deadline.ms / 1000} s deadline`);
+    throw turn.aborted ? new GeminiUnavailable("Gemini timed out") : new GeminiUnavailable("Gemini could not be reached", true);
   }
 }
 
-async function withRetry(fn, delays, onRetry) {
+
+async function withRetry(fn, delays, onRetry, deadline) {
   for (let attempt = 0; ; attempt++) {
     try {
       return await fn();
     } catch (e) {
-      if (attempt >= delays.length || !(e instanceof GeminiUnavailable && e.transient)) throw e;
+      if (attempt >= delays.length || !(e instanceof GeminiUnavailable && e.transient) || deadline.signal.aborted) throw e;
       const wait = Math.round(delays[attempt] * (0.75 + Math.random() * 0.5));
       onRetry?.(e, wait);
       await sleep(wait);
@@ -97,9 +100,10 @@ async function withRetry(fn, delays, onRetry) {
  * returns { response, done? }; its arguments come from the model and are
  * untrusted. `onNote` hears about retries and fallback models, for the trace.
  */
-export async function runGeminiAgent({ system, input, tools, maxTurns = 8, temperature = 0.8, onNote }) {
+export async function runGeminiAgent({ system, input, tools, maxTurns = 8, temperature = 0.8, deadlineMs = DEADLINE_MS, onNote }) {
   const key = geminiKey();
   if (!key) throw new GeminiUnavailable("No GEMINI_API_KEY configured");
+  const deadline = { signal: AbortSignal.timeout(deadlineMs), ms: deadlineMs };
   let model = process.env.GEMINI_MODEL || DEFAULT_MODEL;
   const byName = new Map(tools.map((t) => [t.declaration.name, t]));
   const contents = [{ role: "user", parts: [{ text: input }] }];
@@ -112,14 +116,14 @@ export async function runGeminiAgent({ system, input, tools, maxTurns = 8, tempe
     let reply;
     for (const [i, m] of candidates.entries()) {
       try {
-        reply = await withRetry(() => generate(m, key, system, tools, contents, temperature), i === 0 ? RETRY_DELAYS_MS : [],
-          (e, ms) => onNote?.(`${m}: ${e.message}; retrying in ${(ms / 1000).toFixed(1)}s`));
+        reply = await withRetry(() => generate(m, key, system, tools, contents, temperature, deadline), i === 0 ? RETRY_DELAYS_MS : [],
+          (e, ms) => onNote?.(`${m}: ${e.message}; retrying in ${(ms / 1000).toFixed(1)}s`), deadline);
         model = m;
         break;
       } catch (e) {
         const next = candidates[i + 1];
         const another = e instanceof GeminiUnavailable && (e.transient || e.status === 404);
-        if (!next || !another) throw e;
+        if (!next || !another || deadline.signal.aborted) throw e;
         if (Date.now() - started > CASCADE_BUDGET_MS) {
           onNote?.(`${m}: ${e.message}; stopped asking after ${CASCADE_BUDGET_MS / 1000}s`);
           throw e;

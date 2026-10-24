@@ -73,16 +73,16 @@ export const CHIPS = [
    decades included, since people describe a look by when it was. */
 export const VIBES = [
   { vibe: "deco", name: "Art Deco", mood: "Gilded and geometric",
-    tags: ["deco", "art deco", "1920s", "20s", "gatsby", "jazz", "roaring", "speakeasy", "gold", "chrysler", "glamorous", "luxury"],
+    tags: ["deco", "art deco", "1920s", "20s", "gatsby", "jazz", "roaring", "speakeasy", "gold", "chrysler", "glamorous", "luxury", "hotel", "lobby"],
     // A copper bloom: at the accent's +27° it is a teal that misses AA under white text.
     hues: { ground: 95, accent: 165, gold: 85, bloom: 45 },
     display: "poiret", label: "dm-mono", body: "inter", corners: "square", shadow: "hard", texture: "none" },
   { vibe: "noir", name: "Noir", mood: "Moody and cinematic",
-    tags: ["noir", "film noir", "1940s", "40s", "detective", "crime", "rain", "hardboiled", "mystery", "black and white", "moody", "dark"],
+    tags: ["noir", "film noir", "1940s", "40s", "detective", "crime", "rain", "rainy", "hardboiled", "mystery", "black and white", "moody", "dark"],
     hues: { ground: 250, accent: 15, gold: 60 },
     display: "playfair", label: "courier", body: "georgia", corners: "square", shadow: "soft", texture: "grain" },
   { vibe: "midcentury", name: "Mid-century", mood: "Warm and modern",
-    tags: ["mid-century", "midcentury", "1950s", "50s", "eames", "atomic", "diner", "modern", "warm", "cosy", "cozy"],
+    tags: ["mid-century", "midcentury", "1950s", "50s", "eames", "atomic", "diner", "modern", "warm", "cosy", "cozy", "minimalist", "minimal", "calm", "scandinavian"],
     hues: { ground: 55, accent: 25, gold: 85 },
     display: "jost", label: "dm-mono", body: "inter", corners: "round", shadow: "soft", texture: "none" },
   { vibe: "mod", name: "Mod", mood: "Bold and playful",
@@ -94,7 +94,7 @@ export const VIBES = [
     hues: { ground: 45, accent: 25, gold: 75 },
     display: "shrikhand", label: "dm-mono", body: "inter", corners: "round", shadow: "glow", texture: "none" },
   { vibe: "arcade", name: "Arcade", mood: "Neon and pixelated",
-    tags: ["arcade", "1980s", "80s", "eighties", "neon", "synthwave", "retro game", "8-bit", "pixel", "crt", "vhs", "gaming"],
+    tags: ["arcade", "1980s", "80s", "eighties", "neon", "synthwave", "retro game", "8-bit", "pixel", "crt", "vhs", "gaming", "cyberpunk", "terminal", "hacker", "hackers", "video game"],
     hues: { ground: 285, accent: 320, gold: 95, cool: 195 },
     display: "vt323", label: "dm-mono", body: "inter", corners: "square", shadow: "glow", texture: "scanlines" },
   { vibe: "web", name: "Early web", mood: "Plain and nostalgic",
@@ -215,11 +215,15 @@ const KEYS = ["name", "vibe", "hues", "display", "label", "body", "corners", "sh
 
 /* Deliberately short: the name and note come from a model or a template, so
    this is a backstop, not a moderation system. Whole words for the short ones
-   (so "Cocktail Hour" survives), stems only where a stem has no innocent use. */
-const BLOCKED_WORDS = new Set(["shit", "dick", "cock", "rape", "nazi", "nazis", "hitler", "kkk", "retard", "retarded"]);
-const BLOCKED_STEMS = ["fuck", "cunt", "bitch", "whore", "slut", "porn", "wank", "twat", "pussy", "nigg", "fagg"];
+   (so "Cocktail Hour" and "Swank Lounge" survive), stems only where a stem
+   has no innocent use. Digits standing in for letters are read as the
+   letters, so "Sh1t" is the word it spells. */
+const BLOCKED_WORDS = new Set(["shit", "shits", "dick", "dicks", "cock", "cocks", "rape", "nazi", "nazis", "hitler", "kkk",
+  "retard", "retarded", "wank", "wanker", "wankers", "wanking", "cunt", "cunts"]);
+const BLOCKED_STEMS = ["fuck", "bitch", "whore", "slut", "porn", "twat", "pussy", "nigg", "fagg"];
+const LEET = { 0: "o", 1: "i", 3: "e", 4: "a", 5: "s", 7: "t", "@": "a", $: "s" };
 export function hasBlockedWord(text) {
-  const words = text.toLowerCase().split(/[^a-z]+/).filter(Boolean);
+  const words = text.toLowerCase().replace(/[013457@$]/g, (c) => LEET[c]).split(/[^a-z]+/).filter(Boolean);
   return words.some((w) => BLOCKED_WORDS.has(w) || BLOCKED_STEMS.some((s) => w.includes(s)));
 }
 
@@ -257,7 +261,8 @@ export function checkSet(args) {
     else hues[k] = Math.round(v * 10) / 10;
   }
   const pick = (k, table) => {
-    if (!Object.hasOwn(table, rest[k])) problems.push(`${k}: one of ${Object.keys(table).join(", ")}`);
+    // A string, not just a key: ["jost"] would find the "jost" key too.
+    if (typeof rest[k] !== "string" || !Object.hasOwn(table, rest[k])) problems.push(`${k}: one of ${Object.keys(table).join(", ")}`);
     return rest[k];
   };
   const set = {
@@ -380,12 +385,11 @@ const COLOUR_WORDS = {
   navy: 250, cobalt: 265, indigo: 275, violet: 290, purple: 300, lavender: 300, plum: 315,
   magenta: 330, pink: 350, flamingo: 350, rose: 355,
 };
-// FNV-1a: a stable choice when a description names no vibe at all.
-const hash = (text) => { let h = 0x811c9dc5; for (let i = 0; i < text.length; i++) h = Math.imul(h ^ text.charCodeAt(i), 0x01000193) >>> 0; return h; };
 const title = (w) => w.charAt(0).toUpperCase() + w.slice(1);
 // Whole word or phrase, so "mod" does not fire inside "modern".
 const mentions = (text, phrase) => new RegExp(`(^|[^a-z0-9])${phrase.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}([^a-z0-9]|$)`).test(text);
 
+/** The vibe and colour a description names, or a refusal when it names no vibe: a guess dressed as a match would mislead. */
 export function matchVibe(brief) {
   const text = brief.toLowerCase();
   // The vibe whose tags the words mention most; longer tags count for more,
@@ -395,13 +399,13 @@ export function matchVibe(brief) {
     const score = vibe.tags.filter((t) => mentions(text, t)).reduce((n, t) => n + t.length, 0);
     if (score > 0 && (!best || score > best.score)) best = { vibe, score };
   }
-  const vibe = best?.vibe ?? VIBES[hash(text) % VIBES.length];
+  if (!best) return { set: null, refusal: "The rules don't know that vibe yet. Try a decade, a genre or a mood, like 1970s disco or moody noir." };
+  const { vibe } = best;
   const base = vibeSet(vibe);
   const word = Object.keys(COLOUR_WORDS).find((w) => mentions(text, w));
   const tinted = word && { ...base, name: `${title(word)} ${vibe.name}`, hues: { ...base.hues, accent: COLOUR_WORDS[word] } };
   // A colour word only counts if the vibe still reads with it.
   const set = tinted && measure(tinted).fails.length === 0 ? tinted : base;
   const chip = set === tinted ? (CHIPS.find((c) => c.hue === COLOUR_WORDS[word])?.name ?? title(word)).toLowerCase() : null;
-  const why = best ? `Matched to the ${vibe.name} vibe` : `No vibe matched those words, so ${vibe.name} stands in`;
-  return { set, note: `${why}${chip ? `, with a ${chip} accent` : ""}.` };
+  return { set, note: `Matched to the ${vibe.name} vibe${chip ? `, with a ${chip} accent` : ""}.` };
 }

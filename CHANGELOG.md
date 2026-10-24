@@ -97,6 +97,16 @@ the platform can now draw with no script.
 
 ### Added
 
+- **Theming by vibe, in the docs.** Theming → From a vibe offers seven
+  vibes, Art Deco to Early web. Each is a palette with display, label and
+  body faces, corners, a shadow and a texture to match, and each passes AA
+  in light and dark. Apply one to the page, edit its colours, then download
+  it as `walnut-<name>.css`, a file to load after walnut.css. Or describe a
+  vibe: with `GEMINI_API_KEY` set, a Gemini agent picks from the same vetted
+  parts, and code checks every pick, contrast included, before the page
+  applies it. Without a key, rules match the words to a vibe, or say they
+  can't. The model has a 15 s deadline, and the function is capped at 30 s.
+  See `.env.example`.
 - **Openings.** `.wal-chest`, a plan chest of `<details>` drawers that
   slide out of their slots in the flow of the page. `.wal-door`, a sliding
   side panel on a `<dialog>` opened with `commandfor`, so it needs none of
