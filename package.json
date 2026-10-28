@@ -53,7 +53,8 @@
   ],
   "scripts": {
     "build": "node build.js",
-    "dev": "node build.js && npx serve public",
+    "dev": "node build.js && node scripts/dev.mjs",
+    "test": "node --test test/*.test.mjs",
     "prepublishOnly": "node build.js"
   },
   "devDependencies": {}
